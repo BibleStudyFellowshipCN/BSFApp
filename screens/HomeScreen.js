@@ -1,4 +1,6 @@
 import React from 'react';
+import { connect } from 'react-redux'
+import { FontAwesome } from '@expo/vector-icons';
 import {
   Image,
   Linking,
@@ -10,9 +12,11 @@ import {
   View,
 } from 'react-native';
 
+import Accordion from 'react-native-collapsible/Accordion';
+
 import { MonoText } from '../components/StyledText';
 
-export default class HomeScreen extends React.Component {
+class HomeScreen extends React.Component {
   static route = {
     navigationBar: {
       visible: false,
@@ -20,6 +24,7 @@ export default class HomeScreen extends React.Component {
   };
 
   render() {
+    console.log(this.props.books)
     return (
       <View style={styles.container}>
         <ScrollView
@@ -27,82 +32,46 @@ export default class HomeScreen extends React.Component {
           contentContainerStyle={styles.contentContainer}>
 
           <View style={styles.welcomeContainer}>
-            <Image
-              source={require('../assets/images/expo-wordmark.png')}
-              style={styles.welcomeImage}
-            />
-          </View>
-
-          <View style={styles.getStartedContainer}>
-            {this._maybeRenderDevelopmentModeWarning()}
-
-            <Text style={styles.getStartedText}>
-              Get started by opening
-            </Text>
-
-            <View
-              style={[
-                styles.codeHighlightContainer,
-                styles.homeScreenFilename,
-              ]}>
-              <MonoText style={styles.codeHighlightText}>
-                screens/HomeScreen.js
-              </MonoText>
-            </View>
-
-            <Text style={styles.getStartedText}>
-              Change this text and your app will automatically reload.
-            </Text>
-          </View>
-
-          <View style={styles.helpContainer}>
-            <TouchableOpacity
-              onPress={this._handleHelpPress}
-              style={styles.helpLink}>
-              <Text style={styles.helpLinkText}>
-                Help, it didn’t automatically reload!
-              </Text>
+            <TouchableOpacity onPress={(e) => console.log('eeeeeee', e)}>
+              <Image
+                source={require('../assets/images/expo-wordmark.png')}
+                style={styles.welcomeImage}
+              />
             </TouchableOpacity>
           </View>
-        </ScrollView>
 
-        <View style={styles.tabBarInfoContainer}>
-          <Text style={styles.tabBarInfoText}>
-            This is a tab bar. You can edit it in:
-          </Text>
-
-          <View
-            style={[styles.codeHighlightContainer, styles.navigationFilename]}>
-            <MonoText style={styles.codeHighlightText}>
-              navigation/RootNavigation.js
-            </MonoText>
+          <View style={styles.booksContainer}>
+            <Accordion 
+              sections={this.props.booklist}
+              renderHeader={this._renderHeader}
+              renderContent={this._renderContent}
+            />
           </View>
-        </View>
+        </ScrollView>
       </View>
     );
   }
 
-  _maybeRenderDevelopmentModeWarning() {
-    if (__DEV__) {
-      const learnMoreButton = (
-        <Text onPress={this._handleLearnMorePress} style={styles.helpLinkText}>
-          Learn more
-        </Text>
-      );
+  _renderHeader(content, index, isActive) {
+    return (
+      <View style={styles.bookHeader} >
+        <View style={styles.bookHeaderIcon}>
+          <FontAwesome
+            name={ isActive ? 'minus' : 'plus'}
+            size={16}
+          />
+        </View>
+        <Text style={styles.bookHeaderText}> { content.title } </Text>
+      </View>
+    )
+  }
 
-      return (
-        <Text style={styles.developmentModeText}>
-          Development mode is enabled, your app will run slightly slower but
-          you have access to useful development tools. {learnMoreButton}.
-        </Text>
-      );
-    } else {
-      return (
-        <Text style={styles.developmentModeText}>
-          You are not in development mode, your app will run at full speed.
-        </Text>
-      );
-    }
+  _renderContent(content, index, isActive) {
+    return (
+      <View>
+        { content.lessons.map(lesson => <Lesson key={lesson.id} lesson={lesson} />) }
+      </View>
+    )
   }
 
   _handleLearnMorePress = () => {
@@ -117,6 +86,24 @@ export default class HomeScreen extends React.Component {
     );
   };
 }
+
+const Lesson = (props) => (
+  <View>
+    <Text>
+      {props.lesson.name}
+    </Text>
+  </View>
+)
+
+const mapStateToProps = (state) => {
+  return {
+    booklist: state.books.booklist,
+  }
+}
+
+const mapDispatchToProps = { }
+
+export default connect(mapStateToProps, mapDispatchToProps)(HomeScreen)
 
 const styles = StyleSheet.create({
   container: {
@@ -144,64 +131,19 @@ const styles = StyleSheet.create({
     marginTop: 3,
     marginLeft: -10,
   },
-  getStartedContainer: {
+  booksContainer: {
+    marginHorizontal: 15,
+  },
+  bookHeader: {
+    flexDirection: 'row',
+    paddingVertical: 2,
+    backgroundColor: 'white',
+  },
+  bookHeaderIcon: {
     alignItems: 'center',
-    marginHorizontal: 50,
+    justifyContent: 'center',
   },
-  homeScreenFilename: {
-    marginVertical: 7,
-  },
-  codeHighlightText: {
-    color: 'rgba(96,100,109, 0.8)',
-  },
-  codeHighlightContainer: {
-    backgroundColor: 'rgba(0,0,0,0.05)',
-    borderRadius: 3,
-    paddingHorizontal: 4,
-  },
-  getStartedText: {
-    fontSize: 17,
-    color: 'rgba(96,100,109, 1)',
-    lineHeight: 23,
-    textAlign: 'center',
-  },
-  tabBarInfoContainer: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    ...Platform.select({
-      ios: {
-        shadowColor: 'black',
-        shadowOffset: { height: -3 },
-        shadowOpacity: 0.1,
-        shadowRadius: 3,
-      },
-      android: {
-        elevation: 20,
-      },
-    }),
-    alignItems: 'center',
-    backgroundColor: '#fbfbfb',
-    paddingVertical: 20,
-  },
-  tabBarInfoText: {
-    fontSize: 17,
-    color: 'rgba(96,100,109, 1)',
-    textAlign: 'center',
-  },
-  navigationFilename: {
-    marginTop: 5,
-  },
-  helpContainer: {
-    marginTop: 15,
-    alignItems: 'center',
-  },
-  helpLink: {
-    paddingVertical: 15,
-  },
-  helpLinkText: {
-    fontSize: 14,
-    color: '#2e78b7',
+  bookHeaderText: {
+    fontSize: 18,
   },
 });

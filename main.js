@@ -3,9 +3,13 @@ import React from 'react';
 import { Platform, StatusBar, StyleSheet, View } from 'react-native';
 import { NavigationProvider, StackNavigation } from '@expo/ex-navigation';
 import { FontAwesome } from '@expo/vector-icons';
+import { Provider } from 'react-redux'
 
+import createStore from './store/createStore'
 import Router from './navigation/Router';
 import cacheAssetsAsync from './utilities/cacheAssetsAsync';
+
+const store = createStore()
 
 class AppContainer extends React.Component {
   state = {
@@ -39,18 +43,19 @@ class AppContainer extends React.Component {
   render() {
     if (this.state.appIsReady) {
       return (
-        <View style={styles.container}>
-          <NavigationProvider router={Router}>
-            <StackNavigation
-              id="root"
-              initialRoute={Router.getRoute('rootNavigation')}
-            />
-          </NavigationProvider>
+        <Provider store={store}>
+          <View style={styles.container}>
+            <NavigationProvider router={Router}>
+              <StackNavigation
+                id="root"
+                initialRoute={Router.getRoute('rootNavigation')}
+              />
+            </NavigationProvider>
 
-          {Platform.OS === 'ios' && <StatusBar barStyle="default" />}
-          {Platform.OS === 'android' &&
-            <View style={styles.statusBarUnderlay} />}
-        </View>
+            {Platform.OS === 'ios' && <StatusBar barStyle="default" />}
+            {Platform.OS === 'android' && <View style={styles.statusBarUnderlay} />}
+          </View>
+        </Provider>
       );
     } else {
       return <Expo.AppLoading />;
