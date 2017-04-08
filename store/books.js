@@ -16,24 +16,33 @@ export function requestBooks () {
 // ------------------------------------
 const initialState = {
   booklist: [{
-    title: 'Matthew',
+    title: '约翰福音',
     lessons: [{
       id: 1,
       name: '第一课'
     }, {
       id: 2,
       name: '第二课'
-    }]
-  }, {
-    title: 'John',
-    lessons: [{
+    }, {
       id: 3,
-      name: '第一课'
+      name: '第三课'
     }, {
       id: 4,
-      name: '第二课'
+      name: '第四课'
     }, {
       id: 5,
+      name: '第五课'
+    }]
+  }, {
+    title: '罗马书 - 明年',
+    lessons: [{
+      id: 6,
+      name: '第一课'
+    }, {
+      id: 7,
+      name: '第二课'
+    }, {
+      id: 8,
       name: '第三课'
     }]
   }]

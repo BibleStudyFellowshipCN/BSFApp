@@ -31,13 +31,13 @@ class ClassScreen extends React.Component {
     return (
       <View style={styles.container}>
         <ScrollableTabView>
-          <DayQuestions tabLabel="一" requestPassage={requestPassage} />
-          <DayQuestions tabLabel="二" requestPassage={requestPassage} />
-          <DayQuestions tabLabel="三" requestPassage={requestPassage} />
-          <DayQuestions tabLabel="四" requestPassage={requestPassage} />
-          <DayQuestions tabLabel="五" requestPassage={requestPassage} />
-          <DayQuestions tabLabel="六" requestPassage={requestPassage} />
-          <DayQuestions tabLabel="七" requestPassage={requestPassage} />
+          <DayQuestions tabLabel="一" requestPassage={requestPassage} day={this.props.dayQuestions.one} />
+          <DayQuestions tabLabel="二" requestPassage={requestPassage} day={this.props.dayQuestions.two} />
+          <DayQuestions tabLabel="三" requestPassage={requestPassage} day={this.props.dayQuestions.three} />
+          <DayQuestions tabLabel="四" requestPassage={requestPassage} day={this.props.dayQuestions.four}/>
+          <DayQuestions tabLabel="五" requestPassage={requestPassage} day={this.props.dayQuestions.five}/>
+          <DayQuestions tabLabel="六" requestPassage={requestPassage} day={this.props.dayQuestions.six}/>
+          <DayQuestions tabLabel="七" requestPassage={requestPassage} day={this.props.dayQuestions.seven}/>
         </ScrollableTabView>
       </View>
     );
@@ -46,21 +46,21 @@ class ClassScreen extends React.Component {
 
 const DayQuestions = (props) => (
   <ScrollView style={styles.dayQuestionsContainer}>
-    <BSFQuestion requestPassage={props.requestPassage}  />
-    <BSFQuestion requestPassage={props.requestPassage}  />
-    <BSFQuestion requestPassage={props.requestPassage}  />
-    <BSFQuestion requestPassage={props.requestPassage}  />
-    <BSFQuestion requestPassage={props.requestPassage}  />
+    { props.day.questions.map(question => (
+      <BSFQuestion key={question.id} question={question} requestPassage={props.requestPassage}  />
+    )) }
   </ScrollView>
 )
 
 const BSFQuestion = (props) => (
   <View style={styles.BSFQuestionContainer}>
     <QuestionText>
-      7.这个神迹如何指出耶稣为灵 里饥饿的人所做的事？请将他 行神迹的步骤逐一列出。你可 以怎样依循这些步骤来给别人 生命的粮－－耶稣？ 参阅经文：
+      { props.question.questionText }
     </QuestionText>
-    <BibleQuote book='马可福音' verse='6:34-44' requestPassage={props.requestPassage}  />
-    <BibleQuote book='马可福音' verse='8:24-28' requestPassage={props.requestPassage} />
+    { props.question.quotes.map(quote => (
+      <BibleQuote key={quote.book + quote.verse} book={quote.book} verse={quote.verse} requestPassage={props.requestPassage}  />
+
+    )) }
     <Answer />
   </View>
 )
@@ -93,6 +93,8 @@ const Answer = (props) => (
 const mapStateToProps = (state) => {
   return {
     booklist: state.books.booklist,
+    answers: state.answers.answers,
+    dayQuestions: state.class.dayQuestions,
   }
 }
 

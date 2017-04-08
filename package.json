@@ -15,10 +15,12 @@
     "@expo/samples": "~1.0.3",
     "@yasaichi/redux-api-middleware": "git+https://github.com/yasaichi/redux-api-middleware.git",
     "expo": "^15.0.2",
+    "lodash": "^4.17.4",
     "react": "~15.4.0",
     "react-native": "https://github.com/exponent/react-native/archive/sdk-15.0.0.tar.gz",
     "react-native-collapsible": "^0.8.0",
     "react-native-scrollable-tab-view": "^0.7.4",
+    "react-native-storage": "^0.1.5",
     "react-redux": "^5.0.3",
     "redux": "^3.6.0",
     "redux-thunk": "^2.2.0"

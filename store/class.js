@@ -23,18 +23,40 @@ export function loadClass (lesson, navigator) {
 // Reducer
 // ------------------------------------
 const initialState = {
-  class: {
-    id: 0,
-    name: '第二十课',
-    dayQuestions:  {
-      one: {},
-      two: {},
-      three: {},
-      four: {},
-      five: {},
-      six: {},
-      seven: {},
-    }
+  id: 0,
+  name: '第二十课',
+  dayQuestions:  {
+    one: {
+      questions: [{
+        id: 1,
+        questionText: '7.这个神迹如何指出耶稣为灵 里饥饿的人所做的事？请将他 行神迹的步骤逐一列出。你可 以怎样依循这些步骤来给别人 生命的粮－－耶稣？ 参阅经文：',
+        answer: '',
+        quotes: [{
+          book: '马可福音',
+          verse: '8:24-28',
+        }, {
+          book: '马可福音',
+          verse: '6:34-38',
+        }]
+      }, {
+        id: 2,
+        questionText: '8.这个神迹如何指出耶稣为灵 里饥饿的人所做的事？请将他 行神迹的步骤逐一列出。你可 以怎样依循这些步骤来给别人 生命的粮－－耶稣？ 参阅经文：',
+        answer: '',
+        quotes: [{
+          book: '马可福音',
+          verse: '8:24-28',
+        }, {
+          book: '马可福音',
+          verse: '6:34-38',
+        }]
+      }]
+    },
+    two: { questions: [] },
+    three: { questions: [] },
+    four: { questions: [] },
+    five: { questions: [] },
+    six: { questions: [] },
+    seven: { questions: [] },
   }
 }
 

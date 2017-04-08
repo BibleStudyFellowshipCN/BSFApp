@@ -31,15 +31,6 @@ class HomeScreen extends React.Component {
           style={styles.container}
           contentContainerStyle={styles.contentContainer}>
 
-          <View style={styles.welcomeContainer}>
-            <TouchableOpacity onPress={(e) => console.log('eeeeeee', e)}>
-              <Image
-                source={require('../assets/images/expo-wordmark.png')}
-                style={styles.welcomeImage}
-              />
-            </TouchableOpacity>
-          </View>
-
           <View style={styles.booksContainer}>
             <Accordion 
               sections={this.props.booklist}
