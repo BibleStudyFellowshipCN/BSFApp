@@ -1,9 +1,11 @@
 import { combineReducers } from 'redux'
-import booksReducer from './books.js'
+import booksReducer from './books'
+import passageReducer from './passage'
 
 export const makeRootReducer = (asyncReducers) => {
   return combineReducers({
     books: booksReducer,
+    passage: passageReducer,
     ...asyncReducers
   })
 }

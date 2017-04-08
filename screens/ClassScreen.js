@@ -13,6 +13,8 @@ import {
 } from 'react-native';
 import ScrollableTabView from 'react-native-scrollable-tab-view'
 
+import { requestPassage } from '../store/passage.js'
+
 class ClassScreen extends React.Component {
   static route = {
     navigationBar: {
@@ -23,16 +25,19 @@ class ClassScreen extends React.Component {
   };
 
   render() {
+    const requestPassage = (book, verse) => {
+      this.props.requestPassage(book, verse, this.props.navigator)
+    } 
     return (
       <View style={styles.container}>
         <ScrollableTabView>
-          <DayQuestions tabLabel="一"/>
-          <DayQuestions tabLabel="二"/>
-          <DayQuestions tabLabel="三"/>
-          <DayQuestions tabLabel="四"/>
-          <DayQuestions tabLabel="五"/>
-          <DayQuestions tabLabel="六"/>
-          <DayQuestions tabLabel="七"/>
+          <DayQuestions tabLabel="一" requestPassage={requestPassage} />
+          <DayQuestions tabLabel="二" requestPassage={requestPassage} />
+          <DayQuestions tabLabel="三" requestPassage={requestPassage} />
+          <DayQuestions tabLabel="四" requestPassage={requestPassage} />
+          <DayQuestions tabLabel="五" requestPassage={requestPassage} />
+          <DayQuestions tabLabel="六" requestPassage={requestPassage} />
+          <DayQuestions tabLabel="七" requestPassage={requestPassage} />
         </ScrollableTabView>
       </View>
     );
@@ -41,11 +46,11 @@ class ClassScreen extends React.Component {
 
 const DayQuestions = (props) => (
   <ScrollView style={styles.dayQuestionsContainer}>
-    <BSFQuestion />
-    <BSFQuestion />
-    <BSFQuestion />
-    <BSFQuestion />
-    <BSFQuestion />
+    <BSFQuestion requestPassage={props.requestPassage}  />
+    <BSFQuestion requestPassage={props.requestPassage}  />
+    <BSFQuestion requestPassage={props.requestPassage}  />
+    <BSFQuestion requestPassage={props.requestPassage}  />
+    <BSFQuestion requestPassage={props.requestPassage}  />
   </ScrollView>
 )
 
@@ -54,8 +59,8 @@ const BSFQuestion = (props) => (
     <QuestionText>
       7.这个神迹如何指出耶稣为灵 里饥饿的人所做的事？请将他 行神迹的步骤逐一列出。你可 以怎样依循这些步骤来给别人 生命的粮－－耶稣？ 参阅经文：
     </QuestionText>
-    <BibleQuote book='马可福音' verse='6:34-44' />
-    <BibleQuote book='马可福音' verse='8:24-28' />
+    <BibleQuote book='马可福音' verse='6:34-44' requestPassage={props.requestPassage}  />
+    <BibleQuote book='马可福音' verse='8:24-28' requestPassage={props.requestPassage} />
     <Answer />
   </View>
 )
@@ -66,7 +71,7 @@ const QuestionText = (props) => (
 
 const BibleQuote = (props) => (
   <View style={{ flexDirection: 'row' }}>
-    <TouchableOpacity>
+    <TouchableOpacity onPress={() => props.requestPassage(props.book, props.verse)}>
       <View style={styles.bibleQuote}>
         <Text> { props.book } { props.verse }</Text>
       </View>
@@ -91,7 +96,7 @@ const mapStateToProps = (state) => {
   }
 }
 
-const mapDispatchToProps = { }
+const mapDispatchToProps = { requestPassage }
 
 export default connect(mapStateToProps, mapDispatchToProps)(ClassScreen)
 
