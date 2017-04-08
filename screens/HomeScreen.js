@@ -4,13 +4,13 @@ import { FontAwesome } from '@expo/vector-icons';
 import {
   Image,
   Linking,
-  Platform,
   ScrollView,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
 } from 'react-native';
+import { loadClass } from '../store/class.js'
 
 import Accordion from 'react-native-collapsible/Accordion';
 
@@ -43,8 +43,8 @@ class HomeScreen extends React.Component {
           <View style={styles.booksContainer}>
             <Accordion 
               sections={this.props.booklist}
-              renderHeader={this._renderHeader}
-              renderContent={this._renderContent}
+              renderHeader={this._renderHeader.bind(this)}
+              renderContent={this._renderContent.bind(this)}
             />
           </View>
         </ScrollView>
@@ -69,7 +69,14 @@ class HomeScreen extends React.Component {
   _renderContent(content, index, isActive) {
     return (
       <View>
-        { content.lessons.map(lesson => <Lesson key={lesson.id} lesson={lesson} />) }
+        { content.lessons.map(lesson => (
+
+          <Lesson
+            key={lesson.id}
+            loadClass={() => this.props.loadClass(lesson, this.props.navigator)}
+            lesson={lesson} 
+            navigator={this.props.navigator}
+          />)) }
       </View>
     )
   }
@@ -89,9 +96,11 @@ class HomeScreen extends React.Component {
 
 const Lesson = (props) => (
   <View>
-    <Text>
-      {props.lesson.name}
-    </Text>
+    <TouchableOpacity onPress={() => props.loadClass()}>
+      <Text>
+        {props.lesson.name}
+      </Text>
+    </TouchableOpacity>
   </View>
 )
 
@@ -101,7 +110,7 @@ const mapStateToProps = (state) => {
   }
 }
 
-const mapDispatchToProps = { }
+const mapDispatchToProps = { loadClass }
 
 export default connect(mapStateToProps, mapDispatchToProps)(HomeScreen)
 
