@@ -26,12 +26,14 @@ export const ANSWER_KEY = 'answer'
 // ------------------------------------
 export function loadAnswers () {
   return (dispatch) => {
-    storage.load({ key: ANSWER_KEY })
+    storage.getAllDataForKey(ANSWER_KEY)
       .then((answers) => {
-        console.log(answers)
+        const answerMap = answers.reduce((acc, answer) => {
+          return Object.assign(acc, { [answer.questionId] : answer })
+        }, {})
         dispatch({
           type: LOAD_ANSWERS,
-          payload: answers,
+          payload: answerMap,
         })
       })
       .catch(err => {
@@ -40,25 +42,24 @@ export function loadAnswers () {
   }
 }
 
-export function saveAnswer (questionId, answer) {
+function saveAnswer (questionId, answerText) {
+  console.log('Saving answer: ', questionId, answerText)
   storage.save({
     key: ANSWER_KEY,
     id: questionId,
-    rawData: answer
-  }).then((a, b) => {
-    console.log('@@@@@@@@@', a, b)
+    rawData: { questionId, answerText }
   })
 }
 const debouncedSaveAnswer = debounce(saveAnswer, wait = 500)
 
-export function updateAnswer (questionId, answer) {
+export function updateAnswer (questionId, answerText) {
   return (dispatch) => {
     dispatch({
       type: UPDATE_ANSWER,
-      payload: { questionId, answer }
+      payload: { questionId, answerText }
     })
 
-    debouncedSaveAnswer(questionId, answer)
+    debouncedSaveAnswer(questionId, answerText)
   }
 }
 
@@ -75,7 +76,7 @@ const ACTION_HANDLERS = {
   }),
   [UPDATE_ANSWER]: (state, action) => Object.assign({}, state, {
     answers: Object.assign({}, state.answers, {
-      [action.payload.questionId]: action.payload.answer
+      [action.payload.questionId]: action.payload
     })
   })
 }

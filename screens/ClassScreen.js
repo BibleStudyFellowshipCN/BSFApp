@@ -14,6 +14,7 @@ import {
 import ScrollableTabView from 'react-native-scrollable-tab-view'
 
 import { requestPassage } from '../store/passage.js'
+import Answer from '../components/Answer'
 
 class ClassScreen extends React.Component {
   static route = {
@@ -61,7 +62,7 @@ const BSFQuestion = (props) => (
       <BibleQuote key={quote.book + quote.verse} book={quote.book} verse={quote.verse} requestPassage={props.requestPassage}  />
 
     )) }
-    <Answer />
+    <Answer questionId={props.question.id} />
   </View>
 )
 
@@ -79,21 +80,9 @@ const BibleQuote = (props) => (
   </View>
 )
 
-const Answer = (props) => (
-  <View style={styles.answerContainer}>
-    <TextInput
-      style={styles.answerInput}
-      blurOnSubmit={false}
-      multiline
-    />
-  </View>
-)
-
-
 const mapStateToProps = (state) => {
   return {
     booklist: state.books.booklist,
-    answers: state.answers.answers,
     dayQuestions: state.class.dayQuestions,
   }
 }
@@ -123,14 +112,4 @@ const styles = StyleSheet.create({
     borderRadius: 11,
     backgroundColor: 'white',
   },
-  answerContainer: {
-    marginTop: 5,
-    height: 90,
-    borderRadius: 5,
-    padding: 5,
-    backgroundColor: 'whitesmoke',
-  },
-  answerInput: {
-    flex: 1,
-  }
 });
