@@ -24,6 +24,8 @@ export function requestPassage (book, verse, navigator) {
 // ------------------------------------
 const initialState = {
   paragraphs: [{
+    id: 0,
+    title: '',
     verses: [{
       verse: '6:30',
       text: '你們這小信的人哪、野地裡 的草、今天還在、明天就丟在爐 裡、 神還給他這樣的妝飾、何 況你們呢。',
@@ -46,9 +48,21 @@ const initialState = {
       bold: false,
     }]
   }, {
-    verses: [
-
-    ]
+    id: 1,
+    title: '音7章',
+    verses: [{
+      verse: '7:1',
+      text: '你們不要論斷人、免得你們被 論斷。',
+      bold: false,
+    }, {
+      verse: '7:2',
+      text: '因為你們怎樣論斷人、 也必怎樣被論斷。你們用甚麼量 器量給人、也必用甚麼量器量給 你們。',
+      bold: false,
+    }, {
+      verse: '7:3',
+      text: '為甚麼看見你弟兄眼中 有刺、卻不想自己眼中有梁木呢。',
+      bold: false,
+    }]
   }]
 }
 

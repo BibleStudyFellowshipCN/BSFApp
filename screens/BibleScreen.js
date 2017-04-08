@@ -26,7 +26,7 @@ class BibleScreen extends React.Component {
       <View style={styles.container}>
         <ScrollView>
           { this.props.paragraphs.map(paragraph => (
-            <Paragraph paragraph={paragraph}/>
+            <Paragraph key={paragraph.id} paragraph={paragraph}/>
           )) }
         </ScrollView>
       </View>
@@ -36,9 +36,10 @@ class BibleScreen extends React.Component {
 
 const Paragraph = (props) => (
   <View style={styles.paragraphContainer}>
+    { props.paragraph.title ? <Text style={styles.verseText}> { props.paragraph.title } </Text> : null }
     <Text>
       { props.paragraph.verses.map(verse => (
-        <Verse verse={verse} />
+        <Verse key={verse.verse} verse={verse} />
       )) }
     </Text>
   </View>
@@ -46,8 +47,7 @@ const Paragraph = (props) => (
 
 const Verse = (props) => (
   <Text style={[styles.verseText, { color: props.verse.bold ? 'black' : 'grey' }]}>
-    {props.verse.verse}
-    {props.verse.text}
+    {props.verse.verse} {props.verse.text}
   </Text>
 )
 
@@ -69,8 +69,10 @@ const styles = StyleSheet.create({
   },
   paragraphContainer: {
     flex: 1,
+    marginTop: 15,
   },
   verseText: {
+    color: 'grey',
     fontSize: 18,
     lineHeight: 30,
   }
