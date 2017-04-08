@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, View } from 'react-native';
+import { Text, StyleSheet, View } from 'react-native';
 import { Notifications } from 'expo';
 import {
   StackNavigation,
@@ -24,22 +24,28 @@ export default class RootNavigation extends React.Component {
 
   render() {
     return (
-      <TabNavigation tabBarHeight={56} initialTab="home">
+      <TabNavigation tabBarHeight={56} initialTab="class">
         <TabNavigationItem
           id="home"
-          renderIcon={isSelected => this._renderIcon('home', isSelected)}>
+          renderIcon={isSelected => this._renderIcon('BSF', isSelected)}>
           <StackNavigation initialRoute="home" />
         </TabNavigationItem>
 
         <TabNavigationItem
-          id="links"
-          renderIcon={isSelected => this._renderIcon('book', isSelected)}>
+          id="group"
+          renderIcon={isSelected => this._renderIcon('组', isSelected)}>
           <StackNavigation initialRoute="links" />
         </TabNavigationItem>
 
         <TabNavigationItem
-          id="settings"
-          renderIcon={isSelected => this._renderIcon('cog', isSelected)}>
+          id="class"
+          renderIcon={isSelected => this._renderIcon('课', isSelected)}>
+          <StackNavigation initialRoute="home" />
+        </TabNavigationItem>
+
+        <TabNavigationItem
+          id="profile"
+          renderIcon={isSelected => this._renderIcon('我', isSelected)}>
           <StackNavigation initialRoute="settings" />
         </TabNavigationItem>
       </TabNavigation>
@@ -48,11 +54,14 @@ export default class RootNavigation extends React.Component {
 
   _renderIcon(name, isSelected) {
     return (
-      <FontAwesome
-        name={name}
-        size={32}
-        color={isSelected ? Colors.tabIconSelected : Colors.tabIconDefault}
-      />
+      <Text style={{ color: isSelected ? Colors.tabIconSelected : Colors.tabIconDefault }}>
+        {name}
+      </Text>
+      // <FontAwesome
+      //   name={name}
+      //   size={32}
+      //   color={isSelected ? Colors.tabIconSelected : Colors.tabIconDefault}
+      // />
     );
   }
 
