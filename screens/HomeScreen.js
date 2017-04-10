@@ -49,7 +49,7 @@ class HomeScreen extends React.Component {
         <View style={styles.bookHeaderIcon}>
           <FontAwesome
             name={ isActive ? 'minus' : 'plus'}
-            size={16}
+            size={ 18 }
           />
         </View>
         <Text style={styles.bookHeaderText}> { content.title } </Text>
@@ -88,7 +88,7 @@ class HomeScreen extends React.Component {
 const Lesson = (props) => (
   <View>
     <TouchableOpacity onPress={() => props.loadClass()}>
-      <Text>
+      <Text style={styles.lessonText}>
         {props.lesson.name}
       </Text>
     </TouchableOpacity>
@@ -145,5 +145,10 @@ const styles = StyleSheet.create({
   },
   bookHeaderText: {
     fontSize: 18,
+    marginVertical: 6,
+  },
+  lessonText: {
+    fontSize: 18,
+    marginVertical: 6
   },
 });
