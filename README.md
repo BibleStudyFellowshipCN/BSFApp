@@ -10,3 +10,10 @@ iOS: https://itunes.com/apps/exponent
 6) Run Expo XDE, Projects -> Open Projects -> Select "BSFApp" folder
 7) Click "Send Link" to your email, open that email on your phone (Expo will launch BSFApp)
 8) Now you can edit the source files on your PC, once you save it, the device will automatically update
+
+
+* Build a standalone app:
+https://docs.expo.io/versions/v15.0.0/guides/building-standalone-apps.html
+
+This stuff is still in beta, so it¡¯s good to join the slack group here; the developers are prettyresponsive, even on weekends.
+https://expo-developers.slack.com/messages
