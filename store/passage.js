@@ -5,6 +5,14 @@ export const REQUEST_PASSAGE = 'REQUEST_PASSAGE'
 export const RECEIVE_PASSAGE = 'RECEIVE_PASSAGE'
 export const FAILURE_PASSAGE = 'FAILURE_PASSAGE'
 
+function getContent(book, verse)
+{
+    // TODO: Read bible from Sqlite3 database
+    var customData = require('../books/马可福音8.json');
+    var highlighted = "<style> .v2, .v3, v4 { background-color: yellow;} </style>";
+    return highlighted + customData.content;
+}
+
 // ------------------------------------
 // Actions
 // ------------------------------------
@@ -15,7 +23,7 @@ export function requestPassage (book, verse, navigator) {
       payload: { book, verse }
     })
 
-    navigator.push('bible', { book })
+    navigator.push('bible', { book, verse, html: getContent(book, verse) })
   }
 }
 

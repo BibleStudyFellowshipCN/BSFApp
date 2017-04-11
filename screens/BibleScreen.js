@@ -1,5 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux'
+import { WebView } from 'react-native';
 import {
   Image,
   Linking,
@@ -16,7 +17,7 @@ class BibleScreen extends React.Component {
   static route = {
     navigationBar: {
       title: (route) => {
-        return route.book
+        return route.book + route.verse
       },
     },
   };
@@ -24,11 +25,7 @@ class BibleScreen extends React.Component {
   render() {
     return (
       <View style={styles.container}>
-        <ScrollView>
-          { this.props.paragraphs.map(paragraph => (
-            <Paragraph key={paragraph.id} paragraph={paragraph}/>
-          )) }
-        </ScrollView>
+        <WebView source={{html: this.props.html}}/>
       </View>
     );
   }
