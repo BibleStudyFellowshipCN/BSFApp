@@ -45,7 +45,11 @@ export function requestPassage (book, verse, navigator) {
 
     // fetch bible verse from web service
     fetch(getUrl(book, verse))
-    .then((response) => response.json())
+      .then((response) => {
+        // FIXME: [Wei] It's interesting that "response.json()" triggers error on Android
+        // So I have to use "eval"
+        return eval("(" + response._bodyText + ")")
+      })
       .then((responseJson) => {
           console.log("WebService returns: " + JSON.stringify(responseJson))
           if (responseJson.error != undefined)
