@@ -25,7 +25,11 @@ class BibleScreen extends React.Component {
   render() {
     return (
       <View style={styles.container}>
-        <WebView source={{html: this.props.html}}/>
+        <ScrollView>
+          { this.props.paragraphs.map(paragraph => (
+            <Paragraph key={paragraph.id} paragraph={paragraph}/>
+          )) }
+        </ScrollView>
       </View>
     );
   }
