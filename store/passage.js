@@ -27,10 +27,10 @@ function getUrl(book, verse) {
 // ------------------------------------
 // Actions
 // ------------------------------------
-function navigateToBibleScreen (book, verse, navigator) {
+function navigateToBibleScreen (dispatch, navigator, book, verse, state) {
   dispatch({
     type: RECEIVE_PASSAGE,
-    payload: { state: cache }
+    payload: { state }
   })
 
   navigator.push('bible', { book, verse })
@@ -46,7 +46,7 @@ export function requestPassage (book, verse, navigator) {
     let cache = localCache[book + ':' + verse]
     if (cache != undefined) {
       console.log("Cache_Hit:" + book + ':' + verse)
-      navigateToBibleScreen(book, verse, navigator)
+      navigateToBibleScreen(dispatch, navigator, book, verse, cache)
       return
     }
 
@@ -67,7 +67,7 @@ export function requestPassage (book, verse, navigator) {
 
         localCache[book + ':' + verse] = responseJson
         console.log("Cache_Set:" + book + ':' + verse)
-        navigateToBibleScreen(book, verse, navigator)
+        navigateToBibleScreen(dispatch, navigator, book, verse, responseJson)
       })
       .catch((error) => {
         alert(error)
