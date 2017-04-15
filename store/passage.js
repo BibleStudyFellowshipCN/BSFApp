@@ -5,6 +5,9 @@ export const REQUEST_PASSAGE = 'REQUEST_PASSAGE'
 export const RECEIVE_PASSAGE = 'RECEIVE_PASSAGE'
 export const FAILURE_PASSAGE = 'FAILURE_PASSAGE'
 
+// TODO: [Wei] Implement a global cache
+var localCache = []
+
 // Build the web service url
 function getUrl(book, verse) {
   // Parse the book name to id
@@ -43,6 +46,16 @@ export function requestPassage (book, verse, navigator) {
       payload: { book, verse }
     })
 
+    let cache = localCache[book + ':' + verse]
+    if (cache != undefined) {
+      console.log("Cache_Hit:" + book + ':' + verse)
+      dispatch({
+        type: RECEIVE_PASSAGE,
+        payload: { navigator, book, verse, content: cache }
+      })
+      return
+    }
+
     // fetch bible verse from web service
     fetch(getUrl(book, verse))
       .then((response) => {
@@ -59,6 +72,8 @@ export function requestPassage (book, verse, navigator) {
             return
           }
 
+          localCache[book + ':' + verse] = responseJson.content
+          console.log("Cache_Set:" + book + ':' + verse)
           dispatch({
             type: RECEIVE_PASSAGE,
             payload: { navigator, book, verse, content: responseJson.content }

@@ -28,33 +28,54 @@ class ClassScreen extends React.Component {
   render() {
     const requestPassage = (book, verse) => {
       this.props.requestPassage(book, verse, this.props.navigator)
-    } 
+    }
     return (
       <View style={styles.container}>
         <ScrollableTabView>
-          <DayQuestions tabLabel="一" requestPassage={requestPassage} day={this.props.dayQuestions.one} />
-          <DayQuestions tabLabel="二" requestPassage={requestPassage} day={this.props.dayQuestions.two} />
-          <DayQuestions tabLabel="三" requestPassage={requestPassage} day={this.props.dayQuestions.three} />
-          <DayQuestions tabLabel="四" requestPassage={requestPassage} day={this.props.dayQuestions.four}/>
-          <DayQuestions tabLabel="五" requestPassage={requestPassage} day={this.props.dayQuestions.five}/>
-          <DayQuestions tabLabel="六" requestPassage={requestPassage} day={this.props.dayQuestions.six}/>
-          <DayQuestions tabLabel="七" requestPassage={requestPassage} day={this.props.dayQuestions.seven}/>
+          <DayQuestions tabLabel="一" requestPassage={requestPassage} day={this.props.dayQuestions.one} readVerse={this.props.dayQuestions.one.readVerse} memoryVerse={this.props.memoryVerse}/>
+          <DayQuestions tabLabel="二" requestPassage={requestPassage} day={this.props.dayQuestions.two} readVerse={this.props.dayQuestions.two.readVerse}/>
+          <DayQuestions tabLabel="三" requestPassage={requestPassage} day={this.props.dayQuestions.three}  readVerse={this.props.dayQuestions.three.readVerse}/>
+          <DayQuestions tabLabel="四" requestPassage={requestPassage} day={this.props.dayQuestions.four} readVerse={this.props.dayQuestions.four.readVerse}/>
+          <DayQuestions tabLabel="五" requestPassage={requestPassage} day={this.props.dayQuestions.five} readVerse={this.props.dayQuestions.five.readVerse}/>
+          <DayQuestions tabLabel="六" requestPassage={requestPassage} day={this.props.dayQuestions.six} readVerse={this.props.dayQuestions.six.readVerse}/>
         </ScrollableTabView>
       </View>
     );
   }
 }
 
-const DayQuestions = (props) => (
-  <ScrollView style={styles.dayQuestionsContainer}>
-    { props.day.questions.map(question => (
-      <BSFQuestion key={question.id} question={question} requestPassage={props.requestPassage}  />
-    )) }
-  </ScrollView>
-)
+const DayQuestions = (props) => {
+  if (props.memoryVerse != undefined) {
+    memoryVerseUI = <Text style={styles.memoryVerse}>{ props.memoryVerse }</Text>
+  } else {
+    memoryVerseUI = null
+  }
+
+  if (props.readVerse != undefined) {
+    for (var verse in props.readVerse) {
+      let quote = props.readVerse[verse]
+      readVerseUI = <BibleQuote key={quote.book + quote.verse} book={quote.book} verse={quote.verse} requestPassage={props.requestPassage}  />
+    } 
+  } else {
+    readVerseUI = null
+  }
+
+  return (
+    <ScrollView style={styles.dayQuestionsContainer}>
+      <View style={styles.BSFQuestionContainer}>
+        <Text style={styles.dayTitle}>{ props.day.title }</Text>
+        { memoryVerseUI }
+        { readVerseUI }
+        { props.day.questions.map(question => (
+          <BSFQuestion key={question.id} question={question} requestPassage={props.requestPassage}  />
+        )) }
+      </View>
+    </ScrollView>
+  )
+}
 
 const BSFQuestion = (props) => (
-  <View style={styles.BSFQuestionContainer}>
+  <View style={{ marginVertical: 12, }}>
     <QuestionText>
       { props.question.questionText }
     </QuestionText>
@@ -67,7 +88,7 @@ const BSFQuestion = (props) => (
 )
 
 const QuestionText = (props) => (
-  <Text style={{ color: 'white', marginBottom: 5, }}>{ props.children }</Text>
+  <Text style={{ color: 'white', marginBottom: 5, fontSize: 16, }}>{ props.children }</Text>
 )
 
 const BibleQuote = (props) => (
@@ -84,6 +105,7 @@ const mapStateToProps = (state) => {
   return {
     booklist: state.books.booklist,
     dayQuestions: state.class.dayQuestions,
+    memoryVerse: state.class.memoryVerse,
   }
 }
 
@@ -101,7 +123,8 @@ const styles = StyleSheet.create({
   },
   BSFQuestionContainer: {
     flex: 1,
-    padding: 15,
+    marginHorizontal: 15,
+    marginTop: 8,
   },
   bibleQuote: {
     marginVertical: 2,
@@ -111,5 +134,16 @@ const styles = StyleSheet.create({
     height: 22,
     borderRadius: 11,
     backgroundColor: 'white',
+  },
+  dayTitle: {
+    color: 'white',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  memoryVerse: {
+    color: 'white',
+    marginVertical: 14,
+    fontSize: 16,
+    fontWeight: 'bold',
   },
 });
