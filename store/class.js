@@ -161,7 +161,7 @@ const initialState = {
       }],
     },
     six: {
-      title: '第六天：阅读约翰福音18:28-19:17.',
+      title: '第六天：复习约翰福音18:28-19:17.',
       readVerse: [{
         book: '約翰福音',
         verse: '18:28-19:17',

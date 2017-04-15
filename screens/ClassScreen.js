@@ -64,8 +64,8 @@ const DayQuestions = (props) => {
     <ScrollView style={styles.dayQuestionsContainer}>
       <View style={styles.BSFQuestionContainer}>
         <Text style={styles.dayTitle}>{ props.day.title }</Text>
-        { readVerseUI }
         { memoryVerseUI }
+        { readVerseUI }
         { props.day.questions.map(question => (
           <BSFQuestion key={question.id} question={question} requestPassage={props.requestPassage}  />
         )) }
