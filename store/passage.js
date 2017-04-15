@@ -27,6 +27,15 @@ function getUrl(book, verse) {
 // ------------------------------------
 // Actions
 // ------------------------------------
+function navigateToBibleScreen (book, verse, navigator) {
+  dispatch({
+    type: RECEIVE_PASSAGE,
+    payload: { state: cache }
+  })
+
+  navigator.push('bible', { book, verse })
+}
+
 export function requestPassage (book, verse, navigator) {
   return (dispatch) => {
     dispatch({
@@ -37,39 +46,28 @@ export function requestPassage (book, verse, navigator) {
     let cache = localCache[book + ':' + verse]
     if (cache != undefined) {
       console.log("Cache_Hit:" + book + ':' + verse)
-      dispatch({
-        type: RECEIVE_PASSAGE,
-        payload: { navigator, book, verse, content: cache }
-      })
+      navigateToBibleScreen(book, verse, navigator)
       return
     }
 
     // fetch bible verse from web service
     fetch(getUrl(book, verse))
       .then((response) => {
-        // FIXME: [Wei] It's interesting that "response.json()" triggers error on Android
-        // So I have to use "eval"
+        // FIXME: [Wei] "response.json()" triggers error on Android, so I have to use "eval"
         return eval("(" + response._bodyText + ")")
       })
       .then((responseJson) => {
-          console.log("WebService returns: " + JSON.stringify(responseJson))
-          if (responseJson.error != undefined)
-          {
-            alert(responseJson.error)    
-            console.warn(responseJson.error)
-            return
-          }
+        console.log("WebService returns: " + JSON.stringify(responseJson))
+        if (responseJson.error != undefined)
+        {
+          alert(responseJson.error)    
+          console.warn(responseJson.error)
+          return
+        }
 
-          localCache[book + ':' + verse] = responseJson
-          console.log("Cache_Set:" + book + ':' + verse)
-
-          dispatch({
-            type: RECEIVE_PASSAGE,
-            payload: { state: responseJson }
-          })
-
-          // navigate to bible screen
-          navigator.push('bible', { book, verse })
+        localCache[book + ':' + verse] = responseJson
+        console.log("Cache_Set:" + book + ':' + verse)
+        navigateToBibleScreen(book, verse, navigator)
       })
       .catch((error) => {
         alert(error)
