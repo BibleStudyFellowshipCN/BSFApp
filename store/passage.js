@@ -19,21 +19,9 @@ function getUrl(book, verse) {
       break
     }
   }
-  var verseStart = verse.indexOf(':')
-  var chapter = verse.substring(0, verseStart)
-  verse = verse.substring(verseStart + 1)
-  var url = "http://www.turbozv.com/bsf/api/" + bookId + "/" + chapter + "/" + verse
+  var url = "http://www.turbozv.com/bsf/api2/" + bookId + "/" + verse
   console.log(" GET " + url)
   return url
-}
-
-// Parse the JSON content to state
-function parseBibleVerse(content) {
-    var state = {"paragraphs": [{"id":0,"title":"","verses":[]}]}
-    for (var i in content.Verses) {
-        state.paragraphs[0].verses.push({"verse": content.Chapter + ":" + i, "text": content.Verses[i], "bold": true})
-    }    
-    return state
 }
 
 // ------------------------------------
@@ -72,11 +60,11 @@ export function requestPassage (book, verse, navigator) {
             return
           }
 
-          localCache[book + ':' + verse] = responseJson.content
+          localCache[book + ':' + verse] = responseJson
           console.log("Cache_Set:" + book + ':' + verse)
           dispatch({
             type: RECEIVE_PASSAGE,
-            payload: { navigator, book, verse, content: responseJson.content }
+            payload: { navigator, book, verse, content: responseJson }
           })
       })
       .catch((error) => {
@@ -105,11 +93,10 @@ const ACTION_HANDLERS = {
     let book = action.payload.book
     let verse = action.payload.verse
     let content = action.payload.content
-    let newState = parseBibleVerse(content)
 
     // navigate to bible screen
-    navigator.push('bible', { book, verse, content })
-    return newState
+    navigator.push('bible', { book, verse })
+    return content
   },
   [FAILURE_PASSAGE]: (state, action) => state,
 }

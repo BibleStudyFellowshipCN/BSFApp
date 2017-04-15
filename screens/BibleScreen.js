@@ -47,7 +47,7 @@ const Paragraph = (props) => (
 )
 
 const Verse = (props) => (
-  <Text style={[styles.verseText, { color: props.verse.bold ? 'black' : 'grey' }]}>
+  <Text style={[styles.verseText, { color: 'black' }]}>
     {props.verse.verse} {props.verse.text}
   </Text>
 )
