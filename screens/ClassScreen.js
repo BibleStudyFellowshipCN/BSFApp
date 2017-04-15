@@ -9,7 +9,8 @@ import {
   Text,
   TextInput,
   TouchableOpacity,
-  View,
+  View, 
+  KeyboardAvoidingView, 
 } from 'react-native';
 import ScrollableTabView from 'react-native-scrollable-tab-view'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
@@ -31,7 +32,7 @@ class ClassScreen extends React.Component {
       this.props.requestPassage(book, verse, this.props.navigator)
     }
     return (
-      <KeyboardAwareScrollView resetScrollToCoords={{ x: 0, y: 0 }} scrollEnabled={false}>
+      <KeyboardAwareScrollView resetScrollToCoords={{ x: 0, y: 0 }} contentContainerStyle={styles.container} scrollEnabled={false}>
         <View style={styles.container}>
           <ScrollableTabView>
             <DayQuestions tabLabel="一" requestPassage={requestPassage} day={this.props.dayQuestions.one} readVerse={this.props.dayQuestions.one.readVerse} memoryVerse={this.props.memoryVerse}/>
