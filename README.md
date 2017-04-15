@@ -12,8 +12,8 @@ iOS: https://itunes.com/apps/exponent
 8) Now you can edit the source files on your PC, once you save it, the device will automatically update
 
 
-* Build a standalone app:
+Build a standalone app:
 https://docs.expo.io/versions/v15.0.0/guides/building-standalone-apps.html
 
-This stuff is still in beta, so it¡¯s good to join the slack group here; the developers are prettyresponsive, even on weekends.
+This stuff is still in beta, so it's good to join the slack group here; the developers are prettyresponsive, even on weekends.
 https://expo-developers.slack.com/messages
