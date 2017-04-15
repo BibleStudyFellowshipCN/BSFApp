@@ -62,10 +62,14 @@ export function requestPassage (book, verse, navigator) {
 
           localCache[book + ':' + verse] = responseJson
           console.log("Cache_Set:" + book + ':' + verse)
+
           dispatch({
             type: RECEIVE_PASSAGE,
-            payload: { navigator, book, verse, content: responseJson }
+            payload: { state: responseJson }
           })
+
+          // navigate to bible screen
+          navigator.push('bible', { book, verse })
       })
       .catch((error) => {
         alert(error)
@@ -87,17 +91,7 @@ const initialState = {
 
 const ACTION_HANDLERS = {
   [REQUEST_PASSAGE]: (state, action) => state,
-  [RECEIVE_PASSAGE]: (state, action) => {
-    console.log("RECEIVE_PASSAGE:")
-    let navigator = action.payload.navigator
-    let book = action.payload.book
-    let verse = action.payload.verse
-    let content = action.payload.content
-
-    // navigate to bible screen
-    navigator.push('bible', { book, verse })
-    return content
-  },
+  [RECEIVE_PASSAGE]: (state, action) => action.payload.state,
   [FAILURE_PASSAGE]: (state, action) => state,
 }
 
