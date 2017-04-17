@@ -32,18 +32,16 @@ class ClassScreen extends React.Component {
       this.props.requestPassage(book, verse, this.props.navigator)
     }
     return (
-      <KeyboardAwareScrollView resetScrollToCoords={{ x: 0, y: 0 }} contentContainerStyle={styles.container} scrollEnabled={false}>
-        <View style={styles.container}>
-          <ScrollableTabView>
-            <DayQuestions tabLabel="一" requestPassage={requestPassage} day={this.props.dayQuestions.one} readVerse={this.props.dayQuestions.one.readVerse} memoryVerse={this.props.memoryVerse}/>
-            <DayQuestions tabLabel="二" requestPassage={requestPassage} day={this.props.dayQuestions.two} readVerse={this.props.dayQuestions.two.readVerse}/>
-            <DayQuestions tabLabel="三" requestPassage={requestPassage} day={this.props.dayQuestions.three}  readVerse={this.props.dayQuestions.three.readVerse}/>
-            <DayQuestions tabLabel="四" requestPassage={requestPassage} day={this.props.dayQuestions.four} readVerse={this.props.dayQuestions.four.readVerse}/>
-            <DayQuestions tabLabel="五" requestPassage={requestPassage} day={this.props.dayQuestions.five} readVerse={this.props.dayQuestions.five.readVerse}/>
-            <DayQuestions tabLabel="六" requestPassage={requestPassage} day={this.props.dayQuestions.six} readVerse={this.props.dayQuestions.six.readVerse}/>
-          </ScrollableTabView>
-        </View>
-      </KeyboardAwareScrollView>
+      <KeyboardAvoidingView style={styles.container} behavior='padding' keyboardVerticalOffset={80}>
+        <ScrollableTabView>
+          <DayQuestions tabLabel="一" requestPassage={requestPassage} day={this.props.dayQuestions.one} readVerse={this.props.dayQuestions.one.readVerse} memoryVerse={this.props.memoryVerse}/>
+          <DayQuestions tabLabel="二" requestPassage={requestPassage} day={this.props.dayQuestions.two} readVerse={this.props.dayQuestions.two.readVerse}/>
+          <DayQuestions tabLabel="三" requestPassage={requestPassage} day={this.props.dayQuestions.three}  readVerse={this.props.dayQuestions.three.readVerse}/>
+          <DayQuestions tabLabel="四" requestPassage={requestPassage} day={this.props.dayQuestions.four} readVerse={this.props.dayQuestions.four.readVerse}/>
+          <DayQuestions tabLabel="五" requestPassage={requestPassage} day={this.props.dayQuestions.five} readVerse={this.props.dayQuestions.five.readVerse}/>
+          <DayQuestions tabLabel="六" requestPassage={requestPassage} day={this.props.dayQuestions.six} readVerse={this.props.dayQuestions.six.readVerse}/>
+        </ScrollableTabView>
+      </KeyboardAvoidingView>
     );
   }
 }

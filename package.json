@@ -20,7 +20,6 @@
     "react-native": "https://github.com/exponent/react-native/archive/sdk-15.0.0.tar.gz",
     "react-native-collapsible": "^0.8.0",
     "react-native-fs": "^2.1.0-rc.1",
-    "react-native-keyboard-aware-scroll-view": "^0.2.8",
     "react-native-scrollable-tab-view": "^0.7.4",
     "react-native-sqlite-storage": "^3.2.2",
     "react-native-storage": "^0.1.5",
