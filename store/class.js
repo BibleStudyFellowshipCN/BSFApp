@@ -10,12 +10,41 @@ export const FAILURE_CLASS = 'FAILURE_CLASS'
 // ------------------------------------
 export function loadClass (lesson, navigator) {
   const { id, name } = lesson
-  return (dispatch) => {
+  return async(dispatch) => {
+
+    // First dispatch an action that says that we are requesting a class
     dispatch({
       type: 'REQUEST_CLASS',
       payload: lesson,
     })
-    navigator.push('class', { lesson })
+
+    try {
+      // Then make the http request for the class (a placeholder url below)
+      // we use the await syntax.
+      const response = await fetch('https://facebook.github.io/react-native/movies.json');
+      const responseJson = await response.json();
+
+      console.log('Received the following json', responseJson)
+
+      // Now that we received the json, we dispatch an action saying we received it
+      dispatch({
+        type: 'RECEIVE_CLASS',
+        payload: responseJson,
+      })
+
+      // TODO: write a the action handler to update the state with the received data.
+
+      // Finally, we push on a new route
+      navigator.push('class', { lesson })
+    } catch(error) {
+
+      // We handle errors here, and dispatch the failure action in case of an error
+      console.log(error)
+      dispatch({
+        type: 'FAILURE_CLASS',
+        payload: error,
+      })
+    }
   }
 }
 
@@ -186,8 +215,8 @@ const ACTION_HANDLERS = {
     id: action.id,
     name: action.name,
   }),
-  [RECEIVE_CLASS]: (state, action) => state,
-  [FAILURE_CLASS]: (state, action) => state,
+  [RECEIVE_CLASS]: (state, action) => state, // TODO:
+  [FAILURE_CLASS]: (state, action) => state, // TODO:
 }
 
 export default function booksReducer (state = initialState, action) {

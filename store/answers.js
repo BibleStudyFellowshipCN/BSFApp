@@ -8,6 +8,7 @@ if (!global.storage) {
     size: 10000,
     storageBackend: AsyncStorage,
     enableCache: true,
+    defaultExpires: null,
   })
 }
 
