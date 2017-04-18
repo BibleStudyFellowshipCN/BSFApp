@@ -1,4 +1,4 @@
-<B>Instructions to get Expo working on PC</B>
+﻿<B>Instructions to get Expo working on PC</B>
 
 1) Install Expo on your phone:
 Android: https://play.google.com/store/apps/details?id=host.exp.exponent
@@ -23,34 +23,34 @@ https://expo-developers.slack.com/messages
 
 const initialState = {
   booklist: [{
-    title: '约翰福音',
+    title: '约翰福音2016-2017',
     lessons: [{
-      id: 1,
-      name: '第25课 约翰福音18:28-19:17'
+      id: '2016_25',
+      name: '第25课 约翰福音18:28-19:17 (04/17/2017)'
     }, {
-      id: 2,
-      name: '第26课 约翰福音19:18-30'
+      id: '2016_26',
+      name: '第26课 约翰福音19:18-30 (04/24/2017)'
     }, {
-      id: 3,
-      name: '第27课 约翰福音19:31-42'
+      id: '2016_27',
+      name: '第27课 约翰福音19:31-42 (05/01/2017)'
     }, {
-      id: 4,
-      name: '第28课 约翰福音20'
+      id: '2016_28',
+      name: '第28课 约翰福音20 (05/08/2017)'
     }, {
-      id: 5,
-      name: '第27课 约翰福音21'
+      id: '2016_29',
+      name: '第29课 约翰福音21 (05/15/2017)'
     }]
   }, {
-    title: '罗马书 - 明年',
+    title: '罗马书2017-2018',
     lessons: [{
-      id: 6,
-      name: '第一课'
+      id: '2017_1',
+      name: '第1课'
     }, {
-      id: 7,
-      name: '第二课'
+      id: '2017_2',
+      name: '第2课'
     }, {
-      id: 8,
-      name: '第三课'
+      id: '2017_3',
+      name: '第3课'
     }]
   }]
 }
@@ -59,18 +59,18 @@ const initialState = {
 
 const initialState = {
   id: 0,
-  name: 'BSF® Lesson 25',
+  name: '约翰福音 第25课',
   memoryVerse: '背诵经文：耶稣就对彼得说：“收刀入鞘吧，我父所给我的那杯，我岂可不喝呢？” - 约翰福音18:11',
   dayQuestions:  {
     one: {
       title: '第一天：阅读经文释义及参考经文',
       questions: [{
-        id: 1,
+        id: '2016_25_1',
         questionText: '1. 講課中哪些內容對你特別有意義？',
         answer: '',
         quotes: [],
       }, {
-        id: 2,
+        id: '2016_25_2',
         questionText: '2. 經文釋義對你有什麼幫助？',
         answer: '',
         quotes: [],

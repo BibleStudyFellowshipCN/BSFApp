@@ -52,19 +52,19 @@ export function loadClass (lesson, navigator) {
 // Reducer
 // ------------------------------------
 const initialState = {
-  id: 0,
-  name: 'BSF® Lesson 25',
+  id: '2016_25',
+  name: '约翰福音 第25课',
   memoryVerse: '背诵经文：耶稣就对彼得说：“收刀入鞘吧，我父所给我的那杯，我岂可不喝呢？” - 约翰福音18:11',
   dayQuestions:  {
     one: {
       title: '第一天：阅读经文释义及参考经文',
       questions: [{
-        id: 1,
+        id: '2016_25_1',
         questionText: '1. 講課中哪些內容對你特別有意義？',
         answer: '',
         quotes: [],
       }, {
-        id: 2,
+        id: '2016_25_2',
         questionText: '2. 經文釋義對你有什麼幫助？',
         answer: '',
         quotes: [],
@@ -77,7 +77,7 @@ const initialState = {
           verse: '18:28-32',
         }],
       questions: [{
-        id: 3,
+        id: '2016_25_3',
         questionText: '3. 猶太領袖為什麼不肯踏進彼拉多的官邸？他們去找彼拉多的理由顯出他們存心怎樣？',
         answer: '',
         quotes: [{
