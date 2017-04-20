@@ -11,14 +11,14 @@ export const FAILURE_PASSAGE = 'FAILURE_PASSAGE'
 function getUrl(book, verse) {
   // Parse the book name to id
   var bookId = 1
-  var bookid = require('../books/bookid.json')
+  var bookid = require('../assets/bookid.json')
   for (var i in bookid) {
     if (bookid[i].name == book) {
       bookId = bookid[i].id
       break
     }
   }
-  return "http://www.turbozv.com/bsf/api2/" + bookId + "/" + verse
+  return bookId + "/" + verse
 }
 
 // ------------------------------------

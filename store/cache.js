@@ -1,15 +1,20 @@
 import { AsyncStorage } from 'react-native'
 
+if (!global.webserviceUrl) {
+  global.webserviceUrl = 'http://turbozv.com/bsf/api/'
+}
+
 export async function cacheFetch(url) {
-  const content = await AsyncStorage.getItem(url)
+  const key = "[Cache]" + url
+  const content = await AsyncStorage.getItem(key)
   if (content != null) {
-      console.log("[Cache]Hit:" + url)
+      console.log("[Cache]Hit:" + key)
       return eval("(" + content + ")")
   }
-  console.log("[Cache]Miss:" + url)
+  console.log("[Cache]Miss:" + key)
 
   // fetch bible verse from web service
-  const response = await fetch(url)
+  const response = await fetch(global.webserviceUrl + url)
   // FIXME: [Wei] "response.json()" triggers error on Android, so I have to use "eval"
   const responseJson = eval("(" + response._bodyText + ")")
 
@@ -20,7 +25,7 @@ export async function cacheFetch(url) {
     return null
   }
 
-  AsyncStorage.setItem(url, JSON.stringify(responseJson))
-  console.log("[Cache]Set:" + url)
+  AsyncStorage.setItem(key, JSON.stringify(responseJson))
+  console.log("[Cache]Set:" + key)
   return responseJson
 }

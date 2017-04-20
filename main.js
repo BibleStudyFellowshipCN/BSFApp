@@ -9,6 +9,7 @@ import createStore from './store/createStore'
 import Router from './navigation/Router';
 import cacheAssetsAsync from './utilities/cacheAssetsAsync';
 import { loadAnswers } from './store/answers'
+import { requestBooks } from './store/books.js'
 
 const store = createStore()
 
@@ -19,6 +20,7 @@ class AppContainer extends React.Component {
 
   componentWillMount() {
     this._loadAssetsAsync();
+    store.dispatch(requestBooks())
     store.dispatch(loadAnswers())
   }
 

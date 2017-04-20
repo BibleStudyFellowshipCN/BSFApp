@@ -11,7 +11,7 @@ export const FAILURE_CLASS = 'FAILURE_CLASS'
 // Actions
 // ------------------------------------
 function getUrl(lesson) {
-  return 'http://www.turbozv.com/bsf/api/' + lesson.id + '.json'
+  return lesson.id + '.json'
 }
 
 export function loadClass (lesson, navigator) {
@@ -23,7 +23,6 @@ export function loadClass (lesson, navigator) {
       type: 'REQUEST_CLASS',
       payload: lesson,
     })
-    console.log(JSON.stringify(lesson))
 
     try {
       // Then make the http request for the class (a placeholder url below)

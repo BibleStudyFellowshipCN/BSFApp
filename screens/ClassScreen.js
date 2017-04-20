@@ -31,7 +31,7 @@ class ClassScreen extends React.Component {
       this.props.requestPassage(book, verse, this.props.navigator)
     }
     let content = (
-      <ScrollableTabView>
+      <ScrollableTabView initialPage={1}>
         <NotesPage tabLabel="讲义"/>
         <DayQuestions tabLabel="一" requestPassage={requestPassage} day={this.props.dayQuestions.one} readVerse={this.props.dayQuestions.one.readVerse} memoryVerse={this.props.memoryVerse}/>
         <DayQuestions tabLabel="二" requestPassage={requestPassage} day={this.props.dayQuestions.two} readVerse={this.props.dayQuestions.two.readVerse}/>

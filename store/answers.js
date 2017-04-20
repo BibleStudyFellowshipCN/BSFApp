@@ -38,7 +38,8 @@ export function loadAnswers () {
         })
       })
       .catch(err => {
-        console.warn(err.message)
+        console.log(err.message)
+        alert(error)
       })
   }
 }
