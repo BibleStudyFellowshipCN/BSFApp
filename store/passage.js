@@ -1,4 +1,4 @@
-import { AsyncStorage } from 'react-native'
+import { cacheFetch } from '../store/cache.js'
 
 // ------------------------------------
 // Constants
@@ -18,41 +18,12 @@ function getUrl(book, verse) {
       break
     }
   }
-  var url = "http://www.turbozv.com/bsf/api2/" + bookId + "/" + verse
-  console.log(" GET " + url)
-  return url
+  return "http://www.turbozv.com/bsf/api2/" + bookId + "/" + verse
 }
 
 // ------------------------------------
 // Actions
 // ------------------------------------
-async function getBibleVerse(book, verse) {
-  const key = book + ':' + verse
-  const cache = await AsyncStorage.getItem(key)
-  if (cache != null) {
-    console.log("[Cache]Hit:" + book + ':' + verse)
-    return eval("(" + cache + ")")
-  }
-
-  console.log("[Cache]Miss:" + key)
-
-  // fetch bible verse from web service
-  const response = await fetch(getUrl(book, verse))  
-  // FIXME: [Wei] "response.json()" triggers error on Android, so I have to use "eval"
-  const responseJson = eval("(" + response._bodyText + ")")
-
-  console.log("WebService returns: " + JSON.stringify(responseJson))
-  if (responseJson.error != undefined) {
-    alert(responseJson.error)
-    console.warn(responseJson.error)
-    return null
-  }
-
-  AsyncStorage.setItem(key, JSON.stringify(responseJson))
-  console.log("[Cache]Set:" + key)
-  return responseJson
-}
-
 export function requestPassage (book, verse, navigator) {
   return async(dispatch) => {
     dispatch({
@@ -61,7 +32,7 @@ export function requestPassage (book, verse, navigator) {
     })
 
     try {
-      const content = await getBibleVerse(book, verse)
+      const content = await cacheFetch(getUrl(book, verse))
       if (content != null) {
         dispatch({
           type: RECEIVE_PASSAGE,
