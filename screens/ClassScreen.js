@@ -32,6 +32,7 @@ class ClassScreen extends React.Component {
     }
     let content = (
       <ScrollableTabView>
+        <NotesPage tabLabel="讲义"/>
         <DayQuestions tabLabel="一" requestPassage={requestPassage} day={this.props.dayQuestions.one} readVerse={this.props.dayQuestions.one.readVerse} memoryVerse={this.props.memoryVerse}/>
         <DayQuestions tabLabel="二" requestPassage={requestPassage} day={this.props.dayQuestions.two} readVerse={this.props.dayQuestions.two.readVerse}/>
         <DayQuestions tabLabel="三" requestPassage={requestPassage} day={this.props.dayQuestions.three}  readVerse={this.props.dayQuestions.three.readVerse}/>
@@ -110,6 +111,16 @@ const BibleQuote = (props) => (
   </View>
 )
 
+const NotesPage = (props) => (
+  <ScrollView style={styles.dayQuestionsContainer}>
+    <View style={styles.BSFQuestionContainer}>
+      <Text style={{marginVertical: 12, color: 'white'}}>签到 - TODO by Rui</Text>
+      <Text style={{marginVertical: 12, color: 'white'}}>讲道录音 - TODO by Jerry</Text>
+      <Text style={{marginVertical: 12, color: 'white'}}>经文释义</Text>
+    </View>
+  </ScrollView>
+)
+
 const mapStateToProps = (state) => {
   return {
     booklist: state.books.booklist,
@@ -151,7 +162,6 @@ const styles = StyleSheet.create({
   },
   memoryVerse: {
     color: 'white',
-    marginTop: 15,
     marginBottom: 30,
     fontSize: 16,
     fontWeight: 'bold',

@@ -26,73 +26,71 @@ function getUrl(book, verse) {
 // ------------------------------------
 // Actions
 // ------------------------------------
-function navigateToBibleScreen (dispatch, navigator, book, verse, state) {
-  dispatch({
-    type: RECEIVE_PASSAGE,
-    payload: { state }
-  })
+async function getBibleVerse(book, verse) {
+  const key = book + ':' + verse
+  const cache = await AsyncStorage.getItem(key)
+  if (cache != null) {
+    console.log("[Cache]Hit:" + book + ':' + verse)
+    return eval("(" + cache + ")")
+  }
 
-  navigator.push('bible', { book, verse })
+  console.log("[Cache]Miss:" + key)
+
+  // fetch bible verse from web service
+  const response = await fetch(getUrl(book, verse))  
+  // FIXME: [Wei] "response.json()" triggers error on Android, so I have to use "eval"
+  const responseJson = eval("(" + response._bodyText + ")")
+
+  console.log("WebService returns: " + JSON.stringify(responseJson))
+  if (responseJson.error != undefined) {
+    alert(responseJson.error)
+    console.warn(responseJson.error)
+    return null
+  }
+
+  AsyncStorage.setItem(key, JSON.stringify(responseJson))
+  console.log("[Cache]Set:" + key)
+  return responseJson
 }
 
 export function requestPassage (book, verse, navigator) {
-  return (dispatch) => {
+  return async(dispatch) => {
     dispatch({
       type: REQUEST_PASSAGE,
       payload: { book, verse }
     })
 
-    let key = book + ':' + verse
-    AsyncStorage.getItem(key).then((value) => {
-      if (value != null) {
-        console.log("[Cache]Hit:" + book + ':' + verse)
-        navigateToBibleScreen(dispatch, navigator, book, verse, eval("(" + value + ")"))
-      } else {
-        console.log("[Cache]Miss:"+key)
-        // fetch bible verse from web service
-        fetch(getUrl(book, verse))
-          .then((response) => {
-            // FIXME: [Wei] "response.json()" triggers error on Android, so I have to use "eval"
-            return eval("(" + response._bodyText + ")")
-          })
-          .then((responseJson) => {
-            console.log("WebService returns: " + JSON.stringify(responseJson))
-            if (responseJson.error != undefined) {
-              alert(responseJson.error)    
-              console.warn(responseJson.error)
-            } else {
-              AsyncStorage.setItem(key, JSON.stringify(responseJson))
-              console.log("[Cache]Set:" + key)
-              navigateToBibleScreen(dispatch, navigator, book, verse, responseJson)
-            }
-          })
-          .catch((error) => {
-            alert(error)
-            console.warn(error)
-          });
+    try {
+      const content = await getBibleVerse(book, verse)
+      if (content != null) {
+        dispatch({
+          type: RECEIVE_PASSAGE,
+          payload: { content }
+        })
+
+        navigator.push('bible', { book, verse })
       }
-    }).done();
+    } catch(error) {
+      console.log(error)
+      alert(error)
+      dispatch({
+        type: FAILURE_PASSAGE,
+        payload: error,
+      })
+    }
   }
 }
 
 // ------------------------------------
 // Reducer
 // ------------------------------------
-const initialState = {
-  paragraphs: [{
-    id: 0,
-    title: '',
-    verses: []
-  }]
-}
-
 const ACTION_HANDLERS = {
   [REQUEST_PASSAGE]: (state, action) => state,
-  [RECEIVE_PASSAGE]: (state, action) => action.payload.state,
+  [RECEIVE_PASSAGE]: (state, action) => action.payload.content,
   [FAILURE_PASSAGE]: (state, action) => state,
 }
 
-export default function passageReducer (state = initialState, action) {
+export default function passageReducer (state = 0, action) {
   const handler = ACTION_HANDLERS[action.type]
   return handler ? handler(state, action) : state
 }
