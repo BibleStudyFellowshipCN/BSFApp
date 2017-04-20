@@ -39,13 +39,20 @@ export function requestBooks () {
 // ------------------------------------
 // Reducer
 // ------------------------------------
+const initialState = {
+  booklist: [{
+    title: '课程loading',
+    lessons: []
+  }]
+}
+
 const ACTION_HANDLERS = {
   [REQUEST_BOOKS]: (state, action) => state,
   [RECEIVE_BOOKS]: (state, action) => action.payload.state,
   [FAILURE_BOOKS]: (state, action) => state,
 }
 
-export default function booksReducer (state = 0, action) {
+export default function booksReducer (state = initialState, action) {
   const handler = ACTION_HANDLERS[action.type]
   return handler ? handler(state, action) : state
 }

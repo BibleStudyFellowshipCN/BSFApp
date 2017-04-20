@@ -1,17 +1,24 @@
 import { AsyncStorage } from 'react-native'
 
+// TODO: [Wei] Add them to settings' page
 if (!global.webserviceUrl) {
   global.webserviceUrl = 'http://turbozv.com/bsf/api/'
 }
 
+if (!global.enableCache) {
+  global.enableCache = true
+}
+
 export async function cacheFetch(url) {
-  const key = "[Cache]" + url
-  const content = await AsyncStorage.getItem(key)
-  if (content != null) {
-      console.log("[Cache]Hit:" + key)
-      return eval("(" + content + ")")
+  if (global.enableCache) {
+    const key = "[Cache]" + url
+    const content = await AsyncStorage.getItem(key)
+    if (content != null) {
+        console.log("[Cache]Hit:" + key)
+        return eval("(" + content + ")")
+    }
+    console.log("[Cache]Miss:" + key)
   }
-  console.log("[Cache]Miss:" + key)
 
   // fetch bible verse from web service
   const response = await fetch(global.webserviceUrl + url)
@@ -25,7 +32,10 @@ export async function cacheFetch(url) {
     return null
   }
 
-  AsyncStorage.setItem(key, JSON.stringify(responseJson))
-  console.log("[Cache]Set:" + key)
+  if (global.enableCache) {
+    AsyncStorage.setItem(key, JSON.stringify(responseJson))
+    console.log("[Cache]Set:" + key)
+  }
+
   return responseJson
 }
