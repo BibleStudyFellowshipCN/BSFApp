@@ -36,7 +36,7 @@ export function requestPassage (book, verse, navigator) {
       if (content != null) {
         dispatch({
           type: RECEIVE_PASSAGE,
-          payload: { content }
+          payload: { state: content }
         })
 
         navigator.push('bible', { book, verse })
@@ -57,7 +57,7 @@ export function requestPassage (book, verse, navigator) {
 // ------------------------------------
 const ACTION_HANDLERS = {
   [REQUEST_PASSAGE]: (state, action) => state,
-  [RECEIVE_PASSAGE]: (state, action) => action.payload.content,
+  [RECEIVE_PASSAGE]: (state, action) => action.payload.state,
   [FAILURE_PASSAGE]: (state, action) => state,
 }
 
