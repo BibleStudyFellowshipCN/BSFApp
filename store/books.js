@@ -12,33 +12,42 @@ export const FAILURE_BOOKS = 'FAILURE_BOOKS'
 // Actions
 // ------------------------------------
 export function requestBooks () {
-  return (dispatch) => {
+  return async(dispatch) => {
     dispatch({
       type: 'REQUEST_CLASS',
     })
 
-    cacheFetch('home.json')
-    .then((content) => {
+    try {
+      const content = await cacheFetch('home.json')
       if (content != null) {
         dispatch({
           type: RECEIVE_BOOKS,
           payload: { state: content }
         })
       }
-    })
+    } catch(error) {
+      console.log(error)
+      alert(error)
+      dispatch({
+        type: FAILURE_BOOKS,
+        payload: error,
+      })
+    }
   }
 }
 
 // ------------------------------------
 // Reducer
 // ------------------------------------
+const initialState = require('../assets/home.json')
+
 const ACTION_HANDLERS = {
   [REQUEST_BOOKS]: (state, action) => state,
   [RECEIVE_BOOKS]: (state, action) => action.payload.state,
   [FAILURE_BOOKS]: (state, action) => state,
 }
 
-export default function booksReducer (state = 0, action) {
+export default function booksReducer (state = initialState, action) {
   const handler = ACTION_HANDLERS[action.type]
   return handler ? handler(state, action) : state
 }

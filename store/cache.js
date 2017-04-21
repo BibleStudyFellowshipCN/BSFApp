@@ -10,8 +10,8 @@ if (!global.enableCache) {
 }
 
 export async function cacheFetch(url) {
+  const key = "[Cache]" + url
   if (global.enableCache) {
-    const key = "[Cache]" + url
     const content = await AsyncStorage.getItem(key)
     if (content != null) {
         console.log("[Cache]Hit:" + key)
