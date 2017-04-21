@@ -1,24 +1,43 @@
 import { AsyncStorage } from 'react-native'
 
+// ------------------------------------
+// Constants
+// ------------------------------------
+export const CACHE_POLICY = {
+    NONE: 0,
+    MEMORY: 1,
+    ASYNCSTORAGE: 2,
+};
+
 // TODO: [Wei] Add them to settings' page
 if (!global.webserviceUrl) {
   global.webserviceUrl = 'http://turbozv.com/bsf/api/'
 }
 
-if (!global.enableCache) {
-  global.enableCache = true
+if (!global.cachePolicy) {
+  global.cachePolicy = CACHE_POLICY.MEMORY
+}
+
+if (!global.memoryCache) {
+  global.memoryCache = []
 }
 
 export async function cacheFetch(url) {
-  const key = "[Cache]" + url
-  if (global.enableCache) {
-    const content = await AsyncStorage.getItem(key)
+  const key = "CACHE-" + url
+  if (global.memoryCache == CACHE_POLICY.MEMORY) {
+    const content = global.cache[key]
     if (content != null) {
         console.log("[Cache]Hit:" + key)
-        return eval("(" + content + ")")
+        return content
     }
-    console.log("[Cache]Miss:" + key)
+  } else if (global.memoryCache == CACHE_POLICY.ASYNCSTORAGE) {
+      const content = await AsyncStorage.getItem(key)
+      if (content != null) {
+          console.log("[Cache]Hit:" + key)
+          return eval("(" + content + ")")
+      }
   }
+  console.log("[Cache]Miss:" + key)
 
   // fetch bible verse from web service
   const response = await fetch(global.webserviceUrl + url)
@@ -32,10 +51,12 @@ export async function cacheFetch(url) {
     return null
   }
 
-  if (global.enableCache) {
+  if (global.memoryCache == CACHE_POLICY.MEMORY) {
+    global.cache[key] = responseJson
+  } else if (global.memoryCache == CACHE_POLICY.ASYNCSTORAGE) {
     AsyncStorage.setItem(key, JSON.stringify(responseJson))
-    console.log("[Cache]Set:" + key)
   }
+  console.log("[Cache]Set:" + key)
 
   return responseJson
 }
