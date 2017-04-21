@@ -12,47 +12,33 @@ export const FAILURE_BOOKS = 'FAILURE_BOOKS'
 // Actions
 // ------------------------------------
 export function requestBooks () {
-  return async(dispatch) => {
+  return (dispatch) => {
     dispatch({
       type: 'REQUEST_CLASS',
     })
 
-    try {
-      const content = await cacheFetch('home.json')
+    cacheFetch('home.json')
+    .then((content) => {
       if (content != null) {
         dispatch({
           type: RECEIVE_BOOKS,
           payload: { state: content }
         })
       }
-    } catch(error) {
-      console.log(error)
-      alert(error)
-      dispatch({
-        type: FAILURE_BOOKS,
-        payload: error,
-      })
-    }
+    })
   }
 }
 
 // ------------------------------------
 // Reducer
 // ------------------------------------
-const initialState = {
-  booklist: [{
-    title: '课程loading',
-    lessons: []
-  }]
-}
-
 const ACTION_HANDLERS = {
   [REQUEST_BOOKS]: (state, action) => state,
   [RECEIVE_BOOKS]: (state, action) => action.payload.state,
   [FAILURE_BOOKS]: (state, action) => state,
 }
 
-export default function booksReducer (state = initialState, action) {
+export default function booksReducer (state = 0, action) {
   const handler = ACTION_HANDLERS[action.type]
   return handler ? handler(state, action) : state
 }

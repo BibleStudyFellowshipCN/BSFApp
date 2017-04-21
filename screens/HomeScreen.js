@@ -24,23 +24,28 @@ class HomeScreen extends React.Component {
   };
 
   render() {
-    console.log(this.props.books)
+    mainUI = null
+    if  (this.props.booklist != undefined) {
+      mainUI = <Accordion 
+                 sections={this.props.booklist}
+                 renderHeader={this._renderHeader.bind(this)}
+                 renderContent={this._renderContent.bind(this)} />
+    }
+    else {
+      mainUI = <Text style={{textAlign: 'center', textAlignVertical: 'center', fontSize: 22}}>正在加载</Text>
+    }
+
     return (
       <View style={styles.container}>
         <ScrollView
           style={styles.container}
           contentContainerStyle={styles.contentContainer}>
-
           <View style={styles.booksContainer}>
-            <Accordion 
-              sections={this.props.booklist}
-              renderHeader={this._renderHeader.bind(this)}
-              renderContent={this._renderContent.bind(this)}
-            />
+            {mainUI}
           </View>
         </ScrollView>
       </View>
-    );
+    )
   }
 
   _renderHeader(content, index, isActive) {

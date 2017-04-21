@@ -28,7 +28,7 @@ export async function cacheFetch(url) {
   console.log(url + " => " + JSON.stringify(responseJson))
   if (responseJson.error != undefined) {
     alert(responseJson.error)
-    console.warn(responseJson.error)
+    console.log(responseJson.error)
     return null
   }
 
