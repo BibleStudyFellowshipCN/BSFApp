@@ -11,9 +11,7 @@ import {
   View,
 } from 'react-native';
 import { loadClass } from '../store/class.js'
-
 import Accordion from 'react-native-collapsible/Accordion';
-
 import { MonoText } from '../components/StyledText';
 
 class HomeScreen extends React.Component {
@@ -27,6 +25,7 @@ class HomeScreen extends React.Component {
     mainUI = null
     if  (this.props.booklist != undefined) {
       mainUI = <Accordion 
+                 initiallyActiveSection={0}
                  sections={this.props.booklist}
                  renderHeader={this._renderHeader.bind(this)}
                  renderContent={this._renderContent.bind(this)} />
