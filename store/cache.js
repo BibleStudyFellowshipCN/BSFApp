@@ -15,7 +15,7 @@ if (!global.webserviceUrl) {
 }
 
 if (!global.cachePolicy) {
-  global.cachePolicy = CACHE_POLICY.MEMORY
+  global.cachePolicy = CACHE_POLICY.ASYNCSTORAGE
 }
 
 if (!global.memoryCache) {
@@ -24,13 +24,13 @@ if (!global.memoryCache) {
 
 export async function cacheFetch(url) {
   const key = "CACHE-" + url
-  if (global.memoryCache == CACHE_POLICY.MEMORY) {
-    const content = global.cache[key]
+  if (global.cachePolicy == CACHE_POLICY.MEMORY) {
+    const content = global.memoryCache[key]
     if (content != null) {
         console.log("[Cache]Hit:" + key)
         return content
     }
-  } else if (global.memoryCache == CACHE_POLICY.ASYNCSTORAGE) {
+  } else if (global.cachePolicy == CACHE_POLICY.ASYNCSTORAGE) {
       const content = await AsyncStorage.getItem(key)
       if (content != null) {
           console.log("[Cache]Hit:" + key)
@@ -51,9 +51,9 @@ export async function cacheFetch(url) {
     return null
   }
 
-  if (global.memoryCache == CACHE_POLICY.MEMORY) {
-    global.cache[key] = responseJson
-  } else if (global.memoryCache == CACHE_POLICY.ASYNCSTORAGE) {
+  if (global.cachePolicy == CACHE_POLICY.MEMORY) {
+    global.memoryCache[key] = responseJson
+  } else if (global.cachePolicy == CACHE_POLICY.ASYNCSTORAGE) {
     AsyncStorage.setItem(key, JSON.stringify(responseJson))
   }
   console.log("[Cache]Set:" + key)
