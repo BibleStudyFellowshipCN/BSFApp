@@ -62,7 +62,7 @@ async function loadFromCloudAsync(model, id) {
     }
     const url = !!id ? (model.restUri + id) : model.restUri;
     let responseJson;
-    const responseString;
+    let responseString;
     try {
         // fetch data from service
         const response = await fetch(url);

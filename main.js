@@ -19,38 +19,37 @@ class AppContainer extends React.Component {
   };
 
   componentWillMount() {
-      this.loadApp();
+    this.loadApp();
   }
 
-  loadApp() {
-    // add all the neccessary load in Promise.all
-    Promise.all([
-      loadAsync(Models.Book, null, true),
-      loadAsync(Models.Answer, null, true),
-      cacheAssetsAsync({
-        images: [require('./assets/images/expo-wordmark.png')],
-        fonts: [
-          FontAwesome.font,
-          { 'space-mono': require('./assets/fonts/SpaceMono-Regular.ttf') },
-        ],
-      }),
-    ])
-    .then ((bootValues) => {
+  async loadApp() {
+    try {
+      // add all the neccessary load in Promise.all
+      let bootValues = await Promise.all([
+        loadAsync(Models.Book, null, true),
+        loadAsync(Models.Answer, null, true),
+        cacheAssetsAsync({
+          images: [require('./assets/images/expo-wordmark.png')],
+          fonts: [
+            FontAwesome.font,
+            { 'space-mono': require('./assets/fonts/SpaceMono-Regular.ttf') },
+          ],
+        }),
+      ]);
       // create the store with the boot data
       const initialstate = {
         books: bootValues[0],
-        answers: bootValues[1] ? bootValues[1] : { answers : {}},
-      };
+        answers: bootValues[1] ? bootValues[1] : { answers: {} },
+      }
       store = createStore(initialstate);
 
-      // prefetch data:
+      // prefetch data here:
 
       // set the app status to ready
       this.setState({ appIsReady: true });
-    })
-    .catch((err) => {
+    } catch (err) {
       console.error("failed to boot due to: " + err);
-    });
+    }
   }
 
   render() {
