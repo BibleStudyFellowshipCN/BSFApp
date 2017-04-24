@@ -62,17 +62,21 @@ async function loadFromCloudAsync(model, id) {
     }
     const url = !!id ? (model.restUri + id) : model.restUri;
     let responseJson;
+    const responseString;
     try {
         // fetch data from service
-        const response = await fetch(url)
+        const response = await fetch(url);
         // FIXME: [Wei] "response.json()" triggers error on Android, so I have to use "eval"
         // responseJson = eval("(" + response._bodyText + ")")
-        const responseString = await response.text();
+        responseString = await response.text();
         responseJson = JSON.parse(responseString);
 
-        console.log(url + " => " + JSON.stringify(responseJson))
+        console.log(url + " => " + JSON.stringify(responseJson));
     } catch (err) {
         console.error(err);
+        // FIXME: [Wei] "response.json()" triggers error on Android, so I have to use "eval"
+        // Fallback to eval workaround if JSON.parse() doesn't work
+        responseJson = eval("(" + responseString + ")");
     }
 
     return responseJson;
