@@ -100,9 +100,9 @@ const DayQuestions = (props) => {
   );
 
   // TODO:[Wei] KeyboardAwareScrollView works on iOS but not Android, KeyboardAvoidingView works on Android, but not iOS :(
-  // TODO: Need verify if this new KeyboardAwareScrollView can work on Android
+  // TODO: Need verify if this new KeyboardAwareScrollView position can work on Android
   return (Platform.OS === 'ios') ? (
-    <KeyboardAwareScrollView style={styles.dayQuestionsContainer}>
+    <KeyboardAwareScrollView style={styles.dayQuestionsContainer} extraScrollHeight={80}>
       {content}
     </KeyboardAwareScrollView>
   ) : (
