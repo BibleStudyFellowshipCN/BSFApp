@@ -3,15 +3,15 @@ import React from 'react';
 import { Platform, StatusBar, StyleSheet, View } from 'react-native';
 import { NavigationProvider, StackNavigation } from '@expo/ex-navigation';
 import { FontAwesome } from '@expo/vector-icons';
-import { Provider } from 'react-redux'
+import { Provider } from 'react-redux';
 
 import createStore from './store/createStore'
 import Router from './navigation/Router';
 import cacheAssetsAsync from './utilities/cacheAssetsAsync';
-import { loadAnswers } from './store/answers'
-import { requestBooks } from './store/books.js'
+import { loadAsync } from './dataStorage/storage';
+import { Models } from './dataStorage/models';
 
-const store = createStore()
+let store;
 
 class AppContainer extends React.Component {
   state = {
@@ -19,29 +19,38 @@ class AppContainer extends React.Component {
   };
 
   componentWillMount() {
-    this._loadAssetsAsync();
-    store.dispatch(requestBooks())
-    store.dispatch(loadAnswers())
+      this.loadApp();
   }
 
-  async _loadAssetsAsync() {
-    try {
-      await cacheAssetsAsync({
+  loadApp() {
+    // add all the neccessary load in Promise.all
+    Promise.all([
+      loadAsync(Models.Book, null, true),
+      loadAsync(Models.Answer, null, true),
+      cacheAssetsAsync({
         images: [require('./assets/images/expo-wordmark.png')],
         fonts: [
           FontAwesome.font,
           { 'space-mono': require('./assets/fonts/SpaceMono-Regular.ttf') },
         ],
-      });
-    } catch (e) {
-      console.warn(
-        'There was an error caching assets (see: main.js), perhaps due to a ' +
-          'network timeout, so we skipped caching. Reload the app to try again.'
-      );
-      console.log(e.message);
-    } finally {
+      }),
+    ])
+    .then ((bootValues) => {
+      // create the store with the boot data
+      const initialstate = {
+        books: bootValues[0],
+        answers: bootValues[1] ? bootValues[1] : { answers : {}},
+      };
+      store = createStore(initialstate);
+
+      // prefetch data:
+
+      // set the app status to ready
       this.setState({ appIsReady: true });
-    }
+    })
+    .catch((err) => {
+      console.error("failed to boot due to: " + err);
+    });
   }
 
   render() {
