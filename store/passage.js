@@ -27,7 +27,7 @@ function getUrl(book, verse) {
 export function requestPassage (book, verse, navigator) {
   return async(dispatch) => {
     try {
-      const content = await loadAsync(Models.Passage, getUrl(book, verse))
+      const content = await loadAsync(Models.Passage, getUrl(book, verse), true)
       if (content != null) {
         dispatch({
           type: RECEIVE_PASSAGE,
