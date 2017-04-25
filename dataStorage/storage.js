@@ -32,13 +32,15 @@ async function loadAsync(model, id, update) {
     if (!data || data.length == 0) {
         // TODO need to sync from server;
         data = await loadFromCloudAsync(model, id, false);
-        data && saveToOffilneStorageAsync(data, model.key, id);
+        if(data) {
+            saveToOffilneStorageAsync(data, model.key, id);
+        }
     } else if (update) {
         // update the offline storage silently
-        loadFromCloudAsync(model, id, true)
-            .then((cloudData) => {
-                cloudData && saveToOffilneStorageAsync(cloudData, model.key, id);
-            });
+        const updateData = await loadFromCloudAsync(model, id, true);
+        if (updateData) {
+            saveToOffilneStorageAsync(updateData, model.key, id);
+        }
     }
 
     return data;
@@ -78,6 +80,12 @@ async function loadFromCloudAsync(model, id, silentLoad) {
             // FIXME: [Wei] "response.json()" triggers error on Android, so I have to use "eval"
             // Fallback to eval workaround if JSON.parse() doesn't work
             responseJson = eval("(" + responseString + ")");
+        }
+
+        if (responseJson.error != undefined) {
+            alert(responseJson.error);
+            console.log(responseJson.error);
+            return null;
         }
 
         console.log(url + " => " + JSON.stringify(responseJson));
