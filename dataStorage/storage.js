@@ -31,13 +31,13 @@ async function loadAsync(model, id, update) {
     let data = await loadFromOffilneStorageAsync(model.key, id);
     if (!data || data.length == 0) {
         // TODO need to sync from server;
-        data = await loadFromCloudAsync(model, id, false);
+        data = await loadFromCloudAsync(model, id, /*silentLoad*/ false);
         if(data) {
             saveToOffilneStorageAsync(data, model.key, id);
         }
     } else if (update) {
         // update the offline storage silently
-        const updateData = await loadFromCloudAsync(model, id, true);
+        const updateData = await loadFromCloudAsync(model, id, /*silentLoad*/ true);
         if (updateData) {
             saveToOffilneStorageAsync(updateData, model.key, id);
         }
