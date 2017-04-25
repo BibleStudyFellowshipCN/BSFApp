@@ -1,7 +1,7 @@
 {
-  "name": "bsfapp",
+  "name": "CBSF",
   "version": "0.0.0",
-  "description": "Hello Expo!",
+  "description": "Chinese Bible Study Fellowship",
   "author": null,
   "main": "main.js",
   "scripts": {

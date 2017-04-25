@@ -1,56 +1,20 @@
-import { AsyncStorage } from 'react-native'
-import Storage from 'react-native-storage'
-import { debounce } from 'lodash'
-
-
-if (!global.storage) {
-  global.storage = new Storage({
-    size: 10000,
-    storageBackend: AsyncStorage,
-    enableCache: true,
-    defaultExpires: null,
-  })
-}
-
-const storage = global.storage
+import { debounce } from 'lodash';
+import { saveAsync } from '../dataStorage/storage';
+import { Models } from '../dataStorage/models';
 
 // ------------------------------------
 // Constants
 // ------------------------------------
+export const RECEIVED_ANSWERS = 'RECEIVED_ANSWERS'
+
 export const LOAD_ANSWERS = 'LOAD_ANSWERS'
 export const UPDATE_ANSWER = 'UPDATE_ANSWER'
 
 export const ANSWER_KEY = 'answer'
 
-// ------------------------------------
-// Actions
-// ------------------------------------
-export function loadAnswers () {
-  return (dispatch) => {
-    storage.getAllDataForKey(ANSWER_KEY)
-      .then((answers) => {
-        const answerMap = answers.reduce((acc, answer) => {
-          return Object.assign(acc, { [answer.questionId] : answer })
-        }, {})
-        dispatch({
-          type: LOAD_ANSWERS,
-          payload: answerMap,
-        })
-      })
-      .catch(err => {
-        console.log(err.message)
-        alert(error)
-      })
-  }
-}
-
-function saveAnswer (questionId, answerText) {
-  console.log('Saving answer: ', questionId, answerText)
-  storage.save({
-    key: ANSWER_KEY,
-    id: questionId,
-    rawData: { questionId, answerText }
-  })
+function saveAnswer (newState) {
+  console.log("Saving answers...");
+  saveAsync(newState, Models.Answer);
 }
 const debouncedSaveAnswer = debounce(saveAnswer, wait = 500)
 
@@ -60,8 +24,6 @@ export function updateAnswer (questionId, answerText) {
       type: UPDATE_ANSWER,
       payload: { questionId, answerText }
     })
-
-    debouncedSaveAnswer(questionId, answerText)
   }
 }
 
@@ -73,14 +35,16 @@ const initialState = {
 }
 
 const ACTION_HANDLERS = {
-  [LOAD_ANSWERS]: (state, action) => Object.assign({}, state, {
-    answers: action.payload,
-  }),
-  [UPDATE_ANSWER]: (state, action) => Object.assign({}, state, {
-    answers: Object.assign({}, state.answers, {
-      [action.payload.questionId]: action.payload
-    })
-  })
+  [UPDATE_ANSWER]: (state, action) => {
+    const newState = Object.assign({}, state, {
+      answers: Object.assign({}, state.answers, {
+        [action.payload.questionId]: action.payload
+      })
+    });
+
+    debouncedSaveAnswer(newState)
+    return newState;
+  },
 }
 
 export default function booksReducer (state = initialState, action) {

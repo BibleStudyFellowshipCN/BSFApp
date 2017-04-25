@@ -1,50 +1,32 @@
-import { AsyncStorage } from 'react-native'
-import { cacheFetch } from '../store/cache.js'
+import { Models } from '../dataStorage/models';
+import { loadAsync } from '../dataStorage/storage';
 
 // ------------------------------------
 // Constants
 // ------------------------------------
-export const REQUEST_BOOKS = 'REQUEST_BOOKS'
-export const RECEIVE_BOOKS = 'RECEIVE_BOOKS'
-export const FAILURE_BOOKS = 'FAILURE_BOOKS'
+export const RECEIVE_BOOKS = 'RECEIVE_BOOKS';
 
 // ------------------------------------
 // Actions
 // ------------------------------------
 export function requestBooks () {
-  return async(dispatch) => {
-    dispatch({
-      type: 'REQUEST_CLASS',
-    })
+  return async (dispatch) => {
 
-    try {
-      const content = await cacheFetch('home.json')
-      if (content != null) {
-        dispatch({
+    const books = await loadAsync(Models.Book);
+    dispatch({
           type: RECEIVE_BOOKS,
-          payload: { state: content }
-        })
-      }
-    } catch(error) {
-      console.log(error)
-      alert(error)
-      dispatch({
-        type: FAILURE_BOOKS,
-        payload: error,
-      })
-    }
+          payload: { books: books },
+    })
   }
 }
 
 // ------------------------------------
 // Reducer
 // ------------------------------------
-const initialState = require('../assets/home.json')
+const initialState = require('../assets/home.json');
 
 const ACTION_HANDLERS = {
-  [REQUEST_BOOKS]: (state, action) => state,
-  [RECEIVE_BOOKS]: (state, action) => action.payload.state,
-  [FAILURE_BOOKS]: (state, action) => state,
+  [RECEIVE_BOOKS]: (state, action) => action.payload.books,
 }
 
 export default function booksReducer (state = initialState, action) {
