@@ -13,13 +13,13 @@ function getId(lesson) {
   return lesson.id + '.json'
 }
 
-export function loadClass (lesson, navigator, update) {
+export function loadClass (lesson, navigator) {
   const { id, name } = lesson
   return async(dispatch) => {
     try {
       // Then make the http request for the class (a placeholder url below)
       // we use the await syntax.
-      const classContent = await loadAsync(Models.Class, `${id}.json`, update);
+      const classContent = await loadAsync(Models.Class, `${id}.json`, true);
       if (classContent) {
         // Now that we received the json, we dispatch an action to update the stage
         dispatch({

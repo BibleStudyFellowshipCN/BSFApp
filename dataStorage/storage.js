@@ -31,14 +31,14 @@ async function loadAsync(model, id, update) {
     let data = await loadFromOffilneStorageAsync(model.key, id);
     if (!data || data.length == 0) {
         // TODO need to sync from server;
-        data = await loadFromCloudAsync(model, id);
+        data = await loadFromCloudAsync(model, id, false);
         data && saveToOffilneStorageAsync(data, model.key, id);
     } else if (update) {
         // update the offline storage silently
-        loadFromCloudAsync(model, id)
-        .then((cloudData) => {
-            saveToOffilneStorageAsync(cloudData, model.key, id);
-        });
+        loadFromCloudAsync(model, id, true)
+            .then((cloudData) => {
+                cloudData && saveToOffilneStorageAsync(cloudData, model.key, id);
+            });
     }
 
     return data;
@@ -56,7 +56,7 @@ async function loadFromOffilneStorageAsync(key, id) {
     }
 }
 
-async function loadFromCloudAsync(model, id) {
+async function loadFromCloudAsync(model, id, silentLoad) {
     if (!model.restUri) {
         // The model deosn't support online fetch
         return null;
@@ -67,17 +67,24 @@ async function loadFromCloudAsync(model, id) {
     try {
         // fetch data from service
         const response = await fetch(url);
-        // FIXME: [Wei] "response.json()" triggers error on Android, so I have to use "eval"
-        // responseJson = eval("(" + response._bodyText + ")")
-        responseString = await response.text();
-        responseJson = JSON.parse(responseString);
+
+        try {
+            // FIXME: [Wei] "response.json()" triggers error on Android, so I have to use "eval"
+            // responseJson = eval("(" + response._bodyText + ")")
+            responseString = await response.text();
+            responseJson = JSON.parse(responseString);
+        } catch (err) {
+            console.warn(err);
+            // FIXME: [Wei] "response.json()" triggers error on Android, so I have to use "eval"
+            // Fallback to eval workaround if JSON.parse() doesn't work
+            responseJson = eval("(" + responseString + ")");
+        }
 
         console.log(url + " => " + JSON.stringify(responseJson));
     } catch (err) {
-        console.warn(err);
-        // FIXME: [Wei] "response.json()" triggers error on Android, so I have to use "eval"
-        // Fallback to eval workaround if JSON.parse() doesn't work
-        responseJson = eval("(" + responseString + ")");
+        if (!silentLoad) {
+            alert("Failed to get data from network, check your network connection.");
+        }
     }
 
     return responseJson;
