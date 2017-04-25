@@ -1,7 +1,8 @@
 import { AsyncStorage } from 'react-native';
-import { debounce } from 'lodash'
+import { debounce } from 'lodash';
 import Storage from 'react-native-storage';
-import { Models } from './models'
+
+import { Models } from './models';
 
 if (!global.storage) {
     global.storage = new Storage({
@@ -9,7 +10,7 @@ if (!global.storage) {
         storageBackend: AsyncStorage,
         enableCache: true,
         defaultExpires: null,
-    })
+    });
 }
 
 const storage = global.storage;
@@ -73,7 +74,7 @@ async function loadFromCloudAsync(model, id) {
 
         console.log(url + " => " + JSON.stringify(responseJson));
     } catch (err) {
-        console.error(err);
+        console.warn(err);
         // FIXME: [Wei] "response.json()" triggers error on Android, so I have to use "eval"
         // Fallback to eval workaround if JSON.parse() doesn't work
         responseJson = eval("(" + responseString + ")");
