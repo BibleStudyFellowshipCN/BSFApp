@@ -1,4 +1,4 @@
-import { AsyncStorage, Alert } from 'react-native';
+import { AsyncStorage } from 'react-native';
 import { debounce } from 'lodash';
 import Storage from 'react-native-storage';
 
@@ -81,28 +81,27 @@ async function loadFromCloudAsync(model, id, silentLoad) {
     console.log("load from cloud: " + JSON.stringify({model, id, silentLoad}));
     const url = !!id ? (model.restUri + id) : model.restUri;
     let responseJson;
-    let responseString;
     try {
         // fetch data from service
         const response = await fetch(url);
-        responseString = await response.text();
 
         try {
             // FIXME: [Wei] "response.json()" triggers error on Android
+            let responseString = await response.text();
             responseJson = JSON.parse(responseString);
         } catch (err) {
             // Fallback to eval workaround if JSON.parse() doesn't work
-            responseJson = eval("(" + responseString + ")");
+            responseJson = eval("(" + response._bodyText + ")")
         }
 
         if (responseJson == undefined) {
-            Alert.alert("Invalid server response");
+            alert("Invalid server response");
             return null;
         }
         
         if (responseJson.error != undefined) {
             console.log(responseJson.error);
-            Alert.alert(responseJson.error);
+            alert(responseJson.error);
             return null;
         }
 
@@ -110,7 +109,7 @@ async function loadFromCloudAsync(model, id, silentLoad) {
     } catch (err) {
         console.log(err);
         if (!silentLoad) {
-            Alert.alert(err, "Failed to get data from network, check your network connection.");
+            alert(err, "Failed to get data from network, check your network connection.");
         }
     }
 

@@ -97,14 +97,6 @@ export default class SettingsScreen extends React.Component {
             bible verse: {Models.Book.restUri}
           </Text>
         </SectionContent>
-
-        <SectionHeader title="cache" />
-        <SectionContent>
-          <Text style={styles.sectionContentText}>
-            clear cache
-          </Text>
-        </SectionContent>
-
       </ScrollView>
     );
   }

@@ -1,4 +1,3 @@
-import { Alert } from 'react-native';
 import { Models } from '../dataStorage/models';
 import { loadAsync } from '../dataStorage/storage';
 
@@ -39,7 +38,7 @@ export function requestPassage (book, verse, navigator) {
       }
     } catch(error) {
       console.log(error)
-      Alert.alert(error)
+      alert(error)
     }
   }
 }
