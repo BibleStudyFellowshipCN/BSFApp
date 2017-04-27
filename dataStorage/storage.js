@@ -1,12 +1,12 @@
-import { AsyncStorage } from 'react-native';
+import { AsyncStorage, Alert } from 'react-native';
 import { debounce } from 'lodash';
 import Storage from 'react-native-storage';
 
-import { Models } from './models';
+import { Models, CachePolicy } from './models';
 
 if (!global.storage) {
     global.storage = new Storage({
-        size: 10000,
+        size: 100000,
         storageBackend: AsyncStorage,
         enableCache: true,
         defaultExpires: null,
@@ -15,45 +15,60 @@ if (!global.storage) {
 
 const storage = global.storage;
 
+if (!global.cache) {
+    global.cache = [];
+}
+
 function encode(idOrKey) {
     // key and id can never contains "_"
     return idOrKey.replace(/_/g, '##-##');
 }
 
-async function loadAsync(model, id, update) {
+async function loadAsync(model, id) {
     if (!model) {
         throw "key is not defined";
     }
 
-    console.log("start load");
-
-    // try to load from offline storage first
-    let data = await loadFromOffilneStorageAsync(model.key, id);
-    if (!data || data.length == 0) {
-        // TODO need to sync from server;
-        data = await loadFromCloudAsync(model, id, /*silentLoad*/ false);
-        if(data) {
-            saveToOffilneStorageAsync(data, model.key, id);
-        }
-    } else if (update) {
-        // update the offline storage silently
-        const updateData = await loadFromCloudAsync(model, id, /*silentLoad*/ true);
-        if (updateData) {
-            saveToOffilneStorageAsync(updateData, model.key, id);
-        }
+    console.log("start load " + JSON.stringify({model, id}));
+    
+    // try to load from cache first
+    let data = null;
+    let keyString = (id == null)? model.key: model.key + id;    
+    if (model.cachePolicy == CachePolicy.Memory) {
+        data = global.cache[keyString];
+    }
+    else if (model.cachePolicy == CachePolicy.AsyncStorage) {
+        data = await loadFromOffilneStorageAsync(model.key, id);
+    }    
+    if (data) {
+        return data
     }
 
+    // cache miss, load from network
+    data = await loadFromCloudAsync(model, id, /*silentLoad*/ false);
+
+    // store to cache
+    if (data) {
+        if (model.cachePolicy == CachePolicy.Memory) {
+            global.cache[keyString] = data;
+        }
+        else if (model.cachePolicy == CachePolicy.AsyncStorage) {
+            saveToOffilneStorageAsync(data, model.key, id);
+        }
+    }
+    console.log("finish load " + JSON.stringify({model, id}));
     return data;
 }
 
 async function loadFromOffilneStorageAsync(key, id) {
+    console.log("load from storage: " + JSON.stringify({key, id}));
     try {
         const data = !!id ?
             await storage.load({ key: encode(key), id: encode(id) }) :
             await storage.load({ key: encode(key) });
         return data;
     } catch (err) {
-        console.log("failed to load: " + JSON.stringify(err));
+        console.log("failed to load from storage: " + JSON.stringify({key, id}));
         return null;
     }
 }
@@ -63,35 +78,39 @@ async function loadFromCloudAsync(model, id, silentLoad) {
         // The model deosn't support online fetch
         return null;
     }
+    console.log("load from cloud: " + JSON.stringify({model, id, silentLoad}));
     const url = !!id ? (model.restUri + id) : model.restUri;
     let responseJson;
     let responseString;
     try {
         // fetch data from service
         const response = await fetch(url);
+        responseString = await response.text();
 
         try {
-            // FIXME: [Wei] "response.json()" triggers error on Android, so I have to use "eval"
-            // responseJson = eval("(" + response._bodyText + ")")
-            responseString = await response.text();
+            // FIXME: [Wei] "response.json()" triggers error on Android
             responseJson = JSON.parse(responseString);
         } catch (err) {
-            console.warn(err);
-            // FIXME: [Wei] "response.json()" triggers error on Android, so I have to use "eval"
             // Fallback to eval workaround if JSON.parse() doesn't work
             responseJson = eval("(" + responseString + ")");
         }
 
+        if (responseJson == undefined) {
+            Alert.alert("Invalid server response");
+            return null;
+        }
+        
         if (responseJson.error != undefined) {
-            alert(responseJson.error);
             console.log(responseJson.error);
+            Alert.alert(responseJson.error);
             return null;
         }
 
         console.log(url + " => " + JSON.stringify(responseJson));
     } catch (err) {
+        console.log(err);
         if (!silentLoad) {
-            alert("Failed to get data from network, check your network connection.");
+            Alert.alert(err, "Failed to get data from network, check your network connection.");
         }
     }
 
@@ -110,6 +129,7 @@ async function saveAsync(data, model, id) {
 }
 
 async function saveToOffilneStorageAsync(payload, key, id) {
+    console.log("save to storage: " + JSON.stringify({key, id}));
     return !!id ?
         await storage.save({ key: encode(key), id: encode(id), rawData: payload }) :
         await storage.save({ key: encode(key), rawData: payload })

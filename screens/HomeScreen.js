@@ -17,7 +17,7 @@ import { MonoText } from '../components/StyledText';
 class HomeScreen extends React.Component {
   static route = {
     navigationBar: {
-      visible: false,
+      title: 'BSF课程',
     },
   };
 
@@ -121,7 +121,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   contentContainer: {
-    paddingTop: 80,
+    paddingTop: 18,
   },
   welcomeContainer: {
     alignItems: 'center',

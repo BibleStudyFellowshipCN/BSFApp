@@ -1,3 +1,4 @@
+import { Alert } from 'react-native';
 import { Models } from '../dataStorage/models';
 import { loadAsync } from '../dataStorage/storage';
 
@@ -27,7 +28,7 @@ function getUrl(book, verse) {
 export function requestPassage (book, verse, navigator) {
   return async(dispatch) => {
     try {
-      const content = await loadAsync(Models.Passage, getUrl(book, verse), true)
+      const content = await loadAsync(Models.Passage, getUrl(book, verse))
       if (content != null) {
         dispatch({
           type: RECEIVE_PASSAGE,
@@ -38,7 +39,7 @@ export function requestPassage (book, verse, navigator) {
       }
     } catch(error) {
       console.log(error)
-      alert(error)
+      Alert.alert(error)
     }
   }
 }

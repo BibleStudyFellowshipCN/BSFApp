@@ -1,3 +1,4 @@
+import { Alert } from 'react-native';
 import { Models } from '../dataStorage/models';
 import { loadAsync } from '../dataStorage/storage';
 
@@ -19,7 +20,7 @@ export function loadClass (lesson, navigator) {
     try {
       // Then make the http request for the class (a placeholder url below)
       // we use the await syntax.
-      const classContent = await loadAsync(Models.Class, `${id}.json`, true);
+      const classContent = await loadAsync(Models.Class, `${id}.json`);
       if (classContent) {
         // Now that we received the json, we dispatch an action to update the stage
         dispatch({
@@ -31,9 +32,8 @@ export function loadClass (lesson, navigator) {
         navigator.push('class', { lesson })
       }
     } catch(error) {
-      alert(error)
-      // We handle errors here, and dispatch the failure action in case of an error
       console.log(error)
+      Alert.alert(error)
     }
   }
 }
