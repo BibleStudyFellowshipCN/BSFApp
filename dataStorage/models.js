@@ -9,12 +9,12 @@ export const Models = {
   Book: {
     key: "BOOK",
     restUri: "http://turbozv.com/bsf/api/",
-    cachePolicy: CachePolicy.Memory,
+    cachePolicy: CachePolicy.AsyncStorage,
   },
   Class: {
     key: "CLASS",
     restUri: "http://turbozv.com/bsf/api/",
-    cachePolicy: CachePolicy.Memory,
+    cachePolicy: CachePolicy.AsyncStorage,
   },
   Passage: {
     key: "PASSAGE",

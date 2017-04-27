@@ -82,8 +82,13 @@ async function loadFromCloudAsync(model, id, silentLoad) {
     const url = !!id ? (model.restUri + id) : model.restUri;
     let responseJson;
     try {
+        // Set no cache header
+        let noCacheHeader = new Headers();
+        noCacheHeader.append('pragma', 'no-cache');
+        noCacheHeader.append('cache-control', 'no-cache');
+
         // fetch data from service
-        const response = await fetch(url);
+        const response = await fetch(url, { method: 'GET', headers: noCacheHeader });
 
         try {
             // FIXME: [Wei] "response.json()" triggers error on Android
