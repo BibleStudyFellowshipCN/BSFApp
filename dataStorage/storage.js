@@ -24,7 +24,7 @@ function encode(idOrKey) {
     return idOrKey.replace(/_/g, '##-##');
 }
 
-async function loadAsync(model, id) {
+async function loadAsync(model, id, update) {
     if (!model) {
         throw "key is not defined";
     }
@@ -33,15 +33,21 @@ async function loadAsync(model, id) {
     
     // try to load from cache first
     let data = null;
-    let keyString = (id == null)? model.key: model.key + id;    
+    let keyString = (id == null)? model.key: model.key + id;
     if (model.cachePolicy == CachePolicy.Memory) {
         data = global.cache[keyString];
     }
     else if (model.cachePolicy == CachePolicy.AsyncStorage) {
         data = await loadFromOffilneStorageAsync(model.key, id);
-    }    
+        if (data && update) {
+            console.log("updating the data from cloud");
+            let updatedData = await loadFromCloudAsync(model, id, /*silentLoad*/ true);
+            console.log("silently save the updated cloud data to storage");
+            saveToOffilneStorageAsync(updatedData, model.key, id);
+        }
+    }
     if (data) {
-        return data
+        return data;
     }
 
     // cache miss, load from network
@@ -55,8 +61,12 @@ async function loadAsync(model, id) {
         else if (model.cachePolicy == CachePolicy.AsyncStorage) {
             saveToOffilneStorageAsync(data, model.key, id);
         }
+        console.log("finish load " + JSON.stringify({model, id}));
     }
-    console.log("finish load " + JSON.stringify({model, id}));
+    else {
+        console.log("failed to load" + JSON.stringify({model, id}));
+    }
+    
     return data;
 }
 

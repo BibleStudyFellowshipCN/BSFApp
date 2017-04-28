@@ -25,16 +25,24 @@ function getUrl(book, verse) {
 // Actions
 // ------------------------------------
 export function requestPassage (book, verse, navigator) {
-  return async(dispatch) => {
+  return async(dispatch, getState) => {
     try {
-      const content = await loadAsync(Models.Passage, getUrl(book, verse))
-      if (content != null) {
-        dispatch({
-          type: RECEIVE_PASSAGE,
-          payload: { passage: content }
-        })
+      const id = getUrl(book, verse);
+      const state = getState();
+      let content;
+      if (!state.passages[id]) {
+        content = await loadAsync(Models.Passage, id);
+        if (content) {
+          dispatch({
+            type: RECEIVE_PASSAGE,
+            payload: { id: id, passage: content }
+          });
 
-        navigator.push('bible', { book, verse })
+          navigator.push('bible', { book, verse });
+        }
+      }
+      else {
+        navigator.push('bible', { book, verse });
       }
     } catch(error) {
       console.log(error)
@@ -46,11 +54,15 @@ export function requestPassage (book, verse, navigator) {
 // ------------------------------------
 // Reducer
 // ------------------------------------
-const ACTION_HANDLERS = {
-  [RECEIVE_PASSAGE]: (state, action) => action.payload.passage,
+const initialState = {
+  passages: {}
 }
 
-export default function passageReducer (state = 0, action) {
+const ACTION_HANDLERS = {
+  [RECEIVE_PASSAGE]: (state, action) => Object.Assign({}, state.passages, { [action.payload.id]: action.payload.passage}),
+}
+
+export default function passageReducer (state = initialState, action) {
   const handler = ACTION_HANDLERS[action.type]
   return handler ? handler(state, action) : state
 }

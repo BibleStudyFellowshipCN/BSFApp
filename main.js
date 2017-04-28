@@ -26,8 +26,8 @@ class AppContainer extends React.Component {
     try {
       // add all the neccessary load in Promise.all
       let bootValues = await Promise.all([
-        loadAsync(Models.Book, "home.json"),
-        loadAsync(Models.Answer, null),
+        loadAsync(Models.Book, "home.json", true),
+        loadAsync(Models.Answer, null, true),
         cacheAssetsAsync({
           images: [require('./assets/images/expo-wordmark.png')],
           fonts: [
