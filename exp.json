@@ -2,7 +2,7 @@
   "name": "CBSF",
   "description": "Chinese Bible Study Fellowship",
   "slug": "CBSFApp",
-  "privacy": "unlisted",
+  "privacy": "public",
   "sdkVersion": "15.0.0",
   "version": "2017.04.26",
   "orientation": "portrait",
