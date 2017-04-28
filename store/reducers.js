@@ -1,6 +1,6 @@
 import { combineReducers } from 'redux'
 import booksReducer from './books'
-import classReducer from './class'
+import lessonsReducer from './lessons'
 import passageReducer from './passage'
 import answersReducer from './answers'
 
@@ -9,7 +9,7 @@ export const makeRootReducer = (asyncReducers) => {
     books: booksReducer,
     passage: passageReducer,
     answers: answersReducer,
-    class: classReducer,
+    lessons: lessonsReducer,
     ...asyncReducers
   })
 }

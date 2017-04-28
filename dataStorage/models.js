@@ -11,8 +11,8 @@ export const Models = {
     restUri: "http://turbozv.com/bsf/api/",
     cachePolicy: CachePolicy.AsyncStorage,
   },
-  Class: {
-    key: "CLASS",
+  Lesson: {
+    key: "LESSON",
     restUri: "http://turbozv.com/bsf/api/",
     cachePolicy: CachePolicy.AsyncStorage,
   },
