@@ -39,29 +39,42 @@ export default class RootNavigation extends React.Component {
 
         <TabNavigationItem
           id="class"
-          renderIcon={isSelected => this._renderIcon('课', isSelected)}>
-          <StackNavigation initialRoute="home" />
+          renderIcon={isSelected => this._renderIcon('课', 'book', isSelected)}>
+          <StackNavigation
+            initialRoute="home"
+            defaultRouteConfig={{
+              navigationBar: {
+                backgroundColor: Colors.yellow,
+                titleStyle: {
+                  fontSize: 22,
+                  fontWeight: '700'
+                }
+              }
+            }}
+          />
         </TabNavigationItem>
 
         <TabNavigationItem
           id="profile"
-          renderIcon={isSelected => this._renderIcon('我', isSelected)}>
+          renderIcon={isSelected => this._renderIcon('我', 'info-circle', isSelected)}>
           <StackNavigation initialRoute="settings" />
         </TabNavigationItem>
       </TabNavigation>
     );
   }
 
-  _renderIcon(name, isSelected) {
+  _renderIcon(name, iconName, isSelected) {
     return (
-      <Text style={{ color: isSelected ? Colors.tabIconSelected : Colors.tabIconDefault }}>
-        {name}
-      </Text>
-      // <FontAwesome
-      //   name={name}
-      //   size={32}
-      //   color={isSelected ? Colors.tabIconSelected : Colors.tabIconDefault}
-      // />
+      <View style={{ justifyContent: 'center', alignItems: 'center'}}>
+        <FontAwesome
+          name={iconName}
+          size={26}
+          color={isSelected ? Colors.tabIconSelected : Colors.tabIconDefault}
+        />
+        <Text style={{ color: isSelected ? Colors.tabIconSelected : Colors.tabIconDefault, fontSize: 12 }}>
+          {name}
+        </Text>
+      </View>
     );
   }
 

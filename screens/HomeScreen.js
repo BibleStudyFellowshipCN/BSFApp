@@ -12,6 +12,7 @@ import {
 } from 'react-native';
 import Accordion from 'react-native-collapsible/Accordion';
 import { MonoText } from '../components/StyledText';
+import Colors from '../constants/Colors'
 
 class HomeScreen extends React.Component {
   static route = {
@@ -53,12 +54,12 @@ class HomeScreen extends React.Component {
   _renderHeader(content, index, isActive) {
     return (
       <View style={styles.bookHeader} >
-        <View style={styles.bookHeaderIcon}>
-          <FontAwesome
-            name={ isActive ? 'minus' : 'plus'}
-            size={ 18 }
-          />
-        </View>
+        {/* <View style={styles.bookHeaderIcon}> */}
+        {/*   <FontAwesome */}
+        {/*     name={ isActive ? 'minus' : 'plus'} */}
+        {/*     size={ 18 } */}
+        {/*   /> */}
+        {/* </View> */}
         <Text style={styles.bookHeaderText}> { content.title } </Text>
       </View>
     )
@@ -90,15 +91,34 @@ class HomeScreen extends React.Component {
   };
 }
 
-const Lesson = (props) => (
-  <View>
-    <TouchableOpacity onPress={() => props.goToLesson()}>
-      <Text style={styles.lessonText}>
-        {props.lesson.name}
-      </Text>
+const Lesson = (props) => {
+  // TODO: clean up backend api for this to work
+  const parsed = props.lesson.name.split(' ')
+  const lessonNumber = parsed[0]
+  const name = parsed[1]
+  const date = parsed[2]
+  return (
+    <TouchableOpacity style={styles.lessonContainer} onPress={() => props.goToLesson()}>
+      <View>
+        <View style={styles.lessonMetadata}>
+          <Text style={styles.lessonMetadataText}>
+            {date} {lessonNumber}
+          </Text>
+        </View>
+        <Text style={styles.lessonText}>
+          {name}
+        </Text>
+      </View>
+      <View style={styles.lessonChevron}>
+        <FontAwesome
+          name='chevron-right'
+          color='grey'
+          size={ 16 }
+        />
+      </View>
     </TouchableOpacity>
-  </View>
-)
+  ) 
+}
 
 const mapStateToProps = (state) => {
   return {
@@ -113,7 +133,7 @@ export default connect(mapStateToProps, mapDispatchToProps)(HomeScreen)
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: 'whitesmoke',
   },
   developmentModeText: {
     marginBottom: 20,
@@ -122,38 +142,47 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   contentContainer: {
-    paddingTop: 18,
-  },
-  welcomeContainer: {
-    alignItems: 'center',
-    marginTop: 10,
-    marginBottom: 20,
-  },
-  welcomeImage: {
-    width: 140,
-    height: 38,
-    resizeMode: 'contain',
-    marginTop: 3,
-    marginLeft: -10,
   },
   booksContainer: {
-    marginHorizontal: 15,
   },
   bookHeader: {
     flexDirection: 'row',
     paddingVertical: 2,
-    backgroundColor: 'white',
+    backgroundColor: 'whitesmoke',
+    justifyContent: 'center',
+    alignItems: 'center',
+    height: 60,
+    paddingLeft: 15,
   },
   bookHeaderIcon: {
     alignItems: 'center',
     justifyContent: 'center',
   },
   bookHeaderText: {
-    fontSize: 18,
+    fontSize: 20,
     marginVertical: 6,
+    fontWeight: '400',
+  },
+
+  lessonContainer: {
+    paddingLeft: 25,
+    paddingVertical: 5,
+    backgroundColor: 'white',
+    height: 60,
+  },
+  lessonChevron: {
+    position: 'absolute',
+    right: 15,
+    top: 25,
+  },
+  lessonMetadata: {
+    flexDirection: 'row',
+    marginBottom: 3,
+  },
+  lessonMetadataText: {
+    color: 'grey',
   },
   lessonText: {
     fontSize: 18,
-    marginVertical: 6
   },
 });

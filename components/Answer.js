@@ -43,12 +43,13 @@ export default connect(mapStateToProps, mapDispatchToProps)(Answer)
 const styles = StyleSheet.create({
   answerContainer: {
     marginTop: 5,
-    height: 90,
+    height: 120,
     borderRadius: 5,
     padding: 5,
     backgroundColor: 'whitesmoke',
   },
   answerInput: {
     flex: 1,
+    fontSize: 16,
   },
 });
