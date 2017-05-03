@@ -22,6 +22,12 @@ class BibleScreen extends React.Component {
     },
   };
 
+  componentWillMount() {
+    if (!this.props.lesson) {
+      this.props.loadLesson(this.props.route.params.lesson.id);
+    }
+  }
+
   render() {
     return (
       <View style={styles.container}>

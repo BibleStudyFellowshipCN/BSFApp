@@ -24,7 +24,7 @@ function getUrl(book, verse) {
 // ------------------------------------
 // Actions
 // ------------------------------------
-export function requestPassage (book, verse, navigator) {
+export function loadPassage (book, verse) {
   return async(dispatch, getState) => {
     try {
       const id = getUrl(book, verse);

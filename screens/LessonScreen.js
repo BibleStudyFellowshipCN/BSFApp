@@ -28,37 +28,38 @@ class LessonScreen extends React.Component {
 
   componentWillMount() {
     if (!this.props.lesson) {
-      this.props.loadLesson();
+      this.props.loadLesson(this.props.route.params.lesson.id);
     }
   }
 
   render() {
     const requestPassage = (book, verse) => {
-      this.props.requestPassage(book, verse, this.props.navigator)
+      this.props.navigator.push('bible', { book, verse });
     }
 
     if (this.props.lesson) {
+      const lesson = this.props.lesson;
       // TODO:[Wei] KeyboardAwareScrollView works on iOS but not Android, KeyboardAvoidingView works on Android, but not iOS :(
       return (Platform.OS === 'ios') ? (
         <ScrollableTabView initialPage={1}>
           <NotesPage tabLabel="讲义" />
-          <DayQuestions tabLabel="一" requestPassage={requestPassage} day={this.props.dayQuestions.one} readVerse={this.props.dayQuestions.one.readVerse} memoryVerse={this.props.memoryVerse} />
-          <DayQuestions tabLabel="二" requestPassage={requestPassage} day={this.props.dayQuestions.two} readVerse={this.props.dayQuestions.two.readVerse} />
-          <DayQuestions tabLabel="三" requestPassage={requestPassage} day={this.props.dayQuestions.three} readVerse={this.props.dayQuestions.three.readVerse} />
-          <DayQuestions tabLabel="四" requestPassage={requestPassage} day={this.props.dayQuestions.four} readVerse={this.props.dayQuestions.four.readVerse} />
-          <DayQuestions tabLabel="五" requestPassage={requestPassage} day={this.props.dayQuestions.five} readVerse={this.props.dayQuestions.five.readVerse} />
-          <DayQuestions tabLabel="六" requestPassage={requestPassage} day={this.props.dayQuestions.six} readVerse={this.props.dayQuestions.six.readVerse} />
+          <DayQuestions tabLabel="一" requestPassage={requestPassage} day={lesson.dayQuestions.one} readVerse={lesson.dayQuestions.one.readVerse} memoryVerse={lesson.memoryVerse} />
+          <DayQuestions tabLabel="二" requestPassage={requestPassage} day={lesson.dayQuestions.two} readVerse={lesson.dayQuestions.two.readVerse} />
+          <DayQuestions tabLabel="三" requestPassage={requestPassage} day={lesson.dayQuestions.three} readVerse={lesson.dayQuestions.three.readVerse} />
+          <DayQuestions tabLabel="四" requestPassage={requestPassage} day={lesson.dayQuestions.four} readVerse={lesson.dayQuestions.four.readVerse} />
+          <DayQuestions tabLabel="五" requestPassage={requestPassage} day={lesson.dayQuestions.five} readVerse={lesson.dayQuestions.five.readVerse} />
+          <DayQuestions tabLabel="六" requestPassage={requestPassage} day={lesson.dayQuestions.six} readVerse={lesson.dayQuestions.six.readVerse} />
         </ScrollableTabView>
       ) : (
           <KeyboardAvoidingView style={styles.container} behavior='padding' keyboardVerticalOffset={80}>
             <ScrollableTabView initialPage={1}>
               <NotesPage tabLabel="讲义" />
-              <DayQuestions tabLabel="一" requestPassage={requestPassage} day={this.props.dayQuestions.one} readVerse={this.props.dayQuestions.one.readVerse} memoryVerse={this.props.memoryVerse} />
-              <DayQuestions tabLabel="二" requestPassage={requestPassage} day={this.props.dayQuestions.two} readVerse={this.props.dayQuestions.two.readVerse} />
-              <DayQuestions tabLabel="三" requestPassage={requestPassage} day={this.props.dayQuestions.three} readVerse={this.props.dayQuestions.three.readVerse} />
-              <DayQuestions tabLabel="四" requestPassage={requestPassage} day={this.props.dayQuestions.four} readVerse={this.props.dayQuestions.four.readVerse} />
-              <DayQuestions tabLabel="五" requestPassage={requestPassage} day={this.props.dayQuestions.five} readVerse={this.props.dayQuestions.five.readVerse} />
-              <DayQuestions tabLabel="六" requestPassage={requestPassage} day={this.props.dayQuestions.six} readVerse={this.props.dayQuestions.six.readVerse} />
+              <DayQuestions tabLabel="一" requestPassage={requestPassage} day={lesson.dayQuestions.one} readVerse={lesson.dayQuestions.one.readVerse} memoryVerse={lesson.memoryVerse} />
+              <DayQuestions tabLabel="二" requestPassage={requestPassage} day={lesson.dayQuestions.two} readVerse={lesson.dayQuestions.two.readVerse} />
+              <DayQuestions tabLabel="三" requestPassage={requestPassage} day={lesson.dayQuestions.three} readVerse={lesson.dayQuestions.three.readVerse} />
+              <DayQuestions tabLabel="四" requestPassage={requestPassage} day={lesson.dayQuestions.four} readVerse={lesson.dayQuestions.four.readVerse} />
+              <DayQuestions tabLabel="五" requestPassage={requestPassage} day={lesson.dayQuestions.five} readVerse={lesson.dayQuestions.five.readVerse} />
+              <DayQuestions tabLabel="六" requestPassage={requestPassage} day={lesson.dayQuestions.six} readVerse={lesson.dayQuestions.six.readVerse} />
             </ScrollableTabView>
           </KeyboardAvoidingView>
         );
@@ -66,7 +67,7 @@ class LessonScreen extends React.Component {
       // Display loading screen
       return (
         <View style={styles.BSFQuestionContainer}>
-          <Text style={{ marginVertical: 12, color: 'white' }}>Loading</Text>
+          <Text style={{ marginVertical: 12, color: 'black' }}>Loading</Text>
         </View>
       )
     }
