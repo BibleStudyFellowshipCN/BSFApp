@@ -16,6 +16,7 @@ import ScrollableTabView from 'react-native-scrollable-tab-view'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 import { requestPassage } from '../store/passage.js'
 import Answer from '../components/Answer'
+import Colors from '../constants/Colors'
 
 class ClassScreen extends React.Component {
   static route = {
@@ -31,9 +32,17 @@ class ClassScreen extends React.Component {
       this.props.requestPassage(book, verse, this.props.navigator)
     }
 
+    const scrollableStyleProps = {
+      tabBarBackgroundColor: Colors.yellow,
+      tabBarActiveTextColor: 'rgba(255, 255, 255, 1)',
+      tabBarInactiveTextColor: 'rgba(255, 255, 255, 0.6)',
+      tabBarUnderlineStyle: { backgroundColor: 'white', height: 2 },
+      tabBarTextStyle: { fontSize: 20, fontWeight: '700' },
+    }
+
     // TODO:[Wei] KeyboardAwareScrollView works on iOS but not Android, KeyboardAvoidingView works on Android, but not iOS :(
     return (Platform.OS === 'ios') ? (
-      <ScrollableTabView initialPage={1}>
+      <ScrollableTabView initialPage={1} {...scrollableStyleProps}>
         <NotesPage tabLabel="讲义" />
         <DayQuestions tabLabel="一" requestPassage={requestPassage} day={this.props.dayQuestions.one} readVerse={this.props.dayQuestions.one.readVerse} memoryVerse={this.props.memoryVerse} />
         <DayQuestions tabLabel="二" requestPassage={requestPassage} day={this.props.dayQuestions.two} readVerse={this.props.dayQuestions.two.readVerse} />
@@ -44,7 +53,7 @@ class ClassScreen extends React.Component {
       </ScrollableTabView>
     ) : (
         <KeyboardAvoidingView style={styles.container} behavior='padding' keyboardVerticalOffset={80}>
-          <ScrollableTabView initialPage={1}>
+          <ScrollableTabView initialPage={1} {...scrollableStyleProps}>
             <NotesPage tabLabel="讲义" />
             <DayQuestions tabLabel="一" requestPassage={requestPassage} day={this.props.dayQuestions.one} readVerse={this.props.dayQuestions.one.readVerse} memoryVerse={this.props.memoryVerse} />
             <DayQuestions tabLabel="二" requestPassage={requestPassage} day={this.props.dayQuestions.two} readVerse={this.props.dayQuestions.two.readVerse} />
@@ -126,14 +135,14 @@ const BSFQuestion = (props) => (
 )
 
 const QuestionText = (props) => (
-  <Text style={{ color: 'white', marginBottom: 5, fontSize: 16, }}>{props.children}</Text>
+  <Text style={{ color: 'black', marginBottom: 5, fontSize: 16, }}>{props.children}</Text>
 )
 
 const BibleQuote = (props) => (
   <View style={{ flexDirection: 'row' }}>
     <TouchableOpacity onPress={() => props.requestPassage(props.book, props.verse)}>
       <View style={styles.bibleQuote}>
-        <Text> {props.book} {props.verse}</Text>
+        <Text style={{ color: 'white' }}> {props.book} {props.verse}</Text>
       </View>
     </TouchableOpacity>
   </View>
@@ -142,9 +151,9 @@ const BibleQuote = (props) => (
 const NotesPage = (props) => (
   <ScrollView style={styles.dayQuestionsContainer}>
     <View style={styles.BSFQuestionContainer}>
-      <Text style={{ marginVertical: 12, color: 'white' }}>签到 - TODO by Rui</Text>
-      <Text style={{ marginVertical: 12, color: 'white' }}>讲道录音 - TODO by Jerry</Text>
-      <Text style={{ marginVertical: 12, color: 'white' }}>经文释义</Text>
+      <Text style={{ marginVertical: 12, color: 'black' }}>签到 - TODO by Rui</Text>
+      <Text style={{ marginVertical: 12, color: 'black' }}>讲道录音 - TODO by Jerry</Text>
+      <Text style={{ marginVertical: 12, color: 'black' }}>经文释义</Text>
     </View>
   </ScrollView>
 )
@@ -167,7 +176,7 @@ const styles = StyleSheet.create({
   },
   dayQuestionsContainer: {
     flex: 1,
-    backgroundColor: 'grey',
+    backgroundColor: 'whitesmoke',
   },
   BSFQuestionContainer: {
     flex: 1,
@@ -176,20 +185,20 @@ const styles = StyleSheet.create({
   },
   bibleQuote: {
     marginVertical: 2,
-    paddingHorizontal: 25,
+    paddingHorizontal: 15,
     justifyContent: 'center',
     alignItems: 'center',
     height: 22,
     borderRadius: 11,
-    backgroundColor: 'white',
+    backgroundColor: Colors.yellow,
   },
   dayTitle: {
-    color: 'white',
+    color: 'black',
     fontSize: 16,
     fontWeight: 'bold',
   },
   memoryVerse: {
-    color: 'white',
+    color: 'black',
     marginBottom: 30,
     fontSize: 16,
     fontWeight: 'bold',

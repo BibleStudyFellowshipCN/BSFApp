@@ -45,6 +45,9 @@ export default class RootNavigation extends React.Component {
             defaultRouteConfig={{
               navigationBar: {
                 backgroundColor: Colors.yellow,
+                tintColor: 'white',
+                elevation: 0,
+                borderBottomWidth: 0,
                 titleStyle: {
                   fontSize: 22,
                   fontWeight: '700'
