@@ -23,8 +23,8 @@ export function loadLesson(id) {
         })
       }
     } catch(error) {
-      console.log(error)
-      alert(error)
+      console.log(error);
+      alert(error);
     }
   }
 }

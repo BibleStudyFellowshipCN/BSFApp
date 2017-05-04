@@ -7,7 +7,7 @@ import answersReducer from './answers'
 export const makeRootReducer = (asyncReducers) => {
   return combineReducers({
     books: booksReducer,
-    passage: passageReducer,
+    passages: passageReducer,
     answers: answersReducer,
     lessons: lessonsReducer,
     ...asyncReducers

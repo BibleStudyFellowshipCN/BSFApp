@@ -26,40 +26,45 @@ class LessonScreen extends React.Component {
     },
   };
 
+  constructor() {
+    super();
+    this.goToPassage = this.goToPassage.bind(this);
+  }
+
   componentWillMount() {
     if (!this.props.lesson) {
-      this.props.loadLesson(this.props.route.params.lesson.id);
+      this.props.loadLesson();
     }
   }
 
-  render() {
-    const requestPassage = (book, verse) => {
-      this.props.navigator.push('bible', { book, verse });
-    }
+  goToPassage(book, verse) {
+    this.props.navigator.push('bible', { book, verse });
+  }
 
+  render() {
     if (this.props.lesson) {
-      const lesson = this.props.lesson;
+      dayQuestions = this.props.lesson.dayQuestions;
       // TODO:[Wei] KeyboardAwareScrollView works on iOS but not Android, KeyboardAvoidingView works on Android, but not iOS :(
       return (Platform.OS === 'ios') ? (
         <ScrollableTabView initialPage={1}>
           <NotesPage tabLabel="讲义" />
-          <DayQuestions tabLabel="一" requestPassage={requestPassage} day={lesson.dayQuestions.one} readVerse={lesson.dayQuestions.one.readVerse} memoryVerse={lesson.memoryVerse} />
-          <DayQuestions tabLabel="二" requestPassage={requestPassage} day={lesson.dayQuestions.two} readVerse={lesson.dayQuestions.two.readVerse} />
-          <DayQuestions tabLabel="三" requestPassage={requestPassage} day={lesson.dayQuestions.three} readVerse={lesson.dayQuestions.three.readVerse} />
-          <DayQuestions tabLabel="四" requestPassage={requestPassage} day={lesson.dayQuestions.four} readVerse={lesson.dayQuestions.four.readVerse} />
-          <DayQuestions tabLabel="五" requestPassage={requestPassage} day={lesson.dayQuestions.five} readVerse={lesson.dayQuestions.five.readVerse} />
-          <DayQuestions tabLabel="六" requestPassage={requestPassage} day={lesson.dayQuestions.six} readVerse={lesson.dayQuestions.six.readVerse} />
+          <DayQuestions tabLabel="一" goToPassage={this.goToPassage} day={dayQuestions.one} readVerse={dayQuestions.one.readVerse} memoryVerse={this.props.memoryVerse} />
+          <DayQuestions tabLabel="二" goToPassage={this.goToPassage} day={dayQuestions.two} readVerse={dayQuestions.two.readVerse} />
+          <DayQuestions tabLabel="三" goToPassage={this.goToPassage} day={dayQuestions.three} readVerse={dayQuestions.three.readVerse} />
+          <DayQuestions tabLabel="四" goToPassage={this.goToPassage} day={dayQuestions.four} readVerse={dayQuestions.four.readVerse} />
+          <DayQuestions tabLabel="五" goToPassage={this.goToPassage} day={dayQuestions.five} readVerse={dayQuestions.five.readVerse} />
+          <DayQuestions tabLabel="六" goToPassage={this.goToPassage} day={dayQuestions.six} readVerse={dayQuestions.six.readVerse} />
         </ScrollableTabView>
       ) : (
           <KeyboardAvoidingView style={styles.container} behavior='padding' keyboardVerticalOffset={80}>
             <ScrollableTabView initialPage={1}>
               <NotesPage tabLabel="讲义" />
-              <DayQuestions tabLabel="一" requestPassage={requestPassage} day={lesson.dayQuestions.one} readVerse={lesson.dayQuestions.one.readVerse} memoryVerse={lesson.memoryVerse} />
-              <DayQuestions tabLabel="二" requestPassage={requestPassage} day={lesson.dayQuestions.two} readVerse={lesson.dayQuestions.two.readVerse} />
-              <DayQuestions tabLabel="三" requestPassage={requestPassage} day={lesson.dayQuestions.three} readVerse={lesson.dayQuestions.three.readVerse} />
-              <DayQuestions tabLabel="四" requestPassage={requestPassage} day={lesson.dayQuestions.four} readVerse={lesson.dayQuestions.four.readVerse} />
-              <DayQuestions tabLabel="五" requestPassage={requestPassage} day={lesson.dayQuestions.five} readVerse={lesson.dayQuestions.five.readVerse} />
-              <DayQuestions tabLabel="六" requestPassage={requestPassage} day={lesson.dayQuestions.six} readVerse={lesson.dayQuestions.six.readVerse} />
+              <DayQuestions tabLabel="一" goToPassage={this.goToPassage} day={dayQuestions.one} readVerse={dayQuestions.one.readVerse} memoryVerse={this.props.memoryVerse} />
+              <DayQuestions tabLabel="二" goToPassage={this.goToPassage} day={dayQuestions.two} readVerse={dayQuestions.two.readVerse} />
+              <DayQuestions tabLabel="三" goToPassage={this.goToPassage} day={dayQuestions.three} readVerse={dayQuestions.three.readVerse} />
+              <DayQuestions tabLabel="四" goToPassage={this.goToPassage} day={dayQuestions.four} readVerse={dayQuestions.four.readVerse} />
+              <DayQuestions tabLabel="五" goToPassage={this.goToPassage} day={dayQuestions.five} readVerse={dayQuestions.five.readVerse} />
+              <DayQuestions tabLabel="六" goToPassage={this.goToPassage} day={dayQuestions.six} readVerse={dayQuestions.six.readVerse} />
             </ScrollableTabView>
           </KeyboardAvoidingView>
         );
@@ -96,7 +101,7 @@ const DayQuestions = (props) => {
   if (props.readVerse != undefined) {
     for (var verse in props.readVerse) {
       let quote = props.readVerse[verse]
-      readVerseUI = <BibleQuote key={quote.book + quote.verse} book={quote.book} verse={quote.verse} requestPassage={props.requestPassage} />
+      readVerseUI = <BibleQuote key={quote.book + quote.verse} book={quote.book} verse={quote.verse} goToPassage={props.goToPassage} />
     }
   } else {
     readVerseUI = null
@@ -111,7 +116,7 @@ const DayQuestions = (props) => {
         <BSFQuestion
           key={question.id}
           question={question}
-          requestPassage={props.requestPassage}
+          goToPassage={props.goToPassage}
         />
       ))}
     </View>
@@ -135,7 +140,7 @@ const BSFQuestion = (props) => (
       {props.question.questionText}
     </QuestionText>
     {props.question.quotes.map(quote => (
-      <BibleQuote key={quote.book + quote.verse} book={quote.book} verse={quote.verse} requestPassage={props.requestPassage} />
+      <BibleQuote key={quote.book + quote.verse} book={quote.book} verse={quote.verse} goToPassage={props.goToPassage} />
     ))}
     <Answer questionId={props.question.id} />
   </View>
@@ -147,7 +152,7 @@ const QuestionText = (props) => (
 
 const BibleQuote = (props) => (
   <View style={{ flexDirection: 'row' }}>
-    <TouchableOpacity onPress={() => props.requestPassage(props.book, props.verse)}>
+    <TouchableOpacity onPress={() => props.goToPassage(props.book, props.verse)}>
       <View style={styles.bibleQuote}>
         <Text> {props.book} {props.verse}</Text>
       </View>
@@ -169,9 +174,13 @@ const mapStateToProps = (state, ownProps) => {
   return {
     lesson: state.lessons[ownProps.route.params.lesson.id],
   }
-}
+};
 
-const mapDispatchToProps = { loadLesson }
+const mapDispatchToProps = (dispatch, ownProps) => {
+  return {
+    loadLesson: () => dispatch(loadLesson(ownProps.route.params.lesson.id)),
+  }
+};
 
 export default connect(mapStateToProps, mapDispatchToProps)(LessonScreen)
 
