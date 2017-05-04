@@ -58,6 +58,12 @@ export default class RootNavigation extends React.Component {
         </TabNavigationItem>
 
         <TabNavigationItem
+          id="audioBible"
+          renderIcon={isSelected => this._renderIcon('有声圣经', 'headphones', isSelected)}>
+          <StackNavigation initialRoute="audioBible" />
+        </TabNavigationItem>
+
+        <TabNavigationItem
           id="profile"
           renderIcon={isSelected => this._renderIcon('关于', 'info-circle', isSelected)}>
           <StackNavigation initialRoute="settings" />
