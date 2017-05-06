@@ -25,6 +25,6 @@
   },
   "android": {
     "package": "org.cbsfappv1.bsfclass",
-    "versionCode": 2
+    "versionCode": 3
   }
 }

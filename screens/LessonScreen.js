@@ -43,14 +43,6 @@ class LessonScreen extends React.Component {
   }
 
   render() {
-  
-    const scrollableStyleProps = {
-      tabBarBackgroundColor: Colors.yellow,
-      tabBarActiveTextColor: 'rgba(255, 255, 255, 1)',
-      tabBarInactiveTextColor: 'rgba(255, 255, 255, 0.6)',
-      tabBarUnderlineStyle: { backgroundColor: 'white', height: 2 },
-      tabBarTextStyle: { fontSize: 20, fontWeight: '700' },
-    }
     const scrollableStyleProps = {
       tabBarBackgroundColor: Colors.yellow,
       tabBarActiveTextColor: 'rgba(255, 255, 255, 1)',
@@ -59,6 +51,8 @@ class LessonScreen extends React.Component {
       tabBarTextStyle: { fontSize: 20, fontWeight: '700' },
     }
 
+    if (this.props.lesson) {
+      dayQuestions = this.props.lesson.dayQuestions;
       // TODO:[Wei] KeyboardAwareScrollView works on iOS but not Android, KeyboardAvoidingView works on Android, but not iOS :(
       return (Platform.OS === 'ios') ? (
       <ScrollableTabView initialPage={1} {...scrollableStyleProps}>
