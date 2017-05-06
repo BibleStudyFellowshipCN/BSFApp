@@ -56,7 +56,7 @@ class LessonScreen extends React.Component {
       // TODO:[Wei] KeyboardAwareScrollView works on iOS but not Android, KeyboardAvoidingView works on Android, but not iOS :(
       return (Platform.OS === 'ios') ? (
       <ScrollableTabView initialPage={1} {...scrollableStyleProps}>
-          <NotesPage tabLabel="讲义" />
+          {/*<NotesPage tabLabel="讲义" />*/}
           <DayQuestions tabLabel="一" goToPassage={this.goToPassage} day={dayQuestions.one} readVerse={dayQuestions.one.readVerse} memoryVerse={this.props.memoryVerse} />
           <DayQuestions tabLabel="二" goToPassage={this.goToPassage} day={dayQuestions.two} readVerse={dayQuestions.two.readVerse} />
           <DayQuestions tabLabel="三" goToPassage={this.goToPassage} day={dayQuestions.three} readVerse={dayQuestions.three.readVerse} />
@@ -67,7 +67,7 @@ class LessonScreen extends React.Component {
       ) : (
           <KeyboardAvoidingView style={styles.container} behavior='padding' keyboardVerticalOffset={80}>
           <ScrollableTabView initialPage={1} {...scrollableStyleProps}>
-              <NotesPage tabLabel="讲义" />
+              {/*<NotesPage tabLabel="讲义" />*/}
               <DayQuestions tabLabel="一" goToPassage={this.goToPassage} day={dayQuestions.one} readVerse={dayQuestions.one.readVerse} memoryVerse={this.props.memoryVerse} />
               <DayQuestions tabLabel="二" goToPassage={this.goToPassage} day={dayQuestions.two} readVerse={dayQuestions.two.readVerse} />
               <DayQuestions tabLabel="三" goToPassage={this.goToPassage} day={dayQuestions.three} readVerse={dayQuestions.three.readVerse} />
