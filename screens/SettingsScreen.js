@@ -85,18 +85,18 @@ export default class SettingsScreen extends React.Component {
           </Text>
         </SectionContent>
 
-        <SectionHeader title="servers" />
-        <SectionContent >
-          <Text style={styles.sectionContentText}>
-            book: {Models.Book.restUri}
-          </Text>
-          <Text style={styles.sectionContentText}>
-            lesson: {Models.Book.restUri}
-          </Text>
-          <Text style={styles.sectionContentText}>
-            bible verse: {Models.Book.restUri}
-          </Text>
-        </SectionContent>
+        {/* <SectionHeader title="servers" /> */}
+        {/* <SectionContent > */}
+        {/*   <Text style={styles.sectionContentText}> */}
+        {/*     book: {Models.Book.restUri} */}
+        {/*   </Text> */}
+        {/*   <Text style={styles.sectionContentText}> */}
+        {/*     lesson: {Models.Book.restUri} */}
+        {/*   </Text> */}
+        {/*   <Text style={styles.sectionContentText}> */}
+        {/*     bible verse: {Models.Book.restUri} */}
+        {/*   </Text> */}
+        {/* </SectionContent> */}
       </ScrollView>
     );
   }

@@ -44,9 +44,11 @@ const styles = StyleSheet.create({
   answerContainer: {
     marginTop: 5,
     height: 120,
-    borderRadius: 5,
     padding: 5,
     backgroundColor: 'whitesmoke',
+    borderColor: 'black',
+    borderWidth: 1,
+    borderRadius: 5,
   },
   answerInput: {
     flex: 1,
