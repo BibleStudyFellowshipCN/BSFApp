@@ -151,7 +151,15 @@ const BibleQuote = (props) => (
 const NotesPage = (props) => (
   <ScrollView style={styles.dayQuestionsContainer}>
     <View style={styles.BSFQuestionContainer}>
-      <Text style={{ marginVertical: 12, color: 'black' }}>签到 - TODO by Rui</Text>
+      <View style={styles.flowRight}>
+        <TextInput style={styles.locationInput} placeholder='课程地点' />
+        <TouchableOpacity style={styles.button} underlayColor='#99d9f4'>
+          <Text style={styles.buttonText}>签到</Text>
+        </TouchableOpacity>
+      </View>
+      <TouchableOpacity style={styles.button} underlayColor='#99d9f4'>
+        <Text style={styles.buttonText}>定位</Text>
+      </TouchableOpacity>
       <Text style={{ marginVertical: 12, color: 'black' }}>讲道录音 - TODO by Jerry</Text>
       <Text style={{ marginVertical: 12, color: 'black' }}>经文释义</Text>
     </View>
@@ -202,5 +210,38 @@ const styles = StyleSheet.create({
     marginBottom: 30,
     fontSize: 16,
     fontWeight: 'bold',
+  },
+  flowRight: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      alignSelf: 'stretch'
+  },
+  buttonText: {
+      fontSize: 18,
+      color: 'white',
+      alignSelf: 'center'
+  },
+  button: {
+      height: 36,
+      flex: 1,
+      flexDirection: 'row',
+      backgroundColor: Colors.yellow,
+      borderColor: Colors.yellow,
+      borderWidth: 1,
+      borderRadius: 8,
+      marginBottom: 10,
+      alignSelf: 'stretch',
+      justifyContent: 'center'
+  },
+  locationInput: {
+      height: 36,
+      padding: 4,
+      marginRight: 5,
+      flex: 4,
+      fontSize: 18,
+      borderWidth: 1,
+      borderColor: Colors.yellow,
+      borderRadius: 8,
+      color: Colors.yellow
   },
 });
