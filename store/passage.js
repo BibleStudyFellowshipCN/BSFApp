@@ -6,39 +6,31 @@ import { loadAsync } from '../dataStorage/storage';
 // ------------------------------------
 export const RECEIVE_PASSAGE = 'RECEIVE_PASSAGE'
 
-const bookid = require('../assets/bookid.json');
-
-// Build the web service url
-function getUrl(book, verse) {
-  // Parse the book name to id
-  let bookId = 1;
-  for (var i in bookid) {
-    if (bookid[i].name == book) {
-      bookId = bookid[i].id;
-      break;
-    }
-  }
-  return bookId + "/" + verse;
-}
-
 // ------------------------------------
 // Actions
 // ------------------------------------
-export function requestPassage (book, verse, navigator) {
-  return async(dispatch) => {
+// ------------------------------------
+// Actions
+// ------------------------------------
+export function loadPassage(passageId) {
+  return async(dispatch, getState) => {
     try {
-      const content = await loadAsync(Models.Passage, getUrl(book, verse))
-      if (content != null) {
-        dispatch({
-          type: RECEIVE_PASSAGE,
-          payload: { passage: content }
-        })
-
-        navigator.push('bible', { book, verse })
+      // Then make the http request for the class (a placeholder url below)
+      // we use the await syntax.
+      const state = getState();
+      let passage;
+      if (!state.passages[passageId]) {
+        passage = await loadAsync(Models.Passage, passageId);
+        if (passage) {
+          dispatch({
+            type: RECEIVE_PASSAGE,
+            payload: {id: passageId, passage: passage},
+          });
+        }
       }
     } catch(error) {
-      console.log(error)
-      alert(error)
+      console.log(error);
+      alert(error);
     }
   }
 }
@@ -46,11 +38,14 @@ export function requestPassage (book, verse, navigator) {
 // ------------------------------------
 // Reducer
 // ------------------------------------
-const ACTION_HANDLERS = {
-  [RECEIVE_PASSAGE]: (state, action) => action.payload.passage,
+const initialState = {
 }
 
-export default function passageReducer (state = 0, action) {
+const ACTION_HANDLERS = {
+  [RECEIVE_PASSAGE]: (state, action) => Object.assign({}, state, { [action.payload.id]: action.payload.passage}),
+}
+
+export default function passageReducer (state = initialState, action) {
   const handler = ACTION_HANDLERS[action.type]
   return handler ? handler(state, action) : state
 }

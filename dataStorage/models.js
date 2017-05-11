@@ -11,8 +11,8 @@ export const Models = {
     restUri: "http://cbsf.azurewebsites.net/",
     cachePolicy: CachePolicy.AsyncStorage,
   },
-  Class: {
-    key: "CLASS",
+  Lesson: {
+    key: "LESSON",
     restUri: "http://cbsf.azurewebsites.net/",
     cachePolicy: CachePolicy.AsyncStorage,
   },

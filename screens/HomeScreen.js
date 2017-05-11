@@ -10,7 +10,6 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import { loadClass } from '../store/class.js'
 import Accordion from 'react-native-collapsible/Accordion';
 import { MonoText } from '../components/StyledText';
 import Colors from '../constants/Colors'
@@ -21,6 +20,10 @@ class HomeScreen extends React.Component {
       title: 'BSF课程',
     },
   };
+
+  goToLesson(lesson) {
+    this.props.navigator.push('lesson', { lesson })
+  }
 
   render() {
     mainUI = null
@@ -66,12 +69,10 @@ class HomeScreen extends React.Component {
     return (
       <View>
         { content.lessons.map(lesson => (
-
           <Lesson
             key={lesson.id}
-            loadClass={() => this.props.loadClass(lesson, this.props.navigator)}
-            lesson={lesson} 
-            navigator={this.props.navigator}
+            goToLesson={() => this.goToLesson(lesson)}
+            lesson={lesson}
           />)) }
       </View>
     )
@@ -97,7 +98,7 @@ const Lesson = (props) => {
   const name = parsed[1]
   const date = parsed[2]
   return (
-    <TouchableOpacity style={styles.lessonContainer} onPress={() => props.loadClass()}>
+    <TouchableOpacity style={styles.lessonContainer} onPress={() => props.goToLesson()}>
       <View>
         <View style={styles.lessonMetadata}>
           <Text style={styles.lessonMetadataText}>
@@ -125,7 +126,7 @@ const mapStateToProps = (state) => {
   }
 }
 
-const mapDispatchToProps = { loadClass }
+const mapDispatchToProps = {}
 
 export default connect(mapStateToProps, mapDispatchToProps)(HomeScreen)
 
