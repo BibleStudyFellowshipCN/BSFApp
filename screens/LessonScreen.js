@@ -22,7 +22,9 @@ class LessonScreen extends React.Component {
   static route = {
     navigationBar: {
       title: (params) => {
-        return params.lesson.name
+        // TODO: clean up backend api for this to work
+        const parsed = params.lesson.name.split(' ');
+        return parsed[1];
       },
     },
   };
@@ -46,7 +48,7 @@ class LessonScreen extends React.Component {
     const scrollableStyleProps = {
       tabBarBackgroundColor: Colors.yellow,
       tabBarActiveTextColor: 'rgba(255, 255, 255, 1)',
-      tabBarInactiveTextColor: 'rgba(255, 255, 255, 0.6)',
+      tabBarInactiveTextColor: 'rgba(0, 0, 0, 0.7)',
       tabBarUnderlineStyle: { backgroundColor: 'white', height: 2 },
       tabBarTextStyle: { fontSize: 20, fontWeight: '700' },
     }
@@ -55,8 +57,8 @@ class LessonScreen extends React.Component {
       dayQuestions = this.props.lesson.dayQuestions;
       // TODO:[Wei] KeyboardAwareScrollView works on iOS but not Android, KeyboardAvoidingView works on Android, but not iOS :(
       return (Platform.OS === 'ios') ? (
-      <ScrollableTabView initialPage={1} {...scrollableStyleProps}>
-          {/*<NotesPage tabLabel="讲义" />*/}
+        <ScrollableTabView initialPage={1} {...scrollableStyleProps}>
+          <NotesPage tabLabel="讲义" />
           <DayQuestions tabLabel="一" goToPassage={this.goToPassage} day={dayQuestions.one} readVerse={dayQuestions.one.readVerse} memoryVerse={this.props.memoryVerse} />
           <DayQuestions tabLabel="二" goToPassage={this.goToPassage} day={dayQuestions.two} readVerse={dayQuestions.two.readVerse} />
           <DayQuestions tabLabel="三" goToPassage={this.goToPassage} day={dayQuestions.three} readVerse={dayQuestions.three.readVerse} />
@@ -66,8 +68,8 @@ class LessonScreen extends React.Component {
         </ScrollableTabView>
       ) : (
           <KeyboardAvoidingView style={styles.container} behavior='padding' keyboardVerticalOffset={80}>
-          <ScrollableTabView initialPage={1} {...scrollableStyleProps}>
-              {/*<NotesPage tabLabel="讲义" />*/}
+            <ScrollableTabView initialPage={1} {...scrollableStyleProps}>
+              <NotesPage tabLabel="讲义" />
               <DayQuestions tabLabel="一" goToPassage={this.goToPassage} day={dayQuestions.one} readVerse={dayQuestions.one.readVerse} memoryVerse={this.props.memoryVerse} />
               <DayQuestions tabLabel="二" goToPassage={this.goToPassage} day={dayQuestions.two} readVerse={dayQuestions.two.readVerse} />
               <DayQuestions tabLabel="三" goToPassage={this.goToPassage} day={dayQuestions.three} readVerse={dayQuestions.three.readVerse} />
@@ -172,7 +174,15 @@ const BibleQuote = (props) => (
 const NotesPage = (props) => (
   <ScrollView style={styles.dayQuestionsContainer}>
     <View style={styles.BSFQuestionContainer}>
-      <Text style={{ marginVertical: 12, color: 'black' }}>签到 - TODO by Rui</Text>
+      <View style={styles.flowRight}>
+        <TextInput style={styles.locationInput} placeholder='课程地点' />
+        <TouchableOpacity style={styles.button} underlayColor='#99d9f4'>
+          <Text style={styles.buttonText}>签到</Text>
+        </TouchableOpacity>
+      </View>
+      <TouchableOpacity style={styles.button} underlayColor='#99d9f4'>
+        <Text style={styles.buttonText}>定位</Text>
+      </TouchableOpacity>
       <Text style={{ marginVertical: 12, color: 'black' }}>讲道录音 - TODO by Jerry</Text>
       <Text style={{ marginVertical: 12, color: 'black' }}>经文释义</Text>
     </View>
@@ -226,4 +236,37 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
   },
+   flowRight: {
+     flexDirection: 'row',
+     alignItems: 'center',
+     alignSelf: 'stretch'
+ },
+ buttonText: {
+     fontSize: 18,
+     color: 'white',
+     alignSelf: 'center'
+ },
+ button: {
+     height: 36,
+     flex: 1,
+     flexDirection: 'row',
+     backgroundColor: Colors.yellow,
+     borderColor: Colors.yellow,
+     borderWidth: 1,
+     borderRadius: 8,
+     marginBottom: 10,
+     alignSelf: 'stretch',
+     justifyContent: 'center'
+ },
+ locationInput: {
+     height: 36,
+     padding: 4,
+     marginRight: 5,
+     flex: 4,
+     fontSize: 18,
+     borderWidth: 1,
+     borderColor: Colors.yellow,
+     borderRadius: 8,
+     color: Colors.yellow
+ },
 });

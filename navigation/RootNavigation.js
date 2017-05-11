@@ -60,13 +60,39 @@ export default class RootNavigation extends React.Component {
         <TabNavigationItem
           id="audioBible"
           renderIcon={isSelected => this._renderIcon('有声圣经', 'headphones', isSelected)}>
-          <StackNavigation initialRoute="audioBible" />
+          <StackNavigation initialRoute="audioBible"
+            defaultRouteConfig={{
+              navigationBar: {
+                backgroundColor: Colors.yellow,
+                tintColor: 'white',
+                elevation: 0,
+                borderBottomWidth: 0,
+                titleStyle: {
+                  fontSize: 22,
+                  fontWeight: '700'
+                }
+              }
+            }}
+          />
         </TabNavigationItem>
 
         <TabNavigationItem
           id="profile"
           renderIcon={isSelected => this._renderIcon('关于', 'info-circle', isSelected)}>
-          <StackNavigation initialRoute="settings" />
+          <StackNavigation initialRoute="settings"
+            defaultRouteConfig={{
+              navigationBar: {
+                backgroundColor: Colors.yellow,
+                tintColor: 'white',
+                elevation: 0,
+                borderBottomWidth: 0,
+                titleStyle: {
+                  fontSize: 22,
+                  fontWeight: '700'
+                }
+              }
+            }}
+          />
         </TabNavigationItem>
       </TabNavigation>
     );
