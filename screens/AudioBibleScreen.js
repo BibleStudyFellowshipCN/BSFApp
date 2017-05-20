@@ -8,6 +8,7 @@ import {
   TouchableHighlight,
   View,
   Picker,
+  Button,
 } from 'react-native';
 import Expo, { Audio } from 'expo';
 
@@ -48,6 +49,8 @@ export default class AudioBibleScreen extends React.Component {
       let url = 'http://wpaorg.wordproject.com/bibles/app/audio/4/' + this.state.id + '/' + this.state.currentChapter + '.mp3';
       console.log(url);
       this.sound = new Expo.Audio.Sound({ source: url });
+      // [Wei] setCallback doesn't work!!!
+      //await this.sound.setCallback(this._audioCallback);
       await this.sound.loadAsync();
       await this.sound.playAsync();
       this.setState({ isPlaying: true });
@@ -84,28 +87,34 @@ export default class AudioBibleScreen extends React.Component {
   render() {
     console.log(JSON.stringify(this.state));
     return (
-      <View style={styles.container}>
-        <View style={styles.container}>
-          <Picker
-            style={{alignSelf: 'stretch'}}
-            selectedValue={this.state.id}
-            onValueChange={this._onBookSelected}>
-            { audioBookId.map(s => (
-                <Picker.Item label={s.name} value={s.id} key={s.id}/>
-              )) }
-          </Picker>
+      <View style={{
+        flex: 1,
+        flexDirection: 'column',
+        justifyContent: 'center',
+        alignItems: 'center',}}>
+        <View style={{flex: 1, flexDirection: 'row'}}>
+          <View style={{width: 170}}>
+            <Picker
+              style={{alignSelf: 'stretch'}}
+              selectedValue={this.state.id}
+              onValueChange={this._onBookSelected}>
+              { audioBookId.map(s => (
+                  <Picker.Item label={s.name} value={s.id} key={s.id}/>
+                )) }
+            </Picker>
+          </View>
+          <View style={{width: 170}}>
+            <Picker
+              style={{alignSelf: 'stretch'}}
+              selectedValue={this.state.currentChapter}
+              onValueChange={this._onChapterSelected}>
+              {
+                Array(this.state.totalChapter).fill(0).map((e,i)=>i+1).map(s => (<Picker.Item label={'第'+s.toString()+'章'} value={s} key={s}/>))
+              }
+            </Picker>
+          </View>
         </View>
-        <View style={{ marginHorizontal: 20, alignSelf: 'stretch' }}>
-          <Picker
-            style={{alignSelf: 'stretch'}}
-            selectedValue={this.state.currentChapter}
-            onValueChange={this._onChapterSelected}>
-            {
-              Array(this.state.totalChapter).fill(0).map((e,i)=>i+1).map(s => (<Picker.Item label={'第'+s.toString()+'章'} value={s} key={s}/>))
-            }
-          </Picker>
-        </View>
-        <View>
+        <View style={{flex: 1, flexDirection: 'column', alignItems: 'center',}}>
           <TouchableHighlight
             underlayColor={'#FFFFFF'}
             style={styles.wrapper}
