@@ -53,5 +53,6 @@ const styles = StyleSheet.create({
   answerInput: {
     flex: 1,
     fontSize: 16,
+    textAlignVertical: 'top'
   },
 });
