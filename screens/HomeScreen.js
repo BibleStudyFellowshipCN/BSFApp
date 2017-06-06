@@ -22,20 +22,20 @@ class HomeScreen extends React.Component {
   };
 
   goToLesson(lesson) {
-    this.props.navigator.push('lesson', { lesson })
+    this.props.navigation.getNavigator('root').push('lesson', { lesson });
   }
 
   render() {
     mainUI = null
-    if  (this.props.booklist != undefined) {
-      mainUI = <Accordion 
-                 initiallyActiveSection={0}
-                 sections={this.props.booklist}
-                 renderHeader={this._renderHeader.bind(this)}
-                 renderContent={this._renderContent.bind(this)} />
+    if (this.props.booklist != undefined) {
+      mainUI = <Accordion
+        initiallyActiveSection={0}
+        sections={this.props.booklist}
+        renderHeader={this._renderHeader.bind(this)}
+        renderContent={this._renderContent.bind(this)} />
     }
     else {
-      mainUI = <Text style={{textAlign: 'center', textAlignVertical: 'center', fontSize: 22}}>正在加载</Text>
+      mainUI = <Text style={{ textAlign: 'center', textAlignVertical: 'center', fontSize: 22 }}>正在加载</Text>
     }
 
     return (
@@ -60,7 +60,7 @@ class HomeScreen extends React.Component {
         {/*     size={ 18 } */}
         {/*   /> */}
         {/* </View> */}
-        <Text style={styles.bookHeaderText}> { content.title } </Text>
+        <Text style={styles.bookHeaderText}> {content.title} </Text>
       </View>
     )
   }
@@ -68,12 +68,12 @@ class HomeScreen extends React.Component {
   _renderContent(content, index, isActive) {
     return (
       <View>
-        { content.lessons.map(lesson => (
+        {content.lessons.map(lesson => (
           <Lesson
             key={lesson.id}
             goToLesson={() => this.goToLesson(lesson)}
             lesson={lesson}
-          />)) }
+          />))}
       </View>
     )
   }
@@ -113,11 +113,11 @@ const Lesson = (props) => {
         <FontAwesome
           name='chevron-right'
           color='grey'
-          size={ 16 }
+          size={16}
         />
       </View>
     </TouchableOpacity>
-  ) 
+  )
 }
 
 const mapStateToProps = (state) => {
