@@ -9,8 +9,10 @@ import {
   View,
   Picker,
   Button,
+  Slider
 } from 'react-native';
 import Expo, { Audio } from 'expo';
+import { FontAwesome } from '@expo/vector-icons';
 
 const audioBookId = require('../assets/audioBookId.json');
 
@@ -23,12 +25,19 @@ export default class AudioBibleScreen extends React.Component {
 
   constructor(props) {
     super(props);
-    this.sound = null;
     this.state = {
       chapter: 1,
       isPlaying: false,
+      isPaused: false,
+      isLoading: false,
+      isLoaded: false,
+      position: 0,
+      duration: 0,
+      progress: 0
     };
   }
+
+  isSeeking = false;
 
   componentDidMount() {
     Audio.setIsEnabledAsync(true);
@@ -39,89 +48,185 @@ export default class AudioBibleScreen extends React.Component {
     if (this.sound != null) {
       await this.sound.stopAsync();
       await this.sound.unloadAsync();
+      this.setState({ isLoaded: false, isPlaying: false, isPaused: false, position: 0, duration: 0, progress: 0 });
+      console.log('reset');
       this.sound = null;
-      this.setState({ isPlaying: false });
     }
   }
 
-  _onPlayPausePressed = async () => {
-    if (this.sound == null) {
-      let url = 'http://wpaorg.wordproject.com/bibles/app/audio/4/' + this.state.id + '/' + this.state.currentChapter + '.mp3';
-      console.log(url);
-      this.sound = new Expo.Audio.Sound({ source: url });
-      // [Wei] setCallback doesn't work!!!
-      //await this.sound.setCallback(this._audioCallback);
-      await this.sound.loadAsync();
-      await this.sound.playAsync();
-      this.setState({ isPlaying: true });
-    }
-    else if (this.state.isPlaying) {
-      console.log("Pause")
-      this.sound.pauseAsync();
-      this.setState({ isPlaying: false });
+  _callback = status => {
+    if (status.isLoaded) {
+      this.setState({
+        isLoaded: true,
+        progress: status.positionMillis / status.durationMillis,
+        duration: status.durationMillis,
+        position: status.positionMillis
+      });
     } else {
-      console.log("Play")
-      this.sound.playAsync();
-      this.setState({ isPlaying: true });
+      if (status.error) {
+        console.log(`FATAL PLAYER ERROR: ${status.error}`);
+      }
+    }
+  };
+
+  async _onPlayOrPause() {
+    this.setState({ isLoading: true });
+    if (!this.state.isPlaying) {
+      if (!this.sound) {
+        let uri = 'http://wpaorg.wordproject.com/bibles/app/audio/4/' + this.state.id + '/' + this.state.currentChapter + '.mp3';
+        console.log(uri);
+        try {
+          const { sound, status } = await Audio.Sound.create(
+            { uri },
+            { shouldPlay: false },
+            this._callback
+          );
+          this.sound = sound;
+        } catch (error) {
+          alert(error);
+          this.setState({ isLoading: false });
+          return;
+        }
+      }
+
+      await this.sound.playAsync();
+      this.setState({ isPlaying: true, isPaused: false, isLoading: false });
+      console.log('playing');
+    } else {
+      await this.sound.pauseAsync();
+      this.setState({ isPlaying: false, isPaused: true, isLoading: false });
+      console.log('paused');
     }
   }
 
-  _onBookSelected = (id) => {
+  async _onStop() {
+    if (this.state.isPlaying || this.state.isPaused) {
+      this.setState({ isLoading: true, isLoaded: false });
+      await this.sound.stopAsync();
+      this.setState({ isPlaying: false, isPaused: false, position: 0, duration: 0, progress: 0 });
+      console.log('stopped');
+    }
+  }
+
+  _onBookSelected = async (id) => {
     let book = audioBookId.find((element) => (element.id == id));
-    this._resetAudio();
-    this.setState( {
-        id,
-        name : book.name,
-        currentChapter: 1,
-        totalChapter: book.chapters,
+    await this._resetAudio();
+    this.setState({
+      id,
+      name: book.name,
+      currentChapter: 1,
+      totalChapter: book.chapters,
     });
     console.log(JSON.stringify(this.state));
   }
 
-  _onChapterSelected = (chapter) => {
+  _onChapterSelected = async (chapter) => {
     console.log(chapter);
-    this._resetAudio();
+    await this._resetAudio();
     this.setState({ currentChapter: chapter });
+  }
+
+  _onSeekSliderValueChange(value) {
+    if (this.sound && !this.isSeeking) {
+      this.isSeeking = true;
+      this.sound.pauseAsync();
+    }
+  }
+
+  async _onSeekSliderSlidingComplete(value) {
+    if (this.sound != null) {
+      this.isSeeking = false;
+      const seekPosition = value * this.state.duration;
+      console.log('Seek: ' + seekPosition);
+      this.setState({ progress: seekPosition });
+      this.sound.playFromPositionAsync(seekPosition);
+    }
+  }
+
+  _getMMSSFromMillis(millis) {
+    const totalSeconds = millis / 1000;
+    const seconds = Math.floor(totalSeconds % 60);
+    const minutes = Math.floor(totalSeconds / 60);
+
+    const padWithZero = number => {
+      const string = number.toString();
+      if (number < 10) {
+        return '0' + string;
+      }
+      return string;
+    };
+    return padWithZero(minutes) + ':' + padWithZero(seconds);
   }
 
   render() {
     console.log(JSON.stringify(this.state));
+    const position = this._getMMSSFromMillis(this.state.position);
+    const duration = this._getMMSSFromMillis(this.state.duration);
     return (
       <View style={{
         flex: 1,
         flexDirection: 'column',
         justifyContent: 'center',
-        alignItems: 'center',}}>
-        <View style={{flex: 1, flexDirection: 'row'}}>
-          <View style={{width: 170}}>
+        alignItems: 'center',
+      }}>
+        <View style={{ flex: 1, flexDirection: 'row' }}>
+          <View style={{ width: 170 }}>
             <Picker
-              style={{alignSelf: 'stretch'}}
+              style={{ alignSelf: 'stretch' }}
               selectedValue={this.state.id}
-              onValueChange={this._onBookSelected}>
-              { audioBookId.map(s => (
-                  <Picker.Item label={s.name} value={s.id} key={s.id}/>
-                )) }
+              onValueChange={this._onBookSelected.bind(this)}>
+              {audioBookId.map(s => (
+                <Picker.Item label={s.name} value={s.id} key={s.id} />
+              ))}
             </Picker>
           </View>
-          <View style={{width: 170}}>
+          <View style={{ width: 170 }}>
             <Picker
-              style={{alignSelf: 'stretch'}}
+              style={{ alignSelf: 'stretch' }}
               selectedValue={this.state.currentChapter}
-              onValueChange={this._onChapterSelected}>
+              onValueChange={this._onChapterSelected.bind(this)}>
               {
-                Array(this.state.totalChapter).fill(0).map((e,i)=>i+1).map(s => (<Picker.Item label={'第'+s.toString()+'章'} value={s} key={s}/>))
+                Array(this.state.totalChapter).fill(0).map((e, i) => i + 1).map(s => (<Picker.Item label={'第' + s.toString() + '章'} value={s} key={s} />))
               }
             </Picker>
           </View>
         </View>
-        <View style={{flex: 1, flexDirection: 'column', alignItems: 'center',}}>
+        <Slider
+          style={styles.playbackSlider}
+          value={this.state.progress}
+          onValueChange={this._onSeekSliderValueChange.bind(this)}
+          onSlidingComplete={this._onSeekSliderSlidingComplete.bind(this)}
+          disabled={this.state.isLoading || !this.state.isLoaded}
+        />
+        <Text>{position}/{duration}</Text>
+        <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center', }}>
           <TouchableHighlight
             underlayColor={'#FFFFFF'}
             style={styles.wrapper}
-            onPress={this._onPlayPausePressed}>
-            <Text style={styles.playText}>
-            { this.state.isPlaying? "暂停": "播放" }
-            </Text>
+            onPress={() => {
+              if (!this.state.isLoading) {
+                this._onPlayOrPause();
+              }
+            }}>
+            <FontAwesome
+              style={{ marginHorizontal: 30, width: 50 }}
+              name={this.state.isPlaying ? 'pause' : 'play'}
+              size={50}
+            />
+          </TouchableHighlight>
+          <TouchableHighlight
+            underlayColor={'#FFFFFF'}
+            style={styles.wrapper}
+            onPress={() => {
+              if (!this.state.isLoading) {
+                this._onStop();
+              }
+            }}>
+            <FontAwesome
+              style={{ marginHorizontal: 30, width: 50 }}
+              name='stop'
+              size={50}
+            />
           </TouchableHighlight>
         </View>
       </View>
@@ -141,4 +246,7 @@ const styles = StyleSheet.create({
     marginTop: 40,
     fontSize: 36,
   },
+  playbackSlider: {
+    alignSelf: 'stretch',
+  }
 });
