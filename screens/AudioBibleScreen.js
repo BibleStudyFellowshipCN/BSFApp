@@ -44,15 +44,45 @@ export default class AudioBibleScreen extends React.Component {
     }
   }
 
+  _callback = status => {
+    //console.log(JSON.stringify(status));
+    if (status.isLoaded) {
+      /*this.setState({
+        playbackInstancePosition: status.positionMillis,
+        playbackInstanceDuration: status.durationMillis,
+        shouldPlay: status.shouldPlay,
+        isPlaying: status.isPlaying,
+        isBuffering: status.isBuffering,
+        rate: status.rate,
+        muted: status.isMuted,
+        volume: status.volume,
+        loopingType: status.isLooping ? LOOPING_TYPE_ONE : LOOPING_TYPE_ALL,
+        shouldCorrectPitch: status.shouldCorrectPitch,
+      });*/
+    } else {
+      if (status.error) {
+        console.log(`FATAL PLAYER ERROR: ${status.error}`);
+      }
+    }
+  };
+
   _onPlayPausePressed = async () => {
+    console.log(JSON.stringify(this.state));
     if (this.sound == null) {
-      let url = 'http://wpaorg.wordproject.com/bibles/app/audio/4/' + this.state.id + '/' + this.state.currentChapter + '.mp3';
-      console.log(url);
-      this.sound = new Expo.Audio.Sound({ source: url });
-      // [Wei] setCallback doesn't work!!!
-      //await this.sound.setCallback(this._audioCallback);
-      await this.sound.loadAsync();
-      await this.sound.playAsync();
+      let uri = 'http://wpaorg.wordproject.com/bibles/app/audio/4/' + this.state.id + '/' + this.state.currentChapter + '.mp3';
+      console.log(uri);
+
+      const source = { uri };
+      const initialStatus = {
+        shouldPlay: true,
+
+      };
+      const { instance, status } = await Audio.Sound.create(
+        source,
+        initialStatus,
+        this._callback
+      );
+      this.sound = instance;
       this.setState({ isPlaying: true });
     }
     else if (this.state.isPlaying) {
@@ -69,11 +99,11 @@ export default class AudioBibleScreen extends React.Component {
   _onBookSelected = (id) => {
     let book = audioBookId.find((element) => (element.id == id));
     this._resetAudio();
-    this.setState( {
-        id,
-        name : book.name,
-        currentChapter: 1,
-        totalChapter: book.chapters,
+    this.setState({
+      id,
+      name: book.name,
+      currentChapter: 1,
+      totalChapter: book.chapters,
     });
     console.log(JSON.stringify(this.state));
   }
@@ -91,36 +121,37 @@ export default class AudioBibleScreen extends React.Component {
         flex: 1,
         flexDirection: 'column',
         justifyContent: 'center',
-        alignItems: 'center',}}>
-        <View style={{flex: 1, flexDirection: 'row'}}>
-          <View style={{width: 170}}>
+        alignItems: 'center',
+      }}>
+        <View style={{ flex: 1, flexDirection: 'row' }}>
+          <View style={{ width: 170 }}>
             <Picker
-              style={{alignSelf: 'stretch'}}
+              style={{ alignSelf: 'stretch' }}
               selectedValue={this.state.id}
               onValueChange={this._onBookSelected}>
-              { audioBookId.map(s => (
-                  <Picker.Item label={s.name} value={s.id} key={s.id}/>
-                )) }
+              {audioBookId.map(s => (
+                <Picker.Item label={s.name} value={s.id} key={s.id} />
+              ))}
             </Picker>
           </View>
-          <View style={{width: 170}}>
+          <View style={{ width: 170 }}>
             <Picker
-              style={{alignSelf: 'stretch'}}
+              style={{ alignSelf: 'stretch' }}
               selectedValue={this.state.currentChapter}
               onValueChange={this._onChapterSelected}>
               {
-                Array(this.state.totalChapter).fill(0).map((e,i)=>i+1).map(s => (<Picker.Item label={'第'+s.toString()+'章'} value={s} key={s}/>))
+                Array(this.state.totalChapter).fill(0).map((e, i) => i + 1).map(s => (<Picker.Item label={'第' + s.toString() + '章'} value={s} key={s} />))
               }
             </Picker>
           </View>
         </View>
-        <View style={{flex: 1, flexDirection: 'column', alignItems: 'center',}}>
+        <View style={{ flex: 1, flexDirection: 'column', alignItems: 'center', }}>
           <TouchableHighlight
             underlayColor={'#FFFFFF'}
             style={styles.wrapper}
             onPress={this._onPlayPausePressed}>
             <Text style={styles.playText}>
-            { this.state.isPlaying? "暂停": "播放" }
+              {this.state.isPlaying ? "暂停" : "播放"}
             </Text>
           </TouchableHighlight>
         </View>

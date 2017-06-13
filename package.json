@@ -11,13 +11,12 @@
     "preset": "jest-expo"
   },
   "dependencies": {
-    "@expo/ex-navigation": "~2.9.2",
+    "@expo/ex-navigation": "~3.0.0",
     "@expo/samples": "~1.0.3",
-    "@yasaichi/redux-api-middleware": "git+https://github.com/yasaichi/redux-api-middleware.git",
-    "expo": "^15.0.2",
+    "expo": "17.0.0",
+    "react": "16.0.0-alpha.6",
+    "react-native": "https://github.com/expo/react-native/archive/sdk-17.0.0.tar.gz",
     "lodash": "^4.17.4",
-    "react": "~15.4.0",
-    "react-native": "https://github.com/exponent/react-native/archive/sdk-15.0.0.tar.gz",
     "react-native-collapsible": "^0.8.0",
     "react-native-fs": "^2.1.0-rc.1",
     "react-native-keyboard-aware-scroll-view": "^0.2.8",
@@ -29,6 +28,6 @@
     "redux-thunk": "^2.2.0"
   },
   "devDependencies": {
-    "jest-expo": "~0.3.0"
+    "jest-expo": "~1.0.1"
   }
 }
