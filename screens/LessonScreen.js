@@ -17,10 +17,12 @@ import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view
 import { loadLesson } from '../store/lessons.js'
 import Answer from '../components/Answer'
 import Colors from '../constants/Colors'
+import SharedStyles from '../constants/SharedStyles';
 
 class LessonScreen extends React.Component {
   static route = {
     navigationBar: {
+      ...SharedStyles.navigationBarStyle,
       title: (params) => {
         // TODO: clean up backend api for this to work
         const parsed = params.lesson.name.split(' ');
@@ -55,30 +57,23 @@ class LessonScreen extends React.Component {
 
     if (this.props.lesson) {
       dayQuestions = this.props.lesson.dayQuestions;
+
+      const content = <ScrollableTabView initialPage={1} {...scrollableStyleProps}>
+        <NotesPage tabLabel="讲义" />
+        <DayQuestions tabLabel="一" goToPassage={this.goToPassage} day={dayQuestions.one} readVerse={dayQuestions.one.readVerse} memoryVerse={this.props.memoryVerse} />
+        <DayQuestions tabLabel="二" goToPassage={this.goToPassage} day={dayQuestions.two} readVerse={dayQuestions.two.readVerse} />
+        <DayQuestions tabLabel="三" goToPassage={this.goToPassage} day={dayQuestions.three} readVerse={dayQuestions.three.readVerse} />
+        <DayQuestions tabLabel="四" goToPassage={this.goToPassage} day={dayQuestions.four} readVerse={dayQuestions.four.readVerse} />
+        <DayQuestions tabLabel="五" goToPassage={this.goToPassage} day={dayQuestions.five} readVerse={dayQuestions.five.readVerse} />
+        <DayQuestions tabLabel="六" goToPassage={this.goToPassage} day={dayQuestions.six} readVerse={dayQuestions.six.readVerse} />
+      </ScrollableTabView>;
+
       // TODO:[Wei] KeyboardAwareScrollView works on iOS but not Android, KeyboardAvoidingView works on Android, but not iOS :(
-      return (Platform.OS === 'ios') ? (
-        <ScrollableTabView initialPage={1} {...scrollableStyleProps}>
-          <NotesPage tabLabel="讲义" />
-          <DayQuestions tabLabel="一" goToPassage={this.goToPassage} day={dayQuestions.one} readVerse={dayQuestions.one.readVerse} memoryVerse={this.props.memoryVerse} />
-          <DayQuestions tabLabel="二" goToPassage={this.goToPassage} day={dayQuestions.two} readVerse={dayQuestions.two.readVerse} />
-          <DayQuestions tabLabel="三" goToPassage={this.goToPassage} day={dayQuestions.three} readVerse={dayQuestions.three.readVerse} />
-          <DayQuestions tabLabel="四" goToPassage={this.goToPassage} day={dayQuestions.four} readVerse={dayQuestions.four.readVerse} />
-          <DayQuestions tabLabel="五" goToPassage={this.goToPassage} day={dayQuestions.five} readVerse={dayQuestions.five.readVerse} />
-          <DayQuestions tabLabel="六" goToPassage={this.goToPassage} day={dayQuestions.six} readVerse={dayQuestions.six.readVerse} />
-        </ScrollableTabView>
-      ) : (
-          <KeyboardAvoidingView style={styles.container} behavior='padding' keyboardVerticalOffset={80}>
-            <ScrollableTabView initialPage={1} {...scrollableStyleProps}>
-              <NotesPage tabLabel="讲义" />
-              <DayQuestions tabLabel="一" goToPassage={this.goToPassage} day={dayQuestions.one} readVerse={dayQuestions.one.readVerse} memoryVerse={this.props.memoryVerse} />
-              <DayQuestions tabLabel="二" goToPassage={this.goToPassage} day={dayQuestions.two} readVerse={dayQuestions.two.readVerse} />
-              <DayQuestions tabLabel="三" goToPassage={this.goToPassage} day={dayQuestions.three} readVerse={dayQuestions.three.readVerse} />
-              <DayQuestions tabLabel="四" goToPassage={this.goToPassage} day={dayQuestions.four} readVerse={dayQuestions.four.readVerse} />
-              <DayQuestions tabLabel="五" goToPassage={this.goToPassage} day={dayQuestions.five} readVerse={dayQuestions.five.readVerse} />
-              <DayQuestions tabLabel="六" goToPassage={this.goToPassage} day={dayQuestions.six} readVerse={dayQuestions.six.readVerse} />
-            </ScrollableTabView>
-          </KeyboardAvoidingView>
-        );
+      return (Platform.OS === 'ios') ? content : (
+        <KeyboardAvoidingView style={styles.container} behavior='padding' keyboardVerticalOffset={80}>
+          {content}
+        </KeyboardAvoidingView >
+      );
     } else {
       // Display loading screen
       return (
@@ -236,37 +231,37 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
   },
-   flowRight: {
-     flexDirection: 'row',
-     alignItems: 'center',
-     alignSelf: 'stretch'
- },
- buttonText: {
-     fontSize: 18,
-     color: 'white',
-     alignSelf: 'center'
- },
- button: {
-     height: 36,
-     flex: 1,
-     flexDirection: 'row',
-     backgroundColor: Colors.yellow,
-     borderColor: Colors.yellow,
-     borderWidth: 1,
-     borderRadius: 8,
-     marginBottom: 10,
-     alignSelf: 'stretch',
-     justifyContent: 'center'
- },
- locationInput: {
-     height: 36,
-     padding: 4,
-     marginRight: 5,
-     flex: 4,
-     fontSize: 18,
-     borderWidth: 1,
-     borderColor: Colors.yellow,
-     borderRadius: 8,
-     color: Colors.yellow
- },
+  flowRight: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    alignSelf: 'stretch'
+  },
+  buttonText: {
+    fontSize: 18,
+    color: 'white',
+    alignSelf: 'center'
+  },
+  button: {
+    height: 36,
+    flex: 1,
+    flexDirection: 'row',
+    backgroundColor: Colors.yellow,
+    borderColor: Colors.yellow,
+    borderWidth: 1,
+    borderRadius: 8,
+    marginBottom: 10,
+    alignSelf: 'stretch',
+    justifyContent: 'center'
+  },
+  locationInput: {
+    height: 36,
+    padding: 4,
+    marginRight: 5,
+    flex: 4,
+    fontSize: 18,
+    borderWidth: 1,
+    borderColor: Colors.yellow,
+    borderRadius: 8,
+    color: Colors.yellow
+  },
 });

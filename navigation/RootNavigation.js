@@ -12,6 +12,7 @@ import Alerts from '../constants/Alerts';
 import Colors from '../constants/Colors';
 import registerForPushNotificationsAsync
   from '../api/registerForPushNotificationsAsync';
+import SharedStyles from '../constants/SharedStyles';
 
 export default class RootNavigation extends React.Component {
   componentDidMount() {
@@ -24,7 +25,7 @@ export default class RootNavigation extends React.Component {
 
   render() {
     return (
-      <TabNavigation tabBarHeight={56} initialTab="class">
+      <TabNavigation tabBarHeight={56} initialTab="audioBible">
         {/*<TabNavigationItem
           id="home"
           renderIcon={isSelected => this._renderIcon('BSF', isSelected)}>
@@ -42,18 +43,7 @@ export default class RootNavigation extends React.Component {
           renderIcon={isSelected => this._renderIcon('课', 'book', isSelected)}>
           <StackNavigation
             initialRoute="home"
-            defaultRouteConfig={{
-              navigationBar: {
-                backgroundColor: Colors.yellow,
-                tintColor: 'white',
-                elevation: 0,
-                borderBottomWidth: 0,
-                titleStyle: {
-                  fontSize: 22,
-                  fontWeight: '700'
-                }
-              }
-            }}
+            defaultRouteConfig={SharedStyles.tabNavItemStyle}
           />
         </TabNavigationItem>
 
@@ -61,18 +51,7 @@ export default class RootNavigation extends React.Component {
           id="audioBible"
           renderIcon={isSelected => this._renderIcon('有声圣经', 'headphones', isSelected)}>
           <StackNavigation initialRoute="audioBible"
-            defaultRouteConfig={{
-              navigationBar: {
-                backgroundColor: Colors.yellow,
-                tintColor: 'white',
-                elevation: 0,
-                borderBottomWidth: 0,
-                titleStyle: {
-                  fontSize: 22,
-                  fontWeight: '700'
-                }
-              }
-            }}
+            defaultRouteConfig={SharedStyles.tabNavItemStyle}
           />
         </TabNavigationItem>
 
@@ -80,18 +59,7 @@ export default class RootNavigation extends React.Component {
           id="profile"
           renderIcon={isSelected => this._renderIcon('关于', 'info-circle', isSelected)}>
           <StackNavigation initialRoute="settings"
-            defaultRouteConfig={{
-              navigationBar: {
-                backgroundColor: Colors.yellow,
-                tintColor: 'white',
-                elevation: 0,
-                borderBottomWidth: 0,
-                titleStyle: {
-                  fontSize: 22,
-                  fontWeight: '700'
-                }
-              }
-            }}
+            defaultRouteConfig={SharedStyles.tabNavItemStyle}
           />
         </TabNavigationItem>
       </TabNavigation>
@@ -100,7 +68,7 @@ export default class RootNavigation extends React.Component {
 
   _renderIcon(name, iconName, isSelected) {
     return (
-      <View style={{ justifyContent: 'center', alignItems: 'center'}}>
+      <View style={{ justifyContent: 'center', alignItems: 'center' }}>
         <FontAwesome
           name={iconName}
           size={26}
@@ -141,5 +109,5 @@ const styles = StyleSheet.create({
   },
   selectedTab: {
     color: Colors.tabIconSelected,
-  },
+  }
 });
