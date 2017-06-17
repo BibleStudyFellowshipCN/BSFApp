@@ -58,8 +58,8 @@ class LessonScreen extends React.Component {
     if (this.props.lesson) {
       dayQuestions = this.props.lesson.dayQuestions;
 
-      const content = <ScrollableTabView initialPage={1} {...scrollableStyleProps}>
-        <NotesPage tabLabel="讲义" />
+      const content = <ScrollableTabView initialPage={0} {...scrollableStyleProps}>
+        {/*<NotesPage tabLabel="讲义" />*/}
         <DayQuestions tabLabel="一" goToPassage={this.goToPassage} day={dayQuestions.one} readVerse={dayQuestions.one.readVerse} memoryVerse={this.props.memoryVerse} />
         <DayQuestions tabLabel="二" goToPassage={this.goToPassage} day={dayQuestions.two} readVerse={dayQuestions.two.readVerse} />
         <DayQuestions tabLabel="三" goToPassage={this.goToPassage} day={dayQuestions.three} readVerse={dayQuestions.three.readVerse} />
@@ -99,7 +99,7 @@ function inputFocused(refName) {
 
 const DayQuestions = (props) => {
   if (props.memoryVerse != undefined) {
-    memoryVerseUI = <Text style={styles.memoryVerse}>{props.memoryVerse}</Text>
+    memoryVerseUI = <Text style={styles.memoryVerse} selectable={true}>{props.memoryVerse}</Text>
   } else {
     memoryVerseUI = null
   }
@@ -116,7 +116,7 @@ const DayQuestions = (props) => {
   const content = (
     <View style={styles.BSFQuestionContainer}>
       {memoryVerseUI}
-      <Text style={styles.dayTitle}>{props.day.title}</Text>
+      <Text style={styles.dayTitle} selectable={true}>{props.day.title}</Text>
       {readVerseUI}
       {props.day.questions.map((question, index) => (
         <BSFQuestion
@@ -153,14 +153,14 @@ const BSFQuestion = (props) => (
 )
 
 const QuestionText = (props) => (
-  <Text style={{ color: 'black', marginBottom: 5, fontSize: 16, }}>{props.children}</Text>
+  <Text style={{ color: 'black', marginBottom: 5, fontSize: 16, }} selectable={true}>{props.children}</Text>
 )
 
 const BibleQuote = (props) => (
   <View style={{ flexDirection: 'row' }}>
     <TouchableOpacity onPress={() => props.goToPassage(props.book, props.verse)}>
       <View style={styles.bibleQuote}>
-        <Text style={{ color: 'white' }}> {props.book} {props.verse}</Text>
+        <Text style={{ color: 'white' }} selectable={true}> {props.book} {props.verse}</Text>
       </View>
     </TouchableOpacity>
   </View>

@@ -55,8 +55,8 @@ class BibleScreen extends React.Component {
 
 const Paragraph = (props) => (
   <View style={styles.paragraphContainer}>
-    {props.paragraph.title ? <Text style={styles.verseText}> {props.paragraph.title} </Text> : null}
-    <Text>
+    {props.paragraph.title ? <Text style={styles.verseText} selectable={true}> {props.paragraph.title} </Text> : null}
+    <Text selectable={true}>
       {props.paragraph.verses.map(verse => (
         <Verse key={verse.verse} verse={verse} />
       ))}
@@ -65,7 +65,7 @@ const Paragraph = (props) => (
 )
 
 const Verse = (props) => (
-  <Text style={[styles.verseText, { color: 'black' }]}>
+  <Text style={[styles.verseText, { color: 'black' }]} selectable={true}>
     {props.verse.verse} {props.verse.text}
   </Text>
 )

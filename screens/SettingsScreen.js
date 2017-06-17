@@ -7,7 +7,7 @@ import { Models } from '../dataStorage/models';
 const SectionHeader = ({ title }) => {
   return (
     <View style={styles.sectionHeaderContainer}>
-      <Text style={styles.sectionHeaderText}>
+      <Text style={styles.sectionHeaderText} selectable={true}>
         {title}
       </Text>
     </View>
@@ -53,22 +53,22 @@ export default class SettingsScreen extends React.Component {
         </View>
 
         <View style={styles.titleTextContainer}>
-          <Text style={styles.nameText} numberOfLines={1}>
+          <Text style={styles.nameText} numberOfLines={1} selectable={true}>
             {manifest.name}
           </Text>
 
-          <Text style={styles.slugText} numberOfLines={1}>
+          <Text style={styles.slugText} numberOfLines={1} selectable={true}>
             {manifest.slug}
           </Text>
 
-          <Text style={styles.descriptionText}>
+          <Text style={styles.descriptionText} selectable={true}>
             {manifest.description}
           </Text>
         </View>
       </View>
     );
   }
-  
+
   render() {
     const { manifest } = Constants;
     return (
@@ -80,7 +80,7 @@ export default class SettingsScreen extends React.Component {
 
         <SectionHeader title="version" />
         <SectionContent>
-          <Text style={styles.sectionContentText}>
+          <Text style={styles.sectionContentText} selectable={true}>
             {manifest.version}
           </Text>
         </SectionContent>
