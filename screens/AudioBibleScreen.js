@@ -103,7 +103,7 @@ export default class AudioBibleScreen extends React.Component {
     if (this.state.isPlaying || this.state.isPaused) {
       this.setState({ isLoading: true, isLoaded: false });
       await this.sound.stopAsync();
-      this.setState({ isPlaying: false, isPaused: false, position: 0, duration: 0, progress: 0 });
+      this.setState({ isPlaying: false, isPaused: false, position: 0, progress: 0, isLoading: false });
       console.log('stopped');
     }
   }
