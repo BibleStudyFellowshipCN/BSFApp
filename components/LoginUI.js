@@ -14,12 +14,14 @@ import {
 import Layout from '../constants/Layout';
 import { getImage } from '../components/ImageMap';
 import Colors from '../constants/Colors';
+import { Models } from '../dataStorage/models';
 
 export default class LoginUI extends React.Component {
   cellphone = "4250001111";
 
   state = {
-    busy: false
+    busy: false,
+    language: "CHS"
   };
 
   async onLogon() {
@@ -55,6 +57,13 @@ export default class LoginUI extends React.Component {
             placeholderTextColor="rgba(255,255,255,0.7)"
             onChangeText={(text) => this.cellphone = text}
             keyboardType="phone-pad" />
+          {
+            Models.Languages.map(item => (
+              <RadioButton key={keyIndex++} currentValue={this.state.language} value={item.Value} onPress={() => { this.setState({ language: item.Value }) }} >
+                <Text style={styles.textContent} key={keyIndex++}>{item.DisplayName}</Text>
+              </RadioButton>
+            ))
+          }
           <View style={styles.buttonView}>
             <TouchableOpacity style={styles.buttonContainer} onPress={this.onLogon.bind(this)} disabled={this.state.busy}>
               <Text style={styles.buttonText}>Login</Text>

@@ -1,4 +1,4 @@
-import Expo from 'expo';
+import Expo, { Constants } from 'expo';
 import React from 'react';
 import { Platform, StatusBar, StyleSheet, View } from 'react-native';
 import { NavigationProvider, StackNavigation } from '@expo/ex-navigation';
@@ -50,7 +50,15 @@ class AppContainer extends React.Component {
 
       // prefetch data here:
       // TODO:[Wei] Check if the user has already logged on, set userIsLoggedOn = true
-      
+      this.setState({ userIsLoggedOn: true });
+
+      // TODO:[Wei] Send device info to service
+      let deviceId = Constants['deviceId'];
+      let sessionId = Constants['sessionId'];
+      let deviceYearClass = Constants['deviceYearClass'];
+      let platformOS = Platform.OS;
+      console.log("DeviceInfo: " + JSON.stringify({ deviceId, sessionId, deviceYearClass, platformOS }));
+
       // set the app status to ready
       this.setState({ appIsReady: true });
     } catch (err) {

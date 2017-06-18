@@ -25,5 +25,10 @@ export const Models = {
     key: "ANSWER",
     restUri: "",
     cachePolicy: CachePolicy.AsyncStorage,
-  },  
+  },
+  Languages: [
+    { DisplayName: "简体中文", Value: "CHS"},
+    { DisplayName: "繁體中文", Value: "CHT"},
+    { DisplayName: "English", Value: "ENG"},
+  ]
 }
