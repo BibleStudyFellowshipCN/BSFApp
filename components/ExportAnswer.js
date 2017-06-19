@@ -18,7 +18,7 @@ export default class ExportAnswer extends React.Component {
   getAnswer(answers, questionId) {
     for (var id in answers) {
       if (id == questionId) {
-        return answers[id].answerText + '\n';
+        return '>>' + answers[id].answerText + '\n';
       }
     }
 
@@ -58,23 +58,10 @@ export default class ExportAnswer extends React.Component {
       content += this.getContent(lessonContent.dayQuestions.five, answers);
       content += this.getContent(lessonContent.dayQuestions.six, answers);
 
-      const shareData = { title: lessonContent.name, message: content };
+      const shareData = { title: lessonContent.name, subject: lessonContent.name, message: content };
       console.log(shareData);
 
-      if (Platform.OS == 'android') {
-        Share.share(shareData);
-      } else {
-        // FIXME: [Wei] code is not working on iOS yet
-        /*
-        await ActionSheetIOS.showShareActionSheetWithOptions({
-          title: shareData.title,
-          message: shareData.message,
-          subject: shareData.title
-        }, function () {
-        }, function () {
-        });*/
-        Alert.alert(shareData.title, shareData.message);
-      }
+      Share.share(shareData);
     } catch (error) {
       console.log(error);
       Alert.alert("Error", error);
