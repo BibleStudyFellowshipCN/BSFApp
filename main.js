@@ -29,7 +29,7 @@ class AppContainer extends React.Component {
       // add all the neccessary load in Promise.all
       let bootValues = await Promise.all([
         loadAsync(Models.Book, "home.json", true),
-        loadAsync(Models.Answer, null, true),
+        loadAsync(Models.Answer, null, false),
         cacheAssetsAsync({
           images: [
             require('./assets/images/expo-wordmark.png'),
@@ -46,6 +46,7 @@ class AppContainer extends React.Component {
         books: bootValues[0],
         answers: bootValues[1] ? bootValues[1] : { answers: {} },
       }
+      console.log("Load answers: " + JSON.stringify(initialstate.answers));
       store = createStore(initialstate);
 
       // prefetch data here:
