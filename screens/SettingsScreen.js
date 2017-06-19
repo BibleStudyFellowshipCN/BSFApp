@@ -1,5 +1,5 @@
 
-import React, { PropTypes } from 'react';
+import React from 'react';
 import { ScrollView, StyleSheet, Image, Text, View } from 'react-native';
 import { Constants } from 'expo';
 import { Models } from '../dataStorage/models';

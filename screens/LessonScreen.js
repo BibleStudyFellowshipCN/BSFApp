@@ -16,6 +16,7 @@ import ScrollableTabView from 'react-native-scrollable-tab-view'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 import { loadLesson } from '../store/lessons.js'
 import Answer from '../components/Answer'
+import ExportAnswer from '../components/ExportAnswer.js';
 import Colors from '../constants/Colors'
 import SharedStyles from '../constants/SharedStyles';
 
@@ -28,6 +29,9 @@ class LessonScreen extends React.Component {
         const parsed = params.lesson.name.split(' ');
         return parsed[1];
       },
+      renderRight: (route, props) => {
+        return <ExportAnswer lessonId={route.params.lesson.id} />;
+      }
     },
   };
 

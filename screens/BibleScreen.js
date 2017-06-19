@@ -12,12 +12,13 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-
+import SharedStyles from '../constants/SharedStyles';
 import { loadPassage } from '../store/passage';
 
 class BibleScreen extends React.Component {
   static route = {
     navigationBar: {
+      ...SharedStyles.navigationBarStyle,
       title: (route) => {
         return route.book + route.verse
       },
