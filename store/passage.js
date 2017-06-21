@@ -20,7 +20,7 @@ export function loadPassage(passageId) {
       const state = getState();
       let passage;
       if (!state.passages[passageId]) {
-        passage = await loadAsync(Models.Passage, passageId);
+        passage = await loadAsync(Models.Passage, passageId, true);
         if (passage) {
           dispatch({
             type: RECEIVE_PASSAGE,

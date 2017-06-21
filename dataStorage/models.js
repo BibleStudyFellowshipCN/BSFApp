@@ -18,7 +18,7 @@ export const Models = {
   },
   Passage: {
     key: "PASSAGE",
-    restUri: "http://turbozv.com/bsf/api/",
+    restUri: "http://cbsf.southcentralus.cloudapp.azure.com:3000/verse/",
     cachePolicy: CachePolicy.AsyncStorage,
   },
   Answer: {
