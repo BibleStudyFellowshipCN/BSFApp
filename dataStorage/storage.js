@@ -29,11 +29,11 @@ async function loadAsync(model, id, update) {
         throw "key is not defined";
     }
 
-    console.log("start load " + JSON.stringify({model, id}));
-    
+    console.log("start load " + JSON.stringify({ model, id }));
+
     // try to load from cache first
     let data = null;
-    let keyString = (id == null)? model.key: model.key + id;
+    let keyString = (id == null) ? model.key : model.key + '/' + id;
     if (model.cachePolicy == CachePolicy.Memory) {
         data = global.cache[keyString];
     }
@@ -61,24 +61,24 @@ async function loadAsync(model, id, update) {
         else if (model.cachePolicy == CachePolicy.AsyncStorage) {
             saveToOffilneStorageAsync(data, model.key, id);
         }
-        console.log("finish load " + JSON.stringify({model, id}));
+        console.log("finish load " + JSON.stringify({ model, id }));
     }
     else {
-        console.log("failed to load" + JSON.stringify({model, id}));
+        console.log("failed to load" + JSON.stringify({ model, id }));
     }
-    
+
     return data;
 }
 
 async function loadFromOffilneStorageAsync(key, id) {
-    console.log("load from storage: " + JSON.stringify({key, id}));
+    console.log("load from storage: " + JSON.stringify({ key, id }));
     try {
         const data = !!id ?
             await storage.load({ key: encode(key), id: encode(id) }) :
             await storage.load({ key: encode(key) });
         return data;
     } catch (err) {
-        console.log("failed to load from storage: " + JSON.stringify({key, id}));
+        console.log("failed to load from storage: " + JSON.stringify({ key, id }));
         return null;
     }
 }
@@ -88,8 +88,8 @@ async function loadFromCloudAsync(model, id, silentLoad) {
         // The model deosn't support online fetch
         return null;
     }
-    console.log("load from cloud: " + JSON.stringify({model, id, silentLoad}));
-    const url = !!id ? (model.restUri + id) : model.restUri;
+    console.log("load from cloud: " + JSON.stringify({ model, id, silentLoad }));
+    const url = !!id ? (model.restUri + '/' + id) : model.restUri;
     let responseJson;
     try {
         // Set no cache header
@@ -113,7 +113,7 @@ async function loadFromCloudAsync(model, id, silentLoad) {
             alert("Invalid server response");
             return null;
         }
-        
+
         if (responseJson.error != undefined) {
             console.log(responseJson.error);
             alert(responseJson.error);
@@ -143,7 +143,7 @@ async function saveAsync(data, model, id) {
 }
 
 async function saveToOffilneStorageAsync(payload, key, id) {
-    console.log("save to storage: " + JSON.stringify({key, id}));
+    console.log("save to storage: " + JSON.stringify({ key, id }));
     return !!id ?
         await storage.save({ key: encode(key), id: encode(id), rawData: payload }) :
         await storage.save({ key: encode(key), rawData: payload })

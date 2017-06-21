@@ -28,7 +28,7 @@ class AppContainer extends React.Component {
     try {
       // add all the neccessary load in Promise.all
       let bootValues = await Promise.all([
-        loadAsync(Models.Book, "home.json", true),
+        loadAsync(Models.Book, null, true),
         loadAsync(Models.Answer, null, false),
         cacheAssetsAsync({
           images: [

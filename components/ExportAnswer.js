@@ -70,11 +70,11 @@ export default class ExportAnswer extends React.Component {
   }
 
   render() {
-    return (
+   return (
       <View style={styles.container}>
         <TouchableOpacity onPress={this.onClick.bind(this)}>
           <FontAwesome
-            name='envelope'
+            name='save'
             size={40}
             color='#fff' />
         </TouchableOpacity>
@@ -86,8 +86,7 @@ export default class ExportAnswer extends React.Component {
 const styles = StyleSheet.create({
   container: {
     alignItems: 'center',
-    alignContent: 'center',
     width: 54,
-    marginTop: 2
+    marginTop: 4
   }
 });
