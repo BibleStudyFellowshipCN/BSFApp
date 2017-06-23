@@ -45,7 +45,7 @@ export default class ExportAnswer extends React.Component {
         answers = answerContent.answers;
       }
 
-      const lessonContent = await loadAsync(Models.Lesson, this.props.lessonId + '.json', false);
+      const lessonContent = await loadAsync(Models.Lesson, this.props.lessonId, false);
       if (!lessonContent) {
         Alert.alert("Error", "Network error");
         return;
