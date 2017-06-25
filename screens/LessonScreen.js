@@ -64,12 +64,12 @@ class LessonScreen extends React.Component {
 
       const content = <ScrollableTabView initialPage={0} {...scrollableStyleProps}>
         {/*<NotesPage tabLabel="讲义" />*/}
-        <DayQuestions tabLabel="一" goToPassage={this.goToPassage} day={dayQuestions.one} readVerse={dayQuestions.one.readVerse} memoryVerse={this.props.memoryVerse} />
-        <DayQuestions tabLabel="二" goToPassage={this.goToPassage} day={dayQuestions.two} readVerse={dayQuestions.two.readVerse} />
-        <DayQuestions tabLabel="三" goToPassage={this.goToPassage} day={dayQuestions.three} readVerse={dayQuestions.three.readVerse} />
-        <DayQuestions tabLabel="四" goToPassage={this.goToPassage} day={dayQuestions.four} readVerse={dayQuestions.four.readVerse} />
-        <DayQuestions tabLabel="五" goToPassage={this.goToPassage} day={dayQuestions.five} readVerse={dayQuestions.five.readVerse} />
-        <DayQuestions tabLabel="六" goToPassage={this.goToPassage} day={dayQuestions.six} readVerse={dayQuestions.six.readVerse} />
+        <DayQuestions tabLabel="一" goToPassage={this.goToPassage} day={dayQuestions[0]} readVerse={dayQuestions[0].readVerse} memoryVerse={this.props.memoryVerse} />
+        <DayQuestions tabLabel="二" goToPassage={this.goToPassage} day={dayQuestions[1]} readVerse={dayQuestions[1].readVerse} />
+        <DayQuestions tabLabel="三" goToPassage={this.goToPassage} day={dayQuestions[2]} readVerse={dayQuestions[2].readVerse} />
+        <DayQuestions tabLabel="四" goToPassage={this.goToPassage} day={dayQuestions[3]} readVerse={dayQuestions[3].readVerse} />
+        <DayQuestions tabLabel="五" goToPassage={this.goToPassage} day={dayQuestions[4]} readVerse={dayQuestions[4].readVerse} />
+        <DayQuestions tabLabel="六" goToPassage={this.goToPassage} day={dayQuestions[5]} readVerse={dayQuestions[5].readVerse} />
       </ScrollableTabView>;
 
       // TODO:[Wei] KeyboardAwareScrollView works on iOS but not Android, KeyboardAvoidingView works on Android, but not iOS :(
@@ -109,12 +109,11 @@ const DayQuestions = (props) => {
   }
 
   if (props.readVerse != undefined) {
+    readVerseUI = null
     for (var verse in props.readVerse) {
       let quote = props.readVerse[verse]
       readVerseUI = <BibleQuote key={quote.book + quote.verse} book={quote.book} verse={quote.verse} goToPassage={props.goToPassage} />
     }
-  } else {
-    readVerseUI = null
   }
 
   const content = (
