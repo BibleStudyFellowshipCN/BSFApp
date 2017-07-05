@@ -30,6 +30,10 @@ export const Models = {
     cachePolicy: CachePolicy.AsyncStorage,
     userKey: '@BsfApp:user'
   },
+  Feedback: {
+    key: "Feedback",
+    restUri: "http://cbsf.southcentralus.cloudapp.azure.com:3000/feedback"
+  },
   Answer: {
     key: "ANSWER",
     restUri: "",
@@ -39,6 +43,12 @@ export const Models = {
   Languages: [
     { DisplayName: "简体中文", Value: "chs" },
     { DisplayName: "繁體中文", Value: "cht" },
-    { DisplayName: "English", Value: "eng" },
+    { DisplayName: "English", Value: "eng" }
+  ],
+  DefaultBibleVersion: "rcuvss",
+  BibleVersions: [
+    { DisplayName: "和合本修订版(简体)", Value: "rcuvss" },
+    { DisplayName: "和合本修訂版(繁體)", Value: "rcuvts" },
+    { DisplayName: "New International Version 2011", Value: "niv2011" }
   ]
 }

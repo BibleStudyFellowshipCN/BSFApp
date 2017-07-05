@@ -1,108 +1,132 @@
 
 import React from 'react';
 import { connect } from 'react-redux'
-import { ScrollView, StyleSheet, Image, Text, View } from 'react-native';
+import { ScrollView, StyleSheet, Image, Text, View, Alert, TextInput, TouchableOpacity, KeyboardAvoidingView } from 'react-native';
 import { Constants } from 'expo';
 import { Models } from '../dataStorage/models';
+import { clearStorageAsync, callWebServiceAsync, showWebServiceCallErrorsAsync } from '../dataStorage/storage';
 import RadioButton from 'radio-button-react-native';
 import { getCurrentUser } from '../store/user';
 import { requestBooks } from "../store/books.js";
-
-const SectionHeader = ({ title }) => {
-  return (
-    <View style={styles.sectionHeaderContainer}>
-      <Text style={styles.sectionHeaderText} selectable={true}>
-        {title}
-      </Text>
-    </View>
-  );
-};
-
-const SectionContent = props => {
-  return (
-    <View style={styles.sectionContentContainer}>
-      {props.children}
-    </View>
-  );
-};
-
-const AppIconPreview = ({ iconUrl }) => {
-  return (
-    <Image
-      source={{ uri: iconUrl }}
-      style={{ width: 64, height: 64 }}
-      resizeMode="cover"
-    />
-  );
-};
+import { FontAwesome } from '@expo/vector-icons';
+import SettingsList from 'react-native-settings-list';
 
 class SettingsScreen extends React.Component {
   static route = {
     navigationBar: {
-      title: '关于',
+      title: '我',
     },
   };
 
   state = {
-    language: getCurrentUser().getLanguage()
+    language: getCurrentUser().getLanguageDisplayName(),
+    bibleVersion: getCurrentUser().getBibleVersionDisplayName()
   };
-
-  _renderTitle() {
-    const { manifest } = Constants;
-
-    return (
-      <View style={styles.titleContainer}>
-        <View style={styles.titleTextContainer}>
-          <Text style={styles.nameText} numberOfLines={1} selectable={true}>
-            {manifest.name}
-          </Text>
-
-          <Text style={styles.slugText} numberOfLines={1} selectable={true}>
-            {manifest.slug}
-          </Text>
-
-          <Text style={styles.descriptionText} selectable={true}>
-            {manifest.description}
-          </Text>
-        </View>
-      </View>
-    );
-  }
 
   async onLanguageChange(language) {
     getCurrentUser().setLanguage(language);
     this.props.requestBooks(language);
-    this.setState({ language });
+    this.setState({ language: getCurrentUser().getLanguageDisplayName() });
+  }
+
+  async onBibleVerseChange(version) {
+    getCurrentUser().setBibleVersion(version);
+    await clearStorageAsync(Models.Passage.key);
+    this.setState({ bibleVersion: getCurrentUser().getBibleVersionDisplayName() });
+  }
+
+  feedback = '';
+
+  onLanguage() {
+    // TODO: [Wei] Find a better UI control
+    languages = [];
+    for (var i in Models.Languages) {
+      const language = Models.Languages[i];
+      languages.push({ text: language.DisplayName, onPress: () => this.onLanguageChange(language.Value) });
+    }
+    Alert.alert('请选择', '显示语言', languages);
+  }
+
+  onBibleVerse() {
+    versions = [];
+    for (var i in Models.BibleVersions) {
+      const version = Models.BibleVersions[i];
+      versions.push({ text: version.DisplayName, onPress: () => this.onBibleVerseChange(version.Value) });
+    }
+    Alert.alert('请选择', '圣经版本', versions);
+  }
+
+  onFontSize() {
+    alert("TODO: onFontSize");
+  }
+
+  async onSubmitFeedback() {
+    if (this.feedback.trim() == '') {
+      Alert.alert('缺少内容', '请输入反馈意见内容', [
+        { text: 'OK', onPress: () => this.feedbackInput.focus() },
+      ]);
+      return;
+    }
+
+    const body = { comment: this.feedback };
+    const result = await callWebServiceAsync(Models.Feedback.restUri, '', 'POST', [], body);
+    const succeed = await showWebServiceCallErrorsAsync(result, 201);
+    if (succeed) {
+      this.feedbackInput.clear();
+      this.feedback = '';
+      Alert.alert('谢谢您的反馈意见！');
+    }
   }
 
   render() {
     const { manifest } = Constants;
     let keyIndex = 0;
     return (
-      <ScrollView
-        style={styles.container}
-        contentContainerStyle={this.props.route.getContentContainerStyle()}>
-
-        {this._renderTitle()}
-
-        <SectionHeader title="version" />
-        <SectionContent>
-          <Text style={styles.sectionContentText} selectable={true}>
-            {manifest.version}
-          </Text>
-        </SectionContent>
-
-        <SectionHeader title="language" />
-        <SectionContent>
-          {
-            Models.Languages.map(item => (
-              <RadioButton key={keyIndex++} currentValue={this.state.language} value={item.Value} onPress={this.onLanguageChange.bind(this)} >
-                <Text style={styles.textContent} key={keyIndex++}>{item.DisplayName}</Text>
-              </RadioButton>
-            ))
-          }
-        </SectionContent>
-      </ScrollView>
+      <KeyboardAvoidingView style={styles.container} behavior='padding' keyboardVerticalOffset={0}>
+        <SettingsList borderColor='#c8c7cc' defaultItemSize={40}>
+          <SettingsList.Header headerText='设置' headerStyle={{ color: 'black' }} />
+          <SettingsList.Item
+            title='显示语言'
+            titleInfo={this.state.language}
+            titleInfoStyle={styles.titleInfoStyle}
+            onPress={this.onLanguage.bind(this)}
+          />
+          <SettingsList.Item
+            title='圣经版本'
+            titleInfo={this.state.bibleVersion}
+            titleInfoStyle={styles.titleInfoStyle}
+            onPress={this.onBibleVerse.bind(this)}
+          />
+          {/*<SettingsList.Item
+            title='字体大小'
+            titleInfo='中等'
+            titleInfoStyle={styles.titleInfoStyle}
+            onPress={this.onFontSize.bind(this)}
+          />*/}
+          <SettingsList.Header headerText='MBSF - Mobile Bible Study Fellowship' headerStyle={{ color: 'black', marginTop: 15 }} />
+          <View style={styles.answerContainer}>
+            <TextInput
+              style={styles.answerInput}
+              ref={(input) => this.feedbackInput = input}
+              blurOnSubmit={false}
+              placeholder="反馈意见"
+              multiline
+              onChangeText={(text) => { this.feedback = text }}
+            />
+            <View style={{ alignItems: 'center' }}>
+              <TouchableOpacity style={styles.buttonContainer} onPress={this.onSubmitFeedback.bind(this)}>
+                <Text style={styles.buttonText}>提交</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+          <SettingsList.Item
+            title='App版本'
+            titleInfo={manifest.version}
+            hasNavArrow={false}
+            titleInfoStyle={styles.titleInfoStyle}
+          />
+        </SettingsList>
+      </KeyboardAvoidingView>
     );
   }
 }
@@ -183,5 +207,26 @@ const styles = StyleSheet.create({
   textContent: {
     fontSize: 18,
     height: 30
+  },
+  answerContainer: {
+    marginTop: 5,
+    height: 100,
+    padding: 5,
+    backgroundColor: 'whitesmoke',
+  },
+  answerInput: {
+    flex: 1,
+    fontSize: 16,
+    textAlignVertical: 'top'
+  },
+  buttonText: {
+    fontSize: 16,
+    color: 'white',
+    textAlign: 'center'
+  },
+  buttonContainer: {
+    backgroundColor: '#2980B9',
+    width: 80,
+    borderRadius: 4
   }
 });

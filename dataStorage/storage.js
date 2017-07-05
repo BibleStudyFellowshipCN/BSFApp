@@ -49,7 +49,11 @@ async function loadAsync(model, id, update) {
     console.log("start load " + JSON.stringify({ model, id }));
 
     if (model.useLanguage) {
-        id = id + '?lang=' + getLanguage();
+        if (id.indexOf('?') == -1) {
+            id = id + '?lang=' + getLanguage();
+        } else {
+            id = id + '&lang=' + getLanguage();
+        }
     }
 
     // try to load from cache first
@@ -185,4 +189,84 @@ async function clearStorageAsync(key) {
     await storage.clearMapForKey(key);
 }
 
-export { loadAsync, saveAsync, clearStorageAsync };
+async function callWebServiceAsync(url, api, method, headers, body) {
+    let responseStatus;
+    let responseHeader;
+    let responseJson;
+    let serverUrl = url + api;
+    try {
+        // Set no cache header
+        let httpHeaders = new Headers();
+        httpHeaders.append('pragma', 'no-cache');
+        httpHeaders.append('cache-control', 'no-cache');
+        httpHeaders.append('Content-type', 'application/json');
+        httpHeaders.append('Accept', 'application/json');
+        if (headers) {
+            headers.forEach(function (item) {
+                httpHeaders.append(item.name, item.value);
+            });
+        }
+
+        let payload;
+        if (body) {
+            payload = { method, headers: httpHeaders, body: JSON.stringify(body) };
+        } else {
+            payload = { method, headers: httpHeaders };
+        }
+
+        console.log(JSON.stringify({ url: serverUrl, ...payload }));
+        const response = await fetch(serverUrl, payload);
+
+        responseStatus = response.status;
+        responseHeader = response.headers.map;
+
+        try {
+            let responseString = await response.text();
+            responseJson = JSON.parse(responseString);
+        } catch (err) {
+            if (response._bodyText) {
+                responseJson = eval("(" + response._bodyText + ")")
+            }
+        }
+
+        if (!responseJson) {
+            responseJson = '';
+        }
+
+    } catch (err) {
+        console.log('callWebServiceAsync Error:' + JSON.stringify(err));
+    }
+
+    const result = { headers: responseHeader, body: responseJson, status: responseStatus };
+    console.log(method + ' ' + serverUrl + " => " + JSON.stringify(result));
+    return result;
+}
+
+async function showWebServiceCallErrorsAsync(result, acceptStatus) {
+    if (!result) {
+        await Alert.alert('Error', 'Please check your network connection');
+    }
+    else if (acceptStatus) {
+        if (result.status == acceptStatus) {
+            return true;
+        } else {
+            let message = 'HTTP status ' + result.status;
+            if (result.body) {
+                if (result.body.Message) {
+                    message = message + "\n\n" + result.body.Message;
+                }
+                if (result.body.ExceptionMessage) {
+                    message = message + "\n\n" + result.body.ExceptionMessage;
+                }
+                if (result.body.ExceptionType) {
+                    message = message + "\n\n" + result.body.ExceptionType;
+                }
+            }
+            await Alert.alert('Error', message);
+        }
+    }
+
+    return false;
+}
+
+export { loadAsync, saveAsync, clearStorageAsync, callWebServiceAsync, showWebServiceCallErrorsAsync };

@@ -21,6 +21,7 @@
     "react-native-collapsible": "^0.8.0",
     "react-native-keyboard-aware-scroll-view": "^0.2.8",
     "react-native-scrollable-tab-view": "^0.7.4",
+    "react-native-settings-list": "^1.6.1",
     "react-native-storage": "^0.1.5",
     "react-redux": "^5.0.3",
     "redux": "^3.6.0",

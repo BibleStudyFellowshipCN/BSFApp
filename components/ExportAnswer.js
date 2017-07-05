@@ -6,8 +6,7 @@ import {
   Text,
   Alert,
   Share,
-  Platform,
-  ActionSheetIOS
+  Platform
 } from 'react-native';
 import { FontAwesome } from '@expo/vector-icons';
 import { loadAsync } from '../dataStorage/storage';
