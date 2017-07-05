@@ -8,12 +8,12 @@ export const CachePolicy = {
 export const Models = {
   Book: {
     key: "BOOK",
-    restUri: "http://bsfapi.azurewebsites.net/material/Studies",
+    restUri: "http://cbsf.southcentralus.cloudapp.azure.com:3000/lessons",
     cachePolicy: CachePolicy.AsyncStorage,
   },
   Lesson: {
     key: "LESSON",
-    restUri: "http://bsfapi.azurewebsites.net/material/Lessons",
+    restUri: "http://cbsf.southcentralus.cloudapp.azure.com:3000/lessons",
     cachePolicy: CachePolicy.AsyncStorage,
   },
   Passage: {

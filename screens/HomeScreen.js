@@ -92,16 +92,21 @@ class HomeScreen extends React.Component {
 }
 
 const Lesson = (props) => {
+  // TODO: clean up backend api for this to work
+  const parsed = props.lesson.name.split(' ')
+  const lessonNumber = parsed[0]
+  const name = parsed[1]
+  const date = parsed[2]
   return (
     <TouchableOpacity style={styles.lessonContainer} onPress={() => props.goToLesson()}>
       <View>
         <View style={styles.lessonMetadata}>
           <Text style={styles.lessonMetadataText}>
-            {props.lesson.proposedDate} {props.lesson.order}
+            {date} {lessonNumber}
           </Text>
         </View>
         <Text style={styles.lessonText}>
-          {props.lesson.name}
+          {name}
         </Text>
       </View>
       <View style={styles.lessonChevron}>
@@ -117,7 +122,7 @@ const Lesson = (props) => {
 
 const mapStateToProps = (state) => {
   return {
-    booklist: state.books,
+    booklist: state.books.booklist,
   }
 }
 
