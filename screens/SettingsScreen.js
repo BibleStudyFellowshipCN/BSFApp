@@ -1,8 +1,12 @@
 
 import React from 'react';
+import { connect } from 'react-redux'
 import { ScrollView, StyleSheet, Image, Text, View } from 'react-native';
 import { Constants } from 'expo';
 import { Models } from '../dataStorage/models';
+import RadioButton from 'radio-button-react-native';
+import { getCurrentUser } from '../store/user';
+import { requestBooks } from "../store/books.js";
 
 const SectionHeader = ({ title }) => {
   return (
@@ -23,10 +27,6 @@ const SectionContent = props => {
 };
 
 const AppIconPreview = ({ iconUrl }) => {
-  if (!iconUrl) {
-    iconUrl = 'https://s3.amazonaws.com/exp-brand-assets/ExponentEmptyManifest_192.png';
-  }
-
   return (
     <Image
       source={{ uri: iconUrl }}
@@ -36,11 +36,15 @@ const AppIconPreview = ({ iconUrl }) => {
   );
 };
 
-export default class SettingsScreen extends React.Component {
+class SettingsScreen extends React.Component {
   static route = {
     navigationBar: {
       title: '关于',
     },
+  };
+
+  state = {
+    language: getCurrentUser().getLanguage()
   };
 
   _renderTitle() {
@@ -48,10 +52,6 @@ export default class SettingsScreen extends React.Component {
 
     return (
       <View style={styles.titleContainer}>
-        <View style={styles.titleIconContainer}>
-          <AppIconPreview iconUrl={manifest.iconUrl} />
-        </View>
-
         <View style={styles.titleTextContainer}>
           <Text style={styles.nameText} numberOfLines={1} selectable={true}>
             {manifest.name}
@@ -69,8 +69,15 @@ export default class SettingsScreen extends React.Component {
     );
   }
 
+  async onLanguageChange(language) {
+    getCurrentUser().setLanguage(language);
+    this.props.requestBooks(language);
+    this.setState({ language });
+  }
+
   render() {
     const { manifest } = Constants;
+    let keyIndex = 0;
     return (
       <ScrollView
         style={styles.container}
@@ -85,22 +92,34 @@ export default class SettingsScreen extends React.Component {
           </Text>
         </SectionContent>
 
-        {/* <SectionHeader title="servers" /> */}
-        {/* <SectionContent > */}
-        {/*   <Text style={styles.sectionContentText}> */}
-        {/*     book: {Models.Book.restUri} */}
-        {/*   </Text> */}
-        {/*   <Text style={styles.sectionContentText}> */}
-        {/*     lesson: {Models.Book.restUri} */}
-        {/*   </Text> */}
-        {/*   <Text style={styles.sectionContentText}> */}
-        {/*     bible verse: {Models.Book.restUri} */}
-        {/*   </Text> */}
-        {/* </SectionContent> */}
+        <SectionHeader title="language" />
+        <SectionContent>
+          {
+            Models.Languages.map(item => (
+              <RadioButton key={keyIndex++} currentValue={this.state.language} value={item.Value} onPress={this.onLanguageChange.bind(this)} >
+                <Text style={styles.textContent} key={keyIndex++}>{item.DisplayName}</Text>
+              </RadioButton>
+            ))
+          }
+        </SectionContent>
       </ScrollView>
     );
   }
 }
+
+const mapStateToProps = (state, ownProps) => {
+  return {
+  };
+};
+
+const mapDispatchToProps = (dispatch, ownProps) => {
+  return {
+    requestBooks: () => dispatch(requestBooks()),
+  }
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(SettingsScreen)
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -161,4 +180,8 @@ const styles = StyleSheet.create({
   colorTextContainer: {
     flex: 1,
   },
+  textContent: {
+    fontSize: 18,
+    height: 30
+  }
 });

@@ -70,7 +70,7 @@ export default class ExportAnswer extends React.Component {
   }
 
   render() {
-   return (
+    return (
       <View style={styles.container}>
         <TouchableOpacity onPress={this.onClick.bind(this)}>
           <FontAwesome

@@ -13,6 +13,7 @@ import {
 import Accordion from 'react-native-collapsible/Accordion';
 import { MonoText } from '../components/StyledText';
 import Colors from '../constants/Colors'
+import { requestBooks } from "../store/books.js";
 
 class HomeScreen extends React.Component {
   static route = {
@@ -20,6 +21,10 @@ class HomeScreen extends React.Component {
       title: 'BSF课程',
     },
   };
+
+  componentDidMount() {
+    this.props.requestBooks();
+  }
 
   goToLesson(lesson) {
     this.props.navigation.getNavigator('root').push('lesson', { lesson });
@@ -77,18 +82,6 @@ class HomeScreen extends React.Component {
       </View>
     )
   }
-
-  _handleLearnMorePress = () => {
-    Linking.openURL(
-      'https://docs.expo.io/versions/latest/guides/development-mode'
-    );
-  };
-
-  _handleHelpPress = () => {
-    Linking.openURL(
-      'https://docs.expo.io/versions/latest/guides/up-and-running.html#can-t-see-your-changes'
-    );
-  };
 }
 
 const Lesson = (props) => {
@@ -126,7 +119,11 @@ const mapStateToProps = (state) => {
   }
 }
 
-const mapDispatchToProps = {}
+const mapDispatchToProps = (dispatch, ownProps) => {
+  return {
+    requestBooks: () => dispatch(requestBooks())
+  }
+}
 
 export default connect(mapStateToProps, mapDispatchToProps)(HomeScreen)
 

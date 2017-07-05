@@ -1,8 +1,9 @@
-import { AsyncStorage } from 'react-native';
+import { AsyncStorage, Platform } from 'react-native';
 import { debounce } from 'lodash';
 import Storage from 'react-native-storage';
-
+import { Constants } from 'expo';
 import { Models, CachePolicy } from './models';
+import { getCurrentUser } from '../store/user';
 
 if (!global.storage) {
     global.storage = new Storage({
@@ -19,6 +20,22 @@ if (!global.cache) {
     global.cache = [];
 }
 
+if (!global.deviceInfo) {
+    global.deviceInfo = {
+        deviceId: Constants['deviceId'],
+        sessionId: Constants['sessionId'],
+        deviceYearClass: Constants['deviceYearClass'],
+        platformOS: Platform.OS
+    };
+}
+
+function getLanguage() {
+    let lang = getCurrentUser().getLanguage();
+    if (!lang) {
+        lang = Models.DefaultLanguage;
+    }
+    return lang;
+}
 function encode(idOrKey) {
     // key and id can never contains "_"
     return idOrKey.replace(/_/g, '##-##');
@@ -30,6 +47,10 @@ async function loadAsync(model, id, update) {
     }
 
     console.log("start load " + JSON.stringify({ model, id }));
+
+    if (model.useLanguage) {
+        id = id + '?lang=' + getLanguage();
+    }
 
     // try to load from cache first
     let data = null;
@@ -96,6 +117,10 @@ async function loadFromCloudAsync(model, id, silentLoad) {
         let noCacheHeader = new Headers();
         noCacheHeader.append('pragma', 'no-cache');
         noCacheHeader.append('cache-control', 'no-cache');
+        noCacheHeader.append('deviceId', global.deviceInfo.deviceId);
+        noCacheHeader.append('sessionId', global.deviceInfo.sessionId);
+        noCacheHeader.append('deviceYearClass', global.deviceInfo.deviceYearClass);
+        noCacheHeader.append('platformOS', global.deviceInfo.platformOS);
 
         // fetch data from service
         const response = await fetch(url, { method: 'GET', headers: noCacheHeader });
@@ -155,12 +180,9 @@ function saveToCloud(data, model, id) {
 
 
 async function clearStorageAsync(key) {
-    if (key) {
-        await storage.clearMapForKey(key);
-    }
-    else {
-        await storage.clearMap();
-    }
+    key = encode(key);
+    console.log("clearStorageAsync: " + key);
+    await storage.clearMapForKey(key);
 }
 
 export { loadAsync, saveAsync, clearStorageAsync };

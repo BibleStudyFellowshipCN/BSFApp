@@ -15,13 +15,15 @@ import Layout from '../constants/Layout';
 import { getImage } from '../components/ImageMap';
 import Colors from '../constants/Colors';
 import { Models } from '../dataStorage/models';
+import RadioButton from 'radio-button-react-native';
+import { getCurrentUser } from '../store/user';
 
 export default class LoginUI extends React.Component {
-  cellphone = "4250001111";
+  cellphone = "4250000000";
 
   state = {
     busy: false,
-    language: "CHS"
+    language: Models.Languages[0].Value
   };
 
   async onLogon() {
@@ -29,9 +31,9 @@ export default class LoginUI extends React.Component {
       this.cellphoneInput.focus();
     } else {
       this.setState({ busy: true });
-      const loggedOn = true; //await getCurrentUser().login(this.email, this.password);
+      const logon = await getCurrentUser().login(this.cellphone, this.state.language);
       this.setState({ busy: false });
-      if (loggedOn) {
+      if (logon) {
         this.props.onUserLogon({ logon: true });
       } else {
         await alert("Please check your network connection or email/password");
@@ -40,6 +42,7 @@ export default class LoginUI extends React.Component {
   }
 
   render() {
+    let keyIndex = 0;
     return (
       <KeyboardAvoidingView behavior="padding" style={styles.container}>
         <View style={styles.logonContainer}>
@@ -57,13 +60,15 @@ export default class LoginUI extends React.Component {
             placeholderTextColor="rgba(255,255,255,0.7)"
             onChangeText={(text) => this.cellphone = text}
             keyboardType="phone-pad" />
-          {
-            Models.Languages.map(item => (
-              <RadioButton key={keyIndex++} currentValue={this.state.language} value={item.Value} onPress={() => { this.setState({ language: item.Value }) }} >
-                <Text style={styles.textContent} key={keyIndex++}>{item.DisplayName}</Text>
-              </RadioButton>
-            ))
-          }
+          <View style={styles.langView}>
+            {
+              Models.Languages.map(item => (
+                <RadioButton key={keyIndex++} currentValue={this.state.language} value={item.Value} onPress={() => { this.setState({ language: item.Value }) }} >
+                  <Text style={styles.textContent} key={keyIndex++}>{item.DisplayName}</Text>
+                </RadioButton>
+              ))
+            }
+          </View>
           <View style={styles.buttonView}>
             <TouchableOpacity style={styles.buttonContainer} onPress={this.onLogon.bind(this)} disabled={this.state.busy}>
               <Text style={styles.buttonText}>Login</Text>
@@ -85,6 +90,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   logo: {
+    width: 120,
+    height: 120
   },
   input: {
     height: 40,
@@ -108,6 +115,13 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     color: '#FFFFFF',
     fontWeight: '700',
+  },
+  langView: {
+    flex: 1,
+    flexDirection: 'row',
+    maxHeight: 40,
+    justifyContent: 'space-between',
+    marginVertical: 6
   },
   buttonView: {
     flex: 1,

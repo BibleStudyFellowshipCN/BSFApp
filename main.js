@@ -11,6 +11,7 @@ import cacheAssetsAsync from './utilities/cacheAssetsAsync';
 import { loadAsync } from './dataStorage/storage';
 import { Models } from './dataStorage/models';
 import LoginUI from './components/LoginUI';
+import { getCurrentUser } from './store/user';
 
 let store;
 
@@ -26,9 +27,17 @@ class AppContainer extends React.Component {
 
   async loadApp() {
     try {
+      // initialize existing user
+      await getCurrentUser().loadExistingUser();
+      // TODO: [Wei] Workaround for now
+      if (!getCurrentUser().isLoggedOn()) {
+        await getCurrentUser().login("4250000000", "chs");
+      }
+      getCurrentUser().logUserInfo();
+
       // add all the neccessary load in Promise.all
       let bootValues = await Promise.all([
-        loadAsync(Models.Book, null, true),
+        loadAsync(Models.Book, '', true),
         loadAsync(Models.Answer, null, false),
         cacheAssetsAsync({
           images: [
@@ -50,18 +59,10 @@ class AppContainer extends React.Component {
       store = createStore(initialstate);
 
       // prefetch data here:
-      // TODO:[Wei] Check if the user has already logged on, set userIsLoggedOn = true
-      this.setState({ userIsLoggedOn: true });
-
-      // TODO:[Wei] Send device info to service
-      let deviceId = Constants['deviceId'];
-      let sessionId = Constants['sessionId'];
-      let deviceYearClass = Constants['deviceYearClass'];
-      let platformOS = Platform.OS;
-      console.log("DeviceInfo: " + JSON.stringify({ deviceId, sessionId, deviceYearClass, platformOS }));
 
       // set the app status to ready
-      this.setState({ appIsReady: true });
+      // TODO: [Wei] Workaround for now
+      this.setState({ appIsReady: true, userIsLoggedOn: /*getCurrentUser().isLoggedOn() */ true });
     } catch (err) {
       console.error("failed to boot due to: " + err);
     }

@@ -10,25 +10,35 @@ export const Models = {
     key: "BOOK",
     restUri: "http://cbsf.southcentralus.cloudapp.azure.com:3000/lessons",
     cachePolicy: CachePolicy.AsyncStorage,
+    useLanguage: true
   },
   Lesson: {
     key: "LESSON",
     restUri: "http://cbsf.southcentralus.cloudapp.azure.com:3000/lessons",
     cachePolicy: CachePolicy.AsyncStorage,
+    useLanguage: true
   },
   Passage: {
     key: "PASSAGE",
     restUri: "http://cbsf.southcentralus.cloudapp.azure.com:3000/verse",
     cachePolicy: CachePolicy.AsyncStorage,
+    useLanguage: true
+  },
+  Logon: {
+    key: "LOGON",
+    restUri: "http://cbsf.southcentralus.cloudapp.azure.com:3000/logon",
+    cachePolicy: CachePolicy.AsyncStorage,
+    userKey: '@BsfApp:user'
   },
   Answer: {
     key: "ANSWER",
     restUri: "",
     cachePolicy: CachePolicy.AsyncStorage,
   },
+  DefaultLanguage: "chs",
   Languages: [
-    { DisplayName: "简体中文", Value: "CHS"},
-    { DisplayName: "繁體中文", Value: "CHT"},
-    { DisplayName: "English", Value: "ENG"},
+    { DisplayName: "简体中文", Value: "chs" },
+    { DisplayName: "繁體中文", Value: "cht" },
+    { DisplayName: "English", Value: "eng" },
   ]
 }
