@@ -49,6 +49,8 @@ export const Models = {
   BibleVersions: [
     { DisplayName: "和合本修订版(简体)", Value: "rcuvss" },
     { DisplayName: "和合本修訂版(繁體)", Value: "rcuvts" },
-    { DisplayName: "New International Version 2011", Value: "niv2011" }
+    { DisplayName: "New International Version 2011", Value: "niv2011" },
+    { DisplayName: "American Standard Version", Value: "asv" },
+    { DisplayName: "King James Version", Value: "kjv" }
   ]
 }

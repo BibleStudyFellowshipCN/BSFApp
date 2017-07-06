@@ -201,6 +201,10 @@ async function callWebServiceAsync(url, api, method, headers, body) {
         httpHeaders.append('cache-control', 'no-cache');
         httpHeaders.append('Content-type', 'application/json');
         httpHeaders.append('Accept', 'application/json');
+        httpHeaders.append('deviceId', global.deviceInfo.deviceId);
+        httpHeaders.append('sessionId', global.deviceInfo.sessionId);
+        httpHeaders.append('deviceYearClass', global.deviceInfo.deviceYearClass);
+        httpHeaders.append('platformOS', global.deviceInfo.platformOS);
         if (headers) {
             headers.forEach(function (item) {
                 httpHeaders.append(item.name, item.value);
