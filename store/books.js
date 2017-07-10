@@ -12,7 +12,7 @@ export const RECEIVE_BOOKS = 'RECEIVE_BOOKS';
 export function requestBooks() {
   return async (dispatch) => {
 
-    const books = await loadAsync(Models.Book, '', false);
+    const books = await loadAsync(Models.Book, '', true);
     dispatch({
       type: RECEIVE_BOOKS,
       payload: { books: books },

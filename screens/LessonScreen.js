@@ -19,6 +19,7 @@ import Answer from '../components/Answer'
 import ExportAnswer from '../components/ExportAnswer.js';
 import Colors from '../constants/Colors'
 import SharedStyles from '../constants/SharedStyles';
+import getI18nText from '../store/I18n';
 
 class LessonScreen extends React.Component {
   static route = {
@@ -64,7 +65,7 @@ class LessonScreen extends React.Component {
 
       const content = <ScrollableTabView initialPage={0} {...scrollableStyleProps}>
         {/*<NotesPage tabLabel="讲义" />*/}
-        <DayQuestions tabLabel="一" goToPassage={this.goToPassage} day={dayQuestions.one} readVerse={dayQuestions.one.readVerse} memoryVerse={this.props.memoryVerse} />
+        <DayQuestions tabLabel="一" goToPassage={this.goToPassage} day={dayQuestions.one} readVerse={dayQuestions.one.readVerse} memoryVerse={this.props.lesson.memoryVerse} />
         <DayQuestions tabLabel="二" goToPassage={this.goToPassage} day={dayQuestions.two} readVerse={dayQuestions.two.readVerse} />
         <DayQuestions tabLabel="三" goToPassage={this.goToPassage} day={dayQuestions.three} readVerse={dayQuestions.three.readVerse} />
         <DayQuestions tabLabel="四" goToPassage={this.goToPassage} day={dayQuestions.four} readVerse={dayQuestions.four.readVerse} />
@@ -103,7 +104,7 @@ function inputFocused(refName) {
 
 const DayQuestions = (props) => {
   if (props.memoryVerse != undefined) {
-    memoryVerseUI = <Text style={styles.memoryVerse} selectable={true}>{props.memoryVerse}</Text>
+    memoryVerseUI = <Text style={styles.memoryVerse} selectable={true}>{getI18nText('背诵经文：')}{props.memoryVerse}</Text>
   } else {
     memoryVerseUI = null
   }

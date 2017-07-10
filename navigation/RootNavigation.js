@@ -7,12 +7,11 @@ import {
   TabNavigationItem,
 } from '@expo/ex-navigation';
 import { FontAwesome } from '@expo/vector-icons';
-
 import Alerts from '../constants/Alerts';
 import Colors from '../constants/Colors';
-import registerForPushNotificationsAsync
-  from '../api/registerForPushNotificationsAsync';
+import registerForPushNotificationsAsync from '../api/registerForPushNotificationsAsync';
 import SharedStyles from '../constants/SharedStyles';
+import getI18nText from '../store/I18n';
 
 export default class RootNavigation extends React.Component {
   componentDidMount() {
@@ -40,7 +39,7 @@ export default class RootNavigation extends React.Component {
 
         <TabNavigationItem
           id="class"
-          renderIcon={isSelected => this._renderIcon('课', 'book', isSelected)}>
+          renderIcon={isSelected => this._renderIcon(getI18nText('课'), 'book', isSelected)}>
           <StackNavigation
             initialRoute="home"
             defaultRouteConfig={SharedStyles.tabNavItemStyle}
@@ -49,7 +48,7 @@ export default class RootNavigation extends React.Component {
 
         <TabNavigationItem
           id="audioBible"
-          renderIcon={isSelected => this._renderIcon('有声圣经', 'headphones', isSelected)}>
+          renderIcon={isSelected => this._renderIcon(getI18nText('有声圣经'), 'headphones', isSelected)}>
           <StackNavigation initialRoute="audioBible"
             defaultRouteConfig={SharedStyles.tabNavItemStyle}
           />
@@ -57,7 +56,7 @@ export default class RootNavigation extends React.Component {
 
         <TabNavigationItem
           id="profile"
-          renderIcon={isSelected => this._renderIcon('我', 'info-circle', isSelected)}>
+          renderIcon={isSelected => this._renderIcon(getI18nText('我'), 'info-circle', isSelected)}>
           <StackNavigation initialRoute="settings"
             defaultRouteConfig={SharedStyles.tabNavItemStyle}
           />

@@ -54,10 +54,10 @@ export default class User {
     existingUser = await loadUser();
     if (existingUser) {
       this.cellphone = existingUser.cellphone;
-      if (['chs', 'cht', 'eng'].indexOf(existingUser.language) != -1) {
+      if (Models.ValidLanguages.indexOf(existingUser.language) != -1) {
         this.language = existingUser.language;
       }
-      if (['rcuvss', 'rcuvts', 'niv2011'].indexOf(existingUser.bibleVersion) != -1) {
+      if (Models.ValidBibleVersionsLanguages.indexOf(existingUser.bibleVersion) != -1) {
         this.bibleVersion = existingUser.bibleVersion;
       }
       this.loggedOn = true;

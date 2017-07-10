@@ -40,12 +40,14 @@ export const Models = {
     cachePolicy: CachePolicy.AsyncStorage,
   },
   DefaultLanguage: "chs",
+  ValidLanguages: ["chs", "cht", "eng"],
   Languages: [
     { DisplayName: "简体中文", Value: "chs" },
     { DisplayName: "繁體中文", Value: "cht" },
     { DisplayName: "English", Value: "eng" }
   ],
   DefaultBibleVersion: "rcuvss",
+  ValidBibleVersionsLanguages: ["rcuvss", "rcuvts", "niv2011", "asv", "kjv"],
   BibleVersions: [
     { DisplayName: "和合本修订版(简体)", Value: "rcuvss" },
     { DisplayName: "和合本修訂版(繁體)", Value: "rcuvts" },

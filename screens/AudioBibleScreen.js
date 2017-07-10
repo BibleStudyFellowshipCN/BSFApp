@@ -11,13 +11,16 @@ import {
   Button,
 } from 'react-native';
 import Expo, { Audio } from 'expo';
+import getI18nText from '../store/I18n';
 
 const audioBookId = require('../assets/audioBookId.json');
 
 export default class AudioBibleScreen extends React.Component {
   static route = {
     navigationBar: {
-      title: '有声圣经',
+      title(params) {
+        return getI18nText('有声圣经');
+      }
     },
   };
 
@@ -69,11 +72,11 @@ export default class AudioBibleScreen extends React.Component {
   _onBookSelected = (id) => {
     let book = audioBookId.find((element) => (element.id == id));
     this._resetAudio();
-    this.setState( {
-        id,
-        name : book.name,
-        currentChapter: 1,
-        totalChapter: book.chapters,
+    this.setState({
+      id,
+      name: book.name,
+      currentChapter: 1,
+      totalChapter: book.chapters,
     });
     console.log(JSON.stringify(this.state));
   }
@@ -91,36 +94,37 @@ export default class AudioBibleScreen extends React.Component {
         flex: 1,
         flexDirection: 'column',
         justifyContent: 'center',
-        alignItems: 'center',}}>
-        <View style={{flex: 1, flexDirection: 'row'}}>
-          <View style={{width: 170}}>
+        alignItems: 'center',
+      }}>
+        <View style={{ flex: 1, flexDirection: 'row' }}>
+          <View style={{ width: 170 }}>
             <Picker
-              style={{alignSelf: 'stretch'}}
+              style={{ alignSelf: 'stretch' }}
               selectedValue={this.state.id}
               onValueChange={this._onBookSelected}>
-              { audioBookId.map(s => (
-                  <Picker.Item label={s.name} value={s.id} key={s.id}/>
-                )) }
+              {audioBookId.map(s => (
+                <Picker.Item label={s.name} value={s.id} key={s.id} />
+              ))}
             </Picker>
           </View>
-          <View style={{width: 170}}>
+          <View style={{ width: 170 }}>
             <Picker
-              style={{alignSelf: 'stretch'}}
+              style={{ alignSelf: 'stretch' }}
               selectedValue={this.state.currentChapter}
               onValueChange={this._onChapterSelected}>
               {
-                Array(this.state.totalChapter).fill(0).map((e,i)=>i+1).map(s => (<Picker.Item label={'第'+s.toString()+'章'} value={s} key={s}/>))
+                Array(this.state.totalChapter).fill(0).map((e, i) => i + 1).map(s => (<Picker.Item label={'第' + s.toString() + '章'} value={s} key={s} />))
               }
             </Picker>
           </View>
         </View>
-        <View style={{flex: 1, flexDirection: 'column', alignItems: 'center',}}>
+        <View style={{ flex: 1, flexDirection: 'column', alignItems: 'center', }}>
           <TouchableHighlight
             underlayColor={'#FFFFFF'}
             style={styles.wrapper}
             onPress={this._onPlayPausePressed}>
             <Text style={styles.playText}>
-            { this.state.isPlaying? "暂停": "播放" }
+              {this.state.isPlaying ? "暂停" : "播放"}
             </Text>
           </TouchableHighlight>
         </View>
