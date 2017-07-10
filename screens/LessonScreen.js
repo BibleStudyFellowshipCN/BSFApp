@@ -60,17 +60,17 @@ class LessonScreen extends React.Component {
     }
 
     if (this.props.lesson) {
-      dayQuestions = this.props.lesson.dayQuestions;
+        dayQuestions = this.props.lesson.dayQuestions;
 
-      const content = <ScrollableTabView initialPage={0} {...scrollableStyleProps}>
-        {/*<NotesPage tabLabel="讲义" />*/}
-        <DayQuestions tabLabel="一" goToPassage={this.goToPassage} day={dayQuestions[0]} readVerse={dayQuestions[0].readVerse} memoryVerse={this.props.memoryVerse} />
-        <DayQuestions tabLabel="二" goToPassage={this.goToPassage} day={dayQuestions[1]} readVerse={dayQuestions[1].readVerse} />
-        <DayQuestions tabLabel="三" goToPassage={this.goToPassage} day={dayQuestions[2]} readVerse={dayQuestions[2].readVerse} />
-        <DayQuestions tabLabel="四" goToPassage={this.goToPassage} day={dayQuestions[3]} readVerse={dayQuestions[3].readVerse} />
-        <DayQuestions tabLabel="五" goToPassage={this.goToPassage} day={dayQuestions[4]} readVerse={dayQuestions[4].readVerse} />
-        <DayQuestions tabLabel="六" goToPassage={this.goToPassage} day={dayQuestions[5]} readVerse={dayQuestions[5].readVerse} />
-      </ScrollableTabView>;
+        const content = <ScrollableTabView initialPage={0} {...scrollableStyleProps}>
+            {/*<NotesPage tabLabel="讲义" />*/}
+            <DayQuestions tabLabel={dayQuestions[0].tab} goToPassage={this.goToPassage} day={dayQuestions[0]} readVerse={dayQuestions[0].readVerse} memoryVerse={this.props.memoryVerse} />
+            <DayQuestions tabLabel={dayQuestions[1].tab} goToPassage={this.goToPassage} day={dayQuestions[1]} readVerse={dayQuestions[1].readVerse} />
+            <DayQuestions tabLabel={dayQuestions[2].tab} goToPassage={this.goToPassage} day={dayQuestions[2]} readVerse={dayQuestions[2].readVerse} />
+            <DayQuestions tabLabel={dayQuestions[3].tab} goToPassage={this.goToPassage} day={dayQuestions[3]} readVerse={dayQuestions[3].readVerse} />
+            <DayQuestions tabLabel={dayQuestions[4].tab} goToPassage={this.goToPassage} day={dayQuestions[4]} readVerse={dayQuestions[4].readVerse} />
+            <DayQuestions tabLabel={dayQuestions[5].tab} goToPassage={this.goToPassage} day={dayQuestions[5]} readVerse={dayQuestions[5].readVerse} />
+        </ScrollableTabView>;
 
       // TODO:[Wei] KeyboardAwareScrollView works on iOS but not Android, KeyboardAvoidingView works on Android, but not iOS :(
       return (Platform.OS === 'ios') ? content : (
