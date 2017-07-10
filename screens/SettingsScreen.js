@@ -10,6 +10,7 @@ import { getCurrentUser } from '../store/user';
 import { requestBooks } from "../store/books.js";
 import { FontAwesome } from '@expo/vector-icons';
 import SettingsList from 'react-native-settings-list';
+import { RkButton } from 'react-native-ui-kitten';
 
 class SettingsScreen extends React.Component {
   static route = {
@@ -113,11 +114,9 @@ class SettingsScreen extends React.Component {
               multiline
               onChangeText={(text) => { this.feedback = text }}
             />
-            <View style={{ alignItems: 'center' }}>
-              <TouchableOpacity style={styles.buttonContainer} onPress={this.onSubmitFeedback.bind(this)}>
-                <Text style={styles.buttonText}>提交</Text>
-              </TouchableOpacity>
-            </View>
+          </View>
+          <View style={{ alignItems: 'center' }}>
+            <RkButton onPress={this.onSubmitFeedback.bind(this)}>提交</RkButton>
           </View>
           <SettingsList.Item
             title='App版本'
@@ -216,6 +215,7 @@ const styles = StyleSheet.create({
   },
   answerInput: {
     flex: 1,
+    height: 50,
     fontSize: 16,
     textAlignVertical: 'top'
   },
