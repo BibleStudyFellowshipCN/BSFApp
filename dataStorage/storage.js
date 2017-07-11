@@ -56,27 +56,9 @@ async function loadAsync(model, id, update) {
         }
     }
 
-    // try to load from cache first
-    let data = null;
+    // load from network first
+    let data = await loadFromCloudAsync(model, id, /*silentLoad*/ true);
     let keyString = (id == null) ? model.key : model.key + '/' + id;
-    if (model.cachePolicy == CachePolicy.Memory) {
-        data = global.cache[keyString];
-    }
-    else if (model.cachePolicy == CachePolicy.AsyncStorage) {
-        data = await loadFromOffilneStorageAsync(model.key, id);
-        if (data && update) {
-            console.log("updating the data from cloud");
-            let updatedData = await loadFromCloudAsync(model, id, /*silentLoad*/ true);
-            console.log("silently save the updated cloud data to storage");
-            saveToOffilneStorageAsync(updatedData, model.key, id);
-        }
-    }
-    if (data) {
-        return data;
-    }
-
-    // cache miss, load from network
-    data = await loadFromCloudAsync(model, id, /*silentLoad*/ false);
 
     // store to cache
     if (data) {
@@ -90,6 +72,14 @@ async function loadAsync(model, id, update) {
     }
     else {
         console.log("failed to load" + JSON.stringify({ model, id }));
+
+        // then try to load from cache
+        if (model.cachePolicy == CachePolicy.Memory) {
+            data = global.cache[keyString];
+        }
+        else if (model.cachePolicy == CachePolicy.AsyncStorage) {
+            data = await loadFromOffilneStorageAsync(model.key, id);
+        }
     }
 
     return data;

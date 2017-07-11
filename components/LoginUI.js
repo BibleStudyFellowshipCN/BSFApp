@@ -31,7 +31,7 @@ export default class LoginUI extends React.Component {
       this.cellphoneInput.focus();
     } else {
       this.setState({ busy: true });
-      const logon = await getCurrentUser().login(this.cellphone, this.state.language);
+      const logon = await getCurrentUser().loginAsync(this.cellphone, this.state.language);
       this.setState({ busy: false });
       if (logon) {
         this.props.onUserLogon({ logon: true });

@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { connect } from 'react-redux'
-import { ScrollView, StyleSheet, Image, Text, View, Alert, TextInput, TouchableOpacity, KeyboardAvoidingView } from 'react-native';
+import { ScrollView, StyleSheet, Image, Text, View, Alert, TextInput, TouchableOpacity, KeyboardAvoidingView, Platform } from 'react-native';
 import Expo, { Constants } from 'expo';
 import { Models } from '../dataStorage/models';
 import { clearStorageAsync, callWebServiceAsync, showWebServiceCallErrorsAsync } from '../dataStorage/storage';
@@ -30,7 +30,18 @@ class SettingsScreen extends React.Component {
 
   async onLanguageChange(language) {
     if (getCurrentUser().getLanguage() != language) {
-      getCurrentUser().setLanguage(language);
+      await getCurrentUser().setLanguageAsync(language);
+
+      // Also set the bible version based on language selection
+      if (language == 'eng') {
+        await getCurrentUser().setBibleVersionAsync('niv2011');
+      } else if (language == 'cht') {
+        await getCurrentUser().setBibleVersionAsync('rcuvts');
+      } else {
+        await getCurrentUser().setBibleVersionAsync('rcuvss');
+      }
+      getCurrentUser().logUserInfo();
+
       Expo.Util.reload();
       // FIXME: [Wei] For some reason "reload" doesn't work on iOS
       //await clearStorageAsync(Models.Book.key);
@@ -43,7 +54,7 @@ class SettingsScreen extends React.Component {
 
   async onBibleVerseChange(version) {
     if (getCurrentUser().getBibleVersion() != version) {
-      getCurrentUser().setBibleVersion(version);
+      await getCurrentUser().setBibleVersionAsync(version);
       Expo.Util.reload();
       // FIXME: [Wei] For some reason "reload" doesn't work on iOS
       // await clearStorageAsync(Models.Passage.key);
@@ -61,7 +72,7 @@ class SettingsScreen extends React.Component {
       const language = Models.Languages[i];
       languages.push({ text: language.DisplayName, onPress: () => this.onLanguageChange(language.Value) });
     }
-    Alert.alert(getI18nText('请选择显示语言'), getI18nText('提示：选择后程序将重新启动'), languages);
+    Alert.alert(getI18nText('请选择显示语言'), Platform.OS === 'android' ? getI18nText('提示：选择后程序将重新启动') : '', languages);
   }
 
   onBibleVerse() {
@@ -70,7 +81,7 @@ class SettingsScreen extends React.Component {
       const version = Models.BibleVersions[i];
       versions.push({ text: version.DisplayName, onPress: () => this.onBibleVerseChange(version.Value) });
     }
-    Alert.alert(getI18nText('请选择圣经版本'), getI18nText('提示：选择后程序将重新启动'), versions);
+    Alert.alert(getI18nText('请选择圣经版本'), Platform.OS === 'android' ? getI18nText('提示：选择后程序将重新启动') : '', versions);
   }
 
   onFontSize() {
@@ -121,6 +132,7 @@ class SettingsScreen extends React.Component {
             titleInfoStyle={styles.titleInfoStyle}
             onPress={this.onFontSize.bind(this)}
           />*/}
+          <SettingsList.Header headerText={getI18nText('反馈意见')} headerStyle={{ color: 'black', marginTop: 15 }} />
           <SettingsList.Header headerText='MBSF - Mobile Bible Study Fellowship' headerStyle={{ color: 'black', marginTop: 15 }} />
           <View style={styles.answerContainer}>
             <TextInput

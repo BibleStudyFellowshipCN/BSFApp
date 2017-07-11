@@ -29,10 +29,10 @@ async function loadUser() {
   return null;
 }
 
-async function saveUser(user) {
+async function saveUserAsync(user) {
   try {
     if (user) {
-      console.log("saveUser: " + JSON.stringify(user));
+      console.log("saveUserAsync: " + JSON.stringify(user));
       await AsyncStorage.setItem(Models.Logon.userKey, JSON.stringify(user));
     } else {
       console.log("deleteUser");
@@ -50,7 +50,7 @@ export default class User {
   language = Models.DefaultLanguage;
   bibleVersion = Models.DefaultBibleVersion;
 
-  async loadExistingUser() {
+  async loadExistingUserAsync() {
     existingUser = await loadUser();
     if (existingUser) {
       this.cellphone = existingUser.cellphone;
@@ -93,12 +93,12 @@ export default class User {
     return null;
   }
 
-  async setLanguage(language) {
+  async setLanguageAsync(language) {
     if (!this.isLoggedOn()) {
       return null;
     }
     this.language = language;
-    await saveUser(this.getUserInfo());
+    await saveUserAsync(this.getUserInfo());
   }
 
   getBibleVersion() {
@@ -108,12 +108,12 @@ export default class User {
     return this.bibleVersion;
   }
 
-  async setBibleVersion(version) {
+  async setBibleVersionAsync(version) {
     if (!this.isLoggedOn()) {
       return null;
     }
     this.bibleVersion = version;
-    await saveUser(this.getUserInfo());
+    await saveUserAsync(this.getUserInfo());
   }
 
   getBibleVersionDisplayName() {
@@ -126,15 +126,15 @@ export default class User {
     return null;
   }
 
-  async logout() {
+  async logoutAsync() {
     if (this.loggedOn) {
       this.loggedOn = false;
       this.cellphone = null;
-      await saveUser(null);
+      await saveUserAsync(null);
     }
   }
 
-  async login(cellphone, language) {
+  async loginAsync(cellphone, language) {
     const result = await loadAsync(Models.Logon, '?cellphone=' + cellphone, true);
     if (!result || !result.logon) {
       return false;
@@ -143,7 +143,7 @@ export default class User {
     this.cellphone = cellphone;
     this.language = language;
     this.loggedOn = true;
-    await saveUser(this.getUserInfo());
+    await saveUserAsync(this.getUserInfo());
     this.logUserInfo();
     return true;
   }

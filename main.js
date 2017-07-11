@@ -28,10 +28,10 @@ class AppContainer extends React.Component {
   async loadApp() {
     try {
       // initialize existing user
-      await getCurrentUser().loadExistingUser();
+      await getCurrentUser().loadExistingUserAsync();
       // TODO: [Wei] Workaround for now
       if (!getCurrentUser().isLoggedOn()) {
-        await getCurrentUser().login("4250000000", "chs");
+        await getCurrentUser().loginAsync("4250000000", "chs");
       }
       getCurrentUser().logUserInfo();
 
