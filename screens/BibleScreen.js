@@ -34,14 +34,17 @@ class BibleScreen extends React.Component {
   render() {
     if (this.props.passage) {
       const paragraphs = this.props.passage.paragraphs;
+      let html = '<style> body { font-size: 110%;} </style>';
+      for (var i in paragraphs) {
+        for (var j in paragraphs[i].verses) {
+          const verse = paragraphs[i].verses[j];
+          html += verse.verse + " " + verse.text + "<br>";
+        }
+      }
       return (
-        <View style={styles.container}>
-          <ScrollView>
-            {paragraphs.map(paragraph => (
-              <Paragraph key={paragraph.id} paragraph={paragraph} />
-            ))}
-          </ScrollView>
-        </View>
+        <WebView
+          source={{ html }}
+        />
       );
     } else {
       // Display loading screen
@@ -53,23 +56,6 @@ class BibleScreen extends React.Component {
     }
   }
 }
-
-const Paragraph = (props) => (
-  <View style={styles.paragraphContainer}>
-    {props.paragraph.title ? <Text style={styles.verseText} selectable={true}> {props.paragraph.title} </Text> : null}
-    <Text selectable={true}>
-      {props.paragraph.verses.map(verse => (
-        <Verse key={verse.verse} verse={verse} />
-      ))}
-    </Text>
-  </View>
-)
-
-const Verse = (props) => (
-  <Text style={[styles.verseText, { color: 'black' }]} selectable={true}>
-    {props.verse.verse} {props.verse.text}
-  </Text>
-)
 
 const bookid = require('../assets/bookid.json');
 
