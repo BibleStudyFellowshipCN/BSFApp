@@ -66,8 +66,11 @@ class HomeScreen extends React.Component {
     const year = content.title.substring(parsed);
     return (
       <View style={styles.bookHeader} >
-        <FontAwesome name="book" size={18} />
-        <Text style={styles.bookHeaderText}> {book} ({year})</Text>
+        <FontAwesome
+          name={isActive ? 'minus' : 'plus'}
+          size={18}
+        />
+        <Text style={styles.bookHeaderText}>    {book} ({year})</Text>
       </View>
     )
   }
@@ -148,10 +151,10 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     paddingVertical: 2,
     backgroundColor: '#FFECC4',
-    justifyContent: 'center',
     alignItems: 'center',
     height: 60,
     paddingLeft: 15,
+    marginBottom: 3
   },
   bookHeaderIcon: {
     alignItems: 'center',
