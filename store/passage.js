@@ -5,7 +5,8 @@ import { getCurrentUser } from '../store/user';
 // ------------------------------------
 // Constants
 // ------------------------------------
-export const RECEIVE_PASSAGE = 'RECEIVE_PASSAGE'
+export const RECEIVE_PASSAGE = 'RECEIVE_PASSAGE';
+export const CLEAR_PASSAGE = 'CLEAR_PASSAGE';
 
 // ------------------------------------
 // Actions
@@ -36,6 +37,20 @@ export function loadPassage(passageId) {
   }
 }
 
+export function clearPassage() {
+  return async (dispatch, getState) => {
+    try {
+      dispatch({
+        type: CLEAR_PASSAGE,
+        payload: null,
+      });
+    } catch (error) {
+      console.log(error);
+      alert(error);
+    }
+  }
+}
+
 // ------------------------------------
 // Reducer
 // ------------------------------------
@@ -44,6 +59,7 @@ const initialState = {
 
 const ACTION_HANDLERS = {
   [RECEIVE_PASSAGE]: (state, action) => Object.assign({}, state, { [action.payload.id]: action.payload.passage }),
+  [CLEAR_PASSAGE]: (state, action) => { return {}; }
 }
 
 export default function passageReducer(state = initialState, action) {

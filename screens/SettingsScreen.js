@@ -12,7 +12,8 @@ import { FontAwesome } from '@expo/vector-icons';
 import SettingsList from 'react-native-settings-list';
 import { RkButton } from 'react-native-ui-kitten';
 import getI18nText from '../store/I18n';
-import { clearState } from '../store/lessons.js'
+import { clearLesson } from '../store/lessons.js'
+import { clearPassage } from '../store/passage.js'
 
 class SettingsScreen extends React.Component {
   static route = {
@@ -34,19 +35,17 @@ class SettingsScreen extends React.Component {
 
       // Also set the bible version based on language selection
       if (language == 'eng') {
-        await getCurrentUser().setBibleVersionAsync('niv2011');
+        await this.onBibleVerseChange('niv2011');
       } else if (language == 'cht') {
-        await getCurrentUser().setBibleVersionAsync('rcuvts');
+        await this.onBibleVerseChange('rcuvts');
       } else {
-        await getCurrentUser().setBibleVersionAsync('rcuvss');
+        await this.onBibleVerseChange('rcuvss');
       }
-      getCurrentUser().logUserInfo();
 
       Expo.Util.reload();
+
       // FIXME: [Wei] For some reason "reload" doesn't work on iOS
-      //await clearStorageAsync(Models.Book.key);
-      //await clearStorageAsync(Models.Lesson.key);
-      this.props.clearState();
+      this.props.clearLesson();
       this.props.requestBooks(language);
       this.setState({ language: getCurrentUser().getLanguageDisplayName() });
     }
@@ -56,9 +55,9 @@ class SettingsScreen extends React.Component {
     if (getCurrentUser().getBibleVersion() != version) {
       await getCurrentUser().setBibleVersionAsync(version);
       Expo.Util.reload();
+
       // FIXME: [Wei] For some reason "reload" doesn't work on iOS
-      // await clearStorageAsync(Models.Passage.key);
-      this.props.clearState();
+      this.props.clearPassage();
       this.setState({ bibleVersion: getCurrentUser().getBibleVersionDisplayName() });
     }
   }
@@ -167,7 +166,8 @@ const mapStateToProps = (state, ownProps) => {
 const mapDispatchToProps = (dispatch, ownProps) => {
   return {
     requestBooks: () => dispatch(requestBooks()),
-    clearState: () => dispatch(clearState())
+    clearLesson: () => dispatch(clearLesson()),
+    clearPassage: () => dispatch(clearPassage())
   }
 };
 
