@@ -64,7 +64,7 @@ class LessonScreen extends React.Component {
 
         const content = <ScrollableTabView initialPage={0} {...scrollableStyleProps}>
             {/*<NotesPage tabLabel="讲义" />*/}
-            <DayQuestions tabLabel={dayQuestions[0].tab} goToPassage={this.goToPassage} day={dayQuestions[0]} readVerse={dayQuestions[0].readVerse} memoryVerse={this.props.memoryVerse} />
+            <DayQuestions tabLabel={dayQuestions[0].tab} goToPassage={this.goToPassage} day={dayQuestions[0]} readVerse={dayQuestions[0].readVerse} memoryVerse={this.props.lesson.memoryVerse} />
             <DayQuestions tabLabel={dayQuestions[1].tab} goToPassage={this.goToPassage} day={dayQuestions[1]} readVerse={dayQuestions[1].readVerse} />
             <DayQuestions tabLabel={dayQuestions[2].tab} goToPassage={this.goToPassage} day={dayQuestions[2]} readVerse={dayQuestions[2].readVerse} />
             <DayQuestions tabLabel={dayQuestions[3].tab} goToPassage={this.goToPassage} day={dayQuestions[3]} readVerse={dayQuestions[3].readVerse} />
