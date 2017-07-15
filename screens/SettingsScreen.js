@@ -5,17 +5,29 @@ import { ScrollView, StyleSheet, Image, Text, View, Alert, TextInput, TouchableO
 import Expo, { Constants } from 'expo';
 import { Models } from '../dataStorage/models';
 import { clearStorageAsync, callWebServiceAsync, showWebServiceCallErrorsAsync } from '../dataStorage/storage';
-import RadioButton from 'radio-button-react-native';
 import { getCurrentUser } from '../store/user';
 import { requestBooks } from "../store/books.js";
 import { FontAwesome } from '@expo/vector-icons';
 import SettingsList from 'react-native-settings-list';
-import { RkButton } from 'react-native-ui-kitten';
 import getI18nText from '../store/I18n';
 import { clearLesson } from '../store/lessons.js'
 import { clearPassage } from '../store/passage.js'
+import { RkConfig, RkCard, RkButton, RkChoiceGroup, RkChoice, RkText, RkTabView } from 'react-native-ui-kitten';
+import {
+  ActionSheetProvider,
+  connectActionSheet,
+} from '@expo/react-native-action-sheet';
 
 class SettingsScreen extends React.Component {
+  render() {
+    return (
+      <ActionSheetProvider>
+        <SettingsScreenUI />
+      </ActionSheetProvider>
+    );
+  }
+}
+@connectActionSheet class SettingsScreenUI extends React.Component {
   static route = {
     navigationBar: {
       title(params) {
@@ -34,7 +46,7 @@ class SettingsScreen extends React.Component {
       await getCurrentUser().setLanguageAsync(language);
 
       // Also set the bible version based on language selection
-      if (language == 'eng') {
+      if (language == 'eng' || language == 'spa') {
         await this.onBibleVerseChange('niv2011');
       } else if (language == 'cht') {
         await this.onBibleVerseChange('rcuvts');
@@ -65,22 +77,50 @@ class SettingsScreen extends React.Component {
   feedback = '';
 
   onLanguage() {
-    // TODO: [Wei] Find a better UI control
-    languages = [];
+    let options = [];
     for (var i in Models.Languages) {
-      const language = Models.Languages[i];
-      languages.push({ text: language.DisplayName, onPress: () => this.onLanguageChange(language.Value) });
+      const text = Models.Languages[i].DisplayName;
+      console.log(text);
+      options.push(text);
     }
-    Alert.alert(getI18nText('请选择显示语言'), Platform.OS === 'android' ? getI18nText('提示：选择后程序将重新启动') : '', languages);
+    options.push('Cancel');
+    let cancelButtonIndex = options.length - 1;
+    let destructiveButtonIndex = cancelButtonIndex;
+    this.props.showActionSheetWithOptions(
+      {
+        options,
+        cancelButtonIndex,
+        destructiveButtonIndex,
+      },
+      buttonIndex => {
+        if (buttonIndex != cancelButtonIndex) {
+          this.onLanguageChange(Models.Languages[buttonIndex].Value);
+        }
+      }
+    );
   }
 
   onBibleVerse() {
-    versions = [];
+    let options = [];
     for (var i in Models.BibleVersions) {
-      const version = Models.BibleVersions[i];
-      versions.push({ text: version.DisplayName, onPress: () => this.onBibleVerseChange(version.Value) });
+      const text = Models.BibleVersions[i].DisplayName;
+      options.push(text);
     }
-    Alert.alert(getI18nText('请选择圣经版本'), Platform.OS === 'android' ? getI18nText('提示：选择后程序将重新启动') : '', versions);
+    options.push('Cancel');
+    let cancelButtonIndex = options.length - 1;
+    let destructiveButtonIndex = cancelButtonIndex;
+    this.props.showActionSheetWithOptions(
+      {
+        options,
+        cancelButtonIndex,
+        destructiveButtonIndex,
+      },
+      buttonIndex => {
+        if (buttonIndex != cancelButtonIndex) {
+          this.onBibleVerseChange(Models.BibleVersions[buttonIndex].Value);
+        }
+      }
+    );
   }
 
   onFontSize() {

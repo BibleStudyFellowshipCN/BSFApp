@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@expo/ex-navigation": "~2.9.2",
+    "@expo/react-native-action-sheet": "^1.0.0",
     "@expo/samples": "~1.0.3",
     "expo": "^15.0.2",
     "lodash": "^4.17.4",

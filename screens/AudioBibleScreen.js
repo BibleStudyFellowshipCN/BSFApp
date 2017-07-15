@@ -53,6 +53,8 @@ export default class AudioBibleScreen extends React.Component {
       let lang = 4; // Chinese
       if (getCurrentUser().getLanguage() == 'eng') {
         lang = 1; // English
+      } else if (getCurrentUser().getLanguage() == 'spa') {
+        lang = 6; // Spanish
       }
       let url = 'http://wpaorg.wordproject.com/bibles/app/audio/' + lang + '/' + this.state.id + '/' + this.state.currentChapter + '.mp3';
       console.log(url);
