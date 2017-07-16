@@ -99,6 +99,7 @@ export default class User {
     }
     this.language = language;
     await saveUserAsync(this.getUserInfo());
+    this.logUserInfo();
   }
 
   getBibleVersion() {
@@ -114,6 +115,7 @@ export default class User {
     }
     this.bibleVersion = version;
     await saveUserAsync(this.getUserInfo());
+    this.logUserInfo();
   }
 
   getBibleVersionDisplayName() {

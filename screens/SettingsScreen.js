@@ -22,7 +22,7 @@ class SettingsScreen extends React.Component {
   render() {
     return (
       <ActionSheetProvider>
-        <SettingsScreenUI clearPassage={this.props.clearPassage} requestBooks={this.props.requestBooks} clearPassage={this.props.clearPassage} />
+        <SettingsScreenUI requestBooks={this.props.requestBooks} clearLesson={this.props.clearLesson} clearPassage={this.props.clearPassage} />
       </ActionSheetProvider>
     );
   }
@@ -55,6 +55,7 @@ class SettingsScreen extends React.Component {
       }
 
       Expo.Util.reload();
+      getCurrentUser().logUserInfo();
 
       // FIXME: [Wei] For some reason "reload" doesn't work on iOS
       this.props.clearLesson();
@@ -67,6 +68,7 @@ class SettingsScreen extends React.Component {
     if (getCurrentUser().getBibleVersion() != version) {
       await getCurrentUser().setBibleVersionAsync(version);
       Expo.Util.reload();
+      getCurrentUser().logUserInfo();
 
       // FIXME: [Wei] For some reason "reload" doesn't work on iOS
       this.props.clearPassage();
