@@ -31,7 +31,23 @@ class AppContainer extends React.Component {
       await getCurrentUser().loadExistingUserAsync();
       // TODO: [Wei] Workaround for now
       if (!getCurrentUser().isLoggedOn()) {
-        await getCurrentUser().loginAsync("4250000000", "chs");
+        let locale = await Expo.Util.getCurrentLocaleAsync();
+        console.log(locale);
+        let lang = 'chs';
+        let bible = 'rcuvss';
+        if (locale.substring(0, 2) == 'es') {
+          lang = 'spa';
+          bible = 'niv2011';
+        } else if (locale.substring(0, 2) == 'en') {
+          lang = 'eng';
+          bible = 'niv2011';
+        } else if (locale == 'zh-hk' || locale == 'zh-tw') {
+          lang = 'cht';
+          bible = 'rcuvts';
+        }
+
+        await getCurrentUser().loginAsync("4250000000", lang);
+        await getCurrentUser().setBibleVersionAsync(bible);
       }
       getCurrentUser().logUserInfo();
 
