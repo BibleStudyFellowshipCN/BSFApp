@@ -19,15 +19,6 @@ import {
 } from '@expo/react-native-action-sheet';
 
 class SettingsScreen extends React.Component {
-  render() {
-    return (
-      <ActionSheetProvider>
-        <SettingsScreenUI requestBooks={this.props.requestBooks} clearLesson={this.props.clearLesson} clearPassage={this.props.clearPassage} />
-      </ActionSheetProvider>
-    );
-  }
-}
-@connectActionSheet class SettingsScreenUI extends React.Component {
   static route = {
     navigationBar: {
       title(params) {
@@ -36,6 +27,16 @@ class SettingsScreen extends React.Component {
     },
   };
 
+  render() {
+    return (
+      <ActionSheetProvider>
+        <SettingsScreenUI requestBooks={this.props.requestBooks} clearLesson={this.props.clearLesson} clearPassage={this.props.clearPassage} />
+      </ActionSheetProvider>
+    );
+  }
+}
+
+@connectActionSheet class SettingsScreenUI extends React.Component {
   state = {
     language: getCurrentUser().getLanguageDisplayName(),
     bibleVersion: getCurrentUser().getBibleVersionDisplayName()

@@ -94,7 +94,7 @@ const text = {
     "Contenido faltante",
     "Por favor Introduzca el contenido de comentarios",
     "Gracias por tus comentarios",
-    "Verso de la memoria de las Escrituras",
+    "Verso de la memoria de las Escrituras: ",
     "1ER", "2DO", "3TE", "4TO", "5TO", "6TO",
     "Pausa",
     "Jugar",
