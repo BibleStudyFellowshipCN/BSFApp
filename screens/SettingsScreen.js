@@ -22,7 +22,7 @@ class SettingsScreen extends React.Component {
   render() {
     return (
       <ActionSheetProvider>
-        <SettingsScreenUI />
+        <SettingsScreenUI clearPassage={this.props.clearPassage} requestBooks={this.props.requestBooks} clearPassage={this.props.clearPassage} />
       </ActionSheetProvider>
     );
   }
@@ -80,7 +80,6 @@ class SettingsScreen extends React.Component {
     let options = [];
     for (var i in Models.Languages) {
       const text = Models.Languages[i].DisplayName;
-      console.log(text);
       options.push(text);
     }
     options.push('Cancel');

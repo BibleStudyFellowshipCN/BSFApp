@@ -42,7 +42,7 @@ export function clearPassage() {
     try {
       dispatch({
         type: CLEAR_PASSAGE,
-        payload: null,
+        payload: {},
       });
     } catch (error) {
       console.log(error);
