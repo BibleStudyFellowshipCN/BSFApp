@@ -11,7 +11,7 @@ import Alerts from '../constants/Alerts';
 import Colors from '../constants/Colors';
 import registerForPushNotificationsAsync from '../api/registerForPushNotificationsAsync';
 import SharedStyles from '../constants/SharedStyles';
-import getI18nText from '../store/I18n';
+import { getI18nText, getI18nBibleBook } from '../store/I18n';
 
 export default class RootNavigation extends React.Component {
   componentDidMount() {

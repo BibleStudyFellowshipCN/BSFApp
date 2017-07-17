@@ -12,6 +12,7 @@ import { loadAsync } from './dataStorage/storage';
 import { Models } from './dataStorage/models';
 import LoginUI from './components/LoginUI';
 import { getCurrentUser } from './store/user';
+import { ActionSheetProvider } from '@expo/react-native-action-sheet';
 
 let store;
 
@@ -95,19 +96,21 @@ class AppContainer extends React.Component {
     if (this.state.appIsReady) {
       if (this.state.userIsLoggedOn) {
         return (
-          <Provider store={store}>
-            <View style={styles.container}>
-              <NavigationProvider router={Router}>
-                <StackNavigation
-                  id="root"
-                  initialRoute={Router.getRoute('rootNavigation')}
-                />
-              </NavigationProvider>
+          <ActionSheetProvider>
+            <Provider store={store}>
+              <View style={styles.container}>
+                <NavigationProvider router={Router}>
+                  <StackNavigation
+                    id="root"
+                    initialRoute={Router.getRoute('rootNavigation')}
+                  />
+                </NavigationProvider>
 
-              {Platform.OS === 'ios' && <StatusBar barStyle="default" />}
-              {Platform.OS === 'android' && <View style={styles.statusBarUnderlay} />}
-            </View>
-          </Provider>
+                {Platform.OS === 'ios' && <StatusBar barStyle="default" />}
+                {Platform.OS === 'android' && <View style={styles.statusBarUnderlay} />}
+              </View>
+            </Provider>
+          </ActionSheetProvider>
         );
       } else {
         return (

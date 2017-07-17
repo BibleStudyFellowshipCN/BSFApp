@@ -11,7 +11,7 @@ import {
   Button,
 } from 'react-native';
 import Expo, { Audio } from 'expo';
-import getI18nText from '../store/I18n';
+import { getI18nText, getI18nBibleBook } from '../store/I18n';
 import { getCurrentUser } from '../store/user';
 
 const audioBookId = require('../assets/audioBookId.json');
@@ -110,7 +110,7 @@ export default class AudioBibleScreen extends React.Component {
               selectedValue={this.state.id}
               onValueChange={this._onBookSelected}>
               {audioBookId.map(s => (
-                <Picker.Item label={getI18nText(s.name)} value={s.id} key={s.id} />
+                <Picker.Item label={getI18nBibleBook(s.name)} value={s.id} key={s.id} />
               ))}
             </Picker>
           </View>

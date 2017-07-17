@@ -14,13 +14,14 @@ import {
 } from 'react-native';
 import SharedStyles from '../constants/SharedStyles';
 import { loadPassage } from '../store/passage';
+import { getI18nText, getI18nBibleBook } from '../store/I18n';
 
 class BibleScreen extends React.Component {
   static route = {
     navigationBar: {
       ...SharedStyles.navigationBarStyle,
       title: (route) => {
-        return route.book + route.verse
+        return getI18nBibleBook(route.book) + route.verse
       },
     },
   };

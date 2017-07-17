@@ -14,7 +14,7 @@ import Accordion from 'react-native-collapsible/Accordion';
 import { MonoText } from '../components/StyledText';
 import Colors from '../constants/Colors'
 import { requestBooks } from "../store/books.js";
-import getI18nText from '../store/I18n';
+import { getI18nText, getI18nBibleBook } from '../store/I18n';
 
 class HomeScreen extends React.Component {
   static route = {

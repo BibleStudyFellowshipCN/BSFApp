@@ -9,16 +9,13 @@ import { getCurrentUser } from '../store/user';
 import { requestBooks } from "../store/books.js";
 import { FontAwesome } from '@expo/vector-icons';
 import SettingsList from 'react-native-settings-list';
-import getI18nText from '../store/I18n';
+import { getI18nText, getI18nBibleBook } from '../store/I18n';
 import { clearLesson } from '../store/lessons.js'
 import { clearPassage } from '../store/passage.js'
-import { RkConfig, RkCard, RkButton, RkChoiceGroup, RkChoice, RkText, RkTabView } from 'react-native-ui-kitten';
-import {
-  ActionSheetProvider,
-  connectActionSheet,
-} from '@expo/react-native-action-sheet';
+import { RkButton } from 'react-native-ui-kitten';
+import { connectActionSheet } from '@expo/react-native-action-sheet';
 
-class SettingsScreen extends React.Component {
+@connectActionSheet class SettingsScreen extends React.Component {
   static route = {
     navigationBar: {
       title(params) {
@@ -27,16 +24,6 @@ class SettingsScreen extends React.Component {
     },
   };
 
-  render() {
-    return (
-      <ActionSheetProvider>
-        <SettingsScreenUI requestBooks={this.props.requestBooks} clearLesson={this.props.clearLesson} clearPassage={this.props.clearPassage} />
-      </ActionSheetProvider>
-    );
-  }
-}
-
-@connectActionSheet class SettingsScreenUI extends React.Component {
   state = {
     language: getCurrentUser().getLanguageDisplayName(),
     bibleVersion: getCurrentUser().getBibleVersionDisplayName()
@@ -47,10 +34,12 @@ class SettingsScreen extends React.Component {
       await getCurrentUser().setLanguageAsync(language);
 
       // Also set the bible version based on language selection
-      if (language == 'eng' || language == 'spa') {
+      if (language == 'eng') {
         await this.onBibleVerseChange('niv2011');
       } else if (language == 'cht') {
         await this.onBibleVerseChange('rcuvts');
+      } else if (language == 'spa') {
+        await this.onBibleVerseChange('rvr1995');
       } else {
         await this.onBibleVerseChange('rcuvss');
       }

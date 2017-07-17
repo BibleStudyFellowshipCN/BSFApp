@@ -19,7 +19,7 @@ import Answer from '../components/Answer'
 import ExportAnswer from '../components/ExportAnswer.js';
 import Colors from '../constants/Colors'
 import SharedStyles from '../constants/SharedStyles';
-import getI18nText from '../store/I18n';
+import { getI18nText, getI18nBibleBook } from '../store/I18n';
 
 class LessonScreen extends React.Component {
   static route = {
@@ -165,7 +165,7 @@ const BibleQuote = (props) => (
   <View style={{ flexDirection: 'row' }}>
     <TouchableOpacity onPress={() => props.goToPassage(props.book, props.verse)}>
       <View style={styles.bibleQuote}>
-        <Text style={{ color: 'white' }} selectable={true}> {props.book} {props.verse}</Text>
+        <Text style={{ color: 'white' }} selectable={true}> {getI18nBibleBook(props.book)} {props.verse}</Text>
       </View>
     </TouchableOpacity>
   </View>
