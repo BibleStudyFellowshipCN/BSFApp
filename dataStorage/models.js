@@ -57,8 +57,7 @@ export const Models = {
     { DisplayName: "English Standard Version", Value: "esv" },
     { DisplayName: "New International Version 2011", Value: "niv2011" },
     { DisplayName: "King James Version", Value: "kjv" },
-    { DisplayName: "American Standard Version", Value: "asv" },
     { DisplayName: "Reina-Valera 1995", Value: "rvr1995" },
-    { DisplayName: "Biblia Reina Valera 1995", Value: "rvr95" },
+    { DisplayName: "Nueva Versión Internacional", Value: "nvi" },
   ]
 }
