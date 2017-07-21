@@ -1,106 +1,208 @@
 
 import React from 'react';
-import { ScrollView, StyleSheet, Image, Text, View } from 'react-native';
-import { Constants } from 'expo';
+import { connect } from 'react-redux'
+import { ScrollView, StyleSheet, Image, Text, View, Alert, TextInput, TouchableOpacity, KeyboardAvoidingView, Platform } from 'react-native';
+import Expo, { Constants } from 'expo';
 import { Models } from '../dataStorage/models';
+import { clearStorageAsync, callWebServiceAsync, showWebServiceCallErrorsAsync } from '../dataStorage/storage';
+import { getCurrentUser } from '../store/user';
+import { requestBooks } from "../store/books.js";
+import { FontAwesome } from '@expo/vector-icons';
+import SettingsList from 'react-native-settings-list';
+import { getI18nText, getI18nBibleBook } from '../store/I18n';
+import { clearLesson } from '../store/lessons.js'
+import { clearPassage } from '../store/passage.js'
+import { RkButton } from 'react-native-ui-kitten';
+import { connectActionSheet } from '@expo/react-native-action-sheet';
 
-const SectionHeader = ({ title }) => {
-  return (
-    <View style={styles.sectionHeaderContainer}>
-      <Text style={styles.sectionHeaderText} selectable={true}>
-        {title}
-      </Text>
-    </View>
-  );
-};
-
-const SectionContent = props => {
-  return (
-    <View style={styles.sectionContentContainer}>
-      {props.children}
-    </View>
-  );
-};
-
-const AppIconPreview = ({ iconUrl }) => {
-  if (!iconUrl) {
-    iconUrl = 'https://s3.amazonaws.com/exp-brand-assets/ExponentEmptyManifest_192.png';
-  }
-
-  return (
-    <Image
-      source={{ uri: iconUrl }}
-      style={{ width: 64, height: 64 }}
-      resizeMode="cover"
-    />
-  );
-};
-
-export default class SettingsScreen extends React.Component {
+@connectActionSheet class SettingsScreen extends React.Component {
   static route = {
     navigationBar: {
-      title: '关于',
+      title(params) {
+        return getI18nText('我');
+      }
     },
   };
 
-  _renderTitle() {
-    const { manifest } = Constants;
+  state = {
+    language: getCurrentUser().getLanguageDisplayName(),
+    bibleVersion: getCurrentUser().getBibleVersionDisplayName()
+  };
 
-    return (
-      <View style={styles.titleContainer}>
-        <View style={styles.titleIconContainer}>
-          <AppIconPreview iconUrl={manifest.iconUrl} />
-        </View>
+  async onLanguageChange(language) {
+    if (getCurrentUser().getLanguage() != language) {
+      await getCurrentUser().setLanguageAsync(language);
 
-        <View style={styles.titleTextContainer}>
-          <Text style={styles.nameText} numberOfLines={1} selectable={true}>
-            {manifest.name}
-          </Text>
+      // Also set the bible version based on language selection
+      if (language == 'eng') {
+        await this.onBibleVerseChange('niv2011');
+      } else if (language == 'cht') {
+        await this.onBibleVerseChange('rcuvts');
+      } else if (language == 'spa') {
+        await this.onBibleVerseChange('rvr1995');
+      } else {
+        await this.onBibleVerseChange('rcuvss');
+      }
 
-          <Text style={styles.slugText} numberOfLines={1} selectable={true}>
-            {manifest.slug}
-          </Text>
+      Expo.Util.reload();
+      getCurrentUser().logUserInfo();
 
-          <Text style={styles.descriptionText} selectable={true}>
-            {manifest.description}
-          </Text>
-        </View>
-      </View>
+      // FIXME: [Wei] For some reason "reload" doesn't work on iOS
+      this.props.clearLesson();
+      this.props.requestBooks(language);
+      this.setState({ language: getCurrentUser().getLanguageDisplayName() });
+    }
+  }
+
+  async onBibleVerseChange(version) {
+    if (getCurrentUser().getBibleVersion() != version) {
+      await getCurrentUser().setBibleVersionAsync(version);
+      getCurrentUser().logUserInfo();
+
+      // FIXME: [Wei] For some reason "reload" doesn't work on iOS
+      this.props.clearPassage();
+      this.setState({ bibleVersion: getCurrentUser().getBibleVersionDisplayName() });
+    }
+  }
+
+  feedback = '';
+
+  onLanguage() {
+    let options = [];
+    for (var i in Models.Languages) {
+      const text = Models.Languages[i].DisplayName;
+      options.push(text);
+    }
+    options.push('Cancel');
+    let cancelButtonIndex = options.length - 1;
+    let destructiveButtonIndex = cancelButtonIndex;
+    this.props.showActionSheetWithOptions(
+      {
+        options,
+        cancelButtonIndex,
+        destructiveButtonIndex,
+      },
+      buttonIndex => {
+        if (buttonIndex != cancelButtonIndex) {
+          this.onLanguageChange(Models.Languages[buttonIndex].Value);
+        }
+      }
     );
+  }
+
+  onBibleVerse() {
+    let options = [];
+    for (var i in Models.BibleVersions) {
+      const text = Models.BibleVersions[i].DisplayName;
+      options.push(text);
+    }
+    options.push('Cancel');
+    let cancelButtonIndex = options.length - 1;
+    let destructiveButtonIndex = cancelButtonIndex;
+    this.props.showActionSheetWithOptions(
+      {
+        options,
+        cancelButtonIndex,
+        destructiveButtonIndex,
+      },
+      buttonIndex => {
+        if (buttonIndex != cancelButtonIndex) {
+          this.onBibleVerseChange(Models.BibleVersions[buttonIndex].Value);
+        }
+      }
+    );
+  }
+
+  onFontSize() {
+    alert("TODO: onFontSize");
+  }
+
+  async onSubmitFeedback() {
+    if (this.feedback.trim() == '') {
+      Alert.alert(getI18nText('缺少内容'), getI18nText('请输入反馈意见内容'), [
+        { text: 'OK', onPress: () => this.feedbackInput.focus() },
+      ]);
+      return;
+    }
+
+    const body = { comment: this.feedback };
+    const result = await callWebServiceAsync(Models.Feedback.restUri, '', 'POST', [], body);
+    const succeed = await showWebServiceCallErrorsAsync(result, 201);
+    if (succeed) {
+      this.feedback = '';
+      Alert.alert(getI18nText('谢谢您的反馈意见！'), '', [
+        { text: 'OK', onPress: () => this.feedbackInput.clear() },
+      ]);
+    }
   }
 
   render() {
     const { manifest } = Constants;
+    let keyIndex = 0;
     return (
-      <ScrollView
-        style={styles.container}
-        contentContainerStyle={this.props.route.getContentContainerStyle()}>
-
-        {this._renderTitle()}
-
-        <SectionHeader title="version" />
-        <SectionContent>
-          <Text style={styles.sectionContentText} selectable={true}>
-            {manifest.version}
-          </Text>
-        </SectionContent>
-
-        {/* <SectionHeader title="servers" /> */}
-        {/* <SectionContent > */}
-        {/*   <Text style={styles.sectionContentText}> */}
-        {/*     book: {Models.Book.restUri} */}
-        {/*   </Text> */}
-        {/*   <Text style={styles.sectionContentText}> */}
-        {/*     lesson: {Models.Book.restUri} */}
-        {/*   </Text> */}
-        {/*   <Text style={styles.sectionContentText}> */}
-        {/*     bible verse: {Models.Book.restUri} */}
-        {/*   </Text> */}
-        {/* </SectionContent> */}
-      </ScrollView>
+      <KeyboardAvoidingView style={styles.container} behavior='padding' keyboardVerticalOffset={0}>
+        <SettingsList borderColor='#c8c7cc' defaultItemSize={40}>
+          <SettingsList.Header headerText={getI18nText('设置')} headerStyle={{ color: 'black' }} />
+          <SettingsList.Item
+            title={getI18nText('显示语言')}
+            titleInfo={this.state.language}
+            titleInfoStyle={styles.titleInfoStyle}
+            onPress={this.onLanguage.bind(this)}
+          />
+          <SettingsList.Item
+            title={getI18nText('圣经版本')}
+            titleInfo={this.state.bibleVersion}
+            titleInfoStyle={styles.titleInfoStyle}
+            onPress={this.onBibleVerse.bind(this)}
+          />
+          {/*<SettingsList.Item
+            title='字体大小'
+            titleInfo='中等'
+            titleInfoStyle={styles.titleInfoStyle}
+            onPress={this.onFontSize.bind(this)}
+          />*/}
+          <SettingsList.Header headerText={getI18nText('反馈意见')} headerStyle={{ color: 'black', marginTop: 15 }} />
+          <SettingsList.Header headerText='MBSF - Mobile Bible Study Fellowship' headerStyle={{ color: 'black', marginTop: 15 }} />
+          <View style={styles.answerContainer}>
+            <TextInput
+              style={styles.answerInput}
+              ref={(input) => this.feedbackInput = input}
+              blurOnSubmit={false}
+              placeholder={getI18nText('反馈意见')}
+              multiline
+              onChangeText={(text) => { this.feedback = text }}
+            />
+          </View>
+          <View style={{ alignItems: 'center' }}>
+            <RkButton onPress={this.onSubmitFeedback.bind(this)}>{getI18nText('提交')}</RkButton>
+          </View>
+          <SettingsList.Item
+            title={getI18nText('App版本')}
+            titleInfo={manifest.version}
+            hasNavArrow={false}
+            titleInfoStyle={styles.titleInfoStyle}
+          />
+        </SettingsList>
+      </KeyboardAvoidingView>
     );
   }
 }
+
+const mapStateToProps = (state, ownProps) => {
+  return {
+  };
+};
+
+const mapDispatchToProps = (dispatch, ownProps) => {
+  return {
+    requestBooks: () => dispatch(requestBooks()),
+    clearLesson: () => dispatch(clearLesson()),
+    clearPassage: () => dispatch(clearPassage())
+  }
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(SettingsScreen)
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -161,4 +263,30 @@ const styles = StyleSheet.create({
   colorTextContainer: {
     flex: 1,
   },
+  textContent: {
+    fontSize: 18,
+    height: 30
+  },
+  answerContainer: {
+    marginTop: 5,
+    height: 100,
+    padding: 5,
+    backgroundColor: 'whitesmoke',
+  },
+  answerInput: {
+    flex: 1,
+    height: 50,
+    fontSize: 16,
+    textAlignVertical: 'top'
+  },
+  buttonText: {
+    fontSize: 16,
+    color: 'white',
+    textAlign: 'center'
+  },
+  buttonContainer: {
+    backgroundColor: '#2980B9',
+    width: 80,
+    borderRadius: 4
+  }
 });

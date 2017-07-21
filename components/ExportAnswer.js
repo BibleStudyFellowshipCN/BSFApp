@@ -6,8 +6,7 @@ import {
   Text,
   Alert,
   Share,
-  Platform,
-  ActionSheetIOS
+  Platform
 } from 'react-native';
 import { FontAwesome } from '@expo/vector-icons';
 import { loadAsync } from '../dataStorage/storage';
@@ -51,9 +50,12 @@ export default class ExportAnswer extends React.Component {
         return;
       }
 
-      for (var dayQuestion in lessonContent.dayQuestions) {
-          content += this.getContent(dayQuestion, answers);
-      }
+      let content = this.getContent(lessonContent.dayQuestions.one, answers);
+      content += this.getContent(lessonContent.dayQuestions.two, answers);
+      content += this.getContent(lessonContent.dayQuestions.three, answers);
+      content += this.getContent(lessonContent.dayQuestions.four, answers);
+      content += this.getContent(lessonContent.dayQuestions.five, answers);
+      content += this.getContent(lessonContent.dayQuestions.six, answers);
 
       const shareData = { title: lessonContent.name, subject: lessonContent.name, message: content };
       console.log(shareData);
@@ -67,7 +69,7 @@ export default class ExportAnswer extends React.Component {
   }
 
   render() {
-   return (
+    return (
       <View style={styles.container}>
         <TouchableOpacity onPress={this.onClick.bind(this)}>
           <FontAwesome

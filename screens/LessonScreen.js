@@ -19,6 +19,7 @@ import Answer from '../components/Answer'
 import ExportAnswer from '../components/ExportAnswer.js';
 import Colors from '../constants/Colors'
 import SharedStyles from '../constants/SharedStyles';
+import { getI18nText, getI18nBibleBook } from '../store/I18n';
 
 class LessonScreen extends React.Component {
   static route = {
@@ -62,15 +63,15 @@ class LessonScreen extends React.Component {
     if (this.props.lesson) {
         dayQuestions = this.props.lesson.dayQuestions;
 
-        const content = <ScrollableTabView initialPage={0} {...scrollableStyleProps}>
-            {/*<NotesPage tabLabel="讲义" />*/}
-            <DayQuestions tabLabel={dayQuestions[0].tab} goToPassage={this.goToPassage} day={dayQuestions[0]} readVerse={dayQuestions[0].readVerse} memoryVerse={this.props.lesson.memoryVerse} />
-            <DayQuestions tabLabel={dayQuestions[1].tab} goToPassage={this.goToPassage} day={dayQuestions[1]} readVerse={dayQuestions[1].readVerse} />
-            <DayQuestions tabLabel={dayQuestions[2].tab} goToPassage={this.goToPassage} day={dayQuestions[2]} readVerse={dayQuestions[2].readVerse} />
-            <DayQuestions tabLabel={dayQuestions[3].tab} goToPassage={this.goToPassage} day={dayQuestions[3]} readVerse={dayQuestions[3].readVerse} />
-            <DayQuestions tabLabel={dayQuestions[4].tab} goToPassage={this.goToPassage} day={dayQuestions[4]} readVerse={dayQuestions[4].readVerse} />
-            <DayQuestions tabLabel={dayQuestions[5].tab} goToPassage={this.goToPassage} day={dayQuestions[5]} readVerse={dayQuestions[5].readVerse} />
-        </ScrollableTabView>;
+      const content = <ScrollableTabView initialPage={0} {...scrollableStyleProps}>
+        {/*<NotesPage tabLabel="讲义" />*/}
+        <DayQuestions tabLabel={getI18nText("一")} goToPassage={this.goToPassage} day={dayQuestions.one} readVerse={dayQuestions.one.readVerse} memoryVerse={this.props.lesson.memoryVerse} />
+        <DayQuestions tabLabel={getI18nText("二")} goToPassage={this.goToPassage} day={dayQuestions.two} readVerse={dayQuestions.two.readVerse} />
+        <DayQuestions tabLabel={getI18nText("三")} goToPassage={this.goToPassage} day={dayQuestions.three} readVerse={dayQuestions.three.readVerse} />
+        <DayQuestions tabLabel={getI18nText("四")} goToPassage={this.goToPassage} day={dayQuestions.four} readVerse={dayQuestions.four.readVerse} />
+        <DayQuestions tabLabel={getI18nText("五")} goToPassage={this.goToPassage} day={dayQuestions.five} readVerse={dayQuestions.five.readVerse} />
+        <DayQuestions tabLabel={getI18nText("六")} goToPassage={this.goToPassage} day={dayQuestions.six} readVerse={dayQuestions.six.readVerse} />
+      </ScrollableTabView>;
 
       // TODO:[Wei] KeyboardAwareScrollView works on iOS but not Android, KeyboardAvoidingView works on Android, but not iOS :(
       return (Platform.OS === 'ios') ? content : (
@@ -103,17 +104,18 @@ function inputFocused(refName) {
 
 const DayQuestions = (props) => {
   if (props.memoryVerse != undefined) {
-    memoryVerseUI = <Text style={styles.memoryVerse} selectable={true}>{props.memoryVerse}</Text>
+    memoryVerseUI = <Text style={styles.memoryVerse} selectable={true}>{getI18nText('背诵经文：')}{props.memoryVerse}</Text>
   } else {
     memoryVerseUI = null
   }
 
   if (props.readVerse != undefined) {
-    readVerseUI = null
     for (var verse in props.readVerse) {
       let quote = props.readVerse[verse]
       readVerseUI = <BibleQuote key={quote.book + quote.verse} book={quote.book} verse={quote.verse} goToPassage={props.goToPassage} />
     }
+  } else {
+    readVerseUI = null
   }
 
   const content = (
@@ -163,7 +165,7 @@ const BibleQuote = (props) => (
   <View style={{ flexDirection: 'row' }}>
     <TouchableOpacity onPress={() => props.goToPassage(props.book, props.verse)}>
       <View style={styles.bibleQuote}>
-        <Text style={{ color: 'white' }} selectable={true}> {props.book} {props.verse}</Text>
+        <Text style={{ color: 'white' }} selectable={true}> {getI18nBibleBook(props.book)} {props.verse}</Text>
       </View>
     </TouchableOpacity>
   </View>

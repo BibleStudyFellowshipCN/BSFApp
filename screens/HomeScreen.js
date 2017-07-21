@@ -13,13 +13,21 @@ import {
 import Accordion from 'react-native-collapsible/Accordion';
 import { MonoText } from '../components/StyledText';
 import Colors from '../constants/Colors'
+import { requestBooks } from "../store/books.js";
+import { getI18nText, getI18nBibleBook } from '../store/I18n';
 
 class HomeScreen extends React.Component {
   static route = {
     navigationBar: {
-      title: 'BSF课程',
-    },
+      title(params) {
+        return getI18nText('BSF课程');
+      }
+    }
   };
+
+  componentDidMount() {
+    this.props.requestBooks();
+  }
 
   goToLesson(lesson) {
     this.props.navigation.getNavigator('root').push('lesson', { lesson });
@@ -52,15 +60,17 @@ class HomeScreen extends React.Component {
   }
 
   _renderHeader(content, index, isActive) {
+    // TODO: clean up backend api for this to work
+    const parsed = content.title.indexOf('2');
+    const book = content.title.substring(0, parsed);
+    const year = content.title.substring(parsed);
     return (
       <View style={styles.bookHeader} >
-        {/* <View style={styles.bookHeaderIcon}> */}
-        {/*   <FontAwesome */}
-        {/*     name={ isActive ? 'minus' : 'plus'} */}
-        {/*     size={ 18 } */}
-        {/*   /> */}
-        {/* </View> */}
-        <Text style={styles.bookHeaderText}> {content.title} </Text>
+        <FontAwesome
+          name={isActive ? 'minus' : 'plus'}
+          size={18}
+        />
+        <Text style={styles.bookHeaderText}>    {book} ({year})</Text>
       </View>
     )
   }
@@ -77,31 +87,24 @@ class HomeScreen extends React.Component {
       </View>
     )
   }
-
-  _handleLearnMorePress = () => {
-    Linking.openURL(
-      'https://docs.expo.io/versions/latest/guides/development-mode'
-    );
-  };
-
-  _handleHelpPress = () => {
-    Linking.openURL(
-      'https://docs.expo.io/versions/latest/guides/up-and-running.html#can-t-see-your-changes'
-    );
-  };
 }
 
 const Lesson = (props) => {
+  // TODO: clean up backend api for this to work
+  const parsed = props.lesson.name.split(' ')
+  const lessonNumber = parsed[0]
+  const name = parsed[1]
+  const date = parsed[2]
   return (
     <TouchableOpacity style={styles.lessonContainer} onPress={() => props.goToLesson()}>
       <View>
         <View style={styles.lessonMetadata}>
           <Text style={styles.lessonMetadataText}>
-            {props.lesson.proposedDate} {props.lesson.order}
+            {date} {lessonNumber}
           </Text>
         </View>
         <Text style={styles.lessonText}>
-          {props.lesson.name}
+          {name}
         </Text>
       </View>
       <View style={styles.lessonChevron}>
@@ -117,11 +120,15 @@ const Lesson = (props) => {
 
 const mapStateToProps = (state) => {
   return {
-    booklist: state.books,
+    booklist: state.books.booklist,
   }
 }
 
-const mapDispatchToProps = {}
+const mapDispatchToProps = (dispatch, ownProps) => {
+  return {
+    requestBooks: () => dispatch(requestBooks())
+  }
+}
 
 export default connect(mapStateToProps, mapDispatchToProps)(HomeScreen)
 
@@ -143,11 +150,11 @@ const styles = StyleSheet.create({
   bookHeader: {
     flexDirection: 'row',
     paddingVertical: 2,
-    backgroundColor: 'whitesmoke',
-    justifyContent: 'center',
+    backgroundColor: '#FFECC4',
     alignItems: 'center',
     height: 60,
     paddingLeft: 15,
+    marginBottom: 3
   },
   bookHeaderIcon: {
     alignItems: 'center',
