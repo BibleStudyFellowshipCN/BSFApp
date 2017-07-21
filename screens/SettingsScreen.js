@@ -57,7 +57,6 @@ import { connectActionSheet } from '@expo/react-native-action-sheet';
   async onBibleVerseChange(version) {
     if (getCurrentUser().getBibleVersion() != version) {
       await getCurrentUser().setBibleVersionAsync(version);
-      Expo.Util.reload();
       getCurrentUser().logUserInfo();
 
       // FIXME: [Wei] For some reason "reload" doesn't work on iOS
