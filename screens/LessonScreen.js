@@ -61,7 +61,7 @@ class LessonScreen extends React.Component {
     }
 
     if (this.props.lesson) {
-      dayQuestions = this.props.lesson.dayQuestions;
+        dayQuestions = this.props.lesson.dayQuestions;
 
       const content = <ScrollableTabView initialPage={0} {...scrollableStyleProps}>
         {/*<NotesPage tabLabel="讲义" />*/}
