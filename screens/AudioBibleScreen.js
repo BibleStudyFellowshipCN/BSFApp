@@ -76,7 +76,13 @@ export default class AudioBibleScreen extends React.Component {
     this.setState({ isLoading: true });
     if (!this.state.isPlaying) {
       if (!this.sound) {
-        let uri = 'http://wpaorg.wordproject.com/bibles/app/audio/4/' + this.state.id + '/' + this.state.currentChapter + '.mp3';
+        let lang = 4; // Chinese
+        if (getCurrentUser().getLanguage() == 'eng') {
+          lang = 1; // English
+        } else if (getCurrentUser().getLanguage() == 'spa') {
+          lang = 6; // Spanish
+        }
+        let uri = 'http://wpaorg.wordproject.com/bibles/app/audio/' + lang + '/' + this.state.id + '/' + this.state.currentChapter + '.mp3';
         console.log(uri);
         try {
           const { sound, status } = await Audio.Sound.create(
