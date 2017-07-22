@@ -126,7 +126,7 @@ function getI18nText(origText) {
 function getI18nBibleBook(origText) {
   const lang = getCurrentUser().getLanguage();
   //console.log("[getI18nBibleBook]" + lang + "{" + origText + "}");
-  if (lang == 'chs' || lang == 'cht') {
+  if (lang == 'chs') {
     return origText;
   }
 
