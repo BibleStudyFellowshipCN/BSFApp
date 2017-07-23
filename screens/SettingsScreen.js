@@ -178,7 +178,7 @@ import { connectActionSheet } from '@expo/react-native-action-sheet';
           </View>
           <SettingsList.Item
             title={getI18nText('App版本')}
-            titleInfo={manifest.version}
+            titleInfo={manifest.version + ' (SDK' + manifest.sdkVersion + ')'}
             hasNavArrow={false}
             titleInfoStyle={styles.titleInfoStyle}
           />
