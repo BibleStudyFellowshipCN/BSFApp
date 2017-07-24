@@ -47,6 +47,10 @@ export default class AudioBibleScreen extends React.Component {
     this._onBookSelected(1);
   }
 
+  componentDidUpdate() {
+    this.props.navigator.updateCurrentRouteParams({ title: getI18nText('有声圣经') });
+  }
+
   _resetAudio = async () => {
     if (this.sound != null) {
       await this.sound.stopAsync();

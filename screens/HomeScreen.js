@@ -25,6 +25,10 @@ class HomeScreen extends React.Component {
     }
   };
 
+  componentDidUpdate() {
+    this.props.navigator.updateCurrentRouteParams({ title: getI18nText('BSF课程') });
+  }
+
   componentDidMount() {
     this.props.requestBooks();
   }

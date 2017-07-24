@@ -43,14 +43,15 @@ import { connectActionSheet } from '@expo/react-native-action-sheet';
       } else {
         await this.onBibleVerseChange('rcuvss');
       }
-
-      Expo.Util.reload();
       getCurrentUser().logUserInfo();
 
-      // FIXME: [Wei] For some reason "reload" doesn't work on iOS
+      this.props.navigator.updateCurrentRouteParams({ title: getI18nText('我') });
       this.props.clearLesson();
       this.props.requestBooks(language);
       this.setState({ language: getCurrentUser().getLanguageDisplayName() });
+      this.props.navigation.performAction(({ tabs, stacks }) => {
+        tabs('tab-navigation').jumpToTab('class');
+      });
     }
   }
 
@@ -59,7 +60,6 @@ import { connectActionSheet } from '@expo/react-native-action-sheet';
       await getCurrentUser().setBibleVersionAsync(version);
       getCurrentUser().logUserInfo();
 
-      // FIXME: [Wei] For some reason "reload" doesn't work on iOS
       this.props.clearPassage();
       this.setState({ bibleVersion: getCurrentUser().getBibleVersionDisplayName() });
     }
