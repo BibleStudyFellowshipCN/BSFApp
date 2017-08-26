@@ -86,7 +86,7 @@ export default class AudioBibleScreen extends React.Component {
         } else if (getCurrentUser().getLanguage() == 'spa') {
           lang = 6; // Spanish
         }
-        let uri = 'http://wpaorg.wordproject.com/bibles/app/audio/' + lang + '/' + this.state.id + '/' + this.state.currentChapter + '.mp3';
+        let uri = 'http://167.88.37.77/bsf/' + lang + '/' + this.state.id + '/' + this.state.currentChapter + '.mp3';
         console.log(uri);
         try {
           const { sound, status } = await Audio.Sound.create(
