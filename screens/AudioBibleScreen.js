@@ -1,5 +1,3 @@
-// TODO: Use Redux and with better UX
-
 import React from 'react';
 import {
   Image,
@@ -17,13 +15,13 @@ import { FontAwesome } from '@expo/vector-icons';
 
 const audioBookId = require('../assets/audioBookId.json');
 
+
 export default class AudioBibleScreen extends React.Component {
-  static route = {
-    navigationBar: {
-      title(params) {
-        return getI18nText('有声圣经');
-      }
-    },
+  static navigationOptions = ({ navigation }) => {
+    title = navigation.state.params && navigation.state.params.title ? navigation.state.params.title : '有声圣经';
+    return {
+      title: getI18nText(title)
+    };
   };
 
   constructor(props) {
@@ -48,7 +46,7 @@ export default class AudioBibleScreen extends React.Component {
   }
 
   componentDidUpdate() {
-    this.props.navigator.updateCurrentRouteParams({ title: getI18nText('有声圣经') });
+    //this.props.navigator.updateCurrentRouteParams({ title: getI18nText('有声圣经') });
   }
 
   _resetAudio = async () => {
@@ -86,7 +84,7 @@ export default class AudioBibleScreen extends React.Component {
         } else if (getCurrentUser().getLanguage() == 'spa') {
           lang = 6; // Spanish
         }
-        let uri = 'http://wpaorg.wordproject.com/bibles/app/audio/' + lang + '/' + this.state.id + '/' + this.state.currentChapter + '.mp3';
+        let uri = 'http://167.88.37.77/bsf/' + lang + '/' + this.state.id + '/' + this.state.currentChapter + '.mp3';
         console.log(uri);
         try {
           const { sound, status } = await Audio.Sound.create(

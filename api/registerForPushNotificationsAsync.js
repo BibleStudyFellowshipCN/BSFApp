@@ -1,13 +1,12 @@
-import { Platform } from 'react-native';
 import { Permissions, Notifications } from 'expo';
 
 // Example server, implemented in Rails: https://git.io/vKHKv
-const PUSH_ENDPOINT = 'https://exponent-push-server.herokuapp.com/tokens';
+const PUSH_ENDPOINT = 'https://expo-push-server.herokuapp.com/tokens';
 
 export default (async function registerForPushNotificationsAsync() {
   // Android remote notification permissions are granted during the app
   // install, so this will only ask on iOS
-  let { status } = await Permissions.askAsync(Permissions.REMOTE_NOTIFICATIONS);
+  let { status } = await Permissions.askAsync(Permissions.NOTIFICATIONS);
 
   // Stop here if the user did not grant permissions
   if (status !== 'granted') {

@@ -17,13 +17,10 @@ import { loadPassage } from '../store/passage';
 import { getI18nText, getI18nBibleBook } from '../store/I18n';
 
 class BibleScreen extends React.Component {
-  static route = {
-    navigationBar: {
-      ...SharedStyles.navigationBarStyle,
-      title: (route) => {
-        return getI18nBibleBook(route.book) + route.verse
-      },
-    },
+  static navigationOptions = ({ navigation }) => {
+    return {
+      title: navigation.state.params && navigation.state.params.title ? navigation.state.params.title : 'Bible'
+    };
   };
 
   componentWillMount() {
@@ -74,14 +71,14 @@ function getId(book, verse) {
 }
 
 const mapStateToProps = (state, ownProps) => {
-  const id = getId(ownProps.route.params.book, ownProps.route.params.verse);
+  const id = getId(ownProps.navigation.state.params.book, ownProps.navigation.state.params.verse);
   return {
     passage: state.passages[id],
   }
 };
 
 const mapDispatchToProps = (dispatch, ownProps) => {
-  const id = getId(ownProps.route.params.book, ownProps.route.params.verse);
+  const id = getId(ownProps.navigation.state.params.book, ownProps.navigation.state.params.verse);
   return {
     loadPassage: () => dispatch(loadPassage(id)),
   }

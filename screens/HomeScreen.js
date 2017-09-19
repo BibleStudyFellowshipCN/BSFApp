@@ -7,6 +7,7 @@ import {
   ScrollView,
   StyleSheet,
   Text,
+  TouchableWithoutFeedback,
   TouchableOpacity,
   View,
 } from 'react-native';
@@ -15,18 +16,17 @@ import { MonoText } from '../components/StyledText';
 import Colors from '../constants/Colors'
 import { requestBooks } from "../store/books.js";
 import { getI18nText, getI18nBibleBook } from '../store/I18n';
+import { NavigationActions } from 'react-navigation'
 
 class HomeScreen extends React.Component {
-  static route = {
-    navigationBar: {
-      title(params) {
-        return getI18nText('BSF课程');
-      }
-    }
+  static navigationOptions = ({ navigation }) => {
+    title = navigation.state.params && navigation.state.params.title ? navigation.state.params.title : 'BSF课程';
+    return {
+      title: getI18nText(title)
+    };
   };
 
   componentDidUpdate() {
-    this.props.navigator.updateCurrentRouteParams({ title: getI18nText('BSF课程') });
   }
 
   componentDidMount() {
@@ -34,7 +34,8 @@ class HomeScreen extends React.Component {
   }
 
   goToLesson(lesson) {
-    this.props.navigation.getNavigator('root').push('lesson', { lesson });
+    let parsed = lesson.name.split(' ');
+    this.props.navigation.navigate('Lesson', { lesson, title: parsed[1] });
   }
 
   render() {
