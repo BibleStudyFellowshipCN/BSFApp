@@ -8,7 +8,7 @@ import {
   Share,
   Platform
 } from 'react-native';
-import { FontAwesome } from '@expo/vector-icons';
+import { Entypo } from '@expo/vector-icons';
 import { loadAsync } from '../dataStorage/storage';
 import { Models } from '../dataStorage/models';
 
@@ -72,9 +72,9 @@ export default class ExportAnswer extends React.Component {
     return (
       <View style={styles.container}>
         <TouchableOpacity onPress={this.onClick.bind(this)}>
-          <FontAwesome
-            name='save'
-            size={40}
+          <Entypo
+            name='share-alternative'
+            size={28}
             color='#fff' />
         </TouchableOpacity>
       </View>
@@ -85,7 +85,6 @@ export default class ExportAnswer extends React.Component {
 const styles = StyleSheet.create({
   container: {
     alignItems: 'center',
-    width: 54,
-    marginTop: 4
+    width: 54
   }
 });
