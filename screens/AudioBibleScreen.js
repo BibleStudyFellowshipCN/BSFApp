@@ -60,7 +60,7 @@ export default class AudioBibleScreen extends React.Component {
       } else if (getCurrentUser().getLanguage() == 'spa') {
         lang = 6; // Spanish
       }
-      let url = 'http://wpaorg.wordproject.com/bibles/app/audio/' + lang + '/' + this.state.id + '/' + this.state.currentChapter + '.mp3';
+      let url = 'http://167.88.37.77/bsf/' + lang + '/' + this.state.id + '/' + this.state.currentChapter + '.mp3';
       console.log(url);
       this.sound = new Expo.Audio.Sound({ source: url });
       // [Wei] setCallback doesn't work!!!
