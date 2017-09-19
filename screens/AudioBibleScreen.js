@@ -179,6 +179,7 @@ export default class AudioBibleScreen extends React.Component {
         flexDirection: 'column',
         justifyContent: 'center',
         alignItems: 'center',
+        backgroundColor: 'white'
       }}>
         <View style={{ flex: 1, flexDirection: 'row' }}>
           <View style={{ width: 170 }}>

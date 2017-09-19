@@ -32,7 +32,7 @@ class BibleScreen extends React.Component {
   render() {
     if (this.props.passage) {
       const paragraphs = this.props.passage.paragraphs;
-      let html = '<style> body { font-size: 110%;} </style>';
+      let html = '<style> body { font-size: 19;} </style>';
       for (var i in paragraphs) {
         for (var j in paragraphs[i].verses) {
           const verse = paragraphs[i].verses[j];

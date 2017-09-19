@@ -23,7 +23,8 @@ import { getI18nText, getI18nBibleBook } from '../store/I18n';
 class LessonScreen extends React.Component {
   static navigationOptions = ({ navigation }) => {
     return {
-      title: navigation.state.params && navigation.state.params.title ? navigation.state.params.title : ''
+      title: navigation.state.params && navigation.state.params.title ? navigation.state.params.title : '',
+      headerRight: <ExportAnswer lessonId={navigation.state.params.lesson.id} />
     };
   };
 

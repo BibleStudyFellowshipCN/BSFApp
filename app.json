@@ -5,7 +5,7 @@
     "slug": "CBSFApp",
     "privacy": "unlisted",
     "sdkVersion": "20.0.0",
-    "version": "2017.09.16",
+    "version": "2017.09.19",
     "orientation": "portrait",
     "primaryColor": "#cccccc",
     "icon": "./assets/icons/app-icon.png",
@@ -28,7 +28,7 @@
     },
     "android": {
       "package": "org.cbsfappv1.bsfclass",
-      "versionCode": 3
+      "versionCode": 4
     }
   }
 }
