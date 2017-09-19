@@ -179,7 +179,7 @@ import { NavigationActions } from 'react-navigation'
           </View>
           <SettingsList.Item
             title={getI18nText('App版本')}
-            titleInfo={manifest.version}
+            titleInfo={manifest.version + ' (SDK' + manifest.sdkVersion + ')'}
             hasNavArrow={false}
             titleInfoStyle={styles.titleInfoStyle}
           />
@@ -207,6 +207,7 @@ export default connect(mapStateToProps, mapDispatchToProps)(SettingsScreen)
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: 'white',
   },
   titleContainer: {
     paddingHorizontal: 15,
