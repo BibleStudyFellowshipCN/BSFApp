@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { connect } from 'react-redux'
 import { ScrollView, StyleSheet, Image, Text, View, Alert, TextInput, TouchableOpacity, KeyboardAvoidingView, Platform } from 'react-native';
@@ -14,14 +13,14 @@ import { clearLesson } from '../store/lessons.js'
 import { clearPassage } from '../store/passage.js'
 import { RkButton } from 'react-native-ui-kitten';
 import { connectActionSheet } from '@expo/react-native-action-sheet';
+import { NavigationActions } from 'react-navigation'
 
 @connectActionSheet class SettingsScreen extends React.Component {
-  static route = {
-    navigationBar: {
-      title(params) {
-        return getI18nText('我');
-      }
-    },
+  static navigationOptions = ({ navigation }) => {
+    title = navigation.state.params && navigation.state.params.title ? navigation.state.params.title : '我';
+    return {
+      title: getI18nText(title)
+    };
   };
 
   state = {
@@ -45,13 +44,15 @@ import { connectActionSheet } from '@expo/react-native-action-sheet';
       }
       getCurrentUser().logUserInfo();
 
-      this.props.navigator.updateCurrentRouteParams({ title: getI18nText('我') });
       this.props.clearLesson();
       this.props.requestBooks(language);
       this.setState({ language: getCurrentUser().getLanguageDisplayName() });
-      this.props.navigation.performAction(({ tabs, stacks }) => {
-        tabs('tab-navigation').jumpToTab('class');
-      });
+
+      const setParamsAction = NavigationActions.setParams({
+        params: { title: 'BSF课程' },
+        key: 'Home',
+      })
+      this.props.navigation.dispatch(setParamsAction);
     }
   }
 
