@@ -5,38 +5,38 @@ export const CachePolicy = {
   AsyncStorage: 2,
 };
 
+const HostServer = 'http://cbsf.southcentralus.cloudapp.azure.com:3000';
 export const Models = {
   Book: {
     key: "BOOK",
-    restUri: "http://cbsf.southcentralus.cloudapp.azure.com:3000/lessons",
+    restUri: HostServer + "/lessons",
     cachePolicy: CachePolicy.AsyncStorage,
     useLanguage: true
   },
   Lesson: {
     key: "LESSON",
-    restUri: "http://cbsf.southcentralus.cloudapp.azure.com:3000/lessons",
+    restUri: HostServer + "/lessons",
     cachePolicy: CachePolicy.AsyncStorage,
     useLanguage: true
   },
   Passage: {
     key: "PASSAGE",
-    restUri: "http://cbsf.southcentralus.cloudapp.azure.com:3000/verse",
+    restUri: HostServer + "/verse",
     cachePolicy: CachePolicy.AsyncStorage,
     useLanguage: true
   },
   Logon: {
     key: "LOGON",
-    restUri: "http://cbsf.southcentralus.cloudapp.azure.com:3000/logon",
+    restUri: HostServer + "/logon",
     cachePolicy: CachePolicy.AsyncStorage,
     userKey: '@BsfApp:user'
   },
   Feedback: {
     key: "Feedback",
-    restUri: "http://cbsf.southcentralus.cloudapp.azure.com:3000/feedback"
+    restUri: HostServer + "/feedback"
   },
   Answer: {
     key: "ANSWER",
-    restUri: "",
     cachePolicy: CachePolicy.AsyncStorage,
   },
   DefaultLanguage: "chs",
@@ -54,10 +54,16 @@ export const Models = {
     { DisplayName: "当代译本(简体)", Value: "ccb" },
     { DisplayName: "和合本修訂版(繁體)", Value: "rcuvts" },
     { DisplayName: "新譯本(繁體)", Value: "cnvt" },
-    { DisplayName: "English Standard Version", Value: "esv" },
     { DisplayName: "New International Version 2011", Value: "niv2011" },
+    { DisplayName: "English Standard Version", Value: "esv" },
     { DisplayName: "King James Version", Value: "kjv" },
-    { DisplayName: "Reina-Valera 1995", Value: "rvr1995" },
     { DisplayName: "Nueva Versión Internacional", Value: "nvi" },
+    { DisplayName: "Reina-Valera 1995", Value: "rvr1995" },
+  ],
+  OfflineModes: [
+    { DisplayName: "简体中文 + 和合本修订版(简体)", Value: "chs" },
+    { DisplayName: "繁體中文 + 和合本修訂版(繁體)", Value: "cht" },
+    { DisplayName: "English + New International Version 2011", Value: "eng" },
+    { DisplayName: "Español + Nueva Versión Internacional", Value: "spa" },
   ]
 }

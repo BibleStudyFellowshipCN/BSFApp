@@ -25,6 +25,9 @@ const text = {
     "播放",
     "第",
     "章",
+    "离线模式",
+    "提示",
+    "请先关闭离线模式",
   ],
   cht: [
     "BSF課程",
@@ -49,6 +52,9 @@ const text = {
     "播放",
     "第",
     "章",
+    "離線模式",
+    "提示",
+    "請先關閉離線模式",
   ],
   eng: [
     "BSF Lessons",
@@ -73,6 +79,9 @@ const text = {
     "Play",
     "Chapter ",
     "",
+    "Offline Mode",
+    "Information",
+    "Please turn off offline mode first",
   ],
   spa: [
     "BSF Lecciones",
@@ -97,6 +106,9 @@ const text = {
     "Jugar",
     "Capítulo",
     "",
+    "Modo offline",
+    "Información",
+    "Por favor apague el modo fuera de línea primero",
   ]
 };
 

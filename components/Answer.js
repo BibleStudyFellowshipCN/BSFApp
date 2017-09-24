@@ -8,6 +8,9 @@ import {
 import { updateAnswer } from '../store/answers'
 
 function getHeight(text) {
+  if (!text) {
+    return 120;
+  }
   const lines = text.split('\n');
   return Math.max(lines.length * 21, 120);
 }

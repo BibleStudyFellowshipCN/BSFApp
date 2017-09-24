@@ -56,9 +56,34 @@ async function loadAsync(model, id, update) {
         }
     }
 
+    let keyString = (id == null) ? model.key : model.key + '/' + id;
+
+    if (model.restUri) {
+        if (getCurrentUser().getIsOfflineMode()) {
+            let cache;
+            switch (getCurrentUser().getLanguage()) {
+                case 'chs':
+                    cache = require("./chs_cache.json");
+                    break;
+                case 'cht':
+                    cache = require("./cht_cache.json");
+                    break;
+                case 'eng':
+                    cache = require("./eng_cache.json");
+                    break;
+                case 'spa':
+                    cache = require("./spa_cache.json");
+                    break;
+            }
+            if (cache[keyString]) {
+                console.log("[Offline mode] Hit from cache");
+                return cache[keyString];
+            }
+        }
+    }
+
     // load from network first
     let data = await loadFromCloudAsync(model, id, /*silentLoad*/ true);
-    let keyString = (id == null) ? model.key : model.key + '/' + id;
 
     // store to cache
     if (data) {

@@ -63,7 +63,7 @@ class LessonScreen extends React.Component {
     if (this.props.lesson) {
       dayQuestions = this.props.lesson.dayQuestions;
 
-      const content = <ScrollableTabView initialPage={0} {...scrollableStyleProps} prerenderingSiblingsNumber={Infinity}>
+      const content = <ScrollableTabView initialPage={0} {...scrollableStyleProps}>
         {/*<NotesPage tabLabel="讲义" />*/}
         <DayQuestions tabLabel={getI18nText("一")} goToPassage={this.goToPassage} day={dayQuestions.one} readVerse={dayQuestions.one.readVerse} memoryVerse={this.props.lesson.memoryVerse} />
         <DayQuestions tabLabel={getI18nText("二")} goToPassage={this.goToPassage} day={dayQuestions.two} readVerse={dayQuestions.two.readVerse} />

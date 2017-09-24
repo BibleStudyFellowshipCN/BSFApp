@@ -47,6 +47,7 @@ async function saveUserAsync(user) {
 export default class User {
   cellphone = null;
   loggedOn = false;
+  offlineMode = true;
   language = Models.DefaultLanguage;
   bibleVersion = Models.DefaultBibleVersion;
 
@@ -59,6 +60,9 @@ export default class User {
       }
       if (Models.ValidBibleVersionsLanguages.indexOf(existingUser.bibleVersion) != -1) {
         this.bibleVersion = existingUser.bibleVersion;
+      }
+      if (existingUser.offlineMode) {
+        this.offlineMode = true;
       }
       this.loggedOn = true;
       console.log("loadExistingUser: " + JSON.stringify(this.getUserInfo()));
@@ -93,9 +97,26 @@ export default class User {
     return null;
   }
 
+  getIsOfflineMode() {
+    if (!this.isLoggedOn()) {
+      return false;
+    }
+
+    return this.offlineMode;
+  }
+
+  async setIsOfflineModeAsync(value) {
+    if (!this.isLoggedOn()) {
+      return;
+    }
+    this.offlineMode = value
+    await saveUserAsync(this.getUserInfo());
+    this.logUserInfo();
+  }
+
   async setLanguageAsync(language) {
     if (!this.isLoggedOn()) {
-      return null;
+      return;
     }
     this.language = language;
     await saveUserAsync(this.getUserInfo());
@@ -111,7 +132,7 @@ export default class User {
 
   async setBibleVersionAsync(version) {
     if (!this.isLoggedOn()) {
-      return null;
+      return;
     }
     this.bibleVersion = version;
     await saveUserAsync(this.getUserInfo());
@@ -155,7 +176,7 @@ export default class User {
   }
 
   getUserInfo() {
-    return { cellphone: this.cellphone, language: this.language, bibleVersion: this.bibleVersion };
+    return { cellphone: this.cellphone, language: this.language, bibleVersion: this.bibleVersion, offlineMode: this.offlineMode };
   }
 }
 
