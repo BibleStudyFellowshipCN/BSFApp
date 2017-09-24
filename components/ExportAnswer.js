@@ -11,6 +11,7 @@ import {
 import { Entypo } from '@expo/vector-icons';
 import { loadAsync } from '../dataStorage/storage';
 import { Models } from '../dataStorage/models';
+import { getI18nText } from '../store/I18n';
 
 export default class ExportAnswer extends React.Component {
 
@@ -50,7 +51,8 @@ export default class ExportAnswer extends React.Component {
         return;
       }
 
-      let content = this.getContent(lessonContent.dayQuestions.one, answers);
+      let content = lessonContent.name + '\n\n' + getI18nText('±³ËÐ¾­ÎÄ£º') + lessonContent.memoryVerse + '\n\n';
+      content += this.getContent(lessonContent.dayQuestions.one, answers);
       content += this.getContent(lessonContent.dayQuestions.two, answers);
       content += this.getContent(lessonContent.dayQuestions.three, answers);
       content += this.getContent(lessonContent.dayQuestions.four, answers);
@@ -85,6 +87,7 @@ export default class ExportAnswer extends React.Component {
 const styles = StyleSheet.create({
   container: {
     alignItems: 'center',
-    width: 54
+    width: 54,
+    marginTop: 8
   }
 });
