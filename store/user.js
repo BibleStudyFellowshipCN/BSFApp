@@ -47,7 +47,7 @@ async function saveUserAsync(user) {
 export default class User {
   cellphone = null;
   loggedOn = false;
-  offlineMode = true;
+  offlineMode = false;
   language = Models.DefaultLanguage;
   bibleVersion = Models.DefaultBibleVersion;
 
@@ -158,10 +158,11 @@ export default class User {
   }
 
   async loginAsync(cellphone, language) {
+    /* TODO: [Wei] disable logon
     const result = await loadAsync(Models.Logon, '?cellphone=' + cellphone, true);
     if (!result || !result.logon) {
       return false;
-    }
+    }*/
 
     this.cellphone = cellphone;
     this.language = language;
