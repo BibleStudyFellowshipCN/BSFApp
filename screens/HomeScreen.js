@@ -159,7 +159,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     height: 60,
     paddingLeft: 15,
-    marginBottom: 3
+    marginTop: 2,
+    marginBottom: 2
   },
   bookHeaderIcon: {
     alignItems: 'center',
