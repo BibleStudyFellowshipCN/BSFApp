@@ -23,6 +23,9 @@ const text = {
     "一", "二", "三", "四", "五", "六",
     "第",
     "章",
+    "离线模式",
+    "提示",
+    "请先关闭离线模式",
   ],
   cht: [
     "BSF課程",
@@ -45,6 +48,9 @@ const text = {
     "一", "二", "三", "四", "五", "六",
     "第",
     "章",
+    "離線模式",
+    "提示",
+    "請先關閉離線模式",
   ],
   eng: [
     "BSF Lessons",
@@ -67,6 +73,9 @@ const text = {
     "1ST", "2ND", "3RD", "4TH", "5TH", "6TH",
     "Chapter ",
     "",
+    "Offline Mode",
+    "Information",
+    "Please turn off offline mode first",
   ],
   spa: [
     "BSF Lecciones",
@@ -89,6 +98,9 @@ const text = {
     "1ER", "2DO", "3TE", "4TO", "5TO", "6TO",
     "Capítulo",
     "",
+    "Modo offline",
+    "Información",
+    "Por favor apague el modo fuera de línea primero",
   ]
 };
 

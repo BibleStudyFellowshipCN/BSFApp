@@ -51,7 +51,7 @@ export default class ExportAnswer extends React.Component {
         return;
       }
 
-      let content = lessonContent.name + '\n\n' + getI18nText('±³ËĞ¾­ÎÄ£º') + lessonContent.memoryVerse + '\n\n';
+      let content = lessonContent.name + '\n\n' + getI18nText('èƒŒè¯µç»æ–‡ï¼š') + lessonContent.memoryVerse + '\n\n';
       content += this.getContent(lessonContent.dayQuestions.one, answers);
       content += this.getContent(lessonContent.dayQuestions.two, answers);
       content += this.getContent(lessonContent.dayQuestions.three, answers);

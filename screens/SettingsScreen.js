@@ -1,6 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux'
-import { ScrollView, StyleSheet, Image, Text, View, Alert, TextInput, TouchableOpacity, KeyboardAvoidingView, Platform } from 'react-native';
+import Layout from '../constants/Layout';
+import { ScrollView, StyleSheet, Image, Text, View, Alert, TextInput, TouchableOpacity, KeyboardAvoidingView, Platform, Keyboard, UIManager } from 'react-native';
 import Expo, { Constants } from 'expo';
 import { Models } from '../dataStorage/models';
 import { clearStorageAsync, callWebServiceAsync, showWebServiceCallErrorsAsync } from '../dataStorage/storage';
@@ -25,25 +26,46 @@ import { NavigationActions } from 'react-navigation'
 
   state = {
     language: getCurrentUser().getLanguageDisplayName(),
-    bibleVersion: getCurrentUser().getBibleVersionDisplayName()
+    bibleVersion: getCurrentUser().getBibleVersionDisplayName(),
+    offlineMode: getCurrentUser().getIsOfflineMode()
   };
+
+  componentWillMount() {
+    this.keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', (event) => {
+      this.keyboardHeight = event.endCoordinates.height;
+      this.setState({ keyboard: true });
+    });
+    this.keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', (event) => {
+      this.setState({ keyboard: false })
+    });
+  }
+
+  componentWillUnmount() {
+    this.keyboardDidShowListener.remove();
+    this.keyboardDidHideListener.remove();
+  }
+
+  async updateBibleVersionBasedOnLanguage(language) {
+    if (language == 'eng') {
+      await this.onBibleVerseChange('niv2011');
+    } else if (language == 'cht') {
+      await this.onBibleVerseChange('rcuvts');
+    } else if (language == 'spa') {
+      await this.onBibleVerseChange('nvi');
+    } else {
+      await this.onBibleVerseChange('rcuvss');
+    }
+    getCurrentUser().logUserInfo();
+  }
 
   async onLanguageChange(language) {
     if (getCurrentUser().getLanguage() != language) {
       await getCurrentUser().setLanguageAsync(language);
 
       // Also set the bible version based on language selection
-      if (language == 'eng') {
-        await this.onBibleVerseChange('niv2011');
-      } else if (language == 'cht') {
-        await this.onBibleVerseChange('rcuvts');
-      } else if (language == 'spa') {
-        await this.onBibleVerseChange('rvr1995');
-      } else {
-        await this.onBibleVerseChange('rcuvss');
-      }
-      getCurrentUser().logUserInfo();
+      this.updateBibleVersionBasedOnLanguage(language);
 
+      this.props.navigator.updateCurrentRouteParams({ title: getI18nText('我') });
       this.props.clearLesson();
       this.props.requestBooks(language);
       this.setState({ language: getCurrentUser().getLanguageDisplayName() });
@@ -92,6 +114,11 @@ import { NavigationActions } from 'react-navigation'
   }
 
   onBibleVerse() {
+    if (getCurrentUser().getIsOfflineMode()) {
+      Alert.alert(getI18nText("提示"), getI18nText("请先关闭离线模式"));
+      return;
+    }
+
     let options = [];
     for (var i in Models.BibleVersions) {
       const text = Models.BibleVersions[i].DisplayName;
@@ -118,6 +145,14 @@ import { NavigationActions } from 'react-navigation'
     alert("TODO: onFontSize");
   }
 
+  async onSwitchOffline(value) {
+    await getCurrentUser().setIsOfflineModeAsync(value);
+    this.setState({ offlineMode: value });
+    if (value) {
+      this.updateBibleVersionBasedOnLanguage(getCurrentUser().getLanguage());
+    }
+  }
+
   async onSubmitFeedback() {
     if (this.feedback.trim() == '') {
       Alert.alert(getI18nText('缺少内容'), getI18nText('请输入反馈意见内容'), [
@@ -142,48 +177,73 @@ import { NavigationActions } from 'react-navigation'
     let keyIndex = 0;
     return (
       <KeyboardAvoidingView style={styles.container} behavior='padding' keyboardVerticalOffset={0}>
-        <SettingsList borderColor='#c8c7cc' defaultItemSize={40}>
-          <SettingsList.Header headerText={getI18nText('设置')} headerStyle={{ color: 'black' }} />
-          <SettingsList.Item
-            title={getI18nText('显示语言')}
-            titleInfo={this.state.language}
-            titleInfoStyle={styles.titleInfoStyle}
-            onPress={this.onLanguage.bind(this)}
-          />
-          <SettingsList.Item
-            title={getI18nText('圣经版本')}
-            titleInfo={this.state.bibleVersion}
-            titleInfoStyle={styles.titleInfoStyle}
-            onPress={this.onBibleVerse.bind(this)}
-          />
-          {/*<SettingsList.Item
+        <ScrollView
+          ref={ref => this.scrollView = ref}
+          onContentSizeChange={(contentWidth, contentHeight) => {
+            if (this.state.keyboard) {
+              const { State: TextInputState } = TextInput;
+              const currentlyFocusedField = TextInputState.currentlyFocusedField();
+              UIManager.measure(currentlyFocusedField, (originX, originY, width, height, pageX, pageY) => {
+                const bottom = pageY + height;
+                const viewHeight = Layout.window.height - this.keyboardHeight - 16;
+                if (bottom > viewHeight) {
+                  const pos = bottom - viewHeight + height;
+                  this.scrollView.scrollTo({ y: pos, animated: true });
+                }
+              });
+            }
+          }}>
+
+          <SettingsList borderColor='#c8c7cc' defaultItemSize={40}>
+            <SettingsList.Header headerText={getI18nText('设置')} headerStyle={{ color: 'black' }} />
+            <SettingsList.Item
+              title={getI18nText('显示语言')}
+              titleInfo={this.state.language}
+              titleInfoStyle={styles.titleInfoStyle}
+              onPress={this.onLanguage.bind(this)}
+            />
+            <SettingsList.Item
+              title={getI18nText('圣经版本')}
+              titleInfo={this.state.bibleVersion}
+              titleInfoStyle={styles.titleInfoStyle}
+              onPress={this.onBibleVerse.bind(this)}
+            />
+            <SettingsList.Item
+              title={getI18nText('离线模式')}
+              hasNavArrow={false}
+              hasSwitch={true}
+              switchState={this.state.offlineMode}
+              switchOnValueChange={this.onSwitchOffline.bind(this)}
+            />
+            {/*<SettingsList.Item
             title='字体大小'
             titleInfo='中等'
             titleInfoStyle={styles.titleInfoStyle}
             onPress={this.onFontSize.bind(this)}
           />*/}
-          <SettingsList.Header headerText={getI18nText('反馈意见')} headerStyle={{ color: 'black', marginTop: 15 }} />
-          <SettingsList.Header headerText='MBSF - Mobile Bible Study Fellowship' headerStyle={{ color: 'black', marginTop: 15 }} />
-          <View style={styles.answerContainer}>
-            <TextInput
-              style={styles.answerInput}
-              ref={(input) => this.feedbackInput = input}
-              blurOnSubmit={false}
-              placeholder={getI18nText('反馈意见')}
-              multiline
-              onChangeText={(text) => { this.feedback = text }}
+            <SettingsList.Header headerText={getI18nText('反馈意见')} headerStyle={{ color: 'black', marginTop: 15 }} />
+            <SettingsList.Header headerText='MBSF - Mobile Bible Study Fellowship' headerStyle={{ color: 'black', marginTop: 15 }} />
+            <View style={styles.answerContainer}>
+              <TextInput
+                style={styles.answerInput}
+                ref={(input) => this.feedbackInput = input}
+                blurOnSubmit={false}
+                placeholder={getI18nText('反馈意见')}
+                multiline
+                onChangeText={(text) => { this.feedback = text }}
+              />
+            </View>
+            <View style={{ alignItems: 'center' }}>
+              <RkButton onPress={this.onSubmitFeedback.bind(this)}>{getI18nText('提交')}</RkButton>
+            </View>
+            <SettingsList.Item
+              title={getI18nText('App版本')}
+              titleInfo={manifest.version + ' (SDK' + manifest.sdkVersion + ')'}
+              hasNavArrow={false}
+              titleInfoStyle={styles.titleInfoStyle}
             />
-          </View>
-          <View style={{ alignItems: 'center' }}>
-            <RkButton onPress={this.onSubmitFeedback.bind(this)}>{getI18nText('提交')}</RkButton>
-          </View>
-          <SettingsList.Item
-            title={getI18nText('App版本')}
-            titleInfo={manifest.version + ' (SDK' + manifest.sdkVersion + ')'}
-            hasNavArrow={false}
-            titleInfoStyle={styles.titleInfoStyle}
-          />
-        </SettingsList>
+          </SettingsList>
+        </ScrollView>
       </KeyboardAvoidingView>
     );
   }
