@@ -62,7 +62,7 @@ const text = {
     "Me",
     "AudioBible",
     "Settings",
-    "Diaply Language",
+    "Diaplay Language",
     "Bible Version",
     "Feedback",
     "App Version",
