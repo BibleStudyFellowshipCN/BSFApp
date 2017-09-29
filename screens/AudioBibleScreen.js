@@ -17,11 +17,12 @@ const audioBookId = require('../assets/audioBookId.json');
 
 
 export default class AudioBibleScreen extends React.Component {
-  static navigationOptions = ({ navigation }) => {
-    title = navigation.state.params && navigation.state.params.title ? navigation.state.params.title : '有声圣经';
-    return {
-      title: getI18nText(title)
-    };
+  static route = {
+    navigationBar: {
+      title(params) {
+        return getI18nText('有声圣经');
+      }
+    },
   };
 
   constructor(props) {
@@ -46,7 +47,7 @@ export default class AudioBibleScreen extends React.Component {
   }
 
   componentDidUpdate() {
-    //this.props.navigator.updateCurrentRouteParams({ title: getI18nText('有声圣经') });
+    this.props.navigator.updateCurrentRouteParams({ title: getI18nText('有声圣经') });
   }
 
   _resetAudio = async () => {
@@ -176,12 +177,10 @@ export default class AudioBibleScreen extends React.Component {
     return (
       <View style={{
         flex: 1,
-        flexDirection: 'column',
-        justifyContent: 'center',
         alignItems: 'center',
         backgroundColor: 'white'
       }}>
-        <View style={{ flex: 1, flexDirection: 'row' }}>
+        <View style={{ flexDirection: 'row' }}>
           <View style={{ width: 170 }}>
             <Picker
               style={{ alignSelf: 'stretch' }}
@@ -203,15 +202,15 @@ export default class AudioBibleScreen extends React.Component {
             </Picker>
           </View>
         </View>
-        <Slider
+        {/*<Slider
           style={styles.playbackSlider}
           value={this.state.progress}
           onValueChange={this._onSeekSliderValueChange.bind(this)}
           onSlidingComplete={this._onSeekSliderSlidingComplete.bind(this)}
           disabled={this.state.isLoading || !this.state.isLoaded}
         />
-        <Text>{position}/{duration}</Text>
-        <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center', }}>
+        <Text>{position}/{duration}</Text>*/}
+        <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center' }}>
           <TouchableHighlight
             underlayColor={'#FFFFFF'}
             style={styles.wrapper}
