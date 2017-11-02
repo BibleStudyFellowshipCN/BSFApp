@@ -4,33 +4,76 @@ import {
   StyleSheet,
   TextInput,
   View,
+  Text,
+  TouchableOpacity
 } from 'react-native';
 import { updateAnswer } from '../store/answers'
+import Layout from '../constants/Layout';
 
-function getHeight(text) {
-  if (!text) {
-    return 120;
+class Answer extends React.Component {
+  state = {
+    editMode: false,
+    height: 0
+  };
+
+  contentSize = null;
+
+  onContentSizeChange(e) {
+    const contentSize = e.nativeEvent.contentSize;
+    console.log(JSON.stringify(contentSize));
+
+    // Support earlier versions of React Native on Android.
+    if (!contentSize) return;
+
+    if (!this.contentSize || this.contentSize.height !== contentSize.height) {
+      this.contentSize = contentSize;
+      this.setState({ height: this.contentSize.height + 14 });
+    }
   }
-  const lines = text.split('\n');
-  return Math.max(lines.length * 21, 120);
-}
 
-const Answer = (props) => (
-  <View style={[styles.answerContainer, { height: getHeight(props.answer.answerText) }]}>
-    <TextInput
-      style={styles.answerInput}
-      blurOnSubmit={false}
-      multiline
-      value={props.answer.answerText}
-      onChangeText={(text) => {
-        props.updateAnswer(
-          props.questionId,
-          text,
-        )
-      }}
-    />
-  </View>
-)
+  render() {
+    let height = Math.max(120, this.state.height);
+    console.log({ height, edit: this.state.editMode });
+    return (
+      <View style={[styles.answerContainer, { height }]}>
+        <TextInput
+          ref='answer'
+          style={styles.answerInput}
+          blurOnSubmit={false}
+          multiline
+          value={this.props.answer.answerText}
+          onChange={(e) => this.onContentSizeChange(e)}
+          onContentSizeChange={(e) => this.onContentSizeChange(e)}
+          onChangeText={(text) => {
+            this.props.updateAnswer(
+              this.props.questionId,
+              text,
+            )
+          }}
+          onEndEditing={() => {
+            this.setState({ editMode: false });
+          }}
+        />
+        {
+          !this.state.editMode &&
+          <TouchableOpacity
+            style={{
+              position: 'absolute',
+              height,
+              width: Layout.window.width,
+              backgroundColor: 'rgba(0, 0, 0, 0.05)' // 'transparent'
+            }}
+            onPress={() => {
+              this.setState({ editMode: true });
+              this.refs.answer.focus();
+
+            }}>
+          </TouchableOpacity>
+        }
+      </View >
+    );
+  }
+}
 
 const nullAnswer = {
   answerText: ''
