@@ -35,13 +35,14 @@ class BibleScreen extends React.Component {
   render() {
     if (this.props.passage) {
       const paragraphs = this.props.passage.paragraphs;
-      let html = '<style> body { font-size: 19;} </style>';
+      let html = '<head><meta name="viewport" content="width=device-width, initial-scale=1" /></head><style> body { font-size: 19;} </style> <body>';
       for (var i in paragraphs) {
         for (var j in paragraphs[i].verses) {
           const verse = paragraphs[i].verses[j];
           html += verse.verse + " " + verse.text + "<br>";
         }
       }
+      html += '</body>';
       return (
         <WebView
           source={{ html }}
