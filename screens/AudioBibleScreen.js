@@ -8,7 +8,7 @@ import {
   Picker,
   Slider
 } from 'react-native';
-import Expo, { Audio } from 'expo';
+import Expo, { Audio, KeepAwake } from 'expo';
 import { getI18nText, getI18nBibleBook } from '../store/I18n';
 import { getCurrentUser } from '../store/user';
 import { FontAwesome } from '@expo/vector-icons';
@@ -138,6 +138,7 @@ export default class AudioBibleScreen extends React.Component {
     this.sound.playFromPositionAsync(this.state.progress * this.state.duration);
     this.setState({ isPlaying: true, isPaused: false, isLoading: false });
     console.log('playing');
+    KeepAwake.activate();
   }
 
   async pause() {
@@ -147,6 +148,7 @@ export default class AudioBibleScreen extends React.Component {
 
     this.setState({ isPlaying: false, isPaused: true, isLoading: false });
     console.log('paused');
+    KeepAwake.deactivate();
   }
 
   async _onPlayOrPause() {
@@ -167,6 +169,7 @@ export default class AudioBibleScreen extends React.Component {
       }
       this.setState({ isPlaying: false, isPaused: false, progress: 0, isLoading: false });
       console.log('stopped');
+      KeepAwake.deactivate();
     }
   }
 
