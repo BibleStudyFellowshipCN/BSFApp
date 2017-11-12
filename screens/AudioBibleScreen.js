@@ -176,12 +176,10 @@ export default class AudioBibleScreen extends React.Component {
     return (
       <View style={{
         flex: 1,
-        flexDirection: 'column',
-        justifyContent: 'center',
         alignItems: 'center',
         backgroundColor: 'white'
       }}>
-        <View style={{ flex: 1, flexDirection: 'row' }}>
+        <View style={{ flexDirection: 'row' }}>
           <View style={{ width: 170 }}>
             <Picker
               style={{ alignSelf: 'stretch' }}
@@ -203,15 +201,15 @@ export default class AudioBibleScreen extends React.Component {
             </Picker>
           </View>
         </View>
-        <Slider
+        {/*<Slider
           style={styles.playbackSlider}
           value={this.state.progress}
           onValueChange={this._onSeekSliderValueChange.bind(this)}
           onSlidingComplete={this._onSeekSliderSlidingComplete.bind(this)}
           disabled={this.state.isLoading || !this.state.isLoaded}
         />
-        <Text>{position}/{duration}</Text>
-        <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center', }}>
+        <Text>{position}/{duration}</Text>*/}
+        <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center' }}>
           <TouchableHighlight
             underlayColor={'#FFFFFF'}
             style={styles.wrapper}

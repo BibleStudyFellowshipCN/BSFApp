@@ -1,47 +1,32 @@
+import Expo, { Constants } from 'expo';
 import React from 'react';
 import { Platform, StatusBar, StyleSheet, View } from 'react-native';
-import { AppLoading, Asset, Font } from 'expo';
-import { Ionicons } from '@expo/vector-icons';
-import RootNavigation from './navigation/RootNavigation';
+import { NavigationProvider, StackNavigation } from '@expo/ex-navigation';
 import { FontAwesome } from '@expo/vector-icons';
 import { Provider } from 'react-redux';
 import Layout from './constants/Layout';
 import createStore from './store/createStore'
+import Router from './navigation/Router';
+import cacheAssetsAsync from './utilities/cacheAssetsAsync';
 import { loadAsync } from './dataStorage/storage';
 import { Models } from './dataStorage/models';
 import LoginUI from './components/LoginUI';
 import { getCurrentUser } from './store/user';
 import { ActionSheetProvider } from '@expo/react-native-action-sheet';
 
+let store;
+
 export default class App extends React.Component {
   state = {
-    assetsAreLoaded: false,
+    appIsReady: false,
+    userIsLoggedOn: false,
   };
 
   componentWillMount() {
-    this._loadAssetsAsync();
+    this.loadApp();
   }
 
-  render() {
-    if (!this.state.assetsAreLoaded && !this.props.skipLoadingScreen) {
-      return <AppLoading />;
-    } else {
-      return (
-        <ActionSheetProvider>
-          <Provider store={store}>
-            <View style={styles.container}>
-              {Platform.OS === 'ios' && <StatusBar barStyle="default" />}
-              {Platform.OS === 'android' &&
-                <View style={styles.statusBarUnderlay} />}
-              <RootNavigation />
-            </View>
-          </Provider>
-        </ActionSheetProvider>
-      );
-    }
-  }
-
-  async _loadAssetsAsync() {
+  async loadApp() {
     try {
       // initialize existing user
       await getCurrentUser().loadExistingUserAsync();
@@ -67,20 +52,21 @@ export default class App extends React.Component {
       }
       getCurrentUser().logUserInfo();
 
-      const bootValues = await Promise.all([
-        Asset.loadAsync([
-          require('./assets/icons/app-icon.png')
-        ]),
-        Font.loadAsync([
-          // This is the font that we are using for our tab bar
-          Ionicons.font,
-          FontAwesome.font,
-          // We include SpaceMono because we use it in HomeScreen.js. Feel free
-          // to remove this if you are not using it in your app
-          { 'space-mono': require('./assets/fonts/SpaceMono-Regular.ttf') },
-        ]),
+      // add all the neccessary load in Promise.all
+      let bootValues = await Promise.all([
+        loadAsync(Models.Book, '', true),
+        loadAsync(Models.Answer, null, false),
+        cacheAssetsAsync({
+          images: [
+            require('./assets/images/expo-wordmark.png'),
+            require('./assets/icons/app-icon.png')
+          ],
+          fonts: [
+            FontAwesome.font,
+            { 'space-mono': require('./assets/fonts/SpaceMono-Regular.ttf') },
+          ],
+        }),
       ]);
-
       // create the store with the boot data
       const initialstate = {
         books: bootValues[0],
@@ -89,16 +75,54 @@ export default class App extends React.Component {
       console.log("Load answers: " + JSON.stringify(initialstate.answers));
       store = createStore(initialstate);
 
-    } catch (e) {
-      // In this case, you might want to report the error to your error
-      // reporting service, for example Sentry
-      console.warn(
-        'There was an error caching assets (see: App.js), perhaps due to a ' +
-        'network timeout, so we skipped caching. Reload the app to try again.'
-      );
-      console.log(e);
-    } finally {
-      this.setState({ assetsAreLoaded: true });
+      // prefetch data here:
+
+      // set the app status to ready
+      // TODO: [Wei] Workaround for now
+      this.setState({ appIsReady: true, userIsLoggedOn: /*getCurrentUser().isLoggedOn() */ true });
+    } catch (err) {
+      console.error("failed to boot due to: " + err);
+    }
+  }
+
+  onUserLogon(data) {
+    console.log(JSON.stringify(data));
+    if (data.logon) {
+      this.setState({ userIsLoggedOn: true });
+    }
+  }
+
+  render() {
+    if (this.state.appIsReady) {
+      if (this.state.userIsLoggedOn) {
+        return (
+          <ActionSheetProvider>
+            <Provider store={store}>
+              <View style={styles.container}>
+                <NavigationProvider router={Router}>
+                  <StackNavigation
+                    id="root"
+                    initialRoute={Router.getRoute('rootNavigation')}
+                  />
+                </NavigationProvider>
+
+                {Platform.OS === 'ios' && <StatusBar barStyle="default" />}
+                {Platform.OS === 'android' && <View style={styles.statusBarUnderlay} />}
+              </View>
+            </Provider>
+          </ActionSheetProvider>
+        );
+      } else {
+        return (
+          <Provider store={store}>
+            <View style={styles.loginView}>
+              <LoginUI onUserLogon={this.onUserLogon.bind(this)} />
+            </View>
+          </Provider>
+        );
+      }
+    } else {
+      return <Expo.AppLoading />;
     }
   }
 }
@@ -112,4 +136,9 @@ const styles = StyleSheet.create({
     height: 24,
     backgroundColor: 'rgba(0,0,0,0.2)',
   },
+  loginView: {
+    width: Layout.window.width,
+    height: Layout.window.height,
+    marginTop: 50
+  }
 });
