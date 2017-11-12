@@ -190,7 +190,7 @@ import { connectActionSheet } from '@expo/react-native-action-sheet';
       const serverVersion = this.getVersionNumber(result.body.version);
       console.log('checkForUpdate:' + clientVersion + '-' + serverVersion);
       if (clientVersion < serverVersion) {
-        Alert.alert(getI18nText('发现更新') + ': ' + manifest.version, getI18nText('程序将重新启动'), [
+        Alert.alert(getI18nText('发现更新') + ': ' + result.body.version, getI18nText('程序将重新启动'), [
           { text: 'OK', onPress: () => Expo.Util.reload() },
         ]);
       } else {
