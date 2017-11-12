@@ -171,6 +171,36 @@ import { connectActionSheet } from '@expo/react-native-action-sheet';
     }
   }
 
+  getVersionNumber(version) {
+    // version is "a.b.c"
+    let versionNumbers = version.split(".");
+    let value = 0;
+    for (i in versionNumbers) {
+      value = value * 1000 + parseInt(versionNumbers[i]);
+    }
+    return value;
+  }
+
+  async checkForUpdate() {
+    const { manifest } = Constants;
+    const result = await callWebServiceAsync('https://expo.io/@turbozv/CBSFApp/index.exp?sdkVersion=' + manifest.sdkVersion, '', 'GET');
+    const succeed = await showWebServiceCallErrorsAsync(result, 200);
+    if (succeed) {
+      const clientVersion = this.getVersionNumber(manifest.version);
+      const serverVersion = this.getVersionNumber(result.body.version);
+      console.log('checkForUpdate:' + clientVersion + '-' + serverVersion);
+      if (clientVersion < serverVersion) {
+        Alert.alert(getI18nText('发现更新') + ': ' + manifest.version, getI18nText('程序将重新启动'), [
+          { text: 'OK', onPress: () => Expo.Util.reload() },
+        ]);
+      } else {
+        Alert.alert(getI18nText('您已经在使用最新版本'), getI18nText('版本') + ': ' + manifest.version + ' (SDK' + manifest.sdkVersion + ')', [
+          { text: 'OK', onPress: () => { } },
+        ]);
+      }
+    }
+  }
+
   render() {
     const { manifest } = Constants;
     let keyIndex = 0;
@@ -221,7 +251,7 @@ import { connectActionSheet } from '@expo/react-native-action-sheet';
             onPress={this.onFontSize.bind(this)}
           />*/}
             <SettingsList.Header headerText={getI18nText('反馈意见')} headerStyle={{ color: 'black', marginTop: 15 }} />
-            <SettingsList.Header headerText='MBSF - Mobile Bible Study Fellowship' headerStyle={{ color: 'black', marginTop: 15 }} />
+            {/*<SettingsList.Header headerText='MBSF - Mobile Bible Study Fellowship' headerStyle={{ color: 'black', marginTop: 15 }} />*/}
             <View style={styles.answerContainer}>
               <TextInput
                 style={styles.answerInput}
@@ -236,10 +266,10 @@ import { connectActionSheet } from '@expo/react-native-action-sheet';
               <RkButton onPress={this.onSubmitFeedback.bind(this)}>{getI18nText('提交')}</RkButton>
             </View>
             <SettingsList.Item
-              title={getI18nText('App版本')}
-              titleInfo={manifest.version + ' (SDK' + manifest.sdkVersion + ')'}
-              hasNavArrow={false}
+              title={getI18nText('版本') + ': ' + manifest.version}
+              titleInfo={getI18nText('检查更新')}
               titleInfoStyle={styles.titleInfoStyle}
+              onPress={this.checkForUpdate.bind(this)}
             />
           </SettingsList>
         </ScrollView>
