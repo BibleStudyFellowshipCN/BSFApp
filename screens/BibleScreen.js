@@ -17,10 +17,13 @@ import { loadPassage } from '../store/passage';
 import { getI18nText, getI18nBibleBook } from '../store/I18n';
 
 class BibleScreen extends React.Component {
-  static navigationOptions = ({ navigation }) => {
-    return {
-      title: navigation.state.params && navigation.state.params.title ? navigation.state.params.title : 'Bible'
-    };
+  static route = {
+    navigationBar: {
+      ...SharedStyles.navigationBarStyle,
+      title: (route) => {
+        return getI18nBibleBook(route.book) + route.verse
+      },
+    },
   };
 
   componentWillMount() {
@@ -32,13 +35,14 @@ class BibleScreen extends React.Component {
   render() {
     if (this.props.passage) {
       const paragraphs = this.props.passage.paragraphs;
-      let html = '<style> body { font-size: 19;} </style>';
+      let html = '<head><meta name="viewport" content="width=device-width, initial-scale=1" /></head><style> body { font-size: 19;} </style> <body>';
       for (var i in paragraphs) {
         for (var j in paragraphs[i].verses) {
           const verse = paragraphs[i].verses[j];
           html += verse.verse + " " + verse.text + "<br>";
         }
       }
+      html += '</body>';
       return (
         <WebView
           source={{ html }}
@@ -71,14 +75,14 @@ function getId(book, verse) {
 }
 
 const mapStateToProps = (state, ownProps) => {
-  const id = getId(ownProps.navigation.state.params.book, ownProps.navigation.state.params.verse);
+  const id = getId(ownProps.route.params.book, ownProps.route.params.verse);
   return {
     passage: state.passages[id],
   }
 };
 
 const mapDispatchToProps = (dispatch, ownProps) => {
-  const id = getId(ownProps.navigation.state.params.book, ownProps.navigation.state.params.verse);
+  const id = getId(ownProps.route.params.book, ownProps.route.params.verse);
   return {
     loadPassage: () => dispatch(loadPassage(id)),
   }

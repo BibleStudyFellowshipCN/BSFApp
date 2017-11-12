@@ -19,6 +19,7 @@ import Answer from '../components/Answer'
 import ExportAnswer from '../components/ExportAnswer.js';
 import Colors from '../constants/Colors'
 import { getI18nText, getI18nBibleBook } from '../store/I18n';
+import Layout from '../constants/Layout';
 
 class LessonScreen extends React.Component {
   static navigationOptions = ({ navigation }) => {
@@ -142,9 +143,11 @@ const BSFQuestion = (props) => (
     <QuestionText>
       {props.question.questionText}
     </QuestionText>
-    {props.question.quotes.map(quote => (
-      <BibleQuote key={quote.book + quote.verse} book={quote.book} verse={quote.verse} goToPassage={props.goToPassage} />
-    ))}
+    <View style={styles.row}>
+      {props.question.quotes.map(quote => (
+        <BibleQuote key={quote.book + quote.verse} book={quote.book} verse={quote.verse} goToPassage={props.goToPassage} />
+      ))}
+    </View>
     <Answer questionId={props.question.id} />
   </View>
 )
@@ -243,4 +246,9 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     color: Colors.yellow
   },
+  row: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    maxWidth: Layout.window.width - 30
+  }
 });

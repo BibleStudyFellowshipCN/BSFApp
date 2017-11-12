@@ -4,9 +4,8 @@
     "description": "Chinese Bible Study Fellowship",
     "slug": "CBSFApp",
     "privacy": "unlisted",
-    "sdkVersion": "20.0.0",
-    "version": "2017.09.19",
-    "orientation": "portrait",
+    "sdkVersion": "21.0.0",
+    "version": "2017.11.11",
     "primaryColor": "#cccccc",
     "icon": "./assets/icons/app-icon.png",
     "notification": {

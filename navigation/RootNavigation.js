@@ -1,40 +1,19 @@
-import { Notifications } from 'expo';
 import React from 'react';
-import { StackNavigator } from 'react-navigation';
-import Colors from '../constants/Colors'
-import MainTabNavigator from './MainTabNavigator';
+import { Text, StyleSheet, View } from 'react-native';
+import { Notifications } from 'expo';
+import {
+  StackNavigation,
+  TabNavigation,
+  TabNavigationItem,
+} from '@expo/ex-navigation';
+import { FontAwesome } from '@expo/vector-icons';
+import Alerts from '../constants/Alerts';
+import Colors from '../constants/Colors';
 import registerForPushNotificationsAsync from '../api/registerForPushNotificationsAsync';
-import LessonScreen from '../screens/LessonScreen';
-import BibleScreen from '../screens/BibleScreen';
+import SharedStyles from '../constants/SharedStyles';
+import { getI18nText, getI18nBibleBook } from '../store/I18n';
 
-const RootStackNavigator = StackNavigator(
-  {
-    Main: {
-      screen: MainTabNavigator
-    },
-    Lesson: {
-      screen: LessonScreen
-    },
-    Bible: {
-      screen: BibleScreen
-    }
-  },
-  {
-    navigationOptions: () => ({
-      headerStyle: {
-        backgroundColor: Colors.yellow
-      },
-      headerTitleStyle: {
-        color: 'white',
-        fontSize: 22,
-        fontWeight: '700'
-      },
-      headerTintColor: 'white'
-    })
-  }
-);
-
-export default class RootNavigator extends React.Component {
+export default class RootNavigation extends React.Component {
   componentDidMount() {
     this._notificationSubscription = this._registerForPushNotifications();
   }
@@ -44,7 +23,61 @@ export default class RootNavigator extends React.Component {
   }
 
   render() {
-    return <RootStackNavigator />;
+    return (
+      <TabNavigation tabBarColor={Colors.yellow} id="tab-navigation" navigatorUID="tab-navigation" tabBarHeight={56} initialTab="class">
+        {/*<TabNavigationItem
+          id="home"
+          renderIcon={isSelected => this._renderIcon('BSF', isSelected)}>
+          <StackNavigation initialRoute="home" />
+        </TabNavigationItem>
+
+        <TabNavigationItem
+          id="group"
+          renderIcon={isSelected => this._renderIcon('组', isSelected)}>
+          <StackNavigation initialRoute="links" />
+        </TabNavigationItem>*/}
+
+        <TabNavigationItem
+          id="class"
+          renderIcon={isSelected => this._renderIcon(getI18nText('课'), 'book', isSelected)}>
+          <StackNavigation
+            initialRoute="home"
+            defaultRouteConfig={SharedStyles.tabNavItemStyle}
+          />
+        </TabNavigationItem>
+
+        <TabNavigationItem
+          id="audioBible"
+          renderIcon={isSelected => this._renderIcon(getI18nText('有声圣经'), 'headphones', isSelected)}>
+          <StackNavigation initialRoute="audioBible"
+            defaultRouteConfig={SharedStyles.tabNavItemStyle}
+          />
+        </TabNavigationItem>
+
+        <TabNavigationItem
+          id="profile"
+          renderIcon={isSelected => this._renderIcon(getI18nText('我'), 'info-circle', isSelected)}>
+          <StackNavigation initialRoute="settings"
+            defaultRouteConfig={SharedStyles.tabNavItemStyle}
+          />
+        </TabNavigationItem>
+      </TabNavigation>
+    );
+  }
+
+  _renderIcon(name, iconName, isSelected) {
+    return (
+      <View style={{ justifyContent: 'center', alignItems: 'center' }}>
+        <FontAwesome
+          name={iconName}
+          size={26}
+          color={isSelected ? Colors.tabIconSelected : Colors.tabIconDefault}
+        />
+        <Text style={{ color: isSelected ? Colors.tabIconSelected : Colors.tabIconDefault, fontSize: 12 }}>
+          {name}
+        </Text>
+      </View>
+    );
   }
 
   _registerForPushNotifications() {
@@ -61,8 +94,19 @@ export default class RootNavigator extends React.Component {
   }
 
   _handleNotification = ({ origin, data }) => {
-    console.log(
-      `Push notification ${origin} with data: ${JSON.stringify(data)}`
+    this.props.navigator.showLocalAlert(
+      `Push notification ${origin} with data: ${JSON.stringify(data)}`,
+      Alerts.notice
     );
   };
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#fff',
+  },
+  selectedTab: {
+    color: Colors.tabIconSelected,
+  }
+});
