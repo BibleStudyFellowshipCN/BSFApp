@@ -256,13 +256,14 @@ export default class AudioBibleScreen extends React.Component {
             </Picker>
           </View>
         </View>
+        {/*
         <Slider
           style={styles.playbackSlider}
           value={this.state.progress}
           onValueChange={this._onSeekSliderValueChange.bind(this)}
           onSlidingComplete={this._onSeekSliderSlidingComplete.bind(this)}
           disabled={this.state.isLoading || !this.state.isLoaded}
-        />
+        />*/}
         <Text>{position}/{duration}</Text>
         <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center' }}>
           <TouchableHighlight
