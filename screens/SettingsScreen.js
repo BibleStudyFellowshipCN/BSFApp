@@ -2,7 +2,7 @@
 import React from 'react';
 import { connect } from 'react-redux'
 import Layout from '../constants/Layout';
-import { ScrollView, StyleSheet, Image, Text, View, Alert, TextInput, TouchableOpacity, KeyboardAvoidingView, Platform, Keyboard, UIManager } from 'react-native';
+import { ScrollView, StyleSheet, Image, Text, View, Alert, TextInput, TouchableOpacity, KeyboardAvoidingView, Platform, Keyboard, UIManager, AsyncStorage, Dimensions } from 'react-native';
 import Expo, { Constants } from 'expo';
 import { Models } from '../dataStorage/models';
 import { clearStorageAsync, callWebServiceAsync, showWebServiceCallErrorsAsync } from '../dataStorage/storage';
@@ -15,6 +15,7 @@ import { clearLesson } from '../store/lessons.js'
 import { clearPassage } from '../store/passage.js'
 import { RkButton } from 'react-native-ui-kitten';
 import { connectActionSheet } from '@expo/react-native-action-sheet';
+import { LegacyAsyncStorage } from 'expo';
 
 @connectActionSheet class SettingsScreen extends React.Component {
   static route = {
@@ -28,7 +29,9 @@ import { connectActionSheet } from '@expo/react-native-action-sheet';
   state = {
     language: getCurrentUser().getLanguageDisplayName(),
     bibleVersion: getCurrentUser().getBibleVersionDisplayName(),
-    offlineMode: getCurrentUser().getIsOfflineMode()
+    offlineMode: getCurrentUser().getIsOfflineMode(),
+    log: '',
+    height: 120
   };
 
   componentWillMount() {
@@ -201,6 +204,99 @@ import { connectActionSheet } from '@expo/react-native-action-sheet';
     }
   }
 
+  async migrate() {
+    console.log('migrate');
+
+    /*
+    this.setState({ log: 'Start\n' });
+    await AsyncStorage.getAllKeys((err, keys) => {
+      AsyncStorage.multiGet(keys, (err, stores) => {
+        stores.map((result, i, store) => {
+          let key = store[i][0];
+          let value = store[i][1];
+          console.log("[Existing]" + key + ":" + value);
+          this.setState({ log: this.state.log + "\n[Existing]" + key + ":" + value });
+        });
+      });
+    });
+
+    await LegacyAsyncStorage.getAllKeys((err, keys) => {
+      LegacyAsyncStorage.multiGet(keys, (err, stores) => {
+        stores.map((result, i, store) => {
+          // get at each store's key/value so you can work with it
+          let key = store[i][0];
+          let value = store[i][1];
+          console.log("[OLD]" + key + ":" + value);
+          this.setState({ log: this.state.log + "\n[Old]" + key + ":" + value });
+
+          AsyncStorage.getItem(key, (err, newData) => {
+            if (err || !newData) {
+              newData = "{}";
+            }
+            console.log("[NEW]" + key + ":" + newData);
+            AsyncStorage.setItem(key, value, () => {
+              AsyncStorage.mergeItem(key, newData, () => {
+                AsyncStorage.getItem(key, (err, result) => {
+                  console.log("[MERGED]" + key + ":" + result);
+                  this.setState({ log: this.state.log + "\n[MERGED]" + key + ":" + value });
+                });
+              });
+            });
+          });
+        });
+
+        Alert.alert("Complete", "Please check your notes, if not working, please send us feedback");
+      });
+    });*/
+
+    this.setState({ log: 'Start' });
+    await LegacyAsyncStorage.migrateItems([key]);
+
+    var key = 'ANSWER';
+
+    LegacyAsyncStorage.getItem(key, (err, oldData) => {
+      if (err || !oldData) {
+        oldData = "{}";
+      }
+      console.log("[OLD]" + key + ":" + oldData);
+      this.setState({ log: this.state.log + "\n[OLD]" + key + ":" + oldData });
+
+      AsyncStorage.getItem(key, (err, newData) => {
+        if (err || !newData) {
+          newData = "{}";
+        }
+        console.log("[NEW]" + key + ":" + newData);
+        this.setState({ log: this.state.log + "\n[NEW]" + key + ":" + newData });
+
+        AsyncStorage.setItem(key, oldData, () => {
+          AsyncStorage.mergeItem(key, newData, () => {
+            AsyncStorage.getItem(key, (err, mergedData) => {
+              console.log("[MERGED]" + key + ":" + mergedData);
+              this.setState({ log: this.state.log + "\n[MERGED]" + key + ":" + mergedData });
+              this.setState({ log: this.state.log + "\nFinished!" });
+            });
+          });
+        });
+      });
+
+    });
+  }
+
+  contentSize = null;
+
+  onContentSizeChange(e) {
+    const contentSize = e.nativeEvent.contentSize;
+    console.log(JSON.stringify(contentSize));
+
+    // Support earlier versions of React Native on Android.
+    if (!contentSize) return;
+
+    if (!this.contentSize || this.contentSize.height !== contentSize.height) {
+      this.contentSize = contentSize;
+      this.setState({ height: this.contentSize.height + 14 });
+    }
+  }
+
   render() {
     const { manifest } = Constants;
     let keyIndex = 0;
@@ -272,6 +368,27 @@ import { connectActionSheet } from '@expo/react-native-action-sheet';
               onPress={this.checkForUpdate.bind(this)}
             />
           </SettingsList>
+          {
+            Platform.OS == 'ios' &&
+            <View>
+              <Text style={{ color: 'red', fontSize: 16, fontWeight: 'bold', margin: 5 }}>11/13 Notice: After the recent app update, you'll not see your notes, please do not uninstall the app (your data is not lost), we're working on a fix to bring your notes back</Text>
+              <View style={{ alignItems: 'center' }}>
+                <RkButton onPress={this.migrate.bind(this)}>Try fix1</RkButton>
+                <View style={{ height: this.state.height, width: Dimensions.get('window').width, marginBottom: 200 }}>
+                  <TextInput
+                    style={{ borderWidth: 1 }}
+                    ref='answer'
+                    editable={false}
+                    blurOnSubmit={false}
+                    multiline
+                    value={this.state.log}
+                    onChange={(e) => this.onContentSizeChange(e)}
+                    onContentSizeChange={(e) => this.onContentSizeChange(e)}
+                  />
+                </View>
+              </View>
+            </View>
+          }
         </ScrollView>
       </KeyboardAvoidingView>
     );

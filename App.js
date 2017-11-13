@@ -13,6 +13,7 @@ import { Models } from './dataStorage/models';
 import LoginUI from './components/LoginUI';
 import { getCurrentUser } from './store/user';
 import { ActionSheetProvider } from '@expo/react-native-action-sheet';
+import { LegacyAsyncStorage } from 'expo';
 
 let store;
 
@@ -28,6 +29,9 @@ export default class App extends React.Component {
 
   async loadApp() {
     try {
+      // migrate data from Sdk15
+      await LegacyAsyncStorage.migrateItems(['ANSWER']);
+
       // initialize existing user
       await getCurrentUser().loadExistingUserAsync();
       // TODO: [Wei] Workaround for now

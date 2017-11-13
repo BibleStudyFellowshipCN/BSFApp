@@ -19,7 +19,6 @@ import Colors from '../constants/Colors'
 import { requestBooks } from "../store/books.js";
 import { getI18nText, getI18nBibleBook } from '../store/I18n';
 import { RkButton } from 'react-native-ui-kitten';
-import { LegacyAsyncStorage } from 'expo';
 
 class HomeScreen extends React.Component {
   static route = {
@@ -42,37 +41,6 @@ class HomeScreen extends React.Component {
     this.props.navigation.getNavigator('root').push('lesson', { lesson });
   }
 
-  async migrate() {
-    const keys = [];
-    await LegacyAsyncStorage.getAllKeys((err, keys) => {
-      LegacyAsyncStorage.multiGet(keys, (err, stores) => {
-        stores.map((result, i, store) => {
-          // get at each store's key/value so you can work with it
-          let key = store[i][0];
-          let value = store[i][1];
-          console.log("[OLD]" + key + ":" + value);
-
-          AsyncStorage.getItem(key, (err, newData) => {
-            if (err || !newData) {
-              newData = "{}";
-            }
-            console.log("[NEW]" + key + ":" + newData);
-            AsyncStorage.setItem(key, value, () => {
-              AsyncStorage.mergeItem(key, newData, () => {
-                AsyncStorage.getItem(key, (err, result) => {
-                  console.log("[MERGED]" + key + ":" + result);
-                  keys.push(key);
-                });
-              });
-            });
-          });
-        });
-
-        Alert.alert("Complete", "Please check your notes, if not working, please send us feedback");
-      });
-    });
-  }
-
   render() {
     mainUI = null
     if (this.props.booklist != undefined) {
@@ -92,15 +60,6 @@ class HomeScreen extends React.Component {
           style={styles.container}
           contentContainerStyle={styles.contentContainer}>
           <View style={styles.booksContainer}>
-            {
-              Platform.OS == 'ios' &&
-              <View>
-                <Text style={{ color: 'red', fontSize: 16, fontWeight: 'bold', margin: 5 }}>11/13 Notice: After the recent app update, you'll not see your notes, please do not uninstall the app (your data is not lost), we're working on a fix to bring your notes back</Text>
-                <View style={{ flexDirection: 'row' }}>
-                  <RkButton onPress={this.migrate.bind(this)}>Try fix1</RkButton>
-                </View>
-              </View>
-            }
             {mainUI}
           </View>
         </ScrollView>
