@@ -9,6 +9,7 @@ import {
   Text,
   TouchableOpacity,
   View,
+  Platform,
 } from 'react-native';
 import Accordion from 'react-native-collapsible/Accordion';
 import { MonoText } from '../components/StyledText';
@@ -52,6 +53,10 @@ class HomeScreen extends React.Component {
 
     return (
       <View style={styles.container}>
+        {
+          Platform.OS == 'ios' &&
+          <Text style={{ color: 'red', fontSize: 16 }}>11/13 Notice: After the recent app update, you'll not see your answers, please do not uninstall the app, we're working on a fix to bring your answers back</Text>
+        }
         <ScrollView
           style={styles.container}
           contentContainerStyle={styles.contentContainer}>
