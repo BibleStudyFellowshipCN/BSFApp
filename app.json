@@ -15,11 +15,15 @@
     },
     "ios": {
       "bundleIdentifier": "org.CBSF.bsfclass",
-      "supportsTablet": true
+      "supportsTablet": true,
+      "loadJSInBackgroundExperimental": true
     },
     "android": {
       "package": "org.cbsfappv1.bsfclass",
-      "versionCode": 4
+      "permissions": [
+        "WAKE_LOCK"
+      ],
+      "versionCode": 5
     }
   }
 }
