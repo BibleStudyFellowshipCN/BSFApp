@@ -250,11 +250,23 @@ import { LegacyAsyncStorage } from 'expo';
     });*/
 
     this.setState({ log: 'Start' });
-    await LegacyAsyncStorage.migrateItems([key]);
+    LegacyAsyncStorage.multiGet(['ANSWER'], (err, stores) => {
+      stores.map((result, i, store) => {
+        // get at each store's key/value so you can work with it
+        let key = store[i][0];
+        let value = store[i][1];
+        this.setState({ log: this.state.log + "\n[LIST]" + key + ":" + value });
+      });
+    });
 
     var key = 'ANSWER';
+    await LegacyAsyncStorage.migrateItems([key], { force: true });
 
     LegacyAsyncStorage.getItem(key, (err, oldData) => {
+      if (err) {
+        this.setState({ log: this.state.log + "\n[OLD]" + err });
+      }
+
       if (err || !oldData) {
         oldData = "{}";
       }
@@ -371,12 +383,12 @@ import { LegacyAsyncStorage } from 'expo';
           {
             Platform.OS == 'ios' &&
             <View>
-              <Text style={{ color: 'red', fontSize: 16, fontWeight: 'bold', margin: 5 }}>11/13 Notice: After the recent app update, you'll not see your notes, please do not uninstall the app (your data is not lost), we're working on a fix to bring your notes back</Text>
-              <View style={{ alignItems: 'center' }}>
+              <Text style={{ color: 'red', fontSize: 16, fontWeight: 'normal', margin: 10 }}>11/13 Notice: If you update app recently, you'll not see your answers (it's not lost, we had trouble reading them), we filed a bug on Expo, they're working on a fix, ETA 11/25.</Text>
+              {/*<View style={{ alignItems: 'center' }}>
                 <RkButton onPress={this.migrate.bind(this)}>Try fix1</RkButton>
                 <View style={{ height: this.state.height, width: Dimensions.get('window').width, marginBottom: 200 }}>
                   <TextInput
-                    style={{ borderWidth: 1 }}
+                    style={styles.answerInput}
                     ref='answer'
                     editable={false}
                     blurOnSubmit={false}
@@ -386,7 +398,7 @@ import { LegacyAsyncStorage } from 'expo';
                     onContentSizeChange={(e) => this.onContentSizeChange(e)}
                   />
                 </View>
-              </View>
+              </View>*/}
             </View>
           }
         </ScrollView>

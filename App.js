@@ -30,7 +30,7 @@ export default class App extends React.Component {
   async loadApp() {
     try {
       // migrate data from Sdk15
-      await LegacyAsyncStorage.migrateItems(['ANSWER']);
+      //await LegacyAsyncStorage.migrateItems(['ANSWER']);
 
       // initialize existing user
       await getCurrentUser().loadExistingUserAsync();
