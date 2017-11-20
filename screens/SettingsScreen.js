@@ -1,8 +1,6 @@
-
 import React from 'react';
 import { connect } from 'react-redux'
-import Layout from '../constants/Layout';
-import { ScrollView, StyleSheet, Image, Text, View, Alert, TextInput, TouchableOpacity, KeyboardAvoidingView, Platform, Keyboard, UIManager } from 'react-native';
+import { ScrollView, StyleSheet, Image, Text, View, Alert, TextInput, TouchableOpacity, KeyboardAvoidingView, Platform, Keyboard, UIManager, AsyncStorage, Dimensions } from 'react-native';
 import Expo, { Constants } from 'expo';
 import { Models } from '../dataStorage/models';
 import { clearStorageAsync, callWebServiceAsync, showWebServiceCallErrorsAsync } from '../dataStorage/storage';
@@ -15,20 +13,22 @@ import { clearLesson } from '../store/lessons.js'
 import { clearPassage } from '../store/passage.js'
 import { RkButton } from 'react-native-ui-kitten';
 import { connectActionSheet } from '@expo/react-native-action-sheet';
+import { NavigationActions } from 'react-navigation'
 
 @connectActionSheet class SettingsScreen extends React.Component {
-  static route = {
-    navigationBar: {
-      title(params) {
-        return getI18nText('我');
-      }
-    },
+  static navigationOptions = ({ navigation }) => {
+    title = navigation.state.params && navigation.state.params.title ? navigation.state.params.title : '我';
+    return {
+      title: getI18nText(title)
+    };
   };
 
   state = {
     language: getCurrentUser().getLanguageDisplayName(),
     bibleVersion: getCurrentUser().getBibleVersionDisplayName(),
-    offlineMode: getCurrentUser().getIsOfflineMode()
+    offlineMode: getCurrentUser().getIsOfflineMode(),
+    log: '',
+    height: 120
   };
 
   componentWillMount() {
@@ -66,14 +66,15 @@ import { connectActionSheet } from '@expo/react-native-action-sheet';
       // Also set the bible version based on language selection
       this.updateBibleVersionBasedOnLanguage(language);
 
-      this.props.navigator.updateCurrentRouteParams({ title: getI18nText('我') });
       this.props.clearLesson();
       this.props.requestBooks(language);
       this.setState({ language: getCurrentUser().getLanguageDisplayName() });
-      this.props.navigation.performAction(({ tabs, stacks }) => {
-        tabs('tab-navigation').jumpToTab('class');
-        tabs('tab-navigation').jumpToTab('profile');
-      });
+
+      const setParamsAction = NavigationActions.setParams({
+        params: { title: 'BSF课程' },
+        key: 'Home',
+      })
+      this.props.navigation.dispatch(setParamsAction);
     }
   }
 
@@ -172,7 +173,7 @@ import { connectActionSheet } from '@expo/react-native-action-sheet';
   }
 
   getVersionNumber(version) {
-    // version is "a.b.c"
+    // version is "a.b.c.d"
     let versionNumbers = version.split(".");
     let value = 0;
     for (i in versionNumbers) {
@@ -190,7 +191,7 @@ import { connectActionSheet } from '@expo/react-native-action-sheet';
       const serverVersion = this.getVersionNumber(result.body.version);
       console.log('checkForUpdate:' + clientVersion + '-' + serverVersion);
       if (clientVersion < serverVersion) {
-        Alert.alert(getI18nText('发现更新') + ': ' + manifest.version, getI18nText('程序将重新启动'), [
+        Alert.alert(getI18nText('发现更新') + ': ' + result.body.version, getI18nText('程序将重新启动'), [
           { text: 'OK', onPress: () => Expo.Util.reload() },
         ]);
       } else {
@@ -198,6 +199,69 @@ import { connectActionSheet } from '@expo/react-native-action-sheet';
           { text: 'OK', onPress: () => { } },
         ]);
       }
+    }
+  }
+
+  async migrate() {
+    console.log('migrate');
+
+    this.setState({ log: 'Start' });
+    LegacyAsyncStorage.multiGet(['ANSWER'], (err, stores) => {
+      stores.map((result, i, store) => {
+        // get at each store's key/value so you can work with it
+        let key = store[i][0];
+        let value = store[i][1];
+        this.setState({ log: this.state.log + "\n[LIST]" + key + ":" + value });
+      });
+    });
+
+    var key = 'ANSWER';
+    await LegacyAsyncStorage.migrateItems([key], { force: true });
+
+    LegacyAsyncStorage.getItem(key, (err, oldData) => {
+      if (err) {
+        this.setState({ log: this.state.log + "\n[OLD]" + err });
+      }
+
+      if (err || !oldData) {
+        oldData = "{}";
+      }
+      console.log("[OLD]" + key + ":" + oldData);
+      this.setState({ log: this.state.log + "\n[OLD]" + key + ":" + oldData });
+
+      AsyncStorage.getItem(key, (err, newData) => {
+        if (err || !newData) {
+          newData = "{}";
+        }
+        console.log("[NEW]" + key + ":" + newData);
+        this.setState({ log: this.state.log + "\n[NEW]" + key + ":" + newData });
+
+        AsyncStorage.setItem(key, oldData, () => {
+          AsyncStorage.mergeItem(key, newData, () => {
+            AsyncStorage.getItem(key, (err, mergedData) => {
+              console.log("[MERGED]" + key + ":" + mergedData);
+              this.setState({ log: this.state.log + "\n[MERGED]" + key + ":" + mergedData });
+              this.setState({ log: this.state.log + "\nFinished!" });
+            });
+          });
+        });
+      });
+
+    });
+  }
+
+  contentSize = null;
+
+  onContentSizeChange(e) {
+    const contentSize = e.nativeEvent.contentSize;
+    console.log(JSON.stringify(contentSize));
+
+    // Support earlier versions of React Native on Android.
+    if (!contentSize) return;
+
+    if (!this.contentSize || this.contentSize.height !== contentSize.height) {
+      this.contentSize = contentSize;
+      this.setState({ height: this.contentSize.height + 14 });
     }
   }
 
@@ -222,56 +286,78 @@ import { connectActionSheet } from '@expo/react-native-action-sheet';
               });
             }
           }}>
-
-          <SettingsList borderColor='#c8c7cc' defaultItemSize={40}>
-            <SettingsList.Header headerText={getI18nText('设置')} headerStyle={{ color: 'black' }} />
-            <SettingsList.Item
-              title={getI18nText('显示语言')}
-              titleInfo={this.state.language}
-              titleInfoStyle={styles.titleInfoStyle}
-              onPress={this.onLanguage.bind(this)}
-            />
-            <SettingsList.Item
-              title={getI18nText('圣经版本')}
-              titleInfo={this.state.bibleVersion}
-              titleInfoStyle={styles.titleInfoStyle}
-              onPress={this.onBibleVerse.bind(this)}
-            />
-            <SettingsList.Item
-              title={getI18nText('离线模式')}
-              hasNavArrow={false}
-              hasSwitch={true}
-              switchState={this.state.offlineMode}
-              switchOnValueChange={this.onSwitchOffline.bind(this)}
-            />
-            {/*<SettingsList.Item
+          <View style={{ backgroundColor: 'white' }}>
+            <SettingsList borderColor='#c8c7cc' defaultItemSize={40}>
+              <SettingsList.Header headerText={getI18nText('设置')} headerStyle={{ color: 'black' }} />
+              <SettingsList.Item
+                title={getI18nText('显示语言')}
+                titleInfo={this.state.language}
+                titleInfoStyle={styles.titleInfoStyle}
+                onPress={this.onLanguage.bind(this)}
+              />
+              <SettingsList.Item
+                title={getI18nText('圣经版本')}
+                titleInfo={this.state.bibleVersion}
+                titleInfoStyle={styles.titleInfoStyle}
+                onPress={this.onBibleVerse.bind(this)}
+              />
+              <SettingsList.Item
+                title={getI18nText('离线模式')}
+                hasNavArrow={false}
+                hasSwitch={true}
+                switchState={this.state.offlineMode}
+                switchOnValueChange={this.onSwitchOffline.bind(this)}
+              />
+              {/*<SettingsList.Item
             title='字体大小'
             titleInfo='中等'
             titleInfoStyle={styles.titleInfoStyle}
             onPress={this.onFontSize.bind(this)}
           />*/}
-            <SettingsList.Header headerText={getI18nText('反馈意见')} headerStyle={{ color: 'black', marginTop: 15 }} />
-            {/*<SettingsList.Header headerText='MBSF - Mobile Bible Study Fellowship' headerStyle={{ color: 'black', marginTop: 15 }} />*/}
-            <View style={styles.answerContainer}>
-              <TextInput
-                style={styles.answerInput}
-                ref={(input) => this.feedbackInput = input}
-                blurOnSubmit={false}
-                placeholder={getI18nText('反馈意见')}
-                multiline
-                onChangeText={(text) => { this.feedback = text }}
+              <SettingsList.Header headerText={getI18nText('反馈意见')} headerStyle={{ color: 'black', marginTop: 15 }} />
+              {/*<SettingsList.Header headerText='MBSF - Mobile Bible Study Fellowship' headerStyle={{ color: 'black', marginTop: 15 }} />*/}
+              <View style={styles.answerContainer}>
+                <TextInput
+                  style={styles.answerInput}
+                  ref={(input) => this.feedbackInput = input}
+                  blurOnSubmit={false}
+                  placeholder={getI18nText('反馈意见')}
+                  multiline
+                  onChangeText={(text) => { this.feedback = text }}
+                />
+              </View>
+              <View style={{ alignItems: 'center' }}>
+                <RkButton onPress={this.onSubmitFeedback.bind(this)}>{getI18nText('提交')}</RkButton>
+              </View>
+              <SettingsList.Item
+                title={getI18nText('版本') + ': ' + manifest.version}
+                titleInfo={getI18nText('检查更新')}
+                titleInfoStyle={styles.titleInfoStyle}
+                onPress={this.checkForUpdate.bind(this)}
               />
-            </View>
-            <View style={{ alignItems: 'center' }}>
-              <RkButton onPress={this.onSubmitFeedback.bind(this)}>{getI18nText('提交')}</RkButton>
-            </View>
-            <SettingsList.Item
-              title={getI18nText('版本') + ': ' + manifest.version}
-              titleInfo={getI18nText('检查更新')}
-              titleInfoStyle={styles.titleInfoStyle}
-              onPress={this.checkForUpdate.bind(this)}
-            />
-          </SettingsList>
+            </SettingsList>
+            {
+              Platform.OS == 'ios' &&
+              <View>
+                <Text style={{ color: 'red', fontSize: 16, fontWeight: 'normal', margin: 10 }}>11/13 Notice: If you updated app recently, you'll not see your answers (it's not lost), we're working with Expo team with a fix, ETA 11/25.</Text>
+                {/*<View style={{ alignItems: 'center' }}>
+                <RkButton onPress={this.migrate.bind(this)}>Try fix1</RkButton>
+                <View style={{ height: this.state.height, width: Dimensions.get('window').width, marginBottom: 200 }}>
+                  <TextInput
+                    style={styles.answerInput}
+                    ref='answer'
+                    editable={false}
+                    blurOnSubmit={false}
+                    multiline
+                    value={this.state.log}
+                    onChange={(e) => this.onContentSizeChange(e)}
+                    onContentSizeChange={(e) => this.onContentSizeChange(e)}
+                  />
+                </View>
+              </View>*/}
+              </View>
+            }
+          </View>
         </ScrollView>
       </KeyboardAvoidingView>
     );

@@ -8,7 +8,7 @@ import {
   Picker,
   Slider
 } from 'react-native';
-import Expo, { Audio } from 'expo';
+import Expo, { Audio, KeepAwake } from 'expo';
 import { getI18nText, getI18nBibleBook } from '../store/I18n';
 import { getCurrentUser } from '../store/user';
 import { FontAwesome } from '@expo/vector-icons';
@@ -26,46 +26,72 @@ export default class AudioBibleScreen extends React.Component {
 
   constructor(props) {
     super(props);
+
+    const bookId = parseInt(getCurrentUser().getAudioBibleBook() / 1000);
+    let book = audioBookId.find((element) => (element.id == bookId));
     this.state = {
-      chapter: 1,
+      currentBook: bookId,
+      currentChapter: parseInt(getCurrentUser().getAudioBibleBook() % 1000),
+      totalChapter: book.chapters,
       isPlaying: false,
       isPaused: false,
       isLoading: false,
       isLoaded: false,
-      position: 0,
       duration: 0,
       progress: 0
     };
+    console.log("Init state: " + JSON.stringify(this.state));
   }
 
   isSeeking = false;
 
   componentDidMount() {
     Audio.setIsEnabledAsync(true);
-    this._onBookSelected(1);
   }
 
   componentDidUpdate() {
     //this.props.navigator.updateCurrentRouteParams({ title: getI18nText('有声圣经') });
   }
 
-  _resetAudio = async () => {
-    if (this.sound != null) {
-      await this.sound.stopAsync();
-      await this.sound.unloadAsync();
-      this.setState({ isLoaded: false, isPlaying: false, isPaused: false, position: 0, duration: 0, progress: 0 });
-      console.log('reset');
-      this.sound = null;
+  async _resetAudio() {
+    if (this.sound) {
+      if (this.state.isPlaying) {
+        await this.sound.stopAsync();
+      }
+      if (this.state.isLoaded) {
+        await this.sound.unloadAsync();
+      }
     }
+    this.setState({ isLoaded: false, isPlaying: false, isPaused: false, duration: 0, progress: 0 });
+    console.log('reset');
   }
 
-  _callback = status => {
-    if (status.isLoaded) {
+  async onPlaybackStatusUpdate(status) {
+    console.log(JSON.stringify(status));
+    if (status.didJustFinish || status.progress == 1) {
+      console.log('didJustFinish ' + this.state.currentChapter);
+      await this.sound.unloadAsync();
+      this.setState({ isLoaded: false });
+
+      var newBook = 1;
+      var newChapter = 1;
+      if (this.state.currentChapter < this.state.totalChapter) {
+        // play next chapter
+        newChapter = this.state.currentChapter + 1;
+      } else if (this.state.currentBook < 66) {
+        // play next book
+        newBook = this.state.currentBook + 1;
+      }
+
+      this.setState({ currentBook: newBook, currentChapter: newChapter });
+      await getCurrentUser().setAudioBibleBook(newBook * 1000 + newChapter);
+      await this.sound.loadAsync({ uri: this.getAudioUrl() });
+      await this.sound.playAsync();
+    } else if (status.isLoaded) {
       this.setState({
         isLoaded: true,
         progress: status.positionMillis / status.durationMillis,
-        duration: status.durationMillis,
-        position: status.positionMillis
+        duration: status.durationMillis
       });
     } else {
       if (status.error) {
@@ -74,48 +100,75 @@ export default class AudioBibleScreen extends React.Component {
     }
   };
 
+  getAudioUrl() {
+    let lang = 4; // Chinese
+    if (getCurrentUser().getLanguage() == 'eng') {
+      lang = 1; // English
+    } else if (getCurrentUser().getLanguage() == 'spa') {
+      lang = 6; // Spanish
+    }
+    let url = 'http://167.88.37.77/bsf/' + lang + '/' + this.state.currentBook + '/' + this.state.currentChapter + '.mp3';
+    console.log(url);
+    return url;
+  }
+
+  async play() {
+    if (!this.sound) {
+      try {
+        const { sound, status } = await Audio.Sound.create(
+          { uri: this.getAudioUrl() },
+          { shouldPlay: false },
+          this.onPlaybackStatusUpdate.bind(this),
+          false
+        );
+        this.sound = sound;
+      } catch (error) {
+        alert(error);
+        this.setState({ isLoading: false });
+        return;
+      }
+    }
+    else {
+      if (!this.state.isLoaded) {
+        await this.sound.loadAsync({ uri: this.getAudioUrl() });
+      }
+    }
+
+    this.sound.playFromPositionAsync(this.state.progress * this.state.duration);
+    this.setState({ isPlaying: true, isPaused: false, isLoading: false });
+    console.log('playing');
+    KeepAwake.activate();
+  }
+
+  async pause() {
+    if (this.sound) {
+      await this.sound.pauseAsync();
+    }
+
+    this.setState({ isPlaying: false, isPaused: true, isLoading: false });
+    console.log('paused');
+    KeepAwake.deactivate();
+  }
+
   async _onPlayOrPause() {
+    console.log('_onPlayOrPause');
     this.setState({ isLoading: true });
     if (!this.state.isPlaying) {
-      if (!this.sound) {
-        let lang = 4; // Chinese
-        if (getCurrentUser().getLanguage() == 'eng') {
-          lang = 1; // English
-        } else if (getCurrentUser().getLanguage() == 'spa') {
-          lang = 6; // Spanish
-        }
-        let uri = 'http://167.88.37.77/bsf/' + lang + '/' + this.state.id + '/' + this.state.currentChapter + '.mp3';
-        console.log(uri);
-        try {
-          const { sound, status } = await Audio.Sound.create(
-            { uri },
-            { shouldPlay: false },
-            this._callback
-          );
-          this.sound = sound;
-        } catch (error) {
-          alert(error);
-          this.setState({ isLoading: false });
-          return;
-        }
-      }
-
-      await this.sound.playAsync();
-      this.setState({ isPlaying: true, isPaused: false, isLoading: false });
-      console.log('playing');
+      this.play();
     } else {
-      await this.sound.pauseAsync();
-      this.setState({ isPlaying: false, isPaused: true, isLoading: false });
-      console.log('paused');
+      this.pause();
     }
   }
 
   async _onStop() {
     if (this.state.isPlaying || this.state.isPaused) {
       this.setState({ isLoading: true, isLoaded: false });
-      await this.sound.stopAsync();
-      this.setState({ isPlaying: false, isPaused: false, position: 0, progress: 0, isLoading: false });
+      if (this.sound) {
+        await this.sound.stopAsync();
+      }
+      this.setState({ isPlaying: false, isPaused: false, progress: 0, isLoading: false });
       console.log('stopped');
+      KeepAwake.deactivate();
     }
   }
 
@@ -123,8 +176,7 @@ export default class AudioBibleScreen extends React.Component {
     let book = audioBookId.find((element) => (element.id == id));
     await this._resetAudio();
     this.setState({
-      id,
-      name: book.name,
+      currentBook: id,
       currentChapter: 1,
       totalChapter: book.chapters,
     });
@@ -132,25 +184,27 @@ export default class AudioBibleScreen extends React.Component {
   }
 
   _onChapterSelected = async (chapter) => {
-    console.log(chapter);
+    console.log('_onChapterSelected:' + chapter);
     await this._resetAudio();
     this.setState({ currentChapter: chapter });
   }
 
   _onSeekSliderValueChange(value) {
-    if (this.sound && !this.isSeeking) {
+    console.log('Seeking: ' + value);
+    if (this.sound && this.isPlaying && !this.isSeeking) {
       this.isSeeking = true;
-      this.sound.pauseAsync();
     }
   }
 
   async _onSeekSliderSlidingComplete(value) {
+    console.log('SeekComplete: ' + value);
     if (this.sound != null) {
       this.isSeeking = false;
-      const seekPosition = value * this.state.duration;
-      console.log('Seek: ' + seekPosition);
-      this.setState({ progress: seekPosition });
-      this.sound.playFromPositionAsync(seekPosition);
+      this.setState({ progress: value });
+
+      if (this.state.isPlaying) {
+        await this.sound.playFromPositionAsync(value * this.state.duration);
+      }
     }
   }
 
@@ -170,8 +224,8 @@ export default class AudioBibleScreen extends React.Component {
   }
 
   render() {
-    console.log(JSON.stringify(this.state));
-    const position = this._getMMSSFromMillis(this.state.position);
+    console.log('State:' + JSON.stringify(this.state));
+    const position = this._getMMSSFromMillis(this.state.duration * this.state.progress);
     const duration = this._getMMSSFromMillis(this.state.duration);
     return (
       <View style={{
@@ -183,7 +237,7 @@ export default class AudioBibleScreen extends React.Component {
           <View style={{ width: 170 }}>
             <Picker
               style={{ alignSelf: 'stretch' }}
-              selectedValue={this.state.id}
+              selectedValue={this.state.currentBook}
               onValueChange={this._onBookSelected.bind(this)}>
               {audioBookId.map(s => (
                 <Picker.Item label={getI18nBibleBook(s.name)} value={s.id} key={s.id} />
@@ -201,14 +255,15 @@ export default class AudioBibleScreen extends React.Component {
             </Picker>
           </View>
         </View>
-        {/*<Slider
+        {/*
+        <Slider
           style={styles.playbackSlider}
           value={this.state.progress}
           onValueChange={this._onSeekSliderValueChange.bind(this)}
           onSlidingComplete={this._onSeekSliderSlidingComplete.bind(this)}
           disabled={this.state.isLoading || !this.state.isLoaded}
-        />
-        <Text>{position}/{duration}</Text>*/}
+        />*/}
+        <Text>{position}/{duration}</Text>
         <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center' }}>
           <TouchableHighlight
             underlayColor={'#FFFFFF'}
