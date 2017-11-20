@@ -339,7 +339,7 @@ import { NavigationActions } from 'react-navigation'
             {
               Platform.OS == 'ios' &&
               <View>
-                <Text style={{ color: 'red', fontSize: 16, fontWeight: 'normal', margin: 10 }}>11/13 Notice: If you update app recently, you'll not see your answers (it's not lost, we had trouble reading them), we filed a bug on Expo, they're working on a fix, ETA 11/25.</Text>
+                <Text style={{ color: 'red', fontSize: 16, fontWeight: 'normal', margin: 10 }}>11/13 Notice: If you updated app recently, you'll not see your answers (it's not lost), we're working with Expo team with a fix, ETA 11/25.</Text>
                 {/*<View style={{ alignItems: 'center' }}>
                 <RkButton onPress={this.migrate.bind(this)}>Try fix1</RkButton>
                 <View style={{ height: this.state.height, width: Dimensions.get('window').width, marginBottom: 200 }}>
