@@ -286,61 +286,61 @@ import { NavigationActions } from 'react-navigation'
               });
             }
           }}>
-
-          <SettingsList borderColor='#c8c7cc' defaultItemSize={40}>
-            <SettingsList.Header headerText={getI18nText('设置')} headerStyle={{ color: 'black' }} />
-            <SettingsList.Item
-              title={getI18nText('显示语言')}
-              titleInfo={this.state.language}
-              titleInfoStyle={styles.titleInfoStyle}
-              onPress={this.onLanguage.bind(this)}
-            />
-            <SettingsList.Item
-              title={getI18nText('圣经版本')}
-              titleInfo={this.state.bibleVersion}
-              titleInfoStyle={styles.titleInfoStyle}
-              onPress={this.onBibleVerse.bind(this)}
-            />
-            <SettingsList.Item
-              title={getI18nText('离线模式')}
-              hasNavArrow={false}
-              hasSwitch={true}
-              switchState={this.state.offlineMode}
-              switchOnValueChange={this.onSwitchOffline.bind(this)}
-            />
-            {/*<SettingsList.Item
+          <View style={{ backgroundColor: 'white' }}>
+            <SettingsList borderColor='#c8c7cc' defaultItemSize={40}>
+              <SettingsList.Header headerText={getI18nText('设置')} headerStyle={{ color: 'black' }} />
+              <SettingsList.Item
+                title={getI18nText('显示语言')}
+                titleInfo={this.state.language}
+                titleInfoStyle={styles.titleInfoStyle}
+                onPress={this.onLanguage.bind(this)}
+              />
+              <SettingsList.Item
+                title={getI18nText('圣经版本')}
+                titleInfo={this.state.bibleVersion}
+                titleInfoStyle={styles.titleInfoStyle}
+                onPress={this.onBibleVerse.bind(this)}
+              />
+              <SettingsList.Item
+                title={getI18nText('离线模式')}
+                hasNavArrow={false}
+                hasSwitch={true}
+                switchState={this.state.offlineMode}
+                switchOnValueChange={this.onSwitchOffline.bind(this)}
+              />
+              {/*<SettingsList.Item
             title='字体大小'
             titleInfo='中等'
             titleInfoStyle={styles.titleInfoStyle}
             onPress={this.onFontSize.bind(this)}
           />*/}
-            <SettingsList.Header headerText={getI18nText('反馈意见')} headerStyle={{ color: 'black', marginTop: 15 }} />
-            {/*<SettingsList.Header headerText='MBSF - Mobile Bible Study Fellowship' headerStyle={{ color: 'black', marginTop: 15 }} />*/}
-            <View style={styles.answerContainer}>
-              <TextInput
-                style={styles.answerInput}
-                ref={(input) => this.feedbackInput = input}
-                blurOnSubmit={false}
-                placeholder={getI18nText('反馈意见')}
-                multiline
-                onChangeText={(text) => { this.feedback = text }}
+              <SettingsList.Header headerText={getI18nText('反馈意见')} headerStyle={{ color: 'black', marginTop: 15 }} />
+              {/*<SettingsList.Header headerText='MBSF - Mobile Bible Study Fellowship' headerStyle={{ color: 'black', marginTop: 15 }} />*/}
+              <View style={styles.answerContainer}>
+                <TextInput
+                  style={styles.answerInput}
+                  ref={(input) => this.feedbackInput = input}
+                  blurOnSubmit={false}
+                  placeholder={getI18nText('反馈意见')}
+                  multiline
+                  onChangeText={(text) => { this.feedback = text }}
+                />
+              </View>
+              <View style={{ alignItems: 'center' }}>
+                <RkButton onPress={this.onSubmitFeedback.bind(this)}>{getI18nText('提交')}</RkButton>
+              </View>
+              <SettingsList.Item
+                title={getI18nText('版本') + ': ' + manifest.version}
+                titleInfo={getI18nText('检查更新')}
+                titleInfoStyle={styles.titleInfoStyle}
+                onPress={this.checkForUpdate.bind(this)}
               />
-            </View>
-            <View style={{ alignItems: 'center' }}>
-              <RkButton onPress={this.onSubmitFeedback.bind(this)}>{getI18nText('提交')}</RkButton>
-            </View>
-            <SettingsList.Item
-              title={getI18nText('版本') + ': ' + manifest.version}
-              titleInfo={getI18nText('检查更新')}
-              titleInfoStyle={styles.titleInfoStyle}
-              onPress={this.checkForUpdate.bind(this)}
-            />
-          </SettingsList>
-          {
-            Platform.OS == 'ios' &&
-            <View>
-              <Text style={{ color: 'red', fontSize: 16, fontWeight: 'normal', margin: 10 }}>11/13 Notice: If you update app recently, you'll not see your answers (it's not lost, we had trouble reading them), we filed a bug on Expo, they're working on a fix, ETA 11/25.</Text>
-              {/*<View style={{ alignItems: 'center' }}>
+            </SettingsList>
+            {
+              Platform.OS == 'ios' &&
+              <View>
+                <Text style={{ color: 'red', fontSize: 16, fontWeight: 'normal', margin: 10 }}>11/13 Notice: If you update app recently, you'll not see your answers (it's not lost, we had trouble reading them), we filed a bug on Expo, they're working on a fix, ETA 11/25.</Text>
+                {/*<View style={{ alignItems: 'center' }}>
                 <RkButton onPress={this.migrate.bind(this)}>Try fix1</RkButton>
                 <View style={{ height: this.state.height, width: Dimensions.get('window').width, marginBottom: 200 }}>
                   <TextInput
@@ -355,8 +355,9 @@ import { NavigationActions } from 'react-navigation'
                   />
                 </View>
               </View>*/}
-            </View>
-          }
+              </View>
+            }
+          </View>
         </ScrollView>
       </KeyboardAvoidingView>
     );
