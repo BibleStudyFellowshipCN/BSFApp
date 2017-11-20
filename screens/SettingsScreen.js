@@ -173,7 +173,7 @@ import { NavigationActions } from 'react-navigation'
   }
 
   getVersionNumber(version) {
-    // version is "a.b.c"
+    // version is "a.b.c.d"
     let versionNumbers = version.split(".");
     let value = 0;
     for (i in versionNumbers) {
@@ -204,48 +204,6 @@ import { NavigationActions } from 'react-navigation'
 
   async migrate() {
     console.log('migrate');
-
-    /*
-    this.setState({ log: 'Start\n' });
-    await AsyncStorage.getAllKeys((err, keys) => {
-      AsyncStorage.multiGet(keys, (err, stores) => {
-        stores.map((result, i, store) => {
-          let key = store[i][0];
-          let value = store[i][1];
-          console.log("[Existing]" + key + ":" + value);
-          this.setState({ log: this.state.log + "\n[Existing]" + key + ":" + value });
-        });
-      });
-    });
-
-    await LegacyAsyncStorage.getAllKeys((err, keys) => {
-      LegacyAsyncStorage.multiGet(keys, (err, stores) => {
-        stores.map((result, i, store) => {
-          // get at each store's key/value so you can work with it
-          let key = store[i][0];
-          let value = store[i][1];
-          console.log("[OLD]" + key + ":" + value);
-          this.setState({ log: this.state.log + "\n[Old]" + key + ":" + value });
-
-          AsyncStorage.getItem(key, (err, newData) => {
-            if (err || !newData) {
-              newData = "{}";
-            }
-            console.log("[NEW]" + key + ":" + newData);
-            AsyncStorage.setItem(key, value, () => {
-              AsyncStorage.mergeItem(key, newData, () => {
-                AsyncStorage.getItem(key, (err, result) => {
-                  console.log("[MERGED]" + key + ":" + result);
-                  this.setState({ log: this.state.log + "\n[MERGED]" + key + ":" + value });
-                });
-              });
-            });
-          });
-        });
-
-        Alert.alert("Complete", "Please check your notes, if not working, please send us feedback");
-      });
-    });*/
 
     this.setState({ log: 'Start' });
     LegacyAsyncStorage.multiGet(['ANSWER'], (err, stores) => {

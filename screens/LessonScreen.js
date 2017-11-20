@@ -11,6 +11,7 @@ import {
   TouchableOpacity,
   View,
   KeyboardAvoidingView,
+  Dimensions
 } from 'react-native';
 import ScrollableTabView from 'react-native-scrollable-tab-view'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
@@ -23,7 +24,8 @@ import { getI18nText, getI18nBibleBook } from '../store/I18n';
 class LessonScreen extends React.Component {
   static navigationOptions = ({ navigation }) => {
     return {
-      title: navigation.state.params && navigation.state.params.title ? navigation.state.params.title : ''
+      title: navigation.state.params && navigation.state.params.title ? navigation.state.params.title : '',
+      headerRight: <ExportAnswer lessonId={navigation.state.params.lesson.id} />
     };
   };
 
@@ -141,7 +143,11 @@ const BSFQuestion = (props) => (
     <QuestionText>
       {props.question.questionText}
     </QuestionText>
-    <View style={styles.row}>
+    <View style={{
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+      maxWidth: Dimensions.get('window').width - 10
+    }}>
       {props.question.quotes.map(quote => (
         <BibleQuote key={quote.book + quote.verse} book={quote.book} verse={quote.verse} goToPassage={props.goToPassage} />
       ))}
@@ -243,10 +249,5 @@ const styles = StyleSheet.create({
     borderColor: Colors.yellow,
     borderRadius: 8,
     color: Colors.yellow
-  },
-  row: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    maxWidth: Layout.window.width - 30
   }
 });

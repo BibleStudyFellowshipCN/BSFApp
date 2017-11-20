@@ -5,10 +5,10 @@ import {
   TextInput,
   View,
   Text,
-  TouchableOpacity
+  TouchableOpacity,
+  Dimensions
 } from 'react-native';
 import { updateAnswer } from '../store/answers'
-import Layout from '../constants/Layout';
 
 class Answer extends React.Component {
   state = {
@@ -60,7 +60,7 @@ class Answer extends React.Component {
             style={{
               position: 'absolute',
               height,
-              width: Layout.window.width,
+              width: Dimensions.get('window').width,
               backgroundColor: 'rgba(0, 0, 0, 0.05)' // 'transparent'
             }}
             onPress={() => {

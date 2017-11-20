@@ -8,6 +8,7 @@ import { loadAsync } from './dataStorage/storage';
 import { Models } from './dataStorage/models';
 import { Provider } from 'react-redux';
 import { ActionSheetProvider } from '@expo/react-native-action-sheet';
+import { getCurrentUser } from './store/user';
 
 let store;
 
@@ -55,7 +56,6 @@ export default class App extends React.Component {
       }),
     ]);
 
-    // add all the neccessary load in Promise.all
     let bootValues = await Promise.all([
       loadAsync(Models.Book, '', true),
       loadAsync(Models.Answer, null, false)
@@ -68,6 +68,30 @@ export default class App extends React.Component {
     }
     console.log("Load answers: " + JSON.stringify(initialstate.answers));
     store = createStore(initialstate);
+
+    // initialize existing user
+    await getCurrentUser().loadExistingUserAsync();
+    // TODO: [Wei] Workaround for now
+    if (!getCurrentUser().isLoggedOn()) {
+      let locale = await Expo.Util.getCurrentLocaleAsync();
+      console.log(locale);
+      let lang = 'chs';
+      let bible = 'rcuvss';
+      if (locale.substring(0, 2) == 'es') {
+        lang = 'spa';
+        bible = 'niv2011';
+      } else if (locale.substring(0, 2) == 'en') {
+        lang = 'eng';
+        bible = 'niv2011';
+      } else if (locale == 'zh-hk' || locale == 'zh-tw') {
+        lang = 'cht';
+        bible = 'rcuvts';
+      }
+
+      await getCurrentUser().loginAsync("4250000000", lang);
+      await getCurrentUser().setBibleVersionAsync(bible);
+    }
+    getCurrentUser().logUserInfo();    // add all the neccessary load in Promise.all
   };
 
   _handleLoadingError = error => {

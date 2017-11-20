@@ -134,7 +134,7 @@ export default class User {
     if (!this.isLoggedOn()) {
       return;
     }
-    this.offlineMode = value
+    this.offlineMode = value;
     await saveUserAsync(this.getUserInfo());
     this.logUserInfo();
   }
@@ -143,6 +143,7 @@ export default class User {
     if (!this.isLoggedOn()) {
       return;
     }
+    console.log('setLanguageAsync:', language);
     this.language = language;
     await saveUserAsync(this.getUserInfo());
     this.logUserInfo();

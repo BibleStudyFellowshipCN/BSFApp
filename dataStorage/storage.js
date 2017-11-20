@@ -1,4 +1,4 @@
-import { AsyncStorage, Platform } from 'react-native';
+import { Alert, AsyncStorage, Platform } from 'react-native';
 import { debounce } from 'lodash';
 import Storage from 'react-native-storage';
 import { Constants } from 'expo';
