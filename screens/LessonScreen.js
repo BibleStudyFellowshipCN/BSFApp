@@ -18,23 +18,13 @@ import { loadLesson } from '../store/lessons.js'
 import Answer from '../components/Answer'
 import ExportAnswer from '../components/ExportAnswer.js';
 import Colors from '../constants/Colors'
-import SharedStyles from '../constants/SharedStyles';
 import { getI18nText, getI18nBibleBook } from '../store/I18n';
-import Layout from '../constants/Layout';
 
 class LessonScreen extends React.Component {
-  static route = {
-    navigationBar: {
-      ...SharedStyles.navigationBarStyle,
-      title: (params) => {
-        // TODO: clean up backend api for this to work
-        const parsed = params.lesson.name.split(' ');
-        return parsed[1];
-      },
-      renderRight: (route, props) => {
-        return <ExportAnswer lessonId={route.params.lesson.id} />;
-      }
-    },
+  static navigationOptions = ({ navigation }) => {
+    return {
+      title: navigation.state.params && navigation.state.params.title ? navigation.state.params.title : ''
+    };
   };
 
   constructor() {
@@ -49,7 +39,7 @@ class LessonScreen extends React.Component {
   }
 
   goToPassage(book, verse) {
-    this.props.navigator.push('bible', { book, verse });
+    this.props.navigation.navigate('Bible', { book, verse, title: getI18nBibleBook(book) + verse });
   }
 
   render() {
@@ -174,33 +164,15 @@ const BibleQuote = (props) => (
   </View>
 )
 
-const NotesPage = (props) => (
-  <ScrollView style={styles.dayQuestionsContainer}>
-    <View style={styles.BSFQuestionContainer}>
-      <View style={styles.flowRight}>
-        <TextInput style={styles.locationInput} placeholder='课程地点' />
-        <TouchableOpacity style={styles.button} underlayColor='#99d9f4'>
-          <Text style={styles.buttonText}>签到</Text>
-        </TouchableOpacity>
-      </View>
-      <TouchableOpacity style={styles.button} underlayColor='#99d9f4'>
-        <Text style={styles.buttonText}>定位</Text>
-      </TouchableOpacity>
-      <Text style={{ marginVertical: 12, color: 'black' }}>讲道录音 - TODO by Jerry</Text>
-      <Text style={{ marginVertical: 12, color: 'black' }}>经文释义</Text>
-    </View>
-  </ScrollView>
-)
-
 const mapStateToProps = (state, ownProps) => {
   return {
-    lesson: state.lessons[ownProps.route.params.lesson.id],
+    lesson: state.lessons[ownProps.navigation.state.params.lesson.id],
   }
 };
 
 const mapDispatchToProps = (dispatch, ownProps) => {
   return {
-    loadLesson: () => dispatch(loadLesson(ownProps.route.params.lesson.id)),
+    loadLesson: () => dispatch(loadLesson(ownProps.navigation.state.params.lesson.id)),
   }
 };
 

@@ -17,12 +17,11 @@ const audioBookId = require('../assets/audioBookId.json');
 
 
 export default class AudioBibleScreen extends React.Component {
-  static route = {
-    navigationBar: {
-      title(params) {
-        return getI18nText('有声圣经');
-      }
-    },
+  static navigationOptions = ({ navigation }) => {
+    title = navigation.state.params && navigation.state.params.title ? navigation.state.params.title : '有声圣经';
+    return {
+      title: getI18nText(title)
+    };
   };
 
   constructor(props) {
@@ -51,7 +50,7 @@ export default class AudioBibleScreen extends React.Component {
   }
 
   componentDidUpdate() {
-    this.props.navigator.updateCurrentRouteParams({ title: getI18nText('有声圣经') });
+    //this.props.navigator.updateCurrentRouteParams({ title: getI18nText('有声圣经') });
   }
 
   async _resetAudio() {
