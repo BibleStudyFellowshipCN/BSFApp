@@ -127,11 +127,6 @@ import { LegacyAsyncStorage } from 'expo';
   }
 
   onBibleVerse() {
-    if (getCurrentUser().getIsOfflineMode()) {
-      Alert.alert(getI18nText("提示"), getI18nText("请先关闭离线模式"));
-      return;
-    }
-
     let options = [];
     for (var i in Models.BibleVersions) {
       const text = Models.BibleVersions[i].DisplayName;
