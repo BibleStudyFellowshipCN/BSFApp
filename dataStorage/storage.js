@@ -60,23 +60,67 @@ async function loadAsync(model, id, update) {
 
     if (model.restUri) {
         if (getCurrentUser().getIsOfflineMode()) {
+            if (model.key == Models.Lesson.key || model.key == Models.Book.key) {
+                // Load from book/lesson cache
+                let cache;
+                switch (getCurrentUser().getLanguage()) {
+                    case 'chs':
+                        cache = require("./chs.json");
+                        break;
+                    case 'cht':
+                        cache = require("./cht.json");
+                        break;
+                    case 'eng':
+                        cache = require("./eng.json");
+                        break;
+                    case 'spa':
+                        cache = require("./spa.json");
+                        break;
+                }
+                if (cache[keyString]) {
+                    console.log("[Book/Lesson] Hit from cache");
+                    return cache[keyString];
+                }
+            }
+        }
+
+        // Always load from passage cache
+        if (model.key == Models.Passage.key) {
             let cache;
-            switch (getCurrentUser().getLanguage()) {
-                case 'chs':
-                    cache = require("./chs_cache.json");
+            switch (getCurrentUser().getBibleVersion()) {
+                case 'ccb':
+                    cache = require("./ccb.json");
                     break;
-                case 'cht':
-                    cache = require("./cht_cache.json");
+                case 'cnvt':
+                    cache = require("./cnvt.json");
                     break;
-                case 'eng':
-                    cache = require("./eng_cache.json");
+                case 'esv':
+                    cache = require("./esv.json");
                     break;
-                case 'spa':
-                    cache = require("./spa_cache.json");
+                case 'kjv':
+                    cache = require("./kjv.json");
+                    break;
+                case 'niv1984':
+                    cache = require("./niv1984.json");
+                    break;
+                case 'niv2011':
+                    cache = require("./niv2011.json");
+                    break;
+                case 'nvi':
+                    cache = require("./nvi.json");
+                    break;
+                case 'rcuvss':
+                    cache = require("./rcuvss.json");
+                    break;
+                case 'rcuvts':
+                    cache = require("./rcuvts.json");
+                    break;
+                case 'rvr1995':
+                    cache = require("./rvr1995.json");
                     break;
             }
             if (cache[keyString]) {
-                console.log("[Offline mode] Hit from cache");
+                console.log("[Passage] Hit from cache");
                 return cache[keyString];
             }
         }

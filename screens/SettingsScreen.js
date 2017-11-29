@@ -14,6 +14,7 @@ import { clearPassage } from '../store/passage.js'
 import { RkButton } from 'react-native-ui-kitten';
 import { connectActionSheet } from '@expo/react-native-action-sheet';
 import { NavigationActions } from 'react-navigation'
+import { LegacyAsyncStorage } from 'expo';
 
 @connectActionSheet class SettingsScreen extends React.Component {
   static navigationOptions = ({ navigation }) => {
@@ -27,7 +28,7 @@ import { NavigationActions } from 'react-navigation'
     language: getCurrentUser().getLanguageDisplayName(),
     bibleVersion: getCurrentUser().getBibleVersionDisplayName(),
     offlineMode: getCurrentUser().getIsOfflineMode(),
-    log: '',
+    showMigration: false,
     height: 120
   };
 
@@ -39,6 +40,18 @@ import { NavigationActions } from 'react-navigation'
     this.keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', (event) => {
       this.setState({ keyboard: false })
     });
+
+    if (Platform.OS == 'ios') {
+      LegacyAsyncStorage.getItem('ANSWER', (err, oldData) => {
+        if (err || !oldData) {
+          oldData = "{}";
+        }
+        oldAnswer = JSON.parse(oldData);
+        if (oldAnswer.rawData) {
+          this.setState({ showMigration: true });
+        }
+      });
+    }
   }
 
   componentWillUnmount() {
@@ -114,11 +127,6 @@ import { NavigationActions } from 'react-navigation'
   }
 
   onBibleVerse() {
-    if (getCurrentUser().getIsOfflineMode()) {
-      Alert.alert(getI18nText("提示"), getI18nText("请先关闭离线模式"));
-      return;
-    }
-
     let options = [];
     for (var i in Models.BibleVersions) {
       const text = Models.BibleVersions[i].DisplayName;
@@ -151,6 +159,10 @@ import { NavigationActions } from 'react-navigation'
     if (value) {
       this.updateBibleVersionBasedOnLanguage(getCurrentUser().getLanguage());
     }
+  }
+
+  onFeedback() {
+    this.props.navigation.navigate('Feedback');
   }
 
   async onSubmitFeedback() {
@@ -203,47 +215,51 @@ import { NavigationActions } from 'react-navigation'
   }
 
   async migrate() {
-    console.log('migrate');
-
-    this.setState({ log: 'Start' });
-    LegacyAsyncStorage.multiGet(['ANSWER'], (err, stores) => {
-      stores.map((result, i, store) => {
-        // get at each store's key/value so you can work with it
-        let key = store[i][0];
-        let value = store[i][1];
-        this.setState({ log: this.state.log + "\n[LIST]" + key + ":" + value });
-      });
-    });
-
-    var key = 'ANSWER';
-    await LegacyAsyncStorage.migrateItems([key], { force: true });
+    const key = 'ANSWER';
+    await LegacyAsyncStorage.migrateItems([key]);
 
     LegacyAsyncStorage.getItem(key, (err, oldData) => {
-      if (err) {
-        this.setState({ log: this.state.log + "\n[OLD]" + err });
-      }
-
       if (err || !oldData) {
         oldData = "{}";
       }
-      console.log("[OLD]" + key + ":" + oldData);
-      this.setState({ log: this.state.log + "\n[OLD]" + key + ":" + oldData });
+      oldAnswer = JSON.parse(oldData);
+      if (!oldAnswer.rawData) {
+        Alert.alert("No need to recover", "We don't find any data from previous version");
+        return;
+      }
+      console.log(JSON.stringify(oldAnswer));
 
       AsyncStorage.getItem(key, (err, newData) => {
         if (err || !newData) {
           newData = "{}";
         }
-        console.log("[NEW]" + key + ":" + newData);
-        this.setState({ log: this.state.log + "\n[NEW]" + key + ":" + newData });
 
-        AsyncStorage.setItem(key, oldData, () => {
-          AsyncStorage.mergeItem(key, newData, () => {
-            AsyncStorage.getItem(key, (err, mergedData) => {
-              console.log("[MERGED]" + key + ":" + mergedData);
-              this.setState({ log: this.state.log + "\n[MERGED]" + key + ":" + mergedData });
-              this.setState({ log: this.state.log + "\nFinished!" });
-            });
-          });
+        newAnswer = JSON.parse(newData);
+        if (!newAnswer.rawData) {
+          newAnswer.rawData = {
+            answers: {}
+          };
+        }
+        console.log(JSON.stringify(newAnswer));
+
+        mergeData = JSON.parse(JSON.stringify(newAnswer));
+        for (var item in oldAnswer.rawData.answers) {
+          currentItem = oldAnswer.rawData.answers[item];
+          targetItem = mergeData.rawData.answers[item];
+          if (!targetItem) {
+            mergeData.rawData.answers[item] = currentItem;
+          } else {
+            if (targetItem.answerText.indexOf(currentItem.answerText) == -1) {
+              mergeData.rawData.answers[item].answerText += "\n" + currentItem.answerText;
+            }
+          }
+        }
+
+        console.log(JSON.stringify(mergeData));
+        AsyncStorage.setItem(key, JSON.stringify(mergeData), () => {
+          Alert.alert("Completed!", "App will restart to show the recovered answers", [
+            { text: 'OK', onPress: () => Expo.Util.reload() },
+          ]);
         });
       });
 
@@ -309,54 +325,34 @@ import { NavigationActions } from 'react-navigation'
                 switchOnValueChange={this.onSwitchOffline.bind(this)}
               />
               {/*<SettingsList.Item
-            title='字体大小'
-            titleInfo='中等'
-            titleInfoStyle={styles.titleInfoStyle}
-            onPress={this.onFontSize.bind(this)}
-          />*/}
-              <SettingsList.Header headerText={getI18nText('反馈意见')} headerStyle={{ color: 'black', marginTop: 15 }} />
-              {/*<SettingsList.Header headerText='MBSF - Mobile Bible Study Fellowship' headerStyle={{ color: 'black', marginTop: 15 }} />*/}
-              <View style={styles.answerContainer}>
-                <TextInput
-                  style={styles.answerInput}
-                  ref={(input) => this.feedbackInput = input}
-                  blurOnSubmit={false}
-                  placeholder={getI18nText('反馈意见')}
-                  multiline
-                  onChangeText={(text) => { this.feedback = text }}
-                />
-              </View>
-              <View style={{ alignItems: 'center' }}>
-                <RkButton onPress={this.onSubmitFeedback.bind(this)}>{getI18nText('提交')}</RkButton>
-              </View>
+                title='字体大小'
+                titleInfo='中等'
+                titleInfoStyle={styles.titleInfoStyle}
+                onPress={this.onFontSize.bind(this)}
+              />*/}
+              <SettingsList.Item
+                title={getI18nText('反馈意见')}
+                hasNavArrow={true}
+                titleInfoStyle={styles.titleInfoStyle}
+                onPress={this.onFeedback.bind(this)}
+              />
+              <SettingsList.Header headerText='MBSF - Mobile Bible Study Fellowship' headerStyle={{ color: 'black', marginTop: 15 }} />
               <SettingsList.Item
                 title={getI18nText('版本') + ': ' + manifest.version}
                 titleInfo={getI18nText('检查更新')}
                 titleInfoStyle={styles.titleInfoStyle}
                 onPress={this.checkForUpdate.bind(this)}
               />
+              {
+                this.state.showMigration &&
+                <SettingsList.Item
+                  title='Recover missing answers'
+                  hasNavArrow={true}
+                  titleStyle={{ color: 'red' }}
+                  onPress={this.migrate.bind(this)}
+                />
+              }
             </SettingsList>
-            {
-              Platform.OS == 'ios' &&
-              <View>
-                <Text style={{ color: 'red', fontSize: 16, fontWeight: 'normal', margin: 10 }}>11/13 Notice: If you updated app recently, you'll not see your answers (it's not lost), we're working with Expo team with a fix, ETA 11/25.</Text>
-                {/*<View style={{ alignItems: 'center' }}>
-                <RkButton onPress={this.migrate.bind(this)}>Try fix1</RkButton>
-                <View style={{ height: this.state.height, width: Dimensions.get('window').width, marginBottom: 200 }}>
-                  <TextInput
-                    style={styles.answerInput}
-                    ref='answer'
-                    editable={false}
-                    blurOnSubmit={false}
-                    multiline
-                    value={this.state.log}
-                    onChange={(e) => this.onContentSizeChange(e)}
-                    onContentSizeChange={(e) => this.onContentSizeChange(e)}
-                  />
-                </View>
-              </View>*/}
-              </View>
-            }
           </View>
         </ScrollView>
       </KeyboardAvoidingView>

@@ -6,6 +6,7 @@ import MainTabNavigator from './MainTabNavigator';
 import registerForPushNotificationsAsync from '../api/registerForPushNotificationsAsync';
 import LessonScreen from '../screens/LessonScreen';
 import BibleScreen from '../screens/BibleScreen';
+import FeedbackScreen from '../screens/FeedbackScreen';
 
 const RootStackNavigator = StackNavigator(
   {
@@ -17,6 +18,9 @@ const RootStackNavigator = StackNavigator(
     },
     Bible: {
       screen: BibleScreen
+    },
+    Feedback: {
+      screen: FeedbackScreen
     }
   },
   {

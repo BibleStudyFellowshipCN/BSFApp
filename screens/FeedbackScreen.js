@@ -1,0 +1,128 @@
+import React from 'react';
+import { ScrollView, StyleSheet, Image, Text, View, Alert, TextInput, TouchableOpacity, KeyboardAvoidingView, Platform, Keyboard, UIManager, AsyncStorage, Dimensions } from 'react-native';
+import { Models } from '../dataStorage/models';
+import { clearStorageAsync, callWebServiceAsync, showWebServiceCallErrorsAsync } from '../dataStorage/storage';
+import { getCurrentUser } from '../store/user';
+import { getI18nText } from '../store/I18n';
+import { RkButton } from 'react-native-ui-kitten';
+
+export default class FeedbackScreen extends React.Component {
+  static navigationOptions = ({ navigation }) => {
+    return {
+      title: getI18nText('反馈意见')
+    };
+  };
+
+  state = {
+    height: 120
+  };
+
+  componentWillMount() {
+    this.keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', (event) => {
+      this.keyboardHeight = event.endCoordinates.height;
+      this.setState({ keyboard: true });
+    });
+    this.keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', (event) => {
+      this.setState({ keyboard: false })
+    });
+  }
+
+  componentDidMount() {
+    this.feedbackInput.focus();
+  }
+
+  componentWillUnmount() {
+    this.keyboardDidShowListener.remove();
+    this.keyboardDidHideListener.remove();
+  }
+
+  feedback = '';
+
+  async onSubmitFeedback() {
+    if (this.feedback.trim() == '') {
+      Alert.alert(getI18nText('缺少内容'), getI18nText('请输入反馈意见内容'), [
+        { text: 'OK', onPress: () => this.feedbackInput.focus() },
+      ]);
+      return;
+    }
+
+    const body = { comment: this.feedback };
+    const result = await callWebServiceAsync(Models.Feedback.restUri, '', 'POST', [], body);
+    const succeed = await showWebServiceCallErrorsAsync(result, 201);
+    if (succeed) {
+      this.feedback = '';
+      Alert.alert(getI18nText('谢谢您的反馈意见！'), '', [
+        { text: 'OK', onPress: () => this.feedbackInput.clear() },
+      ]);
+    }
+  }
+
+  contentSize = null;
+
+  onContentSizeChange(e) {
+    const contentSize = e.nativeEvent.contentSize;
+    console.log(JSON.stringify(contentSize));
+
+    // Support earlier versions of React Native on Android.
+    if (!contentSize) return;
+
+    if (!this.contentSize || this.contentSize.height !== contentSize.height) {
+      this.contentSize = contentSize;
+      this.setState({ height: this.contentSize.height + 14 });
+    }
+  }
+
+  render() {
+    return (
+      <KeyboardAvoidingView style={styles.container} behavior='padding' keyboardVerticalOffset={0}>
+        <ScrollView
+          ref={ref => this.scrollView = ref}
+          onContentSizeChange={(contentWidth, contentHeight) => {
+            if (this.state.keyboard) {
+              const { State: TextInputState } = TextInput;
+              const currentlyFocusedField = TextInputState.currentlyFocusedField();
+              UIManager.measure(currentlyFocusedField, (originX, originY, width, height, pageX, pageY) => {
+                const bottom = pageY + height;
+                const viewHeight = Layout.window.height - this.keyboardHeight - 16;
+                if (bottom > viewHeight) {
+                  const pos = bottom - viewHeight + height;
+                  this.scrollView.scrollTo({ y: pos, animated: true });
+                }
+              });
+            }
+          }}>
+          <View style={styles.answerContainer}>
+            <TextInput
+              style={styles.answerInput}
+              ref={(input) => this.feedbackInput = input}
+              blurOnSubmit={false}
+              placeholder={getI18nText('反馈意见')}
+              multiline
+              onChangeText={(text) => { this.feedback = text }}
+            />
+          </View>
+          <View style={{ alignItems: 'center' }}>
+            <RkButton onPress={this.onSubmitFeedback.bind(this)}>{getI18nText('提交')}</RkButton>
+          </View>
+        </ScrollView>
+      </KeyboardAvoidingView>
+    );
+  }
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+  answerContainer: {
+    marginTop: 5,
+    height: 150,
+    padding: 5,
+    backgroundColor: 'whitesmoke',
+  },
+  answerInput: {
+    height: 150,
+    fontSize: 16,
+    textAlignVertical: 'top'
+  }
+});
