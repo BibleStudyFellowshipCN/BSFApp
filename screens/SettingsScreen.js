@@ -28,7 +28,7 @@ import { LegacyAsyncStorage } from 'expo';
     language: getCurrentUser().getLanguageDisplayName(),
     bibleVersion: getCurrentUser().getBibleVersionDisplayName(),
     offlineMode: getCurrentUser().getIsOfflineMode(),
-    log: '',
+    showMigration: false,
     height: 120
   };
 
@@ -40,6 +40,18 @@ import { LegacyAsyncStorage } from 'expo';
     this.keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', (event) => {
       this.setState({ keyboard: false })
     });
+
+    if (Platform.OS == 'ios') {
+      LegacyAsyncStorage.getItem('ANSWER', (err, oldData) => {
+        if (err || !oldData) {
+          oldData = "{}";
+        }
+        oldAnswer = JSON.parse(oldData);
+        if (oldAnswer.rawData) {
+          this.setState({ showMigration: true });
+        }
+      });
+    }
   }
 
   componentWillUnmount() {
@@ -336,16 +348,16 @@ import { LegacyAsyncStorage } from 'expo';
                 titleInfoStyle={styles.titleInfoStyle}
                 onPress={this.checkForUpdate.bind(this)}
               />
+              {
+                this.state.showMigration &&
+                <SettingsList.Item
+                  title='Recover missing answers'
+                  hasNavArrow={true}
+                  titleStyle={{ color: 'red' }}
+                  onPress={this.migrate.bind(this)}
+                />
+              }
             </SettingsList>
-            {
-              Platform.OS == 'ios' &&
-              <View>
-                <Text style={{ color: 'red', fontSize: 16, fontWeight: 'normal', margin: 10 }}>11/13 Notice: If you updated app recently, you'll not see your answers, please click to recover.</Text>
-                <View style={{ alignItems: 'center' }}>
-                  <RkButton onPress={this.migrate.bind(this)}>Recover</RkButton>
-                </View>
-              </View>
-            }
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
