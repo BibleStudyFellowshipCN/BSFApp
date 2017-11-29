@@ -154,6 +154,10 @@ import { LegacyAsyncStorage } from 'expo';
     }
   }
 
+  onFeedback() {
+    this.props.navigation.navigate('Feedback');
+  }
+
   async onSubmitFeedback() {
     if (this.feedback.trim() == '') {
       Alert.alert(getI18nText('缺少内容'), getI18nText('请输入反馈意见内容'), [
@@ -314,26 +318,18 @@ import { LegacyAsyncStorage } from 'expo';
                 switchOnValueChange={this.onSwitchOffline.bind(this)}
               />
               {/*<SettingsList.Item
-            title='字体大小'
-            titleInfo='中等'
-            titleInfoStyle={styles.titleInfoStyle}
-            onPress={this.onFontSize.bind(this)}
-          />*/}
-              <SettingsList.Header headerText={getI18nText('反馈意见')} headerStyle={{ color: 'black', marginTop: 15 }} />
-              {/*<SettingsList.Header headerText='MBSF - Mobile Bible Study Fellowship' headerStyle={{ color: 'black', marginTop: 15 }} />*/}
-              <View style={styles.answerContainer}>
-                <TextInput
-                  style={styles.answerInput}
-                  ref={(input) => this.feedbackInput = input}
-                  blurOnSubmit={false}
-                  placeholder={getI18nText('反馈意见')}
-                  multiline
-                  onChangeText={(text) => { this.feedback = text }}
-                />
-              </View>
-              <View style={{ alignItems: 'center' }}>
-                <RkButton onPress={this.onSubmitFeedback.bind(this)}>{getI18nText('提交')}</RkButton>
-              </View>
+                title='字体大小'
+                titleInfo='中等'
+                titleInfoStyle={styles.titleInfoStyle}
+                onPress={this.onFontSize.bind(this)}
+              />*/}
+              <SettingsList.Item
+                title={getI18nText('反馈意见')}
+                hasNavArrow={true}
+                titleInfoStyle={styles.titleInfoStyle}
+                onPress={this.onFeedback.bind(this)}
+              />
+              <SettingsList.Header headerText='MBSF - Mobile Bible Study Fellowship' headerStyle={{ color: 'black', marginTop: 15 }} />
               <SettingsList.Item
                 title={getI18nText('版本') + ': ' + manifest.version}
                 titleInfo={getI18nText('检查更新')}

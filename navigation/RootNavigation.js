@@ -6,6 +6,7 @@ import MainTabNavigator from './MainTabNavigator';
 import registerForPushNotificationsAsync from '../api/registerForPushNotificationsAsync';
 import LessonScreen from '../screens/LessonScreen';
 import BibleScreen from '../screens/BibleScreen';
+import FeedbackScreen from '../screens/FeedbackScreen';
 
 const RootStackNavigator = StackNavigator(
   {
@@ -17,6 +18,9 @@ const RootStackNavigator = StackNavigator(
     },
     Bible: {
       screen: BibleScreen
+    },
+    Feedback: {
+      screen: FeedbackScreen
     }
   },
   {
@@ -36,11 +40,11 @@ const RootStackNavigator = StackNavigator(
 
 export default class RootNavigator extends React.Component {
   componentDidMount() {
-    this._notificationSubscription = this._registerForPushNotifications();
+    //this._notificationSubscription = this._registerForPushNotifications();
   }
 
   componentWillUnmount() {
-    this._notificationSubscription && this._notificationSubscription.remove();
+    //this._notificationSubscription && this._notificationSubscription.remove();
   }
 
   render() {
