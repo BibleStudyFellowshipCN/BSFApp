@@ -5,10 +5,10 @@ import {
   TextInput,
   View,
   Text,
-  TouchableOpacity
+  TouchableOpacity,
+  Dimensions
 } from 'react-native';
 import { updateAnswer } from '../store/answers'
-import Layout from '../constants/Layout';
 
 class Answer extends React.Component {
   state = {
@@ -20,7 +20,6 @@ class Answer extends React.Component {
 
   onContentSizeChange(e) {
     const contentSize = e.nativeEvent.contentSize;
-    console.log(JSON.stringify(contentSize));
 
     // Support earlier versions of React Native on Android.
     if (!contentSize) return;
@@ -33,7 +32,6 @@ class Answer extends React.Component {
 
   render() {
     let height = Math.max(120, this.state.height);
-    console.log({ height, edit: this.state.editMode });
     return (
       <View style={[styles.answerContainer, { height }]}>
         <TextInput
@@ -60,7 +58,7 @@ class Answer extends React.Component {
             style={{
               position: 'absolute',
               height,
-              width: Layout.window.width,
+              width: Dimensions.get('window').width,
               backgroundColor: 'rgba(0, 0, 0, 0.05)' // 'transparent'
             }}
             onPress={() => {

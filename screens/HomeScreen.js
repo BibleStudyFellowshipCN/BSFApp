@@ -12,7 +12,6 @@ import {
   View,
 } from 'react-native';
 import Accordion from 'react-native-collapsible/Accordion';
-import { MonoText } from '../components/StyledText';
 import Colors from '../constants/Colors'
 import { requestBooks } from "../store/books.js";
 import { getI18nText, getI18nBibleBook } from '../store/I18n';

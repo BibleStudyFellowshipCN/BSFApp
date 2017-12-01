@@ -1,4 +1,4 @@
-import { AsyncStorage, Platform } from 'react-native';
+import { Alert, AsyncStorage, Platform } from 'react-native';
 import { debounce } from 'lodash';
 import Storage from 'react-native-storage';
 import { Constants } from 'expo';
@@ -25,7 +25,8 @@ if (!global.deviceInfo) {
         deviceId: Constants['deviceId'],
         sessionId: Constants['sessionId'],
         deviceYearClass: Constants['deviceYearClass'],
-        platformOS: Platform.OS
+        platformOS: Platform.OS,
+        version: Constants.manifest.version
     };
 }
 
@@ -36,9 +37,98 @@ function getLanguage() {
     }
     return lang;
 }
+
 function encode(idOrKey) {
     // key and id can never contains "_"
     return idOrKey.replace(/_/g, '##-##');
+}
+
+function getFromCache(key, keyString) {
+    let cache;
+    // Load from book/lesson cache
+    if (key == Models.Lesson.key || key == Models.Book.key) {
+        switch (getCurrentUser().getLanguage()) {
+            case 'chs':
+                cache = require("./chs.json");
+                break;
+            case 'cht':
+                cache = require("./cht.json");
+                break;
+            case 'eng':
+                cache = require("./eng.json");
+                break;
+            case 'spa':
+                cache = require("./spa.json");
+                break;
+        }
+        if (cache[keyString]) {
+            console.log("[Book/Lesson] Hit from cache");
+            return cache[keyString];
+        }
+    }
+
+    // Load from passage cache
+    if (key == Models.Passage.key) {
+        switch (getCurrentUser().getBibleVersion()) {
+            case 'ccb':
+                cache = require("./ccb.json");
+                break;
+            case 'cnvt':
+                cache = require("./cnvt.json");
+                break;
+            case 'esv':
+                cache = require("./esv.json");
+                break;
+            case 'kjv':
+                cache = require("./kjv.json");
+                break;
+            case 'niv1984':
+                cache = require("./niv1984.json");
+                break;
+            case 'niv2011':
+                cache = require("./niv2011.json");
+                break;
+            case 'nvi':
+                cache = require("./nvi.json");
+                break;
+            case 'rcuvss':
+                cache = require("./rcuvss.json");
+                break;
+            case 'rcuvts':
+                cache = require("./rcuvts.json");
+                break;
+            case 'rvr1995':
+                cache = require("./rvr1995.json");
+                break;
+        }
+        if (cache[keyString]) {
+            console.log("[Passage] Hit from cache");
+            return cache[keyString];
+        }
+    }
+
+    return null;
+}
+
+async function pokeServer(message) {
+    console.log('>Poke:' + message);
+    let noCacheHeader = new Headers();
+    noCacheHeader.append('pragma', 'no-cache');
+    noCacheHeader.append('cache-control', 'no-cache');
+    noCacheHeader.append('deviceId', global.deviceInfo.deviceId);
+    noCacheHeader.append('sessionId', global.deviceInfo.sessionId);
+    noCacheHeader.append('deviceYearClass', global.deviceInfo.deviceYearClass);
+    noCacheHeader.append('platformOS', global.deviceInfo.platformOS);
+    noCacheHeader.append('version', global.deviceInfo.version);
+    noCacheHeader.append('data', message);
+
+    fetch(Models.Poke.restUri, { method: 'POST', headers: noCacheHeader })
+        .then((response) => {
+            console.log('>' + response.status);
+        })
+        .catch((error) => {
+            console.log(error);
+        });
 }
 
 async function loadAsync(model, id, update) {
@@ -58,27 +148,12 @@ async function loadAsync(model, id, update) {
 
     let keyString = (id == null) ? model.key : model.key + '/' + id;
 
+    // load from cache first
     if (model.restUri) {
-        if (getCurrentUser().getIsOfflineMode()) {
-            let cache;
-            switch (getCurrentUser().getLanguage()) {
-                case 'chs':
-                    cache = require("./chs_cache.json");
-                    break;
-                case 'cht':
-                    cache = require("./cht_cache.json");
-                    break;
-                case 'eng':
-                    cache = require("./eng_cache.json");
-                    break;
-                case 'spa':
-                    cache = require("./spa_cache.json");
-                    break;
-            }
-            if (cache[keyString]) {
-                console.log("[Offline mode] Hit from cache");
-                return cache[keyString];
-            }
+        pokeServer(keyString);
+        let data = getFromCache(model.key, keyString);
+        if (data) {
+            return data;
         }
     }
 
@@ -128,7 +203,7 @@ async function loadFromCloudAsync(model, id, silentLoad) {
         // The model deosn't support online fetch
         return null;
     }
-    console.log("load from cloud: " + JSON.stringify({ model, id, silentLoad }));
+    console.log("load from cloud: " + JSON.stringify({ model, id, silentLoad, deviceInfo: global.deviceInfo }));
     const url = !!id ? (model.restUri + '/' + id) : model.restUri;
     let responseJson;
     try {
@@ -140,6 +215,7 @@ async function loadFromCloudAsync(model, id, silentLoad) {
         noCacheHeader.append('sessionId', global.deviceInfo.sessionId);
         noCacheHeader.append('deviceYearClass', global.deviceInfo.deviceYearClass);
         noCacheHeader.append('platformOS', global.deviceInfo.platformOS);
+        noCacheHeader.append('version', global.deviceInfo.version);
 
         // fetch data from service
         const response = await fetch(url, { method: 'GET', headers: noCacheHeader });
