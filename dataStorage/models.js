@@ -34,6 +34,10 @@ export const Models = {
     key: "Feedback",
     restUri: HostServer + "/feedback"
   },
+  Poke: {
+    key: "Poke",
+    restUri: HostServer + "/poke"
+  },
   Answer: {
     key: "ANSWER",
     cachePolicy: CachePolicy.AsyncStorage,
@@ -59,11 +63,5 @@ export const Models = {
     { DisplayName: "King James Version", Value: "kjv" },
     { DisplayName: "Nueva Versión Internacional", Value: "nvi" },
     { DisplayName: "Reina-Valera 1995", Value: "rvr1995" },
-  ],
-  OfflineModes: [
-    { DisplayName: "简体中文 + 和合本修订版(简体)", Value: "chs" },
-    { DisplayName: "繁體中文 + 和合本修訂版(繁體)", Value: "cht" },
-    { DisplayName: "English + New International Version 2011", Value: "eng" },
-    { DisplayName: "Español + Nueva Versión Internacional", Value: "spa" },
   ]
 }

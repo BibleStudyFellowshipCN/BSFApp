@@ -317,6 +317,7 @@ import { LegacyAsyncStorage } from 'expo';
                 titleInfoStyle={styles.titleInfoStyle}
                 onPress={this.onBibleVerse.bind(this)}
               />
+              {/*
               <SettingsList.Item
                 title={getI18nText('离线模式')}
                 hasNavArrow={false}
@@ -324,6 +325,7 @@ import { LegacyAsyncStorage } from 'expo';
                 switchState={this.state.offlineMode}
                 switchOnValueChange={this.onSwitchOffline.bind(this)}
               />
+              */}
               {/*<SettingsList.Item
                 title='字体大小'
                 titleInfo='中等'
