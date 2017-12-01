@@ -1,25 +1,20 @@
 import React from 'react';
-import { connect } from 'react-redux'
+import { connect } from 'react-redux';
 import { FontAwesome } from '@expo/vector-icons';
 import {
-  Image,
-  Linking,
   ScrollView,
   StyleSheet,
   Text,
-  TouchableWithoutFeedback,
   TouchableOpacity,
   View,
 } from 'react-native';
 import Accordion from 'react-native-collapsible/Accordion';
-import Colors from '../constants/Colors'
 import { requestBooks } from "../store/books.js";
-import { getI18nText, getI18nBibleBook } from '../store/I18n';
-import { NavigationActions } from 'react-navigation'
+import { getI18nText } from '../store/I18n';
 
 class HomeScreen extends React.Component {
   static navigationOptions = ({ navigation }) => {
-    title = navigation.state.params && navigation.state.params.title ? navigation.state.params.title : 'BSF课程';
+    let title = navigation.state.params && navigation.state.params.title ? navigation.state.params.title : 'BSF课程';
     return {
       title: getI18nText(title)
     };
@@ -38,25 +33,24 @@ class HomeScreen extends React.Component {
   }
 
   render() {
-    mainUI = null
-    if (this.props.booklist != undefined) {
-      mainUI = <Accordion
-        initiallyActiveSection={0}
-        sections={this.props.booklist}
-        renderHeader={this._renderHeader.bind(this)}
-        renderContent={this._renderContent.bind(this)} />
-    }
-    else {
-      mainUI = <Text style={{ textAlign: 'center', textAlignVertical: 'center', fontSize: 22 }}>正在加载</Text>
-    }
-
     return (
       <View style={styles.container}>
         <ScrollView
           style={styles.container}
           contentContainerStyle={styles.contentContainer}>
           <View style={styles.booksContainer}>
-            {mainUI}
+            {
+              this.props.booklist &&
+              <Accordion
+                initiallyActiveSection={0}
+                sections={this.props.booklist}
+                renderHeader={this._renderHeader.bind(this)}
+                renderContent={this._renderContent.bind(this)} />
+            }
+            {
+              !this.props.booklist &&
+              <Text style={{ textAlign: 'center', textAlignVertical: 'center', fontSize: 22 }}>Loading</Text>
+            }
           </View>
         </ScrollView>
       </View>
@@ -141,12 +135,6 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: 'whitesmoke',
   },
-  developmentModeText: {
-    marginBottom: 20,
-    color: 'rgba(0,0,0,0.4)',
-    fontSize: 15,
-    textAlign: 'center',
-  },
   contentContainer: {
   },
   booksContainer: {
@@ -160,10 +148,6 @@ const styles = StyleSheet.create({
     paddingLeft: 15,
     marginTop: 2,
     marginBottom: 2
-  },
-  bookHeaderIcon: {
-    alignItems: 'center',
-    justifyContent: 'center',
   },
   bookHeaderText: {
     fontSize: 20,

@@ -1,20 +1,12 @@
 import React from 'react';
-import { connect } from 'react-redux'
+import { connect } from 'react-redux';
 import { WebView } from 'react-native';
 import {
-  Image,
-  Linking,
-  Platform,
-  ScrollView,
   StyleSheet,
   Text,
-  TextInput,
-  TouchableOpacity,
   View,
 } from 'react-native';
-import SharedStyles from '../constants/SharedStyles';
 import { loadPassage } from '../store/passage';
-import { getI18nText, getI18nBibleBook } from '../store/I18n';
 
 class BibleScreen extends React.Component {
   static navigationOptions = ({ navigation }) => {
@@ -88,18 +80,4 @@ const mapDispatchToProps = (dispatch, ownProps) => {
 export default connect(mapStateToProps, mapDispatchToProps)(BibleScreen)
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 10,
-    backgroundColor: 'whitesmoke',
-  },
-  paragraphContainer: {
-    flex: 1,
-    marginTop: 15,
-  },
-  verseText: {
-    color: 'grey',
-    fontSize: 18,
-    lineHeight: 30,
-  }
 });

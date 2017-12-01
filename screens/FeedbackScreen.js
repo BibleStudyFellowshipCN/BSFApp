@@ -1,8 +1,8 @@
 import React from 'react';
-import { ScrollView, StyleSheet, Image, Text, View, Alert, TextInput, TouchableOpacity, KeyboardAvoidingView, Platform, Keyboard, UIManager, AsyncStorage, Dimensions } from 'react-native';
+import { ScrollView, StyleSheet, View, Alert, TextInput, KeyboardAvoidingView, Keyboard, UIManager } from 'react-native';
 import { Models } from '../dataStorage/models';
-import { clearStorageAsync, callWebServiceAsync, showWebServiceCallErrorsAsync } from '../dataStorage/storage';
-import { getCurrentUser } from '../store/user';
+import { Layout } from '../constants/Layout';
+import { callWebServiceAsync, showWebServiceCallErrorsAsync } from '../dataStorage/storage';
 import { getI18nText } from '../store/I18n';
 import { RkButton } from 'react-native-ui-kitten';
 

@@ -1,20 +1,17 @@
 import React from 'react';
-import { connect } from 'react-redux'
+import { connect } from 'react-redux';
 import {
-  Image,
-  Linking,
   Platform,
   ScrollView,
   StyleSheet,
   Text,
-  TextInput,
   TouchableOpacity,
   View,
   KeyboardAvoidingView,
   Dimensions
 } from 'react-native';
-import ScrollableTabView from 'react-native-scrollable-tab-view'
-import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
+import ScrollableTabView from 'react-native-scrollable-tab-view';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { loadLesson } from '../store/lessons.js'
 import Answer from '../components/Answer'
 import ExportAnswer from '../components/ExportAnswer.js';
@@ -54,7 +51,7 @@ class LessonScreen extends React.Component {
     }
 
     if (this.props.lesson) {
-      dayQuestions = this.props.lesson.dayQuestions;
+      const dayQuestions = this.props.lesson.dayQuestions;
 
       const content = <ScrollableTabView initialPage={0} {...scrollableStyleProps} prerenderingSiblingsNumber={Infinity}>
         {/*<NotesPage tabLabel="讲义" />*/}
@@ -83,50 +80,32 @@ class LessonScreen extends React.Component {
   }
 }
 
-// Scroll a component into view. Just pass the component ref string.
-function inputFocused(refName) {
-  setTimeout(() => {
-    let scrollResponder = this.refs.scrollView.getScrollResponder();
-    scrollResponder.scrollResponderScrollNativeHandleToKeyboard(
-      React.findNodeHandle(this.refs[refName]),
-      110, //additionalOffset
-      true
-    );
-  }, 50);
-}
-
 const DayQuestions = (props) => {
-  if (props.memoryVerse != undefined) {
-    memoryVerseUI = <Text style={styles.memoryVerse} selectable={true}>{getI18nText('背诵经文：')}{props.memoryVerse}</Text>
-  } else {
-    memoryVerseUI = null
-  }
-
-  if (props.readVerse != undefined) {
-    for (var verse in props.readVerse) {
-      let quote = props.readVerse[verse]
-      readVerseUI = <BibleQuote key={quote.book + quote.verse} book={quote.book} verse={quote.verse} goToPassage={props.goToPassage} />
-    }
-  } else {
-    readVerseUI = null
-  }
-
   const content = (
     <View style={styles.BSFQuestionContainer}>
-      {memoryVerseUI}
+      {
+        props.memoryVerse &&
+        <Text style={styles.memoryVerse} selectable={true}>{getI18nText('背诵经文：')}{props.memoryVerse}</Text>
+      }
       <Text style={styles.dayTitle} selectable={true}>{props.day.title}</Text>
-      {readVerseUI}
-      {props.day.questions.map((question, index) => (
-        <BSFQuestion
-          key={question.id}
-          question={question}
-          goToPassage={props.goToPassage}
-        />
-      ))}
+      {
+        props.readVerse &&
+        props.readVerse.map((quote) => (
+          <BibleQuote key={quote.book + quote.verse} book={quote.book} verse={quote.verse} goToPassage={props.goToPassage} />
+        ))
+      }
+      {
+        props.day.questions.map((question) => (
+          <BSFQuestion
+            key={question.id}
+            question={question}
+            goToPassage={props.goToPassage}
+          />
+        ))
+      }
     </View>
   );
 
-  // TODO: Need verify if this new KeyboardAwareScrollView position can work on Android
   return (Platform.OS === 'ios') ? (
     <KeyboardAwareScrollView style={styles.dayQuestionsContainer} extraScrollHeight={80}>
       {content}
@@ -216,38 +195,5 @@ const styles = StyleSheet.create({
     marginBottom: 30,
     fontSize: 16,
     fontWeight: 'bold',
-  },
-  flowRight: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    alignSelf: 'stretch'
-  },
-  buttonText: {
-    fontSize: 18,
-    color: 'white',
-    alignSelf: 'center'
-  },
-  button: {
-    height: 36,
-    flex: 1,
-    flexDirection: 'row',
-    backgroundColor: Colors.yellow,
-    borderColor: Colors.yellow,
-    borderWidth: 1,
-    borderRadius: 8,
-    marginBottom: 10,
-    alignSelf: 'stretch',
-    justifyContent: 'center'
-  },
-  locationInput: {
-    height: 36,
-    padding: 4,
-    marginRight: 5,
-    flex: 4,
-    fontSize: 18,
-    borderWidth: 1,
-    borderColor: Colors.yellow,
-    borderRadius: 8,
-    color: Colors.yellow
   }
 });
