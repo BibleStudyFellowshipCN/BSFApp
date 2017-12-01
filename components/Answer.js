@@ -29,10 +29,15 @@ class Answer extends React.Component {
     }
   }
 
+  onLayout(e) {
+    this.setState({ width: Dimensions.get('window').width });
+  }
+
   render() {
-    let height = Math.max(120, this.state.height);
+    const height = Math.max(120, this.state.height);
+    const answerWidth = this.state.width - 32;
     return (
-      <View style={[styles.answerContainer, { height }]}>
+      <View style={[styles.answerContainer, { height }]} onLayout={this.onLayout.bind(this)}>
         <TextInput
           ref={ref => this.answer = ref}
           style={styles.answerInput}
@@ -53,21 +58,18 @@ class Answer extends React.Component {
         />
         {
           !this.state.editMode &&
-          <View style={{
-            position: 'absolute',
-            height,
-            width: Dimensions.get('window').width - 32,
-            borderRadius: 5,
-            backgroundColor: 'transparent'
-          }}>
-            <TouchableOpacity
-              style={{ flex: 1, backgroundColor: 'rgba(0, 0, 0, 0.05)' }}
-              onPress={() => {
-                this.setState({ editMode: true });
-                this.answer.focus();
-              }}>
-            </TouchableOpacity>
-          </View>
+          <TouchableOpacity
+            style={{
+              position: 'absolute',
+              height,
+              width: answerWidth,
+              backgroundColor: 'rgba(0, 0, 0, 0.05)' // 'transparent'
+            }}
+            onPress={() => {
+              this.setState({ editMode: true });
+              this.answer.focus();
+            }}>
+          </TouchableOpacity>
         }
       </View >
     );
