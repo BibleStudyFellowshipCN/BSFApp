@@ -1,6 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { FontAwesome } from '@expo/vector-icons';
+import { FontAwesome, MaterialCommunityIcons } from '@expo/vector-icons';
 import {
   ScrollView,
   StyleSheet,
@@ -11,12 +11,19 @@ import {
 import Accordion from 'react-native-collapsible/Accordion';
 import { requestBooks } from "../store/books.js";
 import { getI18nText } from '../store/I18n';
+import { getCurrentUser } from '../store/user';
 
 class HomeScreen extends React.Component {
   static navigationOptions = ({ navigation }) => {
     let title = navigation.state.params && navigation.state.params.title ? navigation.state.params.title : 'BSF课程';
     return {
-      title: getI18nText(title)
+      title: getI18nText(title),
+      headerRight: (
+        <View style={{ marginRight: 20 }}>
+          <TouchableOpacity onPress={() => { getCurrentUser().checkForUpdate(); }}>
+            <MaterialCommunityIcons name='cloud-sync' size={28} color='#fff' />
+          </TouchableOpacity>
+        </View>)
     };
   };
 

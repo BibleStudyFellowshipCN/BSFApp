@@ -49,16 +49,16 @@ function getFromCache(key, keyString) {
     if (key == Models.Lesson.key || key == Models.Book.key) {
         switch (getCurrentUser().getLanguage()) {
             case 'chs':
-                cache = require("./chs.json");
+                cache = require("../assets/json/chs.json");
                 break;
             case 'cht':
-                cache = require("./cht.json");
+                cache = require("../assets/json/cht.json");
                 break;
             case 'eng':
-                cache = require("./eng.json");
+                cache = require("../assets/json/eng.json");
                 break;
             case 'spa':
-                cache = require("./spa.json");
+                cache = require("../assets/json/spa.json");
                 break;
         }
         if (cache[keyString]) {
@@ -71,34 +71,34 @@ function getFromCache(key, keyString) {
     if (key == Models.Passage.key) {
         switch (getCurrentUser().getBibleVersion()) {
             case 'ccb':
-                cache = require("./ccb.json");
+                cache = require("../assets/json/ccb.json");
                 break;
             case 'cnvt':
-                cache = require("./cnvt.json");
+                cache = require("../assets/json/cnvt.json");
                 break;
             case 'esv':
-                cache = require("./esv.json");
+                cache = require("../assets/json/esv.json");
                 break;
             case 'kjv':
-                cache = require("./kjv.json");
+                cache = require("../assets/json/kjv.json");
                 break;
             case 'niv1984':
-                cache = require("./niv1984.json");
+                cache = require("../assets/json/niv1984.json");
                 break;
             case 'niv2011':
-                cache = require("./niv2011.json");
+                cache = require("../assets/json/niv2011.json");
                 break;
             case 'nvi':
-                cache = require("./nvi.json");
+                cache = require("../assets/json/nvi.json");
                 break;
             case 'rcuvss':
-                cache = require("./rcuvss.json");
+                cache = require("../assets/json/rcuvss.json");
                 break;
             case 'rcuvts':
-                cache = require("./rcuvts.json");
+                cache = require("../assets/json/rcuvts.json");
                 break;
             case 'rvr1995':
-                cache = require("./rvr1995.json");
+                cache = require("../assets/json/rvr1995.json");
                 break;
         }
         if (cache[keyString]) {

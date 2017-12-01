@@ -11,7 +11,7 @@ import { getI18nText, getI18nBibleBook } from '../store/I18n';
 import { getCurrentUser } from '../store/user';
 import { FontAwesome } from '@expo/vector-icons';
 
-const audioBookId = require('../assets/audioBookId.json');
+const audioBookId = require('../assets/json/audioBookId.json');
 
 export default class AudioBibleScreen extends React.Component {
   static navigationOptions = ({ navigation }) => {

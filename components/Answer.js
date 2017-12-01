@@ -1,14 +1,13 @@
 import React from 'react';
-import { connect } from 'react-redux'
+import { connect } from 'react-redux';
 import {
   StyleSheet,
   TextInput,
   View,
-  Text,
   TouchableOpacity,
   Dimensions
 } from 'react-native';
-import { updateAnswer } from '../store/answers'
+import { updateAnswer } from '../store/answers';
 
 class Answer extends React.Component {
   state = {
@@ -35,7 +34,7 @@ class Answer extends React.Component {
     return (
       <View style={[styles.answerContainer, { height }]}>
         <TextInput
-          ref='answer'
+          ref={ref => this.answer = ref}
           style={styles.answerInput}
           blurOnSubmit={false}
           multiline
@@ -54,19 +53,21 @@ class Answer extends React.Component {
         />
         {
           !this.state.editMode &&
-          <TouchableOpacity
-            style={{
-              position: 'absolute',
-              height,
-              width: Dimensions.get('window').width,
-              backgroundColor: 'rgba(0, 0, 0, 0.05)' // 'transparent'
-            }}
-            onPress={() => {
-              this.setState({ editMode: true });
-              this.refs.answer.focus();
-
-            }}>
-          </TouchableOpacity>
+          <View style={{
+            position: 'absolute',
+            height,
+            width: Dimensions.get('window').width - 32,
+            borderRadius: 5,
+            backgroundColor: 'transparent'
+          }}>
+            <TouchableOpacity
+              style={{ flex: 1, backgroundColor: 'rgba(0, 0, 0, 0.05)' }}
+              onPress={() => {
+                this.setState({ editMode: true });
+                this.answer.focus();
+              }}>
+            </TouchableOpacity>
+          </View>
         }
       </View >
     );
@@ -96,7 +97,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'whitesmoke',
     borderColor: 'black',
     borderWidth: 1,
-    borderRadius: 5,
+    borderRadius: 5
   },
   answerInput: {
     flex: 1,

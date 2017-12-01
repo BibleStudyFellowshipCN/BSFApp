@@ -25,7 +25,6 @@ import { LegacyAsyncStorage } from 'expo';
   state = {
     language: getCurrentUser().getLanguageDisplayName(),
     bibleVersion: getCurrentUser().getBibleVersionDisplayName(),
-    offlineMode: getCurrentUser().getIsOfflineMode(),
     showMigration: false
   };
 
@@ -137,14 +136,6 @@ import { LegacyAsyncStorage } from 'expo';
     alert("TODO: onFontSize");
   }
 
-  async onSwitchOffline(value) {
-    await getCurrentUser().setIsOfflineModeAsync(value);
-    this.setState({ offlineMode: value });
-    if (value) {
-      this.updateBibleVersionBasedOnLanguage(getCurrentUser().getLanguage());
-    }
-  }
-
   onFeedback() {
     this.props.navigation.navigate('Feedback');
   }
@@ -165,36 +156,6 @@ import { LegacyAsyncStorage } from 'expo';
       Alert.alert(getI18nText('谢谢您的反馈意见！'), '', [
         { text: 'OK', onPress: () => this.feedbackInput.clear() },
       ]);
-    }
-  }
-
-  getVersionNumber(version) {
-    // version is "a.b.c.d"
-    let versionNumbers = version.split(".");
-    let value = 0;
-    for (let i in versionNumbers) {
-      value = value * 1000 + parseInt(versionNumbers[i]);
-    }
-    return value;
-  }
-
-  async checkForUpdate() {
-    const { manifest } = Constants;
-    const result = await callWebServiceAsync('https://expo.io/@turbozv/CBSFApp/index.exp?sdkVersion=' + manifest.sdkVersion, '', 'GET');
-    const succeed = await showWebServiceCallErrorsAsync(result, 200);
-    if (succeed) {
-      const clientVersion = this.getVersionNumber(manifest.version);
-      const serverVersion = this.getVersionNumber(result.body.version);
-      console.log('checkForUpdate:' + clientVersion + '-' + serverVersion);
-      if (clientVersion < serverVersion) {
-        Alert.alert(getI18nText('发现更新') + ': ' + result.body.version, getI18nText('程序将重新启动'), [
-          { text: 'OK', onPress: () => Expo.Util.reload() },
-        ]);
-      } else {
-        Alert.alert(getI18nText('您已经在使用最新版本'), getI18nText('版本') + ': ' + manifest.version + ' (SDK' + manifest.sdkVersion + ')', [
-          { text: 'OK', onPress: () => { } },
-        ]);
-      }
     }
   }
 
@@ -286,15 +247,6 @@ import { LegacyAsyncStorage } from 'expo';
                 titleInfoStyle={styles.titleInfoStyle}
                 onPress={this.onBibleVerse.bind(this)}
               />
-              {/*
-              <SettingsList.Item
-                title={getI18nText('离线模式')}
-                hasNavArrow={false}
-                hasSwitch={true}
-                switchState={this.state.offlineMode}
-                switchOnValueChange={this.onSwitchOffline.bind(this)}
-              />
-              */}
               {/*<SettingsList.Item
                 title='字体大小'
                 titleInfo='中等'
@@ -312,7 +264,7 @@ import { LegacyAsyncStorage } from 'expo';
                 title={getI18nText('版本') + ': ' + manifest.version}
                 titleInfo={getI18nText('检查更新')}
                 titleInfoStyle={styles.titleInfoStyle}
-                onPress={this.checkForUpdate.bind(this)}
+                onPress={() => { getCurrentUser().checkForUpdate(); }}
               />
               {
                 this.state.showMigration &&

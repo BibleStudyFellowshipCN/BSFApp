@@ -8,6 +8,8 @@ import {
 } from 'react-native';
 import { loadPassage } from '../store/passage';
 
+const bookid = require('../assets/json/bookid.json');
+
 class BibleScreen extends React.Component {
   static navigationOptions = ({ navigation }) => {
     return {
@@ -47,8 +49,6 @@ class BibleScreen extends React.Component {
     }
   }
 }
-
-const bookid = require('../assets/bookid.json');
 
 // Build the web service url
 function getId(book, verse) {
