@@ -1,6 +1,8 @@
-import { AsyncStorage } from 'react-native';
-import { loadAsync } from '../dataStorage/storage';
+import { AsyncStorage, Alert } from 'react-native';
 import { Models } from '../dataStorage/models';
+import { callWebServiceAsync, showWebServiceCallErrorsAsync } from '../dataStorage/storage';
+import Expo, { Constants } from 'expo';
+import { getI18nText } from '../store/I18n';
 
 let currentUser;
 
@@ -53,7 +55,7 @@ export default class User {
   audioBook = 1 * 1000 + 1;
 
   async loadExistingUserAsync() {
-    existingUser = await loadUser();
+    let existingUser = await loadUser();
     if (existingUser) {
       this.cellphone = existingUser.cellphone;
       if (Models.ValidLanguages.indexOf(existingUser.language) != -1) {
@@ -196,6 +198,36 @@ export default class User {
     await saveUserAsync(this.getUserInfo());
     this.logUserInfo();
     return true;
+  }
+
+  getVersionNumber(version) {
+    // version is "a.b.c.d"
+    let versionNumbers = version.split(".");
+    let value = 0;
+    for (let i in versionNumbers) {
+      value = value * 1000 + parseInt(versionNumbers[i]);
+    }
+    return value;
+  }
+
+  async checkForUpdate() {
+    const { manifest } = Constants;
+    const result = await callWebServiceAsync('https://expo.io/@turbozv/CBSFApp/index.exp?sdkVersion=' + manifest.sdkVersion, '', 'GET');
+    const succeed = await showWebServiceCallErrorsAsync(result, 200);
+    if (succeed) {
+      const clientVersion = this.getVersionNumber(manifest.version);
+      const serverVersion = this.getVersionNumber(result.body.version);
+      console.log('checkForUpdate:' + clientVersion + '-' + serverVersion);
+      if (clientVersion < serverVersion) {
+        Alert.alert(getI18nText('发现更新') + ': ' + result.body.version, getI18nText('程序将重新启动'), [
+          { text: 'OK', onPress: () => Expo.Util.reload() },
+        ]);
+      } else {
+        Alert.alert(getI18nText('您已经在使用最新版本'), getI18nText('版本') + ': ' + manifest.version + ' (SDK' + manifest.sdkVersion + ')', [
+          { text: 'OK', onPress: () => { } },
+        ]);
+      }
+    }
   }
 
   logUserInfo() {

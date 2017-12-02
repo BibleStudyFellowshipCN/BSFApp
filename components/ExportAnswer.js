@@ -86,8 +86,6 @@ export default class ExportAnswer extends React.Component {
 
 const styles = StyleSheet.create({
   container: {
-    alignItems: 'center',
-    width: 54,
-    marginTop: 8
+    marginRight: 20
   }
 });

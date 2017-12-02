@@ -1,7 +1,6 @@
 import React from 'react';
 import { Platform, StatusBar, StyleSheet, View } from 'react-native';
-import { AppLoading, Asset, Font } from 'expo';
-import { Ionicons } from '@expo/vector-icons';
+import Expo, { AppLoading } from 'expo';
 import RootNavigation from './navigation/RootNavigation';
 import createStore from './store/createStore'
 import { loadAsync } from './dataStorage/storage';
@@ -65,7 +64,7 @@ export default class App extends React.Component {
       let bible = 'rcuvss';
       if (locale.substring(0, 2) == 'es') {
         lang = 'spa';
-        bible = 'niv2011';
+        bible = 'nvi';
       } else if (locale.substring(0, 2) == 'en') {
         lang = 'eng';
         bible = 'niv2011';

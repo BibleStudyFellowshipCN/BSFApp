@@ -1,24 +1,21 @@
 import React from 'react';
 import {
-  Image,
   StyleSheet,
   Text,
   TouchableHighlight,
   View,
-  Picker,
-  Slider
+  Picker
 } from 'react-native';
-import Expo, { Audio, KeepAwake } from 'expo';
+import { Audio, KeepAwake } from 'expo';
 import { getI18nText, getI18nBibleBook } from '../store/I18n';
 import { getCurrentUser } from '../store/user';
 import { FontAwesome } from '@expo/vector-icons';
 
-const audioBookId = require('../assets/audioBookId.json');
-
+const audioBookId = require('../assets/json/audioBookId.json');
 
 export default class AudioBibleScreen extends React.Component {
   static navigationOptions = ({ navigation }) => {
-    title = navigation.state.params && navigation.state.params.title ? navigation.state.params.title : '有声圣经';
+    let title = navigation.state.params && navigation.state.params.title ? navigation.state.params.title : '有声圣经';
     return {
       title: getI18nText(title)
     };
@@ -98,7 +95,7 @@ export default class AudioBibleScreen extends React.Component {
         console.log(`FATAL PLAYER ERROR: ${status.error}`);
       }
     }
-  };
+  }
 
   getAudioUrl() {
     let lang = 4; // Chinese
@@ -300,18 +297,6 @@ export default class AudioBibleScreen extends React.Component {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    alignItems: 'center',
-    alignSelf: 'stretch',
-    backgroundColor: '#FFFFFF',
-  },
   wrapper: {
   },
-  playText: {
-    marginTop: 40,
-    fontSize: 36,
-  },
-  playbackSlider: {
-    alignSelf: 'stretch',
-  }
 });

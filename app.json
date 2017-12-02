@@ -14,16 +14,19 @@
       "backgroundColor": "#ffffff"
     },
     "ios": {
+      "icon": "./assets/images/icon-ios.png",
+      "buildNumber": "1.0.2",
       "bundleIdentifier": "org.CBSF.bsfclass",
       "supportsTablet": true,
       "loadJSInBackgroundExperimental": true
     },
     "android": {
+      "icon": "./assets/images/icon-android.png",
       "package": "org.cbsfappv1.bsfclass",
       "permissions": [
         "WAKE_LOCK"
       ],
-      "versionCode": 5
+      "versionCode": 6
     }
   }
 }
