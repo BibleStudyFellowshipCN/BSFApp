@@ -40,21 +40,7 @@ export default class App extends React.Component {
     }
   }
 
-  _loadResourcesAsync = async () => {
-    let bootValues = await Promise.all([
-      loadAsync(Models.Book, '', true),
-      loadAsync(Models.Answer, null, false)
-    ]);
-
-    // create the store with the boot data
-    const initialstate = {
-      books: bootValues[0],
-      answers: bootValues[1] ? bootValues[1] : { answers: {} },
-    }
-    console.log("Load answers: " + JSON.stringify(initialstate.answers));
-    store = createStore(initialstate);
-
-    // initialize existing user
+  async loadUserInfo() {
     await getCurrentUser().loadExistingUserAsync();
     // TODO: [Wei] Workaround for now
     if (!getCurrentUser().isLoggedOn()) {
@@ -77,6 +63,22 @@ export default class App extends React.Component {
       await getCurrentUser().setBibleVersionAsync(bible);
     }
     getCurrentUser().logUserInfo();    // add all the neccessary load in Promise.all
+  }
+
+  _loadResourcesAsync = async () => {
+    // initialize existing user
+    await this.loadUserInfo();
+
+    let bootValues = await Promise.all([
+      loadAsync(Models.Answer, null, false)
+    ]);
+
+    // create the store with the boot data
+    const initialstate = {
+      answers: bootValues[0] ? bootValues[0] : { answers: {} },
+    }
+    console.log("Load answers: " + JSON.stringify(initialstate.answers));
+    store = createStore(initialstate);
   };
 
   _handleLoadingError = error => {

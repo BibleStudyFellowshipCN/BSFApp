@@ -7,6 +7,8 @@ import {
   View,
 } from 'react-native';
 import { loadPassage } from '../store/passage';
+import { pokeServer } from '../dataStorage/storage';
+import { Models } from '../dataStorage/models';
 
 const bookid = require('../assets/json/bookid.json');
 
@@ -18,6 +20,8 @@ class BibleScreen extends React.Component {
   };
 
   componentWillMount() {
+    const id = getId(this.props.navigation.state.params.book, this.props.navigation.state.params.verse);
+    pokeServer(Models.Passage, id);
     if (!this.props.passage) {
       this.props.loadPassage();
     }

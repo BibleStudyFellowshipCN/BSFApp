@@ -5,7 +5,7 @@
     "slug": "CBSFApp",
     "privacy": "public",
     "sdkVersion": "23.0.0",
-    "version": "2017.11.30",
+    "version": "2017.12.02",
     "primaryColor": "#cccccc",
     "icon": "./assets/images/icon.png",
     "splash": {
@@ -15,7 +15,7 @@
     },
     "ios": {
       "icon": "./assets/images/icon-ios.png",
-      "buildNumber": "1.0.2",
+      "buildNumber": "1",
       "bundleIdentifier": "org.CBSF.bsfclass",
       "supportsTablet": true,
       "loadJSInBackgroundExperimental": true

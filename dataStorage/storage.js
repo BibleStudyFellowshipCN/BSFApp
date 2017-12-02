@@ -62,7 +62,6 @@ function getFromCache(key, keyString) {
                 break;
         }
         if (cache[keyString]) {
-            console.log("[Book/Lesson] Hit from cache");
             return cache[keyString];
         }
     }
@@ -102,7 +101,6 @@ function getFromCache(key, keyString) {
                 break;
         }
         if (cache[keyString]) {
-            console.log("[Passage] Hit from cache");
             return cache[keyString];
         }
     }
@@ -110,25 +108,60 @@ function getFromCache(key, keyString) {
     return null;
 }
 
-async function pokeServer(message) {
-    console.log('>Poke:' + message);
-    let noCacheHeader = new Headers();
-    noCacheHeader.append('pragma', 'no-cache');
-    noCacheHeader.append('cache-control', 'no-cache');
-    noCacheHeader.append('deviceId', global.deviceInfo.deviceId);
-    noCacheHeader.append('sessionId', global.deviceInfo.sessionId);
-    noCacheHeader.append('deviceYearClass', global.deviceInfo.deviceYearClass);
-    noCacheHeader.append('platformOS', global.deviceInfo.platformOS);
-    noCacheHeader.append('version', global.deviceInfo.version);
-    noCacheHeader.append('data', message);
+let pokeInfo = {
+    lastUploadTime: 0,
+    lastCheckForUpdateTime: new Date(),
+    message: []
+};
 
-    fetch(Models.Poke.restUri, { method: 'POST', headers: noCacheHeader })
-        .then((response) => {
-            console.log('>' + response.status);
+async function pokeServer(model, id) {
+    if (model == Models.Passage) {
+        id = id + "?bibleVersion=" + getCurrentUser().getBibleVersion();
+    }
+
+    const message = model.api + '/' + id;
+    console.log('>Poke:' + message + ' => ' + JSON.stringify(pokeInfo));
+    pokeInfo.message.push(message);
+
+    const now = new Date();
+
+    // Queue poke data up to 5 mins
+    const minsDiff = Math.floor((now - pokeInfo.lastUploadTime) / 1000 / 60);
+    if (minsDiff > 5) {
+        const data = JSON.stringify(pokeInfo.message);
+        pokeInfo.message = [];
+        pokeInfo.lastUploadTime = now;
+
+        console.log('Uploading: ' + data);
+        fetch(Models.Poke.restUri, {
+            method: 'POST',
+            headers: {
+                'pragma': 'no-cache',
+                'cache-control': 'no-cache',
+                'deviceId': global.deviceInfo.deviceId,
+                'sessionId': global.deviceInfo.sessionId,
+                'deviceYearClass': global.deviceInfo.deviceYearClass,
+                'platformOS': global.deviceInfo.platformOS,
+                'version': global.deviceInfo.version,
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ data })
         })
-        .catch((error) => {
-            console.log(error);
-        });
+            .then((response) => {
+                console.log('>' + response.status);
+            })
+            .catch((error) => {
+                console.log(error);
+            });
+    }
+
+    // Check for update every 12 hours
+    const hoursDiff = Math.floor((now - pokeInfo.lastCheckForUpdateTime) / 1000 / 60 / 60);
+    if (hoursDiff >= 12) {
+        pokeInfo.lastCheckForUpdateTime = now;
+        getCurrentUser().checkForUpdate(true);
+    }
 }
 
 async function loadAsync(model, id, update) {
@@ -150,7 +183,6 @@ async function loadAsync(model, id, update) {
 
     // load from cache first
     if (model.restUri) {
-        pokeServer(keyString);
         let data = getFromCache(model.key, keyString);
         if (data) {
             return data;
@@ -364,4 +396,4 @@ async function showWebServiceCallErrorsAsync(result, acceptStatus) {
     return false;
 }
 
-export { loadAsync, saveAsync, clearStorageAsync, callWebServiceAsync, showWebServiceCallErrorsAsync };
+export { loadAsync, saveAsync, clearStorageAsync, callWebServiceAsync, showWebServiceCallErrorsAsync, pokeServer };

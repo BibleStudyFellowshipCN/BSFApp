@@ -17,6 +17,8 @@ import Answer from '../components/Answer'
 import ExportAnswer from '../components/ExportAnswer.js';
 import Colors from '../constants/Colors'
 import { getI18nText, getI18nBibleBook } from '../store/I18n';
+import { Models } from '../dataStorage/models';
+import { pokeServer } from '../dataStorage/storage';
 
 class LessonScreen extends React.Component {
   static navigationOptions = ({ navigation }) => {
@@ -32,6 +34,8 @@ class LessonScreen extends React.Component {
   }
 
   componentWillMount() {
+    pokeServer(Models.Lesson, this.props.navigation.state.params.lesson.id);
+
     if (!this.props.lesson) {
       this.props.loadLesson();
     }

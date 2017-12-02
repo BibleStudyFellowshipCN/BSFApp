@@ -12,6 +12,8 @@ import Accordion from 'react-native-collapsible/Accordion';
 import { requestBooks } from "../store/books.js";
 import { getI18nText } from '../store/I18n';
 import { getCurrentUser } from '../store/user';
+import { Models } from '../dataStorage/models';
+import { pokeServer } from '../dataStorage/storage';
 
 class HomeScreen extends React.Component {
   static navigationOptions = ({ navigation }) => {
@@ -27,11 +29,12 @@ class HomeScreen extends React.Component {
     };
   };
 
-  componentDidUpdate() {
-  }
+  componentWillMount() {
+    pokeServer(Models.Book, '');
 
-  componentDidMount() {
-    this.props.requestBooks();
+    if (!this.props.booklist) {
+      this.props.requestBooks();
+    }
   }
 
   goToLesson(lesson) {
