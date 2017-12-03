@@ -115,6 +115,11 @@ let pokeInfo = {
 };
 
 async function pokeServer(model, id) {
+    // Don't poke from non-device
+    if (!Expo.Constants.isDevice) {
+        return;
+    }
+
     if (model == Models.Passage) {
         id = id + "?bibleVersion=" + getCurrentUser().getBibleVersion();
     }

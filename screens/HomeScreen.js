@@ -1,6 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { FontAwesome, MaterialCommunityIcons } from '@expo/vector-icons';
+import { FontAwesome } from '@expo/vector-icons';
 import {
   ScrollView,
   StyleSheet,
@@ -23,7 +23,7 @@ class HomeScreen extends React.Component {
       headerRight: (
         <View style={{ marginRight: 20 }}>
           <TouchableOpacity onPress={() => { getCurrentUser().checkForUpdate(); }}>
-            <MaterialCommunityIcons name='cloud-sync' size={28} color='#fff' />
+            <FontAwesome name='refresh' size={28} color='#fff' />
           </TouchableOpacity>
         </View>)
     };
