@@ -77,8 +77,30 @@ function onBibleVerse() { }
   render() {
     if (this.props.passage) {
       const paragraphs = this.props.passage.paragraphs;
+
+      // Android
+      if (Platform.OS == 'android') {
+        let line = '';
+        for (var i in paragraphs) {
+          for (var j in paragraphs[i].verses) {
+            const verse = paragraphs[i].verses[j];
+            line += verse.verse + " " + verse.text + "\n";
+          }
+        }
+
+        return (
+          <View style={{ flex: 1 }}>
+            <ScrollView>
+              <Text selectable={true} style={{
+                marginVertical: 2, marginHorizontal: 4, fontSize: 20, lineHeight: 32,
+              }}>{line}</Text>
+            </ScrollView>
+          </View>
+        );
+      }
+
+      // iOS
       let html = '<head><meta charset="UTF-8"> <meta name="viewport" content="width=device-width, initial-scale=1" /></head><style> body { font-size: 19;} </style> <body>';
-      let line = '';
       for (var i in paragraphs) {
         for (var j in paragraphs[i].verses) {
           const verse = paragraphs[i].verses[j];
@@ -90,31 +112,14 @@ function onBibleVerse() { }
         }
       }
       html += '</body>';
-      return (
-        <View style={{ flex: 1 }}>
-          <ScrollView>
-            {
-              Platform.OS == 'android' &&
-              <Text selectable={true} style={{
-                marginVertical: 2, marginHorizontal: 4, fontSize: 20, lineHeight: 32,
-              }}>{line}</Text>
-            }
-            {
-              Platform.OS == 'ios' &&
-              <WebView
-                source={{ html }}
-              />
-            }
-          </ScrollView>
-        </View>
-      );
+      return (<WebView source={{ html }} />);
     } else {
       // Display loading screen
       return (
         <View style={styles.BSFQuestionContainer}>
           <Text style={{ marginVertical: 12, color: 'black' }}>Loading</Text>
         </View>
-      )
+      );
     }
   }
 }
