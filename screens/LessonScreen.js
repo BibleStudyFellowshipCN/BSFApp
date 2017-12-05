@@ -140,7 +140,7 @@ const BSFQuestion = (props) => (
 )
 
 const QuestionText = (props) => (
-  <Text style={{ color: 'black', marginBottom: 5, fontSize: 16, }} selectable={true}>{props.children}</Text>
+  <Text style={{ color: 'black', marginBottom: 5, fontSize: 18 }} selectable={true}>{props.children}</Text>
 )
 
 const BibleQuote = (props) => (
@@ -191,13 +191,13 @@ const styles = StyleSheet.create({
   },
   dayTitle: {
     color: 'black',
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: 'bold',
   },
   memoryVerse: {
     color: 'black',
     marginBottom: 30,
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: 'bold',
   }
 });

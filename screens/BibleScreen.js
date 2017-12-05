@@ -1,6 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { WebView } from 'react-native';
+import { WebView, ScrollView, Platform } from 'react-native';
 import {
   StyleSheet,
   Text,
@@ -77,18 +77,36 @@ function onBibleVerse() { }
   render() {
     if (this.props.passage) {
       const paragraphs = this.props.passage.paragraphs;
-      let html = '<head><meta name="viewport" content="width=device-width, initial-scale=1" /></head><style> body { font-size: 19;} </style> <body>';
+      let html = '<head><meta charset="UTF-8"> <meta name="viewport" content="width=device-width, initial-scale=1" /></head><style> body { font-size: 19;} </style> <body>';
+      let line = '';
       for (var i in paragraphs) {
         for (var j in paragraphs[i].verses) {
           const verse = paragraphs[i].verses[j];
-          html += verse.verse + " " + verse.text + "<br>";
+          if (Platform.OS == 'android') {
+            line += verse.verse + " " + verse.text + "\n";
+          } else {
+            html += verse.verse + " " + verse.text + "<br>";
+          }
         }
       }
       html += '</body>';
       return (
-        <WebView
-          source={{ html }}
-        />
+        <View style={{ flex: 1 }}>
+          <ScrollView>
+            {
+              Platform.OS == 'android' &&
+              <Text selectable={true} style={{
+                marginVertical: 2, marginHorizontal: 4, fontSize: 20, lineHeight: 32,
+              }}>{line}</Text>
+            }
+            {
+              Platform.OS == 'ios' &&
+              <WebView
+                source={{ html }}
+              />
+            }
+          </ScrollView>
+        </View>
       );
     } else {
       // Display loading screen
