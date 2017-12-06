@@ -100,15 +100,11 @@ function onBibleVerse() { }
       }
 
       // iOS
-      let html = '<head><meta charset="UTF-8"> <meta name="viewport" content="width=device-width, initial-scale=1" /></head><style> body { font-size: 19;} </style> <body>';
+      let html = '<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1" /></head><style> body { font-size: 19;} </style> <body>';
       for (var i in paragraphs) {
         for (var j in paragraphs[i].verses) {
           const verse = paragraphs[i].verses[j];
-          if (Platform.OS == 'android') {
-            line += verse.verse + " " + verse.text + "\n";
-          } else {
             html += verse.verse + " " + verse.text + "<br>";
-          }
         }
       }
       html += '</body>';
