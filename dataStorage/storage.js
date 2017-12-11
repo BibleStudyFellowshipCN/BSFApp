@@ -117,6 +117,7 @@ function getHttpHeaders() {
         'deviceYearClass': global.deviceInfo.deviceYearClass,
         'platformOS': global.deviceInfo.platformOS,
         'version': global.deviceInfo.version,
+        'bibleVersion': getCurrentUser().getBibleVersion(),
         'Accept': 'application/json',
         'Content-Type': 'application/json',
     };
@@ -132,10 +133,6 @@ async function pokeServer(model, id) {
     // Don't poke from non-device
     if (!Expo.Constants.isDevice) {
         return;
-    }
-
-    if (model == Models.Passage) {
-        id = id + "?bibleVersion=" + getCurrentUser().getBibleVersion();
     }
 
     const message = model.api + '/' + id;
