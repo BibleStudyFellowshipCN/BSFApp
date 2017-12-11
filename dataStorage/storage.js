@@ -108,6 +108,20 @@ function getFromCache(key, keyString) {
     return null;
 }
 
+function getHttpHeaders() {
+    return {
+        'pragma': 'no-cache',
+        'cache-control': 'no-cache',
+        'deviceId': global.deviceInfo.deviceId,
+        'sessionId': global.deviceInfo.sessionId,
+        'deviceYearClass': global.deviceInfo.deviceYearClass,
+        'platformOS': global.deviceInfo.platformOS,
+        'version': global.deviceInfo.version,
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+    };
+}
+
 let pokeInfo = {
     lastUploadTime: 0,
     lastCheckForUpdateTime: new Date(),
@@ -140,17 +154,7 @@ async function pokeServer(model, id) {
         console.log('Uploading: ' + data);
         fetch(Models.Poke.restUri, {
             method: 'POST',
-            headers: {
-                'pragma': 'no-cache',
-                'cache-control': 'no-cache',
-                'deviceId': global.deviceInfo.deviceId,
-                'sessionId': global.deviceInfo.sessionId,
-                'deviceYearClass': global.deviceInfo.deviceYearClass,
-                'platformOS': global.deviceInfo.platformOS,
-                'version': global.deviceInfo.version,
-                'Accept': 'application/json',
-                'Content-Type': 'application/json',
-            },
+            headers: getHttpHeaders(),
             body: JSON.stringify({ data })
         })
             .then((response) => {
@@ -244,18 +248,8 @@ async function loadFromCloudAsync(model, id, silentLoad) {
     const url = !!id ? (model.restUri + '/' + id) : model.restUri;
     let responseJson;
     try {
-        // Set no cache header
-        let noCacheHeader = new Headers();
-        noCacheHeader.append('pragma', 'no-cache');
-        noCacheHeader.append('cache-control', 'no-cache');
-        noCacheHeader.append('deviceId', global.deviceInfo.deviceId);
-        noCacheHeader.append('sessionId', global.deviceInfo.sessionId);
-        noCacheHeader.append('deviceYearClass', global.deviceInfo.deviceYearClass);
-        noCacheHeader.append('platformOS', global.deviceInfo.platformOS);
-        noCacheHeader.append('version', global.deviceInfo.version);
-
         // fetch data from service
-        const response = await fetch(url, { method: 'GET', headers: noCacheHeader });
+        const response = await fetch(url, { method: 'GET', headers: getHttpHeaders() });
 
         try {
             // FIXME: [Wei] "response.json()" triggers error on Android
@@ -323,27 +317,11 @@ async function callWebServiceAsync(url, api, method, headers, body) {
     let responseJson;
     let serverUrl = url + api;
     try {
-        // Set no cache header
-        let httpHeaders = new Headers();
-        httpHeaders.append('pragma', 'no-cache');
-        httpHeaders.append('cache-control', 'no-cache');
-        httpHeaders.append('Content-type', 'application/json');
-        httpHeaders.append('Accept', 'application/json');
-        httpHeaders.append('deviceId', global.deviceInfo.deviceId);
-        httpHeaders.append('sessionId', global.deviceInfo.sessionId);
-        httpHeaders.append('deviceYearClass', global.deviceInfo.deviceYearClass);
-        httpHeaders.append('platformOS', global.deviceInfo.platformOS);
-        if (headers) {
-            headers.forEach(function (item) {
-                httpHeaders.append(item.name, item.value);
-            });
-        }
-
         let payload;
         if (body) {
-            payload = { method, headers: httpHeaders, body: JSON.stringify(body) };
+            payload = { method, headers: getHttpHeaders(), body: JSON.stringify(body) };
         } else {
-            payload = { method, headers: httpHeaders };
+            payload = { method, headers: getHttpHeaders() };
         }
 
         console.log(JSON.stringify({ url: serverUrl, ...payload }));

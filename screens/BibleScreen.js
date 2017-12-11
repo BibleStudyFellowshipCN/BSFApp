@@ -78,8 +78,10 @@ function onBibleVerse() { }
     if (this.props.passage) {
       const paragraphs = this.props.passage.paragraphs;
 
-      // Android
-      if (Platform.OS == 'android') {
+      // Using text (some Android device cannot show CJK in WebView)
+      const bible = getCurrentUser().getBibleVersion();
+      if (Platform.OS == 'android' &&
+        (bible == 'rcuvss' || bible == 'ccb' || bible == 'rcuvts' || bible == 'cnvt')) {
         let line = '';
         for (var i in paragraphs) {
           for (var j in paragraphs[i].verses) {
@@ -89,7 +91,7 @@ function onBibleVerse() { }
         }
 
         return (
-          <View style={{ flex: 1 }}>
+          <View style={{ flex: 1, backgroundColor: 'white' }}>
             <ScrollView>
               <Text selectable={true} style={{
                 marginVertical: 2, marginHorizontal: 4, fontSize: 20, lineHeight: 32,
@@ -99,12 +101,12 @@ function onBibleVerse() { }
         );
       }
 
-      // iOS
+      // Using html
       let html = '<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1" /></head><style> body { font-size: 19;} </style> <body>';
       for (var i in paragraphs) {
         for (var j in paragraphs[i].verses) {
           const verse = paragraphs[i].verses[j];
-            html += verse.verse + " " + verse.text + "<br>";
+          html += verse.verse + " " + verse.text + "<br>";
         }
       }
       html += '</body>';
