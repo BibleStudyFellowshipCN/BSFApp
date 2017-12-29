@@ -27,6 +27,7 @@ export default class AudioBibleScreen extends React.Component {
     const bookId = parseInt(getCurrentUser().getAudioBibleBook() / 1000);
     let book = audioBookId.find((element) => (element.id == bookId));
     this.state = {
+      currentLanguage: getCurrentUser().getLanguage(),
       currentBook: bookId,
       currentChapter: parseInt(getCurrentUser().getAudioBibleBook() % 1000),
       totalChapter: book.chapters,
@@ -44,10 +45,6 @@ export default class AudioBibleScreen extends React.Component {
 
   componentDidMount() {
     Audio.setIsEnabledAsync(true);
-  }
-
-  componentDidUpdate() {
-    //this.props.navigator.updateCurrentRouteParams({ title: getI18nText('有声圣经') });
   }
 
   async _resetAudio() {

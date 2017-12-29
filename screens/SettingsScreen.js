@@ -12,7 +12,6 @@ import { clearLesson } from '../store/lessons.js'
 import { clearPassage } from '../store/passage.js'
 import { connectActionSheet } from '@expo/react-native-action-sheet';
 import { NavigationActions } from 'react-navigation'
-import { LegacyAsyncStorage } from 'expo';
 
 @connectActionSheet class SettingsScreen extends React.Component {
   static navigationOptions = ({ navigation }) => {
@@ -29,17 +28,6 @@ import { LegacyAsyncStorage } from 'expo';
   };
 
   componentWillMount() {
-    if (Platform.OS == 'ios') {
-      LegacyAsyncStorage.getItem('ANSWER', (err, oldData) => {
-        if (err || !oldData) {
-          oldData = "{}";
-        }
-        let oldAnswer = JSON.parse(oldData);
-        if (oldAnswer.rawData) {
-          this.setState({ showMigration: true });
-        }
-      });
-    }
   }
 
   async updateBibleVersionBasedOnLanguage(language) {
@@ -159,58 +147,6 @@ import { LegacyAsyncStorage } from 'expo';
     }
   }
 
-  async migrate() {
-    const key = 'ANSWER';
-    await LegacyAsyncStorage.migrateItems([key]);
-
-    LegacyAsyncStorage.getItem(key, (err, oldData) => {
-      if (err || !oldData) {
-        oldData = "{}";
-      }
-      let oldAnswer = JSON.parse(oldData);
-      if (!oldAnswer.rawData) {
-        Alert.alert("No need to recover", "We don't find any data from previous version");
-        return;
-      }
-      console.log(JSON.stringify(oldAnswer));
-
-      AsyncStorage.getItem(key, (err, newData) => {
-        if (err || !newData) {
-          newData = "{}";
-        }
-
-        let newAnswer = JSON.parse(newData);
-        if (!newAnswer.rawData) {
-          newAnswer.rawData = {
-            answers: {}
-          };
-        }
-        console.log(JSON.stringify(newAnswer));
-
-        let mergeData = JSON.parse(JSON.stringify(newAnswer));
-        for (var item in oldAnswer.rawData.answers) {
-          let currentItem = oldAnswer.rawData.answers[item];
-          let targetItem = mergeData.rawData.answers[item];
-          if (!targetItem) {
-            mergeData.rawData.answers[item] = currentItem;
-          } else {
-            if (targetItem.answerText.indexOf(currentItem.answerText) == -1) {
-              mergeData.rawData.answers[item].answerText = currentItem.answerText + "\n" + mergeData.rawData.answers[item].answerText;
-            }
-          }
-        }
-
-        console.log(JSON.stringify(mergeData));
-        AsyncStorage.setItem(key, JSON.stringify(mergeData), () => {
-          Alert.alert("Completed!", "App will restart to show the recovered answers", [
-            { text: 'OK', onPress: () => Expo.Util.reload() },
-          ]);
-        });
-      });
-
-    });
-  }
-
   contentSize = null;
 
   onContentSizeChange(e) {
@@ -272,7 +208,7 @@ import { LegacyAsyncStorage } from 'expo';
                   title='Recover missing answers'
                   hasNavArrow={true}
                   titleStyle={{ color: 'red' }}
-                  onPress={this.migrate.bind(this)}
+                  onPress={() => getCurrentUser().migrateAsync()}
                 />
               }
             </SettingsList>

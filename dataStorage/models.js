@@ -9,33 +9,39 @@ const HostServer = 'http://cbsf.southcentralus.cloudapp.azure.com:3000';
 export const Models = {
   Book: {
     key: "BOOK",
+    api: "/lessons",
     restUri: HostServer + "/lessons",
     cachePolicy: CachePolicy.AsyncStorage,
     useLanguage: true
   },
   Lesson: {
     key: "LESSON",
+    api: "/lessons",
     restUri: HostServer + "/lessons",
     cachePolicy: CachePolicy.AsyncStorage,
     useLanguage: true
   },
   Passage: {
     key: "PASSAGE",
+    api: "/verse",
     restUri: HostServer + "/verse",
     cachePolicy: CachePolicy.AsyncStorage
   },
   Logon: {
     key: "LOGON",
+    api: "/logon",
     restUri: HostServer + "/logon",
     cachePolicy: CachePolicy.AsyncStorage,
     userKey: '@BsfApp:user'
   },
   Feedback: {
     key: "Feedback",
+    api: "/feedback",
     restUri: HostServer + "/feedback"
   },
   Poke: {
     key: "Poke",
+    api: "/poke",
     restUri: HostServer + "/poke"
   },
   Answer: {

@@ -62,7 +62,6 @@ function getFromCache(key, keyString) {
                 break;
         }
         if (cache[keyString]) {
-            console.log("[Book/Lesson] Hit from cache");
             return cache[keyString];
         }
     }
@@ -102,7 +101,6 @@ function getFromCache(key, keyString) {
                 break;
         }
         if (cache[keyString]) {
-            console.log("[Passage] Hit from cache");
             return cache[keyString];
         }
     }
@@ -110,25 +108,66 @@ function getFromCache(key, keyString) {
     return null;
 }
 
-async function pokeServer(message) {
-    console.log('>Poke:' + message);
-    let noCacheHeader = new Headers();
-    noCacheHeader.append('pragma', 'no-cache');
-    noCacheHeader.append('cache-control', 'no-cache');
-    noCacheHeader.append('deviceId', global.deviceInfo.deviceId);
-    noCacheHeader.append('sessionId', global.deviceInfo.sessionId);
-    noCacheHeader.append('deviceYearClass', global.deviceInfo.deviceYearClass);
-    noCacheHeader.append('platformOS', global.deviceInfo.platformOS);
-    noCacheHeader.append('version', global.deviceInfo.version);
-    noCacheHeader.append('data', message);
+function getHttpHeaders() {
+    return {
+        'pragma': 'no-cache',
+        'cache-control': 'no-cache',
+        'deviceId': global.deviceInfo.deviceId,
+        'sessionId': global.deviceInfo.sessionId,
+        'deviceYearClass': global.deviceInfo.deviceYearClass,
+        'platformOS': global.deviceInfo.platformOS,
+        'version': global.deviceInfo.version,
+        'bibleVersion': getCurrentUser().getBibleVersion(),
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+    };
+}
 
-    fetch(Models.Poke.restUri, { method: 'POST', headers: noCacheHeader })
-        .then((response) => {
-            console.log('>' + response.status);
+let pokeInfo = {
+    lastUploadTime: 0,
+    lastCheckForUpdateTime: new Date(),
+    message: []
+};
+
+async function pokeServer(model, id) {
+    // Don't poke from non-device
+    if (!Expo.Constants.isDevice) {
+        return;
+    }
+
+    const message = model.api + '/' + id;
+    console.log('>Poke:' + message + ' => ' + JSON.stringify(pokeInfo));
+    pokeInfo.message.push(message);
+
+    const now = new Date();
+
+    // Queue poke data up to 5 mins
+    const minsDiff = Math.floor((now - pokeInfo.lastUploadTime) / 1000 / 60);
+    if (minsDiff > 5) {
+        const data = JSON.stringify(pokeInfo.message);
+        pokeInfo.message = [];
+        pokeInfo.lastUploadTime = now;
+
+        console.log('Uploading: ' + data);
+        fetch(Models.Poke.restUri, {
+            method: 'POST',
+            headers: getHttpHeaders(),
+            body: JSON.stringify({ data })
         })
-        .catch((error) => {
-            console.log(error);
-        });
+            .then((response) => {
+                console.log('>' + response.status);
+            })
+            .catch((error) => {
+                console.log(error);
+            });
+    }
+
+    // Check for update every 12 hours
+    const hoursDiff = Math.floor((now - pokeInfo.lastCheckForUpdateTime) / 1000 / 60 / 60);
+    if (hoursDiff >= 12) {
+        pokeInfo.lastCheckForUpdateTime = now;
+        getCurrentUser().checkForUpdate(true);
+    }
 }
 
 async function loadAsync(model, id, update) {
@@ -150,7 +189,6 @@ async function loadAsync(model, id, update) {
 
     // load from cache first
     if (model.restUri) {
-        pokeServer(keyString);
         let data = getFromCache(model.key, keyString);
         if (data) {
             return data;
@@ -207,18 +245,8 @@ async function loadFromCloudAsync(model, id, silentLoad) {
     const url = !!id ? (model.restUri + '/' + id) : model.restUri;
     let responseJson;
     try {
-        // Set no cache header
-        let noCacheHeader = new Headers();
-        noCacheHeader.append('pragma', 'no-cache');
-        noCacheHeader.append('cache-control', 'no-cache');
-        noCacheHeader.append('deviceId', global.deviceInfo.deviceId);
-        noCacheHeader.append('sessionId', global.deviceInfo.sessionId);
-        noCacheHeader.append('deviceYearClass', global.deviceInfo.deviceYearClass);
-        noCacheHeader.append('platformOS', global.deviceInfo.platformOS);
-        noCacheHeader.append('version', global.deviceInfo.version);
-
         // fetch data from service
-        const response = await fetch(url, { method: 'GET', headers: noCacheHeader });
+        const response = await fetch(url, { method: 'GET', headers: getHttpHeaders() });
 
         try {
             // FIXME: [Wei] "response.json()" triggers error on Android
@@ -286,27 +314,11 @@ async function callWebServiceAsync(url, api, method, headers, body) {
     let responseJson;
     let serverUrl = url + api;
     try {
-        // Set no cache header
-        let httpHeaders = new Headers();
-        httpHeaders.append('pragma', 'no-cache');
-        httpHeaders.append('cache-control', 'no-cache');
-        httpHeaders.append('Content-type', 'application/json');
-        httpHeaders.append('Accept', 'application/json');
-        httpHeaders.append('deviceId', global.deviceInfo.deviceId);
-        httpHeaders.append('sessionId', global.deviceInfo.sessionId);
-        httpHeaders.append('deviceYearClass', global.deviceInfo.deviceYearClass);
-        httpHeaders.append('platformOS', global.deviceInfo.platformOS);
-        if (headers) {
-            headers.forEach(function (item) {
-                httpHeaders.append(item.name, item.value);
-            });
-        }
-
         let payload;
         if (body) {
-            payload = { method, headers: httpHeaders, body: JSON.stringify(body) };
+            payload = { method, headers: getHttpHeaders(), body: JSON.stringify(body) };
         } else {
-            payload = { method, headers: httpHeaders };
+            payload = { method, headers: getHttpHeaders() };
         }
 
         console.log(JSON.stringify({ url: serverUrl, ...payload }));
@@ -364,4 +376,4 @@ async function showWebServiceCallErrorsAsync(result, acceptStatus) {
     return false;
 }
 
-export { loadAsync, saveAsync, clearStorageAsync, callWebServiceAsync, showWebServiceCallErrorsAsync };
+export { loadAsync, saveAsync, clearStorageAsync, callWebServiceAsync, showWebServiceCallErrorsAsync, pokeServer };

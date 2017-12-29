@@ -1,6 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { FontAwesome, MaterialCommunityIcons } from '@expo/vector-icons';
+import { FontAwesome } from '@expo/vector-icons';
 import {
   ScrollView,
   StyleSheet,
@@ -12,6 +12,8 @@ import Accordion from 'react-native-collapsible/Accordion';
 import { requestBooks } from "../store/books.js";
 import { getI18nText } from '../store/I18n';
 import { getCurrentUser } from '../store/user';
+import { Models } from '../dataStorage/models';
+import { pokeServer } from '../dataStorage/storage';
 
 class HomeScreen extends React.Component {
   static navigationOptions = ({ navigation }) => {
@@ -21,17 +23,18 @@ class HomeScreen extends React.Component {
       headerRight: (
         <View style={{ marginRight: 20 }}>
           <TouchableOpacity onPress={() => { getCurrentUser().checkForUpdate(); }}>
-            <MaterialCommunityIcons name='cloud-sync' size={28} color='#fff' />
+            <FontAwesome name='refresh' size={28} color='#fff' />
           </TouchableOpacity>
         </View>)
     };
   };
 
-  componentDidUpdate() {
-  }
+  componentWillMount() {
+    pokeServer(Models.Book, '');
 
-  componentDidMount() {
-    this.props.requestBooks();
+    if (!this.props.booklist) {
+      this.props.requestBooks();
+    }
   }
 
   goToLesson(lesson) {

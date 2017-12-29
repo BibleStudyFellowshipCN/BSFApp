@@ -1,24 +1,75 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { WebView } from 'react-native';
+import { WebView, ScrollView, Platform } from 'react-native';
 import {
   StyleSheet,
   Text,
   View,
+  TouchableOpacity
 } from 'react-native';
 import { loadPassage } from '../store/passage';
+import { pokeServer } from '../dataStorage/storage';
+import { Models } from '../dataStorage/models';
+import { Octicons } from '@expo/vector-icons';
+import { connectActionSheet } from '@expo/react-native-action-sheet';
+import { clearPassage } from '../store/passage.js'
+import { getCurrentUser } from '../store/user';
 
 const bookid = require('../assets/json/bookid.json');
 
-class BibleScreen extends React.Component {
+function onBibleVerse() { }
+
+@connectActionSheet class BibleScreen extends React.Component {
   static navigationOptions = ({ navigation }) => {
     return {
-      title: navigation.state.params && navigation.state.params.title ? navigation.state.params.title : 'Bible'
+      title: navigation.state.params && navigation.state.params.title ? navigation.state.params.title : 'Bible',
+      headerRight: (
+        <View style={{ marginRight: 20 }}>
+          <TouchableOpacity onPress={() => onBibleVerse()}>
+            <Octicons name='book' size={28} color='#fff' />
+          </TouchableOpacity>
+        </View>)
     };
   };
 
   componentWillMount() {
+    onBibleVerse = this.onBibleVerse.bind(this);
+    const id = getId(this.props.navigation.state.params.book, this.props.navigation.state.params.verse);
+    pokeServer(Models.Passage, id);
     if (!this.props.passage) {
+      this.props.loadPassage();
+    }
+  }
+
+  onBibleVerse() {
+    let options = [];
+    for (var i in Models.BibleVersions) {
+      const text = Models.BibleVersions[i].DisplayName;
+      options.push(text);
+    }
+    options.push('Cancel');
+    let cancelButtonIndex = options.length - 1;
+    let destructiveButtonIndex = cancelButtonIndex;
+    this.props.showActionSheetWithOptions(
+      {
+        options,
+        cancelButtonIndex,
+        destructiveButtonIndex,
+      },
+      buttonIndex => {
+        if (buttonIndex != cancelButtonIndex) {
+          this.onBibleVerseChange(Models.BibleVersions[buttonIndex].Value);
+        }
+      }
+    );
+  }
+
+  async onBibleVerseChange(version) {
+    if (getCurrentUser().getBibleVersion() != version) {
+      await getCurrentUser().setBibleVersionAsync(version);
+      getCurrentUser().logUserInfo();
+
+      this.props.clearPassage();
       this.props.loadPassage();
     }
   }
@@ -26,7 +77,32 @@ class BibleScreen extends React.Component {
   render() {
     if (this.props.passage) {
       const paragraphs = this.props.passage.paragraphs;
-      let html = '<head><meta name="viewport" content="width=device-width, initial-scale=1" /></head><style> body { font-size: 19;} </style> <body>';
+
+      // Using text (some Android device cannot show CJK in WebView)
+      const bible = getCurrentUser().getBibleVersion();
+      if (Platform.OS == 'android' &&
+        (bible == 'rcuvss' || bible == 'ccb' || bible == 'rcuvts' || bible == 'cnvt')) {
+        let line = '';
+        for (var i in paragraphs) {
+          for (var j in paragraphs[i].verses) {
+            const verse = paragraphs[i].verses[j];
+            line += verse.verse + " " + verse.text + "\n";
+          }
+        }
+
+        return (
+          <View style={{ flex: 1, backgroundColor: 'white' }}>
+            <ScrollView>
+              <Text selectable={true} style={{
+                marginVertical: 2, marginHorizontal: 4, fontSize: 20, lineHeight: 32,
+              }}>{line}</Text>
+            </ScrollView>
+          </View>
+        );
+      }
+
+      // Using html
+      let html = '<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1" /></head><style> body { font-size: 19;} </style> <body>';
       for (var i in paragraphs) {
         for (var j in paragraphs[i].verses) {
           const verse = paragraphs[i].verses[j];
@@ -34,18 +110,14 @@ class BibleScreen extends React.Component {
         }
       }
       html += '</body>';
-      return (
-        <WebView
-          source={{ html }}
-        />
-      );
+      return (<WebView source={{ html }} />);
     } else {
       // Display loading screen
       return (
         <View style={styles.BSFQuestionContainer}>
           <Text style={{ marginVertical: 12, color: 'black' }}>Loading</Text>
         </View>
-      )
+      );
     }
   }
 }
@@ -74,6 +146,7 @@ const mapDispatchToProps = (dispatch, ownProps) => {
   const id = getId(ownProps.navigation.state.params.book, ownProps.navigation.state.params.verse);
   return {
     loadPassage: () => dispatch(loadPassage(id)),
+    clearPassage: () => dispatch(clearPassage())
   }
 };
 

@@ -210,10 +210,15 @@ export default class User {
     return value;
   }
 
-  async checkForUpdate() {
+  async checkForUpdate(onlyShowUpdateUI) {
     const { manifest } = Constants;
     const result = await callWebServiceAsync('https://expo.io/@turbozv/CBSFApp/index.exp?sdkVersion=' + manifest.sdkVersion, '', 'GET');
-    const succeed = await showWebServiceCallErrorsAsync(result, 200);
+    let succeed;
+    if (onlyShowUpdateUI) {
+      succeed = result && result.status == 200;
+    } else {
+      succeed = await showWebServiceCallErrorsAsync(result, 200);
+    }
     if (succeed) {
       const clientVersion = this.getVersionNumber(manifest.version);
       const serverVersion = this.getVersionNumber(result.body.version);
@@ -222,7 +227,7 @@ export default class User {
         Alert.alert(getI18nText('发现更新') + ': ' + result.body.version, getI18nText('程序将重新启动'), [
           { text: 'OK', onPress: () => Expo.Util.reload() },
         ]);
-      } else {
+      } else if (!onlyShowUpdateUI) {
         Alert.alert(getI18nText('您已经在使用最新版本'), getI18nText('版本') + ': ' + manifest.version + ' (SDK' + manifest.sdkVersion + ')', [
           { text: 'OK', onPress: () => { } },
         ]);

@@ -17,6 +17,8 @@ import Answer from '../components/Answer'
 import ExportAnswer from '../components/ExportAnswer.js';
 import Colors from '../constants/Colors'
 import { getI18nText, getI18nBibleBook } from '../store/I18n';
+import { Models } from '../dataStorage/models';
+import { pokeServer } from '../dataStorage/storage';
 
 class LessonScreen extends React.Component {
   static navigationOptions = ({ navigation }) => {
@@ -32,6 +34,8 @@ class LessonScreen extends React.Component {
   }
 
   componentWillMount() {
+    pokeServer(Models.Lesson, this.props.navigation.state.params.lesson.id);
+
     if (!this.props.lesson) {
       this.props.loadLesson();
     }
@@ -136,7 +140,7 @@ const BSFQuestion = (props) => (
 )
 
 const QuestionText = (props) => (
-  <Text style={{ color: 'black', marginBottom: 5, fontSize: 16, }} selectable={true}>{props.children}</Text>
+  <Text style={{ color: 'black', marginBottom: 5, fontSize: 18 }} selectable={true}>{props.children}</Text>
 )
 
 const BibleQuote = (props) => (
@@ -187,13 +191,13 @@ const styles = StyleSheet.create({
   },
   dayTitle: {
     color: 'black',
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: 'bold',
   },
   memoryVerse: {
     color: 'black',
     marginBottom: 30,
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: 'bold',
   }
 });
