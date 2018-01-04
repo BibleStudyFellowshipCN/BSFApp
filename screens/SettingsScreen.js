@@ -23,8 +23,7 @@ import { NavigationActions } from 'react-navigation'
 
   state = {
     language: getCurrentUser().getLanguageDisplayName(),
-    bibleVersion: getCurrentUser().getBibleVersionDisplayName(),
-    showMigration: false
+    bibleVersion: getCurrentUser().getBibleVersionDisplayName()
   };
 
   componentWillMount() {
@@ -128,6 +127,10 @@ import { NavigationActions } from 'react-navigation'
     this.props.navigation.navigate('Feedback');
   }
 
+  onSetPhoneNumber() {
+
+  }
+
   async onSubmitFeedback() {
     if (this.feedback.trim() == '') {
       Alert.alert(getI18nText('缺少内容'), getI18nText('请输入反馈意见内容'), [
@@ -202,15 +205,12 @@ import { NavigationActions } from 'react-navigation'
                 titleInfoStyle={styles.titleInfoStyle}
                 onPress={() => { getCurrentUser().checkForUpdate(); }}
               />
-              {
-                this.state.showMigration &&
-                <SettingsList.Item
-                  title='Recover missing answers'
-                  hasNavArrow={true}
-                  titleStyle={{ color: 'red' }}
-                  onPress={() => getCurrentUser().migrateAsync()}
-                />
-              }
+              <SettingsList.Item
+                title={getI18nText('设置手机号码')}
+                hasNavArrow={true}
+                titleStyle={{ color: 'red' }}
+                onPress={this.onSetPhoneNumber.bind(this)}
+              />
             </SettingsList>
           </View>
         </ScrollView>

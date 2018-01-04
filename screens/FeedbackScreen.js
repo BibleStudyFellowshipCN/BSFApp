@@ -8,7 +8,6 @@ import { Layout } from '../constants/Layout';
 import { callWebServiceAsync, showWebServiceCallErrorsAsync } from '../dataStorage/storage';
 import { getI18nText } from '../store/I18n';
 import { RkButton } from 'react-native-ui-kitten';
-import { LegacyAsyncStorage } from 'expo';
 import { getCurrentUser } from '../store/user';
 
 export default class FeedbackScreen extends React.Component {
@@ -19,8 +18,7 @@ export default class FeedbackScreen extends React.Component {
   };
 
   state = {
-    height: 120,
-    showMigration: false
+    height: 120
   };
 
   componentWillMount() {
@@ -31,18 +29,6 @@ export default class FeedbackScreen extends React.Component {
     this.keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', (event) => {
       this.setState({ keyboard: false })
     });
-
-    if (Platform.OS == 'ios') {
-      LegacyAsyncStorage.getItem('ANSWER', (err, oldData) => {
-        if (err || !oldData) {
-          oldData = "{}";
-        }
-        let oldAnswer = JSON.parse(oldData);
-        if (oldAnswer.rawData) {
-          this.setState({ showMigration: true });
-        }
-      });
-    }
   }
 
   componentWillUnmount() {
@@ -118,16 +104,6 @@ export default class FeedbackScreen extends React.Component {
           <View style={{ alignItems: 'center' }}>
             <RkButton onPress={this.onSubmitFeedback.bind(this)}>{getI18nText('提交')}</RkButton>
           </View>
-          {
-            this.state.showMigration &&
-            <View style={{ alignItems: 'center', marginVertical: 7, marginHorizontal: 3 }}>
-              <Text style={{ fontSize: 20, color: 'red', marginBottom: 10 }}>Note: If you see missing answers after update, please click 'Recover' button</Text>
-              <RkButton
-                onPress={() => getCurrentUser().migrateAsync()}>
-                Recover
-            </RkButton>
-            </View>
-          }
         </ScrollView>
       </KeyboardAvoidingView>
     );
