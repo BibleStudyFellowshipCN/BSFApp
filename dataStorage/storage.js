@@ -141,6 +141,14 @@ async function pokeServer(model, id) {
 
     const now = new Date();
 
+    // Check for update every 1 hours
+    const hoursDiff = Math.floor((now - pokeInfo.lastCheckForUpdateTime) / 1000 / 60 / 60);
+    if (hoursDiff >= 1) {
+        pokeInfo.message.push('CheckForUpdate');
+        pokeInfo.lastCheckForUpdateTime = now;
+        getCurrentUser().checkForUpdate(true);
+    }
+
     // Queue poke data up to 5 mins
     const minsDiff = Math.floor((now - pokeInfo.lastUploadTime) / 1000 / 60);
     if (minsDiff > 5) {
@@ -160,13 +168,6 @@ async function pokeServer(model, id) {
             .catch((error) => {
                 console.log(error);
             });
-    }
-
-    // Check for update every 12 hours
-    const hoursDiff = Math.floor((now - pokeInfo.lastCheckForUpdateTime) / 1000 / 60 / 60);
-    if (hoursDiff >= 12) {
-        pokeInfo.lastCheckForUpdateTime = now;
-        getCurrentUser().checkForUpdate(true);
     }
 }
 
