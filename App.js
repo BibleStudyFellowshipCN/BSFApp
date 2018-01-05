@@ -66,15 +66,29 @@ export default class App extends React.Component {
   }
 
   _loadResourcesAsync = async () => {
+
     // migrate data
-    await LegacyAsyncStorage.migrateItems(['ANSWER']);
+    try {
+      await LegacyAsyncStorage.migrateItems(['ANSWER']);
+    } catch (error) {
+      console.log(error);
+    }
 
     // initialize existing user
-    await this.loadUserInfo();
+    try {
+      await this.loadUserInfo();
+    } catch (error) {
+      console.log(error);
+    }
 
-    let bootValues = await Promise.all([
-      loadAsync(Models.Answer, null, false)
-    ]);
+    let bootValues;
+    try {
+      bootValues = await Promise.all([
+        loadAsync(Models.Answer, null, false)
+      ]);
+    } catch (error) {
+      console.log(error);
+    }
 
     // create the store with the boot data
     const initialstate = {
