@@ -174,6 +174,7 @@ export default class AudioBibleScreen extends React.Component {
       currentChapter: 1,
       totalChapter: book.chapters,
     });
+    await getCurrentUser().setAudioBibleBook(id * 1000 + 1);
     console.log(JSON.stringify(this.state));
   }
 
@@ -181,6 +182,7 @@ export default class AudioBibleScreen extends React.Component {
     console.log('_onChapterSelected:' + chapter);
     await this._resetAudio();
     this.setState({ currentChapter: chapter });
+    await getCurrentUser().setAudioBibleBook(this.state.currentBook * 1000 + chapter);
   }
 
   _onSeekSliderValueChange(value) {
