@@ -117,6 +117,7 @@ function getHttpHeaders() {
         'deviceYearClass': global.deviceInfo.deviceYearClass,
         'platformOS': global.deviceInfo.platformOS,
         'version': global.deviceInfo.version,
+        'lang': getCurrentUser().getLanguage(),
         'bibleVersion': getCurrentUser().getBibleVersion(),
         'Accept': 'application/json',
         'Content-Type': 'application/json',
@@ -162,7 +163,7 @@ async function pokeServer(model, id) {
         pokeInfo.message = [];
         pokeInfo.lastUploadTime = now;
 
-        console.log('Uploading: ' + data);
+        console.log('Uploading: ' + JSON.stringify(getHttpHeaders()) + data);
         fetch(Models.Poke.restUri, {
             method: 'POST',
             headers: getHttpHeaders(),
