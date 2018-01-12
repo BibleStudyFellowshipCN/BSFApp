@@ -10,7 +10,7 @@
   "dependencies": {
     "@expo/react-native-action-sheet": "^1.0.1",
     "@expo/samples": "2.1.1",
-    "expo": "^24.0.0",
+    "expo": "^24.0.2",
     "lodash": "^4.17.4",
     "radio-button-react-native": "^1.1.6",
     "react": "16.0.0",
