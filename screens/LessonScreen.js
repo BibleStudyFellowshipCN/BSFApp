@@ -54,33 +54,32 @@ class LessonScreen extends React.Component {
       tabBarTextStyle: { fontSize: 20, fontWeight: '700' },
     }
 
-    if (this.props.lesson) {
-      const dayQuestions = this.props.lesson.dayQuestions;
-
-      const content = <ScrollableTabView initialPage={0} {...scrollableStyleProps} prerenderingSiblingsNumber={Infinity}>
-        {/*<NotesPage tabLabel="讲义" />*/}
-        <DayQuestions tabLabel={getI18nText("一")} goToPassage={this.goToPassage} day={dayQuestions.one} readVerse={dayQuestions.one.readVerse} memoryVerse={this.props.lesson.memoryVerse} />
-        <DayQuestions tabLabel={getI18nText("二")} goToPassage={this.goToPassage} day={dayQuestions.two} readVerse={dayQuestions.two.readVerse} />
-        <DayQuestions tabLabel={getI18nText("三")} goToPassage={this.goToPassage} day={dayQuestions.three} readVerse={dayQuestions.three.readVerse} />
-        <DayQuestions tabLabel={getI18nText("四")} goToPassage={this.goToPassage} day={dayQuestions.four} readVerse={dayQuestions.four.readVerse} />
-        <DayQuestions tabLabel={getI18nText("五")} goToPassage={this.goToPassage} day={dayQuestions.five} readVerse={dayQuestions.five.readVerse} />
-        <DayQuestions tabLabel={getI18nText("六")} goToPassage={this.goToPassage} day={dayQuestions.six} readVerse={dayQuestions.six.readVerse} />
-      </ScrollableTabView>;
-
-      // TODO:[Wei] KeyboardAwareScrollView works on iOS but not Android, KeyboardAvoidingView works on Android, but not iOS :(
-      return (Platform.OS === 'ios') ? content : (
-        <KeyboardAvoidingView style={styles.container} behavior='padding' keyboardVerticalOffset={80}>
-          {content}
-        </KeyboardAvoidingView >
-      );
-    } else {
+    if (!this.props.lesson) {
       // Display loading screen
       return (
         <View style={styles.BSFQuestionContainer}>
           <Text style={{ marginVertical: 12, color: 'black' }}>Loading</Text>
         </View>
-      )
+      );
     }
+
+    const dayQuestions = this.props.lesson.dayQuestions;
+    const content =
+      <ScrollableTabView {...scrollableStyleProps}>
+        <DayQuestions tabLabel={getI18nText("一")} goToPassage={this.goToPassage} day={dayQuestions.one} memoryVerse={this.props.lesson.memoryVerse} />
+        <DayQuestions tabLabel={getI18nText("二")} goToPassage={this.goToPassage} day={dayQuestions.two} />
+        <DayQuestions tabLabel={getI18nText("三")} goToPassage={this.goToPassage} day={dayQuestions.three} />
+        <DayQuestions tabLabel={getI18nText("四")} goToPassage={this.goToPassage} day={dayQuestions.four} />
+        <DayQuestions tabLabel={getI18nText("五")} goToPassage={this.goToPassage} day={dayQuestions.five} />
+        <DayQuestions tabLabel={getI18nText("六")} goToPassage={this.goToPassage} day={dayQuestions.six} />
+      </ScrollableTabView>
+
+    // TODO:[Wei] KeyboardAwareScrollView works on iOS but not Android, KeyboardAvoidingView works on Android, but not iOS :(
+    return (Platform.OS === 'ios') ? content : (
+      <KeyboardAvoidingView style={styles.container} behavior='padding' keyboardVerticalOffset={80}>
+        {content}
+      </KeyboardAvoidingView >
+    );
   }
 }
 
@@ -93,12 +92,13 @@ const DayQuestions = (props) => {
       }
       <Text style={styles.dayTitle} selectable={true}>{props.day.title}</Text>
       {
-        props.readVerse &&
-        props.readVerse.map((quote) => (
+        props.day.readVerse &&
+        props.day.readVerse.map((quote) => (
           <BibleQuote key={quote.book + quote.verse} book={quote.book} verse={quote.verse} goToPassage={props.goToPassage} />
         ))
       }
       {
+        props.day.questions &&
         props.day.questions.map((question) => (
           <BSFQuestion
             key={question.id}
