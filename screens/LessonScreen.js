@@ -31,6 +31,11 @@ class LessonScreen extends React.Component {
   constructor() {
     super();
     this.goToPassage = this.goToPassage.bind(this);
+
+    // [Wei] TextInput cannot take do copy-paste on initialPage, this is a bug on Android
+    // The workaround is set initialPage to -1 and navigate to page 0 when control is initialized
+    this.initialPage = Platform.OS === 'ios' ? 0 : -1;
+    this.intervalId = null;
   }
 
   componentWillMount() {
@@ -38,6 +43,29 @@ class LessonScreen extends React.Component {
 
     if (!this.props.lesson) {
       this.props.loadLesson();
+    }
+
+    if (Platform.OS != 'ios') {
+      this.goToFirstPage();
+    }
+  }
+
+  componentWillUnmount() {
+    if (Platform.OS != 'ios') {
+      clearInterval(this.intervalId);
+    }
+  }
+
+  goToFirstPage() {
+    if (this.tabView) {
+      clearInterval(this.intervalId);
+      this.tabView.goToPage(0);
+    } else {
+      if (!this.intervalId) {
+        this.intervalId = setInterval(() => {
+          this.goToFirstPage();
+        }, 0);
+      }
     }
   }
 
@@ -65,7 +93,9 @@ class LessonScreen extends React.Component {
 
     const dayQuestions = this.props.lesson.dayQuestions;
     const content =
-      <ScrollableTabView {...scrollableStyleProps}>
+      <ScrollableTabView
+        ref={ref => this.tabView = ref}
+        {...scrollableStyleProps} initialPage={this.initialPage}>
         <DayQuestions tabLabel={getI18nText("一")} goToPassage={this.goToPassage} day={dayQuestions.one} memoryVerse={this.props.lesson.memoryVerse} />
         <DayQuestions tabLabel={getI18nText("二")} goToPassage={this.goToPassage} day={dayQuestions.two} />
         <DayQuestions tabLabel={getI18nText("三")} goToPassage={this.goToPassage} day={dayQuestions.three} />
