@@ -1,5 +1,5 @@
 import React from 'react';
-import { Platform, StatusBar, StyleSheet, View } from 'react-native';
+import { Platform, StatusBar, StyleSheet, View, Alert } from 'react-native';
 import Expo, { LegacyAsyncStorage, AppLoading } from 'expo';
 import RootNavigation from './navigation/RootNavigation';
 import createStore from './store/createStore'
@@ -8,8 +8,17 @@ import { Models } from './dataStorage/models';
 import { Provider } from 'react-redux';
 import { ActionSheetProvider } from '@expo/react-native-action-sheet';
 import { getCurrentUser } from './store/user';
+import { getI18nText } from './store/I18n';
 
 let store;
+
+Expo.Util.addNewVersionListenerExperimental(() => updateClient());
+
+function updateClient() {
+  Alert.alert(getI18nText('发现更新'), getI18nText('程序将重新启动'), [
+    { text: 'OK', onPress: () => Expo.Util.reload() },
+  ]);
+}
 
 export default class App extends React.Component {
   state = {
