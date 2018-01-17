@@ -128,48 +128,20 @@ import { NavigationActions } from 'react-navigation'
   }
 
   onSetPhoneNumber() {
-
+    this.props.navigation.navigate('SetPhone', { refresh: this.onCellphoneChanged.bind(this) });
   }
 
-  async onSubmitFeedback() {
-    if (this.feedback.trim() == '') {
-      Alert.alert(getI18nText('缺少内容'), getI18nText('请输入反馈意见内容'), [
-        { text: 'OK', onPress: () => this.feedbackInput.focus() },
-      ]);
-      return;
-    }
-
-    const body = { comment: this.feedback };
-    const result = await callWebServiceAsync(Models.Feedback.restUri, '', 'POST', [], body);
-    const succeed = await showWebServiceCallErrorsAsync(result, 201);
-    if (succeed) {
-      this.feedback = '';
-      Alert.alert(getI18nText('谢谢您的反馈意见！'), '', [
-        { text: 'OK', onPress: () => this.feedbackInput.clear() },
-      ]);
-    }
-  }
-
-  contentSize = null;
-
-  onContentSizeChange(e) {
-    const contentSize = e.nativeEvent.contentSize;
-    console.log(JSON.stringify(contentSize));
-
-    // Support earlier versions of React Native on Android.
-    if (!contentSize) return;
-
-    if (!this.contentSize || this.contentSize.height !== contentSize.height) {
-      this.contentSize = contentSize;
-      this.setState({ height: this.contentSize.height + 14 });
-    }
+  onCellphoneChanged() {
+    console.log(getCurrentUser().getCellphone());
   }
 
   render() {
     const { manifest } = Constants;
+    phone = getCurrentUser().getCellphone();
     return (
       <KeyboardAvoidingView style={styles.container} behavior='padding' keyboardVerticalOffset={0}>
         <ScrollView
+          style={{ backgroundColor: 'white' }}
           ref={ref => this.scrollView = ref}>
           <View style={{ backgroundColor: 'white' }}>
             <SettingsList borderColor='#c8c7cc' defaultItemSize={40}>
@@ -206,9 +178,10 @@ import { NavigationActions } from 'react-navigation'
                 onPress={() => { getCurrentUser().checkForUpdate(); }}
               />
               <SettingsList.Item
-                title={getI18nText('设置手机号码')}
+                title={getI18nText('手机号码')}
+                titleInfo={getI18nText(phone == '' ? '设置' : '更改')}
                 hasNavArrow={true}
-                titleStyle={{ color: 'red' }}
+                titleInfoStyle={styles.titleInfoStyle}
                 onPress={this.onSetPhoneNumber.bind(this)}
               />
             </SettingsList>

@@ -5,7 +5,7 @@
     "slug": "CBSFApp",
     "privacy": "public",
     "sdkVersion": "24.0.0",
-    "version": "2018.01.14",
+    "version": "2018.01.16",
     "primaryColor": "#cccccc",
     "icon": "./assets/images/icon.png",
     "splash": {
@@ -27,6 +27,9 @@
         "WAKE_LOCK"
       ],
       "versionCode": 7
-    }
+    },
+    "assetBundlePatterns": [
+      "assets/images/*"
+    ]
   }
 }

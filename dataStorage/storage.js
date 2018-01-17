@@ -117,6 +117,7 @@ function getHttpHeaders() {
         'deviceYearClass': global.deviceInfo.deviceYearClass,
         'platformOS': global.deviceInfo.platformOS,
         'version': global.deviceInfo.version,
+        'lang': getCurrentUser().getLanguage(),
         'bibleVersion': getCurrentUser().getBibleVersion(),
         'Accept': 'application/json',
         'Content-Type': 'application/json',
@@ -131,9 +132,9 @@ let pokeInfo = {
 
 async function pokeServer(model, id) {
     // Don't poke from non-device
-    if (!Expo.Constants.isDevice) {
+    /*if (!Expo.Constants.isDevice) {
         return;
-    }
+    }*/
 
     const message = model.api + '/' + id;
     console.log('>Poke:' + message + ' => ' + JSON.stringify(pokeInfo));
@@ -141,14 +142,28 @@ async function pokeServer(model, id) {
 
     const now = new Date();
 
+    // Check for update every 10 mins
+    let seconds = Math.floor((now - pokeInfo.lastCheckForUpdateTime) / 1000);
+    checkForUpdateTimer = 10 * 60;
+    if (seconds < checkForUpdateTimer) {
+        console.log((checkForUpdateTimer - seconds) + "s to CheckForUpdate");
+    } else {
+        pokeInfo.message.push('CheckForUpdate');
+        pokeInfo.lastCheckForUpdateTime = now;
+        getCurrentUser().checkForUpdate(true);
+    }
+
     // Queue poke data up to 5 mins
-    const minsDiff = Math.floor((now - pokeInfo.lastUploadTime) / 1000 / 60);
-    if (minsDiff > 5) {
+    pokeTimer = 5 * 60;
+    seconds = Math.floor((now - pokeInfo.lastUploadTime) / 1000);
+    if (seconds < pokeTimer) {
+        console.log((pokeTimer - seconds) + "s to Poke");
+    } else {
         const data = JSON.stringify(pokeInfo.message);
         pokeInfo.message = [];
         pokeInfo.lastUploadTime = now;
 
-        console.log('Uploading: ' + data);
+        console.log('Uploading: ' + JSON.stringify(getHttpHeaders()) + data);
         fetch(Models.Poke.restUri, {
             method: 'POST',
             headers: getHttpHeaders(),
@@ -160,13 +175,6 @@ async function pokeServer(model, id) {
             .catch((error) => {
                 console.log(error);
             });
-    }
-
-    // Check for update every 12 hours
-    const hoursDiff = Math.floor((now - pokeInfo.lastCheckForUpdateTime) / 1000 / 60 / 60);
-    if (hoursDiff >= 12) {
-        pokeInfo.lastCheckForUpdateTime = now;
-        getCurrentUser().checkForUpdate(true);
     }
 }
 
