@@ -39,6 +39,11 @@ export const Models = {
     api: "/feedback",
     restUri: HostServer + "/feedback"
   },
+  Attendance: {
+    key: "Attendance",
+    api: "/attendance",
+    restUri: HostServer + "/attendance"
+  },
   Poke: {
     key: "Poke",
     api: "/poke",

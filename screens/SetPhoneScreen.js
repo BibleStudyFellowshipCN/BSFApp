@@ -1,7 +1,7 @@
 import React from 'react';
 import { ScrollView, StyleSheet, View, Alert, TextInput, KeyboardAvoidingView, Keyboard } from 'react-native';
 import { getI18nText } from '../store/I18n';
-import { RkButton } from 'react-native-ui-kitten';
+import { Button } from 'react-native-elements';
 import { getCurrentUser } from '../store/user';
 
 export default class SetPhoneScreen extends React.Component {
@@ -38,7 +38,12 @@ export default class SetPhoneScreen extends React.Component {
               onChangeText={(text) => { this.setState({ cellphone: text }); }}
             />
             <View style={{ alignItems: 'center', marginTop: 40 }}>
-              <RkButton onPress={this.onSubmit.bind(this)}>{getI18nText('提交')}</RkButton>
+              <Button
+                backgroundColor='#397EDC'
+                borderRadius={5}
+                containerViewStyle={{ width: 130 }}
+                title={getI18nText('提交')}
+                onPress={this.onSubmit.bind(this)} />
             </View>
           </View>
         </ScrollView>

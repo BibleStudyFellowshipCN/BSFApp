@@ -152,11 +152,11 @@ function getI18nText(origText) {
 
   for (var i in text[Models.DefaultLanguage]) {
     if (text[Models.DefaultLanguage][i] == origText) {
-      return text[lang][i];
+      return text[lang][i] ? text[lang][i] : origText;
     }
   }
 
-  return '';
+  return origText;
 }
 
 function getI18nBibleBook(origText) {

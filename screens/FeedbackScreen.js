@@ -7,7 +7,7 @@ import { Models } from '../dataStorage/models';
 import { Layout } from '../constants/Layout';
 import { callWebServiceAsync, showWebServiceCallErrorsAsync } from '../dataStorage/storage';
 import { getI18nText } from '../store/I18n';
-import { RkButton } from 'react-native-ui-kitten';
+import { Button } from 'react-native-elements';
 import { getCurrentUser } from '../store/user';
 
 export default class FeedbackScreen extends React.Component {
@@ -108,7 +108,12 @@ export default class FeedbackScreen extends React.Component {
             />
           </View>
           <View style={{ alignItems: 'center', marginTop: 20 }}>
-            <RkButton onPress={this.onSubmitFeedback.bind(this)}>{getI18nText('提交')}</RkButton>
+            <Button
+              backgroundColor='#397EDC'
+              borderRadius={5}
+              containerViewStyle={{ width: 130 }}
+              title={getI18nText('提交')}
+              onPress={this.onSubmitFeedback.bind(this)} />
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
