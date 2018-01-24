@@ -26,7 +26,8 @@ if (!global.deviceInfo) {
         sessionId: Constants['sessionId'],
         deviceYearClass: Constants['deviceYearClass'],
         platformOS: Platform.OS,
-        version: Constants.manifest.version
+        version: Constants.manifest.version,
+        sdkVersion: 'SDK' + Constants.manifest.sdkVersion
     };
 }
 
@@ -59,6 +60,9 @@ function getFromCache(key, keyString) {
                 break;
             case 'spa':
                 cache = require("../assets/json/spa.json");
+                break;
+            default:
+                cache = require("../assets/json/eng.json");
                 break;
         }
         if (cache[keyString]) {
@@ -99,6 +103,9 @@ function getFromCache(key, keyString) {
             case 'rvr1995':
                 cache = require("../assets/json/rvr1995.json");
                 break;
+            default:
+                cache = require("../assets/json/niv2011.json");
+                break;
         }
         if (cache[keyString]) {
             return cache[keyString];
@@ -117,7 +124,7 @@ function getHttpHeaders() {
         'sessionId': global.deviceInfo.sessionId,
         'deviceYearClass': global.deviceInfo.deviceYearClass,
         'platformOS': global.deviceInfo.platformOS,
-        'version': global.deviceInfo.version,
+        'version': global.deviceInfo.version + ' ' + global.deviceInfo.sdkVersion,
         'lang': getCurrentUser().getLanguage(),
         'bibleVersion': getCurrentUser().getBibleVersion(),
         'Accept': 'application/json',
