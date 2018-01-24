@@ -23,10 +23,12 @@ import { NavigationActions } from 'react-navigation'
 
   state = {
     language: getCurrentUser().getLanguageDisplayName(),
-    bibleVersion: getCurrentUser().getBibleVersionDisplayName()
+    bibleVersion: getCurrentUser().getBibleVersionDisplayName(),
+    isGroupLeader: false
   };
 
   componentWillMount() {
+    this.onCellphoneChanged();
   }
 
   async updateBibleVersionBasedOnLanguage(language) {
@@ -131,8 +133,22 @@ import { NavigationActions } from 'react-navigation'
     this.props.navigation.navigate('SetPhone', { refresh: this.onCellphoneChanged.bind(this) });
   }
 
-  onCellphoneChanged() {
-    console.log(getCurrentUser().getCellphone());
+  async onCellphoneChanged() {
+    const phone = getCurrentUser().getCellphone();
+    console.log(phone);
+
+    const body = { comment: this.feedback };
+    const result = await callWebServiceAsync(Models.Attendance.restUri, '?cellphone=' + phone, 'GET');
+    const succeed = await showWebServiceCallErrorsAsync(result);
+    this.setState({ isGroupLeader: succeed && result.status == 200 });
+  }
+
+  async onAttendance() {
+    const result = await callWebServiceAsync(Models.Attendance.restUri, '?cellphone=' + phone, 'GET');
+    const succeed = await showWebServiceCallErrorsAsync(result, 200);
+    if (succeed) {
+      this.props.navigation.navigate('Attendance', { data: result.body });
+    }
   }
 
   render() {
@@ -184,6 +200,15 @@ import { NavigationActions } from 'react-navigation'
                 titleInfoStyle={styles.titleInfoStyle}
                 onPress={this.onSetPhoneNumber.bind(this)}
               />
+              {
+                this.state.isGroupLeader &&
+                <SettingsList.Item
+                  title={getI18nText('考勤表')}
+                  hasNavArrow={true}
+                  titleInfoStyle={styles.titleInfoStyle}
+                  onPress={this.onAttendance.bind(this)}
+                />
+              }
             </SettingsList>
           </View>
         </ScrollView>

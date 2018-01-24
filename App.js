@@ -15,7 +15,7 @@ let store;
 Expo.Util.addNewVersionListenerExperimental(() => updateClient());
 
 function updateClient() {
-  Alert.alert(getI18nText('·¢ÏÖ¸üÐÂ'), getI18nText('³ÌÐò½«ÖØÐÂÆô¶¯'), [
+  Alert.alert(getI18nText('å‘çŽ°æ›´æ–°'), getI18nText('ç¨‹åºå°†é‡æ–°å¯åŠ¨'), [
     { text: 'OK', onPress: () => Expo.Util.reload() },
   ]);
 }
