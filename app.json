@@ -26,7 +26,7 @@
       "permissions": [
         "WAKE_LOCK"
       ],
-      "versionCode": 8
+      "versionCode": 10
     },
     "assetBundlePatterns": [
       "assets/images/*"
