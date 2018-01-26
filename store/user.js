@@ -47,7 +47,7 @@ async function saveUserAsync(user) {
 }
 
 export default class User {
-  cellphone = null;
+  cellphone = '';
   loggedOn = false;
   offlineMode = false;
   language = Models.DefaultLanguage;
@@ -84,7 +84,7 @@ export default class User {
 
   getCellphone() {
     if (!this.isLoggedOn()) {
-      return null;
+      return '';
     }
     return this.cellphone;
   }
@@ -120,6 +120,16 @@ export default class User {
     }
 
     return this.audioBook;
+  }
+
+  async setCellphoneAsync(celphone) {
+    if (!this.isLoggedOn()) {
+      return;
+    }
+
+    this.cellphone = celphone;
+    await saveUserAsync(this.getUserInfo());
+    this.logUserInfo();
   }
 
   async setAudioBibleBook(id) {

@@ -116,6 +116,7 @@ function getFromCache(key, keyString) {
 }
 
 function getHttpHeaders() {
+
     return {
         'pragma': 'no-cache',
         'cache-control': 'no-cache',
@@ -323,20 +324,20 @@ async function clearStorageAsync(key) {
     await storage.clearMapForKey(key);
 }
 
-async function callWebServiceAsync(url, api, method, headers, body) {
+async function callWebServiceAsync(url, api, method, headersUnused, body) {
     let responseStatus;
     let responseHeader;
     let responseJson;
     let serverUrl = url + api;
+    const headers = getHttpHeaders();
     try {
         let payload;
         if (body) {
-            payload = { method, headers: getHttpHeaders(), body: JSON.stringify(body) };
+            payload = { method, headers, body: JSON.stringify(body) };
         } else {
-            payload = { method, headers: getHttpHeaders() };
+            payload = { method, headers };
         }
 
-        console.log(JSON.stringify({ url: serverUrl, ...payload }));
         const response = await fetch(serverUrl, payload);
 
         responseStatus = response.status;
@@ -360,7 +361,8 @@ async function callWebServiceAsync(url, api, method, headers, body) {
     }
 
     const result = { headers: responseHeader, body: responseJson, status: responseStatus };
-    console.log(method + ' ' + serverUrl + " => " + JSON.stringify(result));
+    console.log(method + ' ' + serverUrl + " >>> " + JSON.stringify({ headers, body }));
+    console.log(method + ' ' + serverUrl + " <<< " + JSON.stringify(result));
     return result;
 }
 
@@ -386,9 +388,10 @@ async function showWebServiceCallErrorsAsync(result, acceptStatus) {
             }
             await Alert.alert('Error', message);
         }
+        return false;
     }
 
-    return false;
+    return true;
 }
 
 export { loadAsync, saveAsync, clearStorageAsync, callWebServiceAsync, showWebServiceCallErrorsAsync, pokeServer };

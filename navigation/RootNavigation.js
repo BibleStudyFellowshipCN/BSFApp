@@ -7,6 +7,8 @@ import registerForPushNotificationsAsync from '../api/registerForPushNotificatio
 import LessonScreen from '../screens/LessonScreen';
 import BibleScreen from '../screens/BibleScreen';
 import FeedbackScreen from '../screens/FeedbackScreen';
+import SetPhoneScreen from '../screens/SetPhoneScreen';
+import AttendanceScreen from '../screens/AttendanceScreen';
 
 const RootStackNavigator = StackNavigator(
   {
@@ -21,6 +23,12 @@ const RootStackNavigator = StackNavigator(
     },
     Feedback: {
       screen: FeedbackScreen
+    },
+    SetPhone: {
+      screen: SetPhoneScreen
+    },
+    Attendance: {
+      screen: AttendanceScreen
     }
   },
   {

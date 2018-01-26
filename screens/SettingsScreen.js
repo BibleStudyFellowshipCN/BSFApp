@@ -140,45 +140,35 @@ import { LegacyAsyncStorage } from 'expo';
     this.props.navigation.navigate('Feedback');
   }
 
-  async onSubmitFeedback() {
-    if (this.feedback.trim() == '') {
-      Alert.alert(getI18nText('缺少内容'), getI18nText('请输入反馈意见内容'), [
-        { text: 'OK', onPress: () => this.feedbackInput.focus() },
-      ]);
-      return;
-    }
-
-    const body = { comment: this.feedback };
-    const result = await callWebServiceAsync(Models.Feedback.restUri, '', 'POST', [], body);
-    const succeed = await showWebServiceCallErrorsAsync(result, 201);
-    if (succeed) {
-      this.feedback = '';
-      Alert.alert(getI18nText('谢谢您的反馈意见！'), '', [
-        { text: 'OK', onPress: () => this.feedbackInput.clear() },
-      ]);
-    }
+  onSetPhoneNumber() {
+    this.props.navigation.navigate('SetPhone', { refresh: this.onCellphoneChanged.bind(this) });
   }
 
-  contentSize = null;
+  async onCellphoneChanged() {
+    const phone = getCurrentUser().getCellphone();
+    console.log(phone);
 
-  onContentSizeChange(e) {
-    const contentSize = e.nativeEvent.contentSize;
-    console.log(JSON.stringify(contentSize));
+    const body = { comment: this.feedback };
+    const result = await callWebServiceAsync(Models.Attendance.restUri, '?cellphone=' + phone, 'GET');
+    const succeed = await showWebServiceCallErrorsAsync(result);
+    this.setState({ isGroupLeader: succeed && result.status == 200 });
+  }
 
-    // Support earlier versions of React Native on Android.
-    if (!contentSize) return;
-
-    if (!this.contentSize || this.contentSize.height !== contentSize.height) {
-      this.contentSize = contentSize;
-      this.setState({ height: this.contentSize.height + 14 });
+  async onAttendance() {
+    const result = await callWebServiceAsync(Models.Attendance.restUri, '?cellphone=' + phone, 'GET');
+    const succeed = await showWebServiceCallErrorsAsync(result, 200);
+    if (succeed) {
+      this.props.navigation.navigate('Attendance', { data: result.body });
     }
   }
 
   render() {
     const { manifest } = Constants;
+    phone = getCurrentUser().getCellphone();
     return (
       <KeyboardAvoidingView style={styles.container} behavior='padding' keyboardVerticalOffset={0}>
         <ScrollView
+          style={{ backgroundColor: 'white' }}
           ref={ref => this.scrollView = ref}>
           <View style={{ backgroundColor: 'white' }}>
             <SettingsList borderColor='#c8c7cc' defaultItemSize={40}>
@@ -221,6 +211,22 @@ import { LegacyAsyncStorage } from 'expo';
                   hasNavArrow={true}
                   titleStyle={{ color: 'red' }}
                   onPress={() => getCurrentUser().migrateAsync()}
+                />
+              }
+              <SettingsList.Item
+                title={getI18nText('手机号码')}
+                titleInfo={getI18nText(phone == '' ? '设置' : '更改')}
+                hasNavArrow={true}
+                titleInfoStyle={styles.titleInfoStyle}
+                onPress={this.onSetPhoneNumber.bind(this)}
+              />
+              {
+                this.state.isGroupLeader &&
+                <SettingsList.Item
+                  title={getI18nText('考勤表')}
+                  hasNavArrow={true}
+                  titleInfoStyle={styles.titleInfoStyle}
+                  onPress={this.onAttendance.bind(this)}
                 />
               }
             </SettingsList>
