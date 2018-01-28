@@ -12,14 +12,11 @@ export default class SermonAudioScreen extends React.Component {
   };
 
   render() {
-    const html = '<body oncontextmenu="return false">' +
-      '<audio controls="true" autoplay="true" controlsList="nodownload">' +
-      '<source src="http://cbsf.southcentralus.cloudapp.azure.com:3000/audio/' + getCurrentUser().getCellphone() + '?play=1" type="audio/mpeg">' +
-      'Your browser does not support the audio element.' +
-      '</audio>' +
-      '</body>';
+    const uri = 'http://cbsf.southcentralus.cloudapp.azure.com/bsf/audio.php?cellphone=' + getCurrentUser().getCellphone();
     return (
-      <WebView source={{ html }} />
+      <WebView
+        source={{ uri }}
+      />
     );
   }
 }
