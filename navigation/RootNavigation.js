@@ -9,6 +9,7 @@ import BibleScreen from '../screens/BibleScreen';
 import FeedbackScreen from '../screens/FeedbackScreen';
 import SetPhoneScreen from '../screens/SetPhoneScreen';
 import AttendanceScreen from '../screens/AttendanceScreen';
+import SermonAudioScreen from '../screens/SermonAudioScreen';
 
 const RootStackNavigator = StackNavigator(
   {
@@ -29,6 +30,9 @@ const RootStackNavigator = StackNavigator(
     },
     Attendance: {
       screen: AttendanceScreen
+    },
+    SermonAudio: {
+      screen: SermonAudioScreen
     }
   },
   {

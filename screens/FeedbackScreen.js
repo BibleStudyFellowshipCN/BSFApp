@@ -66,7 +66,12 @@ export default class FeedbackScreen extends React.Component {
     if (succeed) {
       this.feedback = '';
       Alert.alert(getI18nText('谢谢您的反馈意见！'), '', [
-        { text: 'OK', onPress: () => this.feedbackInput.clear() },
+        {
+          text: 'OK', onPress: () => {
+            this.feedbackInput.clear();
+            this.props.navigation.goBack();
+          }
+        },
       ]);
     }
   }
@@ -90,6 +95,7 @@ export default class FeedbackScreen extends React.Component {
     return (
       <KeyboardAvoidingView style={styles.container} behavior='padding' keyboardVerticalOffset={0}>
         <ScrollView
+          style={{ backgroundColor: 'white' }}
           ref={ref => this.scrollView = ref}
           onContentSizeChange={(contentWidth, contentHeight) => {
             if (this.state.keyboard) {
@@ -139,7 +145,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   answerContainer: {
-    marginTop: 5,
+    margin: 5,
     height: 150,
     padding: 5,
     backgroundColor: 'whitesmoke',

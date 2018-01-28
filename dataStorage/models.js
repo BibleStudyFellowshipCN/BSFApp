@@ -11,27 +11,23 @@ export const Models = {
     key: "BOOK",
     api: "/lessons",
     restUri: HostServer + "/lessons",
-    cachePolicy: CachePolicy.AsyncStorage,
     useLanguage: true
   },
   Lesson: {
     key: "LESSON",
     api: "/lessons",
     restUri: HostServer + "/lessons",
-    cachePolicy: CachePolicy.AsyncStorage,
     useLanguage: true
   },
   Passage: {
     key: "PASSAGE",
     api: "/verse",
     restUri: HostServer + "/verse",
-    cachePolicy: CachePolicy.AsyncStorage
   },
   Logon: {
     key: "LOGON",
     api: "/logon",
     restUri: HostServer + "/logon",
-    cachePolicy: CachePolicy.AsyncStorage,
     userKey: '@BsfApp:user'
   },
   Feedback: {
@@ -48,6 +44,11 @@ export const Models = {
     key: "Poke",
     api: "/poke",
     restUri: HostServer + "/poke"
+  },
+  User: {
+    key: "User",
+    api: "/user",
+    restUri: HostServer + "/user"
   },
   Answer: {
     key: "ANSWER",
