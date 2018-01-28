@@ -24,7 +24,7 @@ import { NavigationActions } from 'react-navigation'
   state = {
     language: getCurrentUser().getLanguageDisplayName(),
     bibleVersion: getCurrentUser().getBibleVersionDisplayName(),
-    isGroupLeader: false
+    user: {}
   };
 
   componentWillMount() {
@@ -138,9 +138,14 @@ import { NavigationActions } from 'react-navigation'
     console.log(phone);
 
     const body = { comment: this.feedback };
-    const result = await callWebServiceAsync(Models.Attendance.restUri, '?cellphone=' + phone, 'GET');
+    const result = await callWebServiceAsync(Models.User.restUri, '/' + phone, 'GET');
     const succeed = await showWebServiceCallErrorsAsync(result);
-    this.setState({ isGroupLeader: succeed && result.status == 200 });
+    if (succeed && result.status == 200) {
+      this.setState({ user: result.body });
+    }
+    else {
+      this.setState({ user: {} });
+    }
   }
 
   async onAttendance() {
@@ -149,6 +154,10 @@ import { NavigationActions } from 'react-navigation'
     if (succeed) {
       this.props.navigation.navigate('Attendance', { data: result.body });
     }
+  }
+
+  async onAudio() {
+    this.props.navigation.navigate('SermonAudio', { user: this.state.user });
   }
 
   render() {
@@ -181,11 +190,30 @@ import { NavigationActions } from 'react-navigation'
                 onPress={this.onFontSize.bind(this)}
               />*/}
               <SettingsList.Item
-                title={getI18nText('反馈意见')}
+                title={getI18nText('手机号码')}
+                titleInfo={getI18nText(phone == '' ? '设置' : '更改')}
                 hasNavArrow={true}
                 titleInfoStyle={styles.titleInfoStyle}
-                onPress={this.onFeedback.bind(this)}
+                onPress={this.onSetPhoneNumber.bind(this)}
               />
+              {
+                this.state.user.isGroupLeader &&
+                <SettingsList.Item
+                  title={getI18nText('考勤表')}
+                  hasNavArrow={true}
+                  titleInfoStyle={styles.titleInfoStyle}
+                  onPress={this.onAttendance.bind(this)}
+                />
+              }
+              {
+                this.state.user.audio &&
+                <SettingsList.Item
+                  title={getI18nText('讲道录音')}
+                  hasNavArrow={true}
+                  titleInfoStyle={styles.titleInfoStyle}
+                  onPress={this.onAudio.bind(this)}
+                />
+              }
               <SettingsList.Header headerText='MBSF - Mobile Bible Study Fellowship' headerStyle={{ color: 'black', marginTop: 15 }} />
               <SettingsList.Item
                 title={getI18nText('版本') + ': ' + manifest.version}
@@ -194,21 +222,11 @@ import { NavigationActions } from 'react-navigation'
                 onPress={() => { getCurrentUser().checkForUpdate(); }}
               />
               <SettingsList.Item
-                title={getI18nText('手机号码')}
-                titleInfo={getI18nText(phone == '' ? '设置' : '更改')}
+                title={getI18nText('反馈意见')}
                 hasNavArrow={true}
                 titleInfoStyle={styles.titleInfoStyle}
-                onPress={this.onSetPhoneNumber.bind(this)}
+                onPress={this.onFeedback.bind(this)}
               />
-              {
-                this.state.isGroupLeader &&
-                <SettingsList.Item
-                  title={getI18nText('考勤表')}
-                  hasNavArrow={true}
-                  titleInfoStyle={styles.titleInfoStyle}
-                  onPress={this.onAttendance.bind(this)}
-                />
-              }
             </SettingsList>
           </View>
         </ScrollView>
