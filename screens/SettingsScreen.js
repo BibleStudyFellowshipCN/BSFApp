@@ -41,6 +41,8 @@ import { LegacyAsyncStorage } from 'expo';
         }
       });
     }
+
+    this.onCellphoneChanged();
   }
 
   async updateBibleVersionBasedOnLanguage(language) {
