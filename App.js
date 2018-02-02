@@ -68,7 +68,7 @@ export default class App extends React.Component {
         bible = 'rcuvts';
       }
 
-      await getCurrentUser().loginAsync("4250000000", lang);
+      await getCurrentUser().loginAsync("0000000000", lang);
       await getCurrentUser().setBibleVersionAsync(bible);
     }
     getCurrentUser().logUserInfo();    // add all the neccessary load in Promise.all
