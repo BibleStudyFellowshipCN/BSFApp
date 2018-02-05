@@ -19,6 +19,7 @@ import Colors from '../constants/Colors'
 import { getI18nText, getI18nBibleBook } from '../store/I18n';
 import { Models } from '../dataStorage/models';
 import { pokeServer } from '../dataStorage/storage';
+import { getCurrentUser } from '../store/user';
 
 class LessonScreen extends React.Component {
   static navigationOptions = ({ navigation }) => {
@@ -118,9 +119,9 @@ const DayQuestions = (props) => {
     <View style={styles.BSFQuestionContainer}>
       {
         props.memoryVerse &&
-        <Text style={styles.memoryVerse} selectable={true}>{getI18nText('背诵经文：')}{props.memoryVerse}</Text>
+        <Text style={[styles.memoryVerse, { fontSize: getCurrentUser().getLessonFontSize() }]} selectable={true}>{getI18nText('背诵经文：')}{props.memoryVerse}</Text>
       }
-      <Text style={styles.dayTitle} selectable={true}>{props.day.title}</Text>
+      <Text style={[styles.dayTitle, { fontSize: getCurrentUser().getLessonFontSize() }]} selectable={true}>{props.day.title}</Text>
       {
         props.day.readVerse &&
         props.day.readVerse.map((quote) => (
@@ -137,7 +138,7 @@ const DayQuestions = (props) => {
           />
         ))
       }
-    </View>
+    </View >
   );
 
   return (Platform.OS === 'ios') ? (
@@ -170,7 +171,7 @@ const BSFQuestion = (props) => (
 )
 
 const QuestionText = (props) => (
-  <Text style={{ color: 'black', marginBottom: 5, fontSize: 18 }} selectable={true}>{props.children}</Text>
+  <Text style={{ color: 'black', marginBottom: 5, fontSize: getCurrentUser().getLessonFontSize() }} selectable={true}>{props.children}</Text>
 )
 
 const BibleQuote = (props) => (
@@ -221,13 +222,11 @@ const styles = StyleSheet.create({
   },
   dayTitle: {
     color: 'black',
-    fontSize: 18,
     fontWeight: 'bold',
   },
   memoryVerse: {
     color: 'black',
     marginBottom: 30,
-    fontSize: 18,
     fontWeight: 'bold',
   }
 });

@@ -75,5 +75,6 @@ export const Models = {
     { DisplayName: "King James Version", Value: "kjv" },
     { DisplayName: "Nueva Versión Internacional", Value: "nvi" },
     { DisplayName: "Reina-Valera 1995", Value: "rvr1995" },
-  ]
+  ],
+  DefaultFontSize: 2  // 1 - small, 2 - medium, 3 - large
 }

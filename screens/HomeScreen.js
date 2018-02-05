@@ -111,7 +111,7 @@ const Lesson = (props) => {
             {date} {lessonNumber}
           </Text>
         </View>
-        <Text style={styles.lessonText}>
+        <Text style={{ fontSize: getCurrentUser().getLessonFontSize() }}>
           {name}
         </Text>
       </View>
@@ -154,7 +154,6 @@ const styles = StyleSheet.create({
     paddingVertical: 2,
     backgroundColor: '#FFECC4',
     alignItems: 'center',
-    height: 60,
     paddingLeft: 15,
     marginTop: 2,
     marginBottom: 2
@@ -169,7 +168,6 @@ const styles = StyleSheet.create({
     paddingLeft: 25,
     paddingVertical: 5,
     backgroundColor: 'white',
-    height: 60,
   },
   lessonChevron: {
     position: 'absolute',
@@ -182,8 +180,5 @@ const styles = StyleSheet.create({
   },
   lessonMetadataText: {
     color: 'grey',
-  },
-  lessonText: {
-    fontSize: 18,
-  },
+  }
 });

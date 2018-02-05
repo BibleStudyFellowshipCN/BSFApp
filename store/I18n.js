@@ -37,6 +37,10 @@ const text = {
     "手机号码",
     "设置",
     "更改",
+    "字体大小",
+    "大",
+    "中",
+    "小",
   ],
   cht: [
     "BSF課程",
@@ -73,6 +77,10 @@ const text = {
     "手機號碼",
     "設置",
     "更改",
+    "字體大小",
+    "大",
+    "中",
+    "小",
   ],
   eng: [
     "BSF Lessons",
@@ -109,6 +117,10 @@ const text = {
     "Cellphone",
     "Setup",
     "Update",
+    "Font size",
+    "Big",
+    "Medium",
+    "Small",
   ],
   spa: [
     "BSF Lecciones",
@@ -145,6 +157,10 @@ const text = {
     "Teléfono móvil",
     "Preparar",
     "Actualizar",
+    "Tamaño de fuente",
+    "Grande",
+    "Medio",
+    "Pequeña",
   ]
 };
 

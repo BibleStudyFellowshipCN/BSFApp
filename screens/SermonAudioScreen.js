@@ -28,16 +28,3 @@ export default class SermonAudioScreen extends React.Component {
     );
   }
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  cellphoneInput: {
-    margin: 10,
-    height: 80,
-    fontSize: 24,
-    padding: 5,
-    backgroundColor: 'whitesmoke',
-  }
-});

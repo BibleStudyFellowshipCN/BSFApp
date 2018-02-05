@@ -53,6 +53,7 @@ export default class User {
   language = Models.DefaultLanguage;
   bibleVersion = Models.DefaultBibleVersion;
   audioBook = 1 * 1000 + 1;
+  fontSize = Models.DefaultFontSize;
 
   async loadExistingUserAsync() {
     let existingUser = await loadUser();
@@ -71,6 +72,12 @@ export default class User {
         this.audioBook = existingUser.audioBook;
         if (this.audioBook < 1 * 1000 || this.audioBook > 66 * 1000) {
           this.audioBook = 1 * 1000 + 1;
+        }
+      }
+      if (existingUser.fontSize) {
+        this.fontSize = existingUser.fontSize;
+        if (this.fontSize < 1 || this.fontSize > 3) {
+          this.fontSize = 2;
         }
       }
       this.loggedOn = true;
@@ -159,6 +166,39 @@ export default class User {
     this.language = language;
     await saveUserAsync(this.getUserInfo());
     this.logUserInfo();
+  }
+
+  async setFontSizeAsync(size) {
+    if (!this.isLoggedOn()) {
+      return;
+    }
+
+    this.fontSize = size;
+    await saveUserAsync(this.getUserInfo());
+    this.logUserInfo();
+  }
+
+  getFontSize() {
+    if (!this.isLoggedOn()) {
+      return Models.DefaultFontSize;
+    }
+    return this.fontSize;
+  }
+
+  getLessonFontSize() {
+    return 12 + this.getFontSize() * 3;
+  }
+
+  getBibleFontSize() {
+    return 12 + this.getFontSize() * 3;
+  }
+
+  getLessonFontSize() {
+    return 12 + this.getFontSize() * 3;
+  }
+
+  getSettingFontSize() {
+    return 9 + this.getFontSize() * 3;
   }
 
   getBibleVersion() {
@@ -250,7 +290,14 @@ export default class User {
   }
 
   getUserInfo() {
-    return { cellphone: this.cellphone, language: this.language, bibleVersion: this.bibleVersion, offlineMode: this.offlineMode, audioBook: this.audioBook };
+    return {
+      cellphone: this.cellphone,
+      language: this.language,
+      bibleVersion: this.bibleVersion,
+      offlineMode: this.offlineMode,
+      audioBook: this.audioBook,
+      fontSize: this.fontSize
+    };
   }
 
   async migrateAsync() {
