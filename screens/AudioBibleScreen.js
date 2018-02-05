@@ -4,12 +4,16 @@ import {
   Text,
   TouchableHighlight,
   View,
-  Picker
+  Picker,
+  Dimensions,
+  Modal,
+  Slider
 } from 'react-native';
 import { Audio, KeepAwake } from 'expo';
 import { getI18nText, getI18nBibleBook } from '../store/I18n';
 import { getCurrentUser } from '../store/user';
 import { FontAwesome } from '@expo/vector-icons';
+import { Models } from '../dataStorage/models';
 
 const audioBookId = require('../assets/json/audioBookId.json');
 
@@ -24,19 +28,39 @@ export default class AudioBibleScreen extends React.Component {
   constructor(props) {
     super(props);
 
-    const bookId = parseInt(getCurrentUser().getAudioBibleBook() / 1000);
-    let book = audioBookId.find((element) => (element.id == bookId));
+    const currentLanguage = getCurrentUser().getLanguage();
+    const value = parseInt(getCurrentUser().getAudioBibleBook());
+
+    // set up default veresion based on language
+    let currentVersion = parseInt(value / 1000 / 1000);
+    if (currentVersion == 0) {
+      currentVersion = 4;
+      if (currentLanguage == 'eng') {
+        currentVersion = 1
+      } else if (currentLanguage == 'spa') {
+        currentVersion = 6;
+      } else if (currentLanguage == 'cht') {
+        currentVersion = 13;
+      }
+    }
+    const currentBook = parseInt(value / 1000 % 1000);
+    const currentChapter = parseInt(value % 1000);
+    console.log({ currentLanguage, currentVersion, currentBook, currentChapter });
+
+    let book = audioBookId.find((element) => (element.id == currentBook));
     this.state = {
-      currentLanguage: getCurrentUser().getLanguage(),
-      currentBook: bookId,
-      currentChapter: parseInt(getCurrentUser().getAudioBibleBook() % 1000),
+      currentLanguage,
+      currentVersion,
+      currentBook,
+      currentChapter,
       totalChapter: book.chapters,
       isPlaying: false,
       isPaused: false,
       isLoading: false,
       isLoaded: false,
       duration: 0,
-      progress: 0
+      progress: 0,
+      width: Dimensions.get('window').width
     };
     console.log("Init state: " + JSON.stringify(this.state));
   }
@@ -64,13 +88,14 @@ export default class AudioBibleScreen extends React.Component {
     console.log(JSON.stringify(status));
     if (status.didJustFinish || status.progress == 1) {
       console.log('didJustFinish ' + this.state.currentChapter);
-      await this.sound.unloadAsync();
       this.setState({ isLoaded: false });
+      await this.sound.unloadAsync();
 
       var newBook = 1;
       var newChapter = 1;
       if (this.state.currentChapter < this.state.totalChapter) {
         // play next chapter
+        newBook = this.state.currentBook;
         newChapter = this.state.currentChapter + 1;
       } else if (this.state.currentBook < 66) {
         // play next book
@@ -78,7 +103,7 @@ export default class AudioBibleScreen extends React.Component {
       }
 
       this.setState({ currentBook: newBook, currentChapter: newChapter });
-      await getCurrentUser().setAudioBibleBook(newBook * 1000 + newChapter);
+      await getCurrentUser().setAudioBibleBook(this.state.currentVersion * 1000 * 1000 + newBook * 1000 + newChapter);
       await this.sound.loadAsync({ uri: this.getAudioUrl() });
       await this.sound.playAsync();
     } else if (status.isLoaded) {
@@ -95,15 +120,7 @@ export default class AudioBibleScreen extends React.Component {
   }
 
   getAudioUrl() {
-    let lang = 4; // Chinese Mandarin
-    if (getCurrentUser().getLanguage() == 'eng') {
-      lang = 1; // English
-    } else if (getCurrentUser().getLanguage() == 'spa') {
-      lang = 6; // Spanish
-    } else if (getCurrentUser().getLanguage() == 'cht') {
-      lang = 13; // Chinese Cantonese
-    }
-    let url = 'http://167.88.37.77/bsf/' + lang + '/' + this.state.currentBook + '/' + this.state.currentChapter + '.mp3';
+    let url = 'http://167.88.37.77/bsf/' + this.state.currentVersion + '/' + this.state.currentBook + '/' + this.state.currentChapter + '.mp3';
     console.log(url);
     return url;
   }
@@ -176,7 +193,7 @@ export default class AudioBibleScreen extends React.Component {
       currentChapter: 1,
       totalChapter: book.chapters,
     });
-    await getCurrentUser().setAudioBibleBook(id * 1000 + 1);
+    await getCurrentUser().setAudioBibleBook(this.state.currentVersion * 1000 * 1000 + id * 1000 + 1);
     console.log(JSON.stringify(this.state));
   }
 
@@ -184,7 +201,7 @@ export default class AudioBibleScreen extends React.Component {
     console.log('_onChapterSelected:' + chapter);
     await this._resetAudio();
     this.setState({ currentChapter: chapter });
-    await getCurrentUser().setAudioBibleBook(this.state.currentBook * 1000 + chapter);
+    await getCurrentUser().setAudioBibleBook(this.state.currentVersion * 1000 * 1000 + this.state.currentBook * 1000 + chapter);
   }
 
   _onSeekSliderValueChange(value) {
@@ -206,6 +223,13 @@ export default class AudioBibleScreen extends React.Component {
     }
   }
 
+  async _onVersionSelected(value) {
+    console.log("Swtich version:" + value);
+    await this._resetAudio();
+    this.setState({ currentVersion: value });
+    await getCurrentUser().setAudioBibleBook(value * 1000 * 1000 + this.state.currentBook * 1000 + this.state.currentChapter);
+  }
+
   _getMMSSFromMillis(millis) {
     const totalSeconds = millis / 1000;
     const seconds = Math.floor(totalSeconds % 60);
@@ -221,6 +245,39 @@ export default class AudioBibleScreen extends React.Component {
     return padWithZero(minutes) + ':' + padWithZero(seconds);
   }
 
+  onLayout(e) {
+    this.setState({ width: Dimensions.get('window').width });
+  }
+
+  getBookName(name) {
+    let lang = 'chs';
+    switch (this.state.currentVersion) {
+      case '1':
+        lang = 'eng';
+        break;
+      case '6':
+        lang = 'spa';
+        break;
+      case '13':
+        lang = 'cht';
+        break;
+    }
+    return getI18nBibleBook(name, lang);
+  }
+
+  getChapterName(name) {
+    let lang = 'chs';
+    switch (this.state.currentVersion) {
+      case '1':
+        return 'Chapter ' + name;
+      case '6':
+        return 'Capítulo ' + name;
+      case '13':
+        return '第' + name + '章';
+    }
+    return '第' + name + '章';
+  }
+
   render() {
     console.log('State:' + JSON.stringify(this.state));
     const position = this._getMMSSFromMillis(this.state.duration * this.state.progress);
@@ -232,23 +289,34 @@ export default class AudioBibleScreen extends React.Component {
         backgroundColor: 'white'
       }}>
         <View style={{ flexDirection: 'row' }}>
-          <View style={{ width: 170 }}>
+          <View style={{ width: this.state.width / 3 }}>
+            <Picker
+              style={{ alignSelf: 'stretch' }}
+              selectedValue={this.state.currentVersion}
+              onValueChange={this._onVersionSelected.bind(this)}>
+              {
+                Models.AudioBibles.map(s => (
+                  <Picker.Item label={s.DisplayName} value={s.Value} key={s.Value} />
+                ))}
+            </Picker>
+          </View>
+          <View style={{ width: this.state.width / 3 }}>
             <Picker
               style={{ alignSelf: 'stretch' }}
               selectedValue={this.state.currentBook}
               onValueChange={this._onBookSelected.bind(this)}>
               {audioBookId.map(s => (
-                <Picker.Item label={getI18nBibleBook(s.name)} value={s.id} key={s.id} />
+                <Picker.Item label={this.getBookName(s.name)} value={s.id} key={s.id} />
               ))}
             </Picker>
           </View>
-          <View style={{ width: 170 }}>
+          <View style={{ width: this.state.width / 3 }}>
             <Picker
               style={{ alignSelf: 'stretch' }}
               selectedValue={this.state.currentChapter}
               onValueChange={this._onChapterSelected.bind(this)}>
               {
-                Array(this.state.totalChapter).fill(0).map((e, i) => i + 1).map(s => (<Picker.Item label={getI18nText('第') + s.toString() + getI18nText('章')} value={s} key={s} />))
+                Array(this.state.totalChapter).fill(0).map((e, i) => i + 1).map(s => (<Picker.Item label={this.getChapterName(s.toString())} value={s} key={s} />))
               }
             </Picker>
           </View>
@@ -259,8 +327,9 @@ export default class AudioBibleScreen extends React.Component {
           value={this.state.progress}
           onValueChange={this._onSeekSliderValueChange.bind(this)}
           onSlidingComplete={this._onSeekSliderSlidingComplete.bind(this)}
-          disabled={this.state.isLoading || !this.state.isLoaded}
-        />*/}
+          disabled={!this.state.isPlaying || this.state.isPaused}
+        />
+        */}
         <Text>{position}/{duration}</Text>
         <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center' }}>
           <TouchableHighlight
@@ -300,4 +369,7 @@ export default class AudioBibleScreen extends React.Component {
 const styles = StyleSheet.create({
   wrapper: {
   },
+  playbackSlider: {
+    alignSelf: 'stretch',
+  }
 });
