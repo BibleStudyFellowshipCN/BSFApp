@@ -95,11 +95,13 @@ export default class AudioBibleScreen extends React.Component {
   }
 
   getAudioUrl() {
-    let lang = 4; // Chinese
+    let lang = 4; // Chinese Mandarin
     if (getCurrentUser().getLanguage() == 'eng') {
       lang = 1; // English
     } else if (getCurrentUser().getLanguage() == 'spa') {
       lang = 6; // Spanish
+    } else if (getCurrentUser().getLanguage() == 'cht') {
+      lang = 13; // Chinese Cantonese
     }
     let url = 'http://167.88.37.77/bsf/' + lang + '/' + this.state.currentBook + '/' + this.state.currentChapter + '.mp3';
     console.log(url);
