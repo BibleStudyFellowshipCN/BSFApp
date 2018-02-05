@@ -7,7 +7,8 @@ import { Models } from '../dataStorage/models';
 import { Layout } from '../constants/Layout';
 import { callWebServiceAsync, showWebServiceCallErrorsAsync } from '../dataStorage/storage';
 import { getI18nText } from '../store/I18n';
-import { RkButton } from 'react-native-ui-kitten';
+import { Button } from 'react-native-elements';
+
 import { LegacyAsyncStorage } from 'expo';
 import { getCurrentUser } from '../store/user';
 
@@ -121,17 +122,24 @@ export default class FeedbackScreen extends React.Component {
               onChangeText={(text) => { this.feedback = text }}
             />
           </View>
-          <View style={{ alignItems: 'center' }}>
-            <RkButton onPress={this.onSubmitFeedback.bind(this)}>{getI18nText('提交')}</RkButton>
+          <View style={{ alignItems: 'center', marginTop: 20 }}>
+            <Button
+              backgroundColor='#397EDC'
+              borderRadius={5}
+              containerViewStyle={{ width: 130 }}
+              title={getI18nText('提交')}
+              onPress={this.onSubmitFeedback.bind(this)} />
           </View>
           {
             this.state.showMigration &&
             <View style={{ alignItems: 'center', marginVertical: 7, marginHorizontal: 3 }}>
               <Text style={{ fontSize: 20, color: 'red', marginBottom: 10 }}>Note: If you see missing answers after update, please click 'Recover' button</Text>
-              <RkButton
-                onPress={() => getCurrentUser().migrateAsync()}>
-                Recover
-            </RkButton>
+              <Button
+                backgroundColor='#397EDC'
+                borderRadius={5}
+                containerViewStyle={{ width: 130 }}
+                title='Recover'
+                onPress={() => { getCurrentUser().migrateAsync() }} />
             </View>
           }
         </ScrollView>
