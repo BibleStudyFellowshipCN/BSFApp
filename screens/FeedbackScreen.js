@@ -8,7 +8,6 @@ import { Layout } from '../constants/Layout';
 import { callWebServiceAsync, showWebServiceCallErrorsAsync } from '../dataStorage/storage';
 import { getI18nText } from '../store/I18n';
 import { Button } from 'react-native-elements';
-
 import { LegacyAsyncStorage } from 'expo';
 import { getCurrentUser } from '../store/user';
 
@@ -114,7 +113,7 @@ export default class FeedbackScreen extends React.Component {
           }}>
           <View style={styles.answerContainer}>
             <TextInput
-              style={styles.answerInput}
+              style={[styles.answerInput, { fontSize: getCurrentUser().getLessonFontSize() }]}
               ref={(input) => this.feedbackInput = input}
               blurOnSubmit={false}
               placeholder={getI18nText('反馈意见')}
@@ -160,7 +159,6 @@ const styles = StyleSheet.create({
   },
   answerInput: {
     height: 150,
-    fontSize: 16,
     textAlignVertical: 'top'
   }
 });

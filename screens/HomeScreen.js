@@ -78,7 +78,7 @@ class HomeScreen extends React.Component {
           name={isActive ? 'minus' : 'plus'}
           size={18}
         />
-        <Text style={styles.bookHeaderText}>    {book} ({year})</Text>
+        <Text style={[styles.bookHeaderText, { fontSize: getCurrentUser().getHomeTitleFontSize() }]}>    {book} ({year})</Text>
       </View>
     )
   }
@@ -111,7 +111,7 @@ const Lesson = (props) => {
             {date} {lessonNumber}
           </Text>
         </View>
-        <Text style={{ fontSize: getCurrentUser().getLessonFontSize() }}>
+        <Text style={{ fontSize: getCurrentUser().getHomeFontSize() }}>
           {name}
         </Text>
       </View>
@@ -159,7 +159,6 @@ const styles = StyleSheet.create({
     marginBottom: 2
   },
   bookHeaderText: {
-    fontSize: 20,
     marginVertical: 6,
     fontWeight: '400',
   },

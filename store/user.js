@@ -185,7 +185,11 @@ export default class User {
     return this.fontSize;
   }
 
-  getLessonFontSize() {
+  getHomeTitleFontSize() {
+    return 14 + this.getFontSize() * 3;
+  }
+
+  getHomeFontSize() {
     return 12 + this.getFontSize() * 3;
   }
 
