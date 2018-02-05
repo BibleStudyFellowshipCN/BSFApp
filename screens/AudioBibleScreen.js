@@ -10,7 +10,7 @@ import {
   Slider
 } from 'react-native';
 import { Audio, KeepAwake } from 'expo';
-import { getI18nText, getI18nBibleBook } from '../store/I18n';
+import { getI18nText, getI18nBibleBookFromLang } from '../store/I18n';
 import { getCurrentUser } from '../store/user';
 import { FontAwesome } from '@expo/vector-icons';
 import { Models } from '../dataStorage/models';
@@ -262,7 +262,7 @@ export default class AudioBibleScreen extends React.Component {
         lang = 'cht';
         break;
     }
-    return getI18nBibleBook(name, lang);
+    return getI18nBibleBookFromLang(name, lang);
   }
 
   getChapterName(name) {

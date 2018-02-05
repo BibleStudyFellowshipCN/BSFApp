@@ -76,5 +76,11 @@ export const Models = {
     { DisplayName: "Nueva Versión Internacional", Value: "nvi" },
     { DisplayName: "Reina-Valera 1995", Value: "rvr1995" },
   ],
-  DefaultFontSize: 2  // 1 - small, 2 - medium, 3 - large
+  DefaultFontSize: 2,  // 1 - small, 2 - medium, 3 - large
+  AudioBibles: [
+    { DisplayName: "普通话(CUV)", Value: "4" },
+    { DisplayName: "广东话(CUV)", Value: "13" },
+    { DisplayName: "English(KJV)", Value: "1" },
+    { DisplayName: "Spanish", Value: "6" },
+  ]
 }

@@ -215,4 +215,23 @@ function getI18nBibleBook(origText) {
   return origText;
 }
 
-export { getI18nText, getI18nBibleBook };
+function getI18nBibleBookFromLang(origText, lang) {
+  //console.log("[getI18nBibleBook]" + lang + "{" + origText + "}");
+  if (lang == 'chs') {
+    return origText;
+  }
+
+  for (var j in Models.ValidLanguages) {
+    const checkLang = Models.ValidLanguages[j];
+    for (var i in BibleBookText[checkLang]) {
+      if (BibleBookText[checkLang][i] == origText) {
+        //console.log("=>" + BibleBookText[lang][i]);
+        return BibleBookText[lang][i];
+      }
+    }
+  }
+
+  return origText;
+}
+
+export { getI18nText, getI18nBibleBook, getI18nBibleBookFromLang };
