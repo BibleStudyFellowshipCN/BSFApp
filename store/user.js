@@ -1,4 +1,4 @@
-import { AsyncStorage, Alert } from 'react-native';
+import { AsyncStorage, Alert, Platform } from 'react-native';
 import { Models } from '../dataStorage/models';
 import { callWebServiceAsync, showWebServiceCallErrorsAsync } from '../dataStorage/storage';
 import Expo, { LegacyAsyncStorage, Constants } from 'expo';
@@ -278,9 +278,13 @@ export default class User {
       const serverVersion = this.getVersionNumber(result.body.version);
       console.log('checkForUpdate:' + clientVersion + '-' + serverVersion);
       if (clientVersion < serverVersion) {
-        Alert.alert(getI18nText('发现更新') + ': ' + result.body.version, getI18nText('程序将重新启动'), [
-          { text: 'OK', onPress: () => Expo.Util.reload() },
-        ]);
+        if (Platform.OS === 'ios') {
+          Alert.alert(getI18nText('发现更新') + ': ' + result.body.version, getI18nText("\n请强制关闭程序：\n\n1. 双击Home按钮\n\n2.向上划CBSF的预览界面关闭程序"));
+        } else {
+          Alert.alert(getI18nText('发现更新') + ': ' + result.body.version, getI18nText('程序将重新启动'), [
+            { text: 'OK', onPress: () => Expo.Util.reload() },
+          ]);
+        }
       } else if (!onlyShowUpdateUI) {
         Alert.alert(getI18nText('您已经在使用最新版本'), getI18nText('版本') + ': ' + manifest.version + ' (SDK' + manifest.sdkVersion + ')', [
           { text: 'OK', onPress: () => { } },

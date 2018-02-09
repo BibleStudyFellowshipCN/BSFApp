@@ -10,7 +10,7 @@ import { callWebServiceAsync, showWebServiceCallErrorsAsync } from '../dataStora
 export default class AttendanceScreen extends React.Component {
   static navigationOptions = ({ navigation }) => {
     return {
-      title: getI18nText('考勤表') + '  (' + navigation.state.params.data.date + ')'
+      title: navigation.state.params.data.date
     };
   };
 
