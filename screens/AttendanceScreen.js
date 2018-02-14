@@ -50,6 +50,14 @@ export default class AttendanceScreen extends React.Component {
     this.setState({ users });
   }
 
+  getTitle(keyIndex, user) {
+    if (user.cellphone) {
+      return `#${keyIndex}: ${user.name} (${user.cellphone})`;
+    } else {
+      return `#${keyIndex}: ${user.name}`;
+    }
+  }
+
   render() {
     let keyIndex = 0;
     return (
@@ -63,7 +71,7 @@ export default class AttendanceScreen extends React.Component {
                 <CheckBox
                   containerStyle={{ width: Layout.window.width - 20 }}
                   key={keyIndex++}
-                  title={`#${keyIndex}: ${user.name} (${user.cellphone})`}
+                  title={this.getTitle(keyIndex, user)}
                   checked={user.checked}
                   onPress={() => { this.onCheck(user) }} />
               ))

@@ -111,7 +111,7 @@ const Lesson = (props) => {
             {date} {lessonNumber}
           </Text>
         </View>
-        <Text style={{ fontSize: getCurrentUser().getHomeFontSize() }}>
+        <Text style={{ marginVertical: 4, fontSize: getCurrentUser().getHomeFontSize() }}>
           {name}
         </Text>
       </View>
