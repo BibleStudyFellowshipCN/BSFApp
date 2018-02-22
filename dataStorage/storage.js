@@ -1,7 +1,7 @@
 import { Alert, AsyncStorage, Platform } from 'react-native';
 import { debounce } from 'lodash';
 import Storage from 'react-native-storage';
-import { Constants } from 'expo';
+import { Constants, FileSystem } from 'expo';
 import { Models, CachePolicy } from './models';
 import { getCurrentUser } from '../store/user';
 
@@ -15,10 +15,6 @@ if (!global.storage) {
 }
 
 const storage = global.storage;
-
-if (!global.cache) {
-    global.cache = [];
-}
 
 if (!global.deviceInfo) {
     global.deviceInfo = {
@@ -44,27 +40,66 @@ function encode(idOrKey) {
     return idOrKey.replace(/_/g, '##-##');
 }
 
+global_cache = [];
+async function reloadGlobalCache(name) {
+    console.log("reloadGlobalCache: " + name);
+    global_cache[name] = [];
+    try {
+        const localUri = FileSystem.documentDirectory + name + '.json';
+        var data = await FileSystem.readAsStringAsync(localUri);
+        global_cache[name] = JSON.parse(data);
+    } catch (e) {
+        console.log(e);
+    }
+}
+
+function getCacheData(name) {
+    if (global_cache[name]) {
+        return global_cache[name];
+    }
+
+    console.log("Fails to load from global cache, try the default data");
+    // If fails to get from downloaded cache, return the default ones
+    switch (name) {
+        case 'chs':
+            return require("../assets/json/chs.json");
+        case 'cht':
+            return require("../assets/json/cht.json");
+        case 'eng':
+            return require("../assets/json/eng.json");
+        case 'spa':
+            return require("../assets/json/spa.json");
+        case 'ccb':
+            return require("../assets/json/ccb.json");
+        case 'cnvt':
+            return require("../assets/json/cnvt.json");
+        case 'esv':
+            return require("../assets/json/esv.json");
+        case 'kjv':
+            return require("../assets/json/kjv.json");
+        case 'niv1984':
+            return require("../assets/json/niv1984.json");
+        case 'niv2011':
+            return require("../assets/json/niv2011.json");
+        case 'nvi':
+            return require("../assets/json/nvi.json");
+        case 'rcuvss':
+            return require("../assets/json/rcuvss.json");
+            break;
+        case 'rcuvts':
+            return require("../assets/json/rcuvts.json");
+        case 'rvr1995':
+            return require("../assets/json/rvr1995.json");
+    }
+
+    return [];
+}
+
 function getFromCache(key, keyString) {
     let cache;
     // Load from book/lesson cache
     if (key == Models.Lesson.key || key == Models.Book.key) {
-        switch (getCurrentUser().getLanguage()) {
-            case 'chs':
-                cache = require("../assets/json/chs.json");
-                break;
-            case 'cht':
-                cache = require("../assets/json/cht.json");
-                break;
-            case 'eng':
-                cache = require("../assets/json/eng.json");
-                break;
-            case 'spa':
-                cache = require("../assets/json/spa.json");
-                break;
-            default:
-                cache = require("../assets/json/eng.json");
-                break;
-        }
+        cache = getCacheData(getCurrentUser().getLanguage())
         if (cache[keyString]) {
             return cache[keyString];
         }
@@ -72,41 +107,7 @@ function getFromCache(key, keyString) {
 
     // Load from passage cache
     if (key == Models.Passage.key) {
-        switch (getCurrentUser().getBibleVersion()) {
-            case 'ccb':
-                cache = require("../assets/json/ccb.json");
-                break;
-            case 'cnvt':
-                cache = require("../assets/json/cnvt.json");
-                break;
-            case 'esv':
-                cache = require("../assets/json/esv.json");
-                break;
-            case 'kjv':
-                cache = require("../assets/json/kjv.json");
-                break;
-            case 'niv1984':
-                cache = require("../assets/json/niv1984.json");
-                break;
-            case 'niv2011':
-                cache = require("../assets/json/niv2011.json");
-                break;
-            case 'nvi':
-                cache = require("../assets/json/nvi.json");
-                break;
-            case 'rcuvss':
-                cache = require("../assets/json/rcuvss.json");
-                break;
-            case 'rcuvts':
-                cache = require("../assets/json/rcuvts.json");
-                break;
-            case 'rvr1995':
-                cache = require("../assets/json/rvr1995.json");
-                break;
-            default:
-                cache = require("../assets/json/niv2011.json");
-                break;
-        }
+        cache = getCacheData(getCurrentUser().getBibleVersion())
         if (cache[keyString]) {
             return cache[keyString];
         }
@@ -216,10 +217,7 @@ async function loadAsync(model, id, update) {
 
     // store to cache
     if (data) {
-        if (model.cachePolicy == CachePolicy.Memory) {
-            global.cache[keyString] = data;
-        }
-        else if (model.cachePolicy == CachePolicy.AsyncStorage) {
+        if (model.cachePolicy == CachePolicy.AsyncStorage) {
             saveToOffilneStorageAsync(data, model.key, id);
         }
         console.log("finish load " + JSON.stringify({ model, id }));
@@ -228,10 +226,7 @@ async function loadAsync(model, id, update) {
         console.log("failed to load" + JSON.stringify({ model, id }));
 
         // then try to load from cache
-        if (model.cachePolicy == CachePolicy.Memory) {
-            data = global.cache[keyString];
-        }
-        else if (model.cachePolicy == CachePolicy.AsyncStorage) {
+        if (model.cachePolicy == CachePolicy.AsyncStorage) {
             data = await loadFromOffilneStorageAsync(model.key, id);
         }
     }
@@ -394,4 +389,4 @@ async function showWebServiceCallErrorsAsync(result, acceptStatus) {
     return true;
 }
 
-export { loadAsync, saveAsync, clearStorageAsync, callWebServiceAsync, showWebServiceCallErrorsAsync, pokeServer };
+export { loadAsync, saveAsync, clearStorageAsync, callWebServiceAsync, showWebServiceCallErrorsAsync, pokeServer, reloadGlobalCache };

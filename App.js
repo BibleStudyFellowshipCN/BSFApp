@@ -3,7 +3,7 @@ import { Platform, StatusBar, StyleSheet, View, Alert } from 'react-native';
 import Expo, { LegacyAsyncStorage, AppLoading } from 'expo';
 import RootNavigation from './navigation/RootNavigation';
 import createStore from './store/createStore'
-import { loadAsync } from './dataStorage/storage';
+import { loadAsync, reloadGlobalCache } from './dataStorage/storage';
 import { Models } from './dataStorage/models';
 import { Provider } from 'react-redux';
 import { ActionSheetProvider } from '@expo/react-native-action-sheet';
@@ -86,6 +86,15 @@ export default class App extends React.Component {
     // initialize existing user
     try {
       await this.loadUserInfo();
+    } catch (error) {
+      console.log(error);
+    }
+
+    // load global cache for current language
+    try {
+      for (var i in Models.DownloadList) {
+        await reloadGlobalCache(Models.DownloadList[i]);
+      }
     } catch (error) {
       console.log(error);
     }

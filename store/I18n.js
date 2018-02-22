@@ -42,6 +42,9 @@ const text = {
     "中",
     "小",
     "\n请强制关闭程序：\n\n1. 双击Home按钮\n\n2.向上划CBSF的预览界面关闭程序",
+    "课程没有更新",
+    "是否重新下载？",
+    "下载课程",
   ],
   cht: [
     "BSF課程",
@@ -83,6 +86,9 @@ const text = {
     "中",
     "小",
     "\n請強制關閉程式：\n\n1. 雙擊Home按鈕\n\n2.向上劃CBSF的預覽界面關閉程式",
+    "課程沒有更新",
+    "是否重新下載？",
+    "下載課程",
   ],
   eng: [
     "BSF Lessons",
@@ -124,6 +130,9 @@ const text = {
     "Medium",
     "Small",
     "\nPlease force close the app:\n\n1. Double-click the Home button\n\n2.Swipe up on the CBSF's preview to close the app",
+    "No update on lessons",
+    "Do you want to re-download?",
+    "Download lessons",
   ],
   spa: [
     "BSF Lecciones",
@@ -165,6 +174,9 @@ const text = {
     "Medio",
     "Pequeña",
     "\nPor favor, cierre la aplicación:\n\n1. Haga doble clic en el botón de Inicio\n\n2. Descargue la vista previa de CBSF para cerrar la aplicación",
+    "Sin actualizaciones en las lecciones",
+    "¿Quieres volver a descargar?",
+    "Descargar lecciones",
   ]
 };
 

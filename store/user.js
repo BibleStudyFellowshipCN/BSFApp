@@ -1,7 +1,7 @@
 import { AsyncStorage, Alert, Platform } from 'react-native';
 import { Models } from '../dataStorage/models';
 import { callWebServiceAsync, showWebServiceCallErrorsAsync } from '../dataStorage/storage';
-import Expo, { LegacyAsyncStorage, Constants } from 'expo';
+import Expo, { LegacyAsyncStorage, Constants, FileSystem } from 'expo';
 import { getI18nText } from '../store/I18n';
 
 let currentUser;
@@ -306,6 +306,37 @@ export default class User {
       audioBook: this.audioBook,
       fontSize: this.fontSize
     };
+  }
+
+  async getLocalDataVersion() {
+    try {
+      const localUri = FileSystem.documentDirectory + 'version.json';
+      const data = await FileSystem.readAsStringAsync(localUri);
+      const version = JSON.parse(data);
+      return getCurrentUser().getVersionNumber(version.version);
+    } catch (e) {
+      console.log(e);
+      return 0;
+    }
+  }
+
+  async getRemoteDataVersion() {
+    try {
+      const remoteUri = Models.DownloadUrl;
+      const localUri = FileSystem.documentDirectory + 'serverVersion.json';
+      console.log(`Downlad ${remoteUri} to ${localUri}...`);
+
+      const downloadResumable = FileSystem.createDownloadResumable(remoteUri, localUri, {}, (downloadProgress) => { });
+      const { uri } = await downloadResumable.downloadAsync();
+
+      const data = await FileSystem.readAsStringAsync(localUri);
+      const version = JSON.parse(data);
+      return getCurrentUser().getVersionNumber(version.version);
+    } catch (e) {
+      console.log(e);
+      Alert.alert('Network error', 'Please try again later');
+      return 0;
+    }
   }
 
   async migrateAsync() {

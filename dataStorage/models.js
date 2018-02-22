@@ -1,7 +1,5 @@
 
 export const CachePolicy = {
-  None: 0,
-  Memory: 1,
   AsyncStorage: 2,
 };
 
@@ -82,5 +80,23 @@ export const Models = {
     { DisplayName: "广东话(CUV)", Value: "13" },
     { DisplayName: "English(KJV)", Value: "1" },
     { DisplayName: "Spanish", Value: "6" },
+  ],
+  DownloadUrl: "http://bsf.turbozv.com/data/",
+  DownloadList: [
+    'version',
+    'ccb',
+    'chs',
+    'cht',
+    'cnvt',
+    'eng',
+    'esv',
+    'kjv',
+    'niv1984',
+    'niv2011',
+    'nvi',
+    'rcuvss',
+    'rcuvts',
+    'rvr1995',
+    'spa'
   ]
 }

@@ -1,19 +1,26 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { FontAwesome } from '@expo/vector-icons';
+import { FileSystem } from 'expo';
 import {
   ScrollView,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
+  Alert,
+  Platform,
+  ProgressViewIOS,
+  ProgressBarAndroid
 } from 'react-native';
 import Accordion from 'react-native-collapsible/Accordion';
-import { requestBooks } from "../store/books.js";
+import { requestBooks, clearBooks } from "../store/books.js";
+import { clearLesson } from '../store/lessons.js'
+import { clearPassage } from '../store/passage.js'
 import { getI18nText } from '../store/I18n';
 import { getCurrentUser } from '../store/user';
 import { Models } from '../dataStorage/models';
-import { pokeServer } from '../dataStorage/storage';
+import { pokeServer, reloadGlobalCache } from '../dataStorage/storage';
 
 class HomeScreen extends React.Component {
   static navigationOptions = ({ navigation }) => {
@@ -21,12 +28,17 @@ class HomeScreen extends React.Component {
     return {
       title: getI18nText(title),
       headerRight: (
-        <View style={{ marginRight: 20 }}>
-          <TouchableOpacity onPress={() => { getCurrentUser().checkForUpdate(); }}>
-            <FontAwesome name='refresh' size={28} color='#fff' />
+        <View style={{ marginRight: 20, flexDirection: 'row' }}>
+          <TouchableOpacity onPress={() => { checkForContentUpdate(); }}>
+            <FontAwesome name='download' size={28} color='#fff' />
           </TouchableOpacity>
         </View>)
     };
+  };
+
+  state = {
+    downloadProgress: '',
+    downloading: false
   };
 
   componentWillMount() {
@@ -34,6 +46,75 @@ class HomeScreen extends React.Component {
 
     if (!this.props.booklist) {
       this.props.requestBooks();
+    }
+
+    checkForContentUpdate = this.checkForContentUpdate.bind(this);
+  }
+
+  downloadCallback(downloadProgress) {
+    const progress = downloadProgress.totalBytesWritten / downloadProgress.totalBytesExpectedToWrite;
+    this.setState({ downloadProgress: progress });
+  }
+
+  async checkForContentUpdate() {
+    if (this.checkingForContentUpdate) {
+      return;
+    }
+    this.checkingForContentUpdate = true;
+
+    try {
+      // Get versions
+      const localVersion = await getCurrentUser().getLocalDataVersion();
+      const remoteVersion = await getCurrentUser().getRemoteDataVersion();
+      if (remoteVersion == 0) {
+        return;
+      }
+      console.log("Check lesson content versions " + localVersion + ' ' + remoteVersion);
+      if (localVersion == remoteVersion) {
+        Alert.alert(getI18nText('课程没有更新'), getI18nText('是否重新下载？'), [
+          { text: 'Yes', onPress: () => { this.downloadContent(); } },
+          { text: 'No', onPress: () => { } },
+        ])
+      } else {
+        await this.downloadContent();
+      }
+    } catch (e) {
+      console.log(e);
+    }
+
+    this.checkingForContentUpdate = false;
+  }
+
+  async downloadContent() {
+    this.downloadFiles = Models.DownloadList.length;
+    this.downloadedFiles = 0;
+    this.setState({ downloadProgress: 0, downloading: true });
+    for (var i in Models.DownloadList) {
+      const remoteUri = Models.DownloadUrl + Models.DownloadList[i] + '.json';
+      const localUri = FileSystem.documentDirectory + Models.DownloadList[i] + '.json';
+      console.log(`Downlad ${remoteUri} to ${localUri}...`);
+
+      const downloadResumable = FileSystem.createDownloadResumable(remoteUri, localUri, {}, this.downloadCallback.bind(this));
+      try {
+        const { uri } = await downloadResumable.downloadAsync();
+
+        await reloadGlobalCache(Models.DownloadList[i]);
+
+        this.downloadedFiles++;
+        if (this.downloadedFiles >= Models.DownloadList.length) {
+          // reload all data
+          this.props.clearBooks();
+          this.props.clearLesson();
+          this.props.clearPassage();
+          this.props.requestBooks();
+          this.setState({ downloading: false });
+        }
+      } catch (e) {
+        console.log(e);
+        Alert.alert('Network error', 'Please try again later');
+        this.setState({ downloading: false });
+        return;
+      }
     }
   }
 
@@ -43,8 +124,24 @@ class HomeScreen extends React.Component {
   }
 
   render() {
+    const progress = (this.state.downloadProgress + this.downloadedFiles) / this.downloadFiles;
+    const progressText = getI18nText('下载课程') + ' (' + parseInt(progress * 100) + '%)';
     return (
       <View style={styles.container}>
+        {
+          this.state.downloading && Platform.OS === 'ios' &&
+          <View>
+            <Text style={styles.progress} >{progressText}</Text>
+            <ProgressViewIOS style={styles.progress} progress={progress} />
+          </View>
+        }
+        {
+          this.state.downloading && Platform.OS === 'android' &&
+          <View>
+            <Text style={styles.progress} >{progressText}</Text>
+            <ProgressBarAndroid style={styles.progress} styleAttr="Horizontal" indeterminate={false} progress={progress} />
+          </View>
+        }
         <ScrollView
           style={styles.container}
           contentContainerStyle={styles.contentContainer}>
@@ -134,7 +231,10 @@ const mapStateToProps = (state) => {
 
 const mapDispatchToProps = (dispatch, ownProps) => {
   return {
-    requestBooks: () => dispatch(requestBooks())
+    requestBooks: () => dispatch(requestBooks()),
+    clearLesson: () => dispatch(clearLesson()),
+    clearPassage: () => dispatch(clearPassage()),
+    clearBooks: () => dispatch(clearBooks())
   }
 }
 
@@ -179,5 +279,9 @@ const styles = StyleSheet.create({
   },
   lessonMetadataText: {
     color: 'grey',
+  },
+  progress: {
+    marginHorizontal: 10,
+    marginVertical: 5,
   }
 });
