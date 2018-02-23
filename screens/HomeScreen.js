@@ -38,6 +38,7 @@ class HomeScreen extends React.Component {
 
   state = {
     downloadProgress: '',
+    remoteVersion: '',
     downloading: false
   };
 
@@ -52,7 +53,11 @@ class HomeScreen extends React.Component {
   }
 
   downloadCallback(downloadProgress) {
-    const progress = downloadProgress.totalBytesWritten / downloadProgress.totalBytesExpectedToWrite;
+    if (downloadProgress.totalBytesExpectedToWrite == -1) {
+      progress = 1;
+    } else {
+      progress = downloadProgress.totalBytesWritten / downloadProgress.totalBytesExpectedToWrite;
+    }
     this.setState({ downloadProgress: progress });
   }
 
@@ -64,14 +69,17 @@ class HomeScreen extends React.Component {
 
     try {
       // Get versions
-      const localVersion = await getCurrentUser().getLocalDataVersion();
-      const remoteVersion = await getCurrentUser().getRemoteDataVersion();
-      if (remoteVersion == 0) {
+      const remoteVersionString = await getCurrentUser().getRemoteDataVersion();
+      if (remoteVersion == '') {
         return;
       }
+      const localVersionString = await getCurrentUser().getLocalDataVersion();
+      const localVersion = getCurrentUser().getVersionNumber(localVersionString);
+      const remoteVersion = getCurrentUser().getVersionNumber(remoteVersionString);
+      this.setState({ remoteVersion: remoteVersionString });
       console.log("Check lesson content versions " + localVersion + ' ' + remoteVersion);
       if (localVersion == remoteVersion) {
-        Alert.alert(getI18nText('课程没有更新'), getI18nText('是否重新下载？'), [
+        Alert.alert(getI18nText('课程没有更新'), getI18nText('是否重新下载？' + '[' + remoteVersionString + ']'), [
           { text: 'Yes', onPress: () => { this.downloadContent(); } },
           { text: 'No', onPress: () => { } },
         ])
@@ -125,7 +133,7 @@ class HomeScreen extends React.Component {
 
   render() {
     const progress = (this.state.downloadProgress + this.downloadedFiles) / this.downloadFiles;
-    const progressText = getI18nText('下载课程') + ' (' + parseInt(progress * 100) + '%)';
+    const progressText = getI18nText('下载课程') + ' ' + this.state.remoteVersion + ' (' + parseInt(progress * 100) + '%)';
     return (
       <View style={styles.container}>
         {

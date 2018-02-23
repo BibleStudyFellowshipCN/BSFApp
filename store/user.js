@@ -313,30 +313,26 @@ export default class User {
       const localUri = FileSystem.documentDirectory + 'version.json';
       const data = await FileSystem.readAsStringAsync(localUri);
       const version = JSON.parse(data);
-      return getCurrentUser().getVersionNumber(version.version);
+      console.log('LocalVersion: ' + version.version);
+      return version.version;
     } catch (e) {
       console.log(e);
-      return 0;
+      return '';
     }
   }
 
   async getRemoteDataVersion() {
     try {
-      const remoteUri = Models.DownloadUrl;
-      const localUri = FileSystem.documentDirectory + 'serverVersion.json';
-      console.log(`Downlad ${remoteUri} to ${localUri}...`);
-
-      const downloadResumable = FileSystem.createDownloadResumable(remoteUri, localUri, {}, (downloadProgress) => { });
-      const { uri } = await downloadResumable.downloadAsync();
-
-      const data = await FileSystem.readAsStringAsync(localUri);
-      const version = JSON.parse(data);
-      return getCurrentUser().getVersionNumber(version.version);
+      const result = await callWebServiceAsync(Models.DownloadUrl + 'version.json', '', 'GET');
+      const succeed = await showWebServiceCallErrorsAsync(result, 200);
+      if (succeed) {
+        console.log('RemoteVersion: ' + result.body.version);
+        return result.body.version;
+      }
     } catch (e) {
       console.log(e);
-      Alert.alert('Network error', 'Please try again later');
-      return 0;
     }
+    return '';
   }
 
   async migrateAsync() {
