@@ -1,6 +1,6 @@
 import { AsyncStorage, Alert, Platform } from 'react-native';
 import { Models } from '../dataStorage/models';
-import { callWebServiceAsync, showWebServiceCallErrorsAsync } from '../dataStorage/storage';
+import { callWebServiceAsync, showWebServiceCallErrorsAsync, pokeServer } from '../dataStorage/storage';
 import Expo, { LegacyAsyncStorage, Constants, FileSystem } from 'expo';
 import { getI18nText } from '../store/I18n';
 
@@ -336,6 +336,12 @@ export default class User {
   }
 
   async migrateAsync() {
+    try {
+      pokeServer(Models.Recover, '');
+    } catch (e) {
+      console.log(e);
+    }
+
     const key = 'ANSWER';
     await LegacyAsyncStorage.migrateItems([key]);
 

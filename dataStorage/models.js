@@ -52,6 +52,11 @@ export const Models = {
     key: "ANSWER",
     cachePolicy: CachePolicy.AsyncStorage,
   },
+  Recover: {
+    key: "RECOVER",
+    api: "/recover",
+    restUri: HostServer + "/recover",
+  },
   DefaultLanguage: "chs",
   ValidLanguages: ["chs", "cht", "eng", "spa"],
   Languages: [
