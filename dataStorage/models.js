@@ -88,7 +88,6 @@ export const Models = {
   ],
   DownloadUrl: "http://bsf.turbozv.com/data/",
   DownloadList: [
-    'version',
     'ccb',
     'chs',
     'cht',
@@ -102,6 +101,7 @@ export const Models = {
     'rcuvss',
     'rcuvts',
     'rvr1995',
-    'spa'
+    'spa',
+    'version'
   ]
 }
