@@ -119,7 +119,6 @@ class HomeScreen extends React.Component {
         }
       } catch (e) {
         console.log(e);
-        Alert.alert('Network error', 'Please try again later');
         this.setState({ downloading: false });
         return;
       }

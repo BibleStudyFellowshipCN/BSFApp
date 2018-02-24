@@ -387,7 +387,7 @@ async function callWebServiceAsync(url, api, method, headersUnused, body) {
 }
 
 async function showWebServiceCallErrorsAsync(result, acceptStatus) {
-    if (!result) {
+    if (!result || !result.status) {
         await Alert.alert('Error', 'Please check your network connection');
     }
     else if (acceptStatus) {
