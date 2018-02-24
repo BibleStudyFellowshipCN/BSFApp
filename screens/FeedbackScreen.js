@@ -141,7 +141,6 @@ export default class FeedbackScreen extends React.Component {
                 onPress={() => { getCurrentUser().migrateAsync() }} />
             </View>
           }
-          <Text style={{ fontSize: 20, margin: 12 }}>Feedback is anonymous, please leave your email if you want to hear back from us</Text>
         </ScrollView>
       </KeyboardAvoidingView>
     );
