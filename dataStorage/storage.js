@@ -159,7 +159,7 @@ function getHttpHeaders() {
 }
 
 let pokeInfo = {
-    lastPokeDay: (new Date()).getDate(),
+    lastPokeDay: 0,
     message: []
 };
 
