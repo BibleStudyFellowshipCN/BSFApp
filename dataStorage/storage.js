@@ -43,73 +43,98 @@ function encode(idOrKey) {
 global_cache = [];
 async function reloadGlobalCache(name) {
     console.log("reloadGlobalCache: " + name);
-    global_cache[name] = [];
+    global_cache[name] = null;
     try {
         const localUri = FileSystem.documentDirectory + name + '.json';
         var data = await FileSystem.readAsStringAsync(localUri);
         global_cache[name] = JSON.parse(data);
     } catch (e) {
+        global_cache[name] = null;
         console.log(e);
     }
 }
 
-function getCacheData(name) {
+function getCacheData(name, key) {
     if (global_cache[name]) {
-        return global_cache[name];
+        const data = global_cache[name][key];
+        if (data) {
+            console.log("Load from global cache:" + name + ':' + key);
+            return data;
+        }
     }
 
-    console.log("Fails to load from global cache, try the default data");
     // If fails to get from downloaded cache, return the default ones
+    let cache;
     switch (name) {
         case 'chs':
-            return require("../assets/json/chs.json");
+            cache = require("../assets/json/chs.json");
+            break;
         case 'cht':
-            return require("../assets/json/cht.json");
+            cache = require("../assets/json/cht.json");
+            break;
         case 'eng':
-            return require("../assets/json/eng.json");
+            cache = require("../assets/json/eng.json");
+            break;
         case 'spa':
-            return require("../assets/json/spa.json");
+            cache = require("../assets/json/spa.json");
+            break;
         case 'ccb':
-            return require("../assets/json/ccb.json");
+            cache = require("../assets/json/ccb.json");
+            break;
         case 'cnvt':
-            return require("../assets/json/cnvt.json");
+            cache = require("../assets/json/cnvt.json");
+            break;
         case 'esv':
-            return require("../assets/json/esv.json");
+            cache = require("../assets/json/esv.json");
+            break;
         case 'kjv':
-            return require("../assets/json/kjv.json");
-        case 'niv1984':
-            return require("../assets/json/niv1984.json");
+            cache = require("../assets/json/kjv.json");
+            break;
+        case 'nivavd1984':
+            cache = require("../assets/json/niv1984.json");
+            break;
         case 'niv2011':
-            return require("../assets/json/niv2011.json");
+            cache = require("../assets/json/niv2011.json");
+            break;
         case 'nvi':
-            return require("../assets/json/nvi.json");
+            cache = require("../assets/json/nvi.json");
+            break;
         case 'rcuvss':
-            return require("../assets/json/rcuvss.json");
+            cache = require("../assets/json/rcuvss.json");
             break;
         case 'rcuvts':
-            return require("../assets/json/rcuvts.json");
+            cache = require("../assets/json/rcuvts.json");
+            break;
         case 'rvr1995':
-            return require("../assets/json/rvr1995.json");
+            cache = require("../assets/json/rvr1995.json");
+            break;
+    }
+    if (cache) {
+        const data = cache[key];
+        if (data) {
+            console.log("Load from local cache:" + name + ':' + key);
+            return data;
+        }
     }
 
-    return [];
+    console.log("No cache hit for " + name + ':' + key);
+    return null;
 }
 
 function getFromCache(key, keyString) {
-    let cache;
     // Load from book/lesson cache
     if (key == Models.Lesson.key || key == Models.Book.key) {
-        cache = getCacheData(getCurrentUser().getLanguage())
-        if (cache[keyString]) {
-            return cache[keyString];
+        const data = getCacheData(getCurrentUser().getLanguage(), keyString);
+        if (data) {
+            return data;
         }
     }
 
     // Load from passage cache
     if (key == Models.Passage.key) {
-        cache = getCacheData(getCurrentUser().getBibleVersion())
-        if (cache[keyString]) {
-            return cache[keyString];
+        const data = getCacheData(getCurrentUser().getBibleVersion(), keyString);
+        if (data) {
+            return data;
         }
     }
 

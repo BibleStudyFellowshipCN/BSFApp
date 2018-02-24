@@ -88,20 +88,20 @@ export const Models = {
   ],
   DownloadUrl: "http://bsf.turbozv.com/data/",
   DownloadList: [
-    'ccb',
+    'eng',
     'chs',
     'cht',
-    'cnvt',
-    'eng',
-    'esv',
-    'kjv',
-    'niv1984',
+    'spa',
     'niv2011',
-    'nvi',
     'rcuvss',
     'rcuvts',
+    'esv',
     'rvr1995',
-    'spa',
+    'ccb',
+    'cnvt',
+    'kjv',
+    'niv1984',
+    'nvi',
     'version'
   ]
 }
