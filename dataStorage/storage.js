@@ -159,8 +159,7 @@ function getHttpHeaders() {
 }
 
 let pokeInfo = {
-    lastUploadTime: 0,
-    lastCheckForUpdateTime: new Date(),
+    lastPokeDay: (new Date()).getDate(),
     message: []
 };
 
@@ -174,42 +173,31 @@ async function pokeServer(model, id) {
     console.log('>Poke:' + message + ' => ' + JSON.stringify(pokeInfo));
     pokeInfo.message.push(message);
 
-    const now = new Date();
-
-    // Check for update every 10 mins
-    let seconds = Math.floor((now - pokeInfo.lastCheckForUpdateTime) / 1000);
-    checkForUpdateTimer = 10 * 60;
-    if (seconds < checkForUpdateTimer) {
-        console.log((checkForUpdateTimer - seconds) + "s to CheckForUpdate");
-    } else {
-        pokeInfo.message.push('CheckForUpdate');
-        pokeInfo.lastCheckForUpdateTime = now;
-        getCurrentUser().checkForUpdate(true);
+    // Check is done daily
+    const dayOfToday = (new Date()).getDate();
+    console.log('LastCheckForPokeDate: ' + pokeInfo.lastPokeDay + ' DayOfToday: ' + dayOfToday);
+    if (dayOfToday == pokeInfo.lastPokeDay) {
+        return;
     }
 
-    // Queue poke data up to 5 mins
-    pokeTimer = 5 * 60;
-    seconds = Math.floor((now - pokeInfo.lastUploadTime) / 1000);
-    if (seconds < pokeTimer) {
-        console.log((pokeTimer - seconds) + "s to Poke");
-    } else {
-        const data = JSON.stringify(pokeInfo.message);
-        pokeInfo.message = [];
-        pokeInfo.lastUploadTime = now;
+    pokeInfo.message.push('CheckForUpdate');
+    getCurrentUser().checkForUpdate(true);
 
-        console.log('Uploading: ' + JSON.stringify(getHttpHeaders()) + data);
-        fetch(Models.Poke.restUri, {
-            method: 'POST',
-            headers: getHttpHeaders(),
-            body: JSON.stringify({ data })
+    const data = JSON.stringify(pokeInfo.message);
+    pokeInfo.message = [];
+
+    fetch(Models.Poke.restUri, {
+        method: 'POST',
+        headers: getHttpHeaders(),
+        body: JSON.stringify({ data })
+    })
+        .then((response) => {
+            console.log('>' + response.status);
+            pokeInfo.lastPokeDay = dayOfToday;
         })
-            .then((response) => {
-                console.log('>' + response.status);
-            })
-            .catch((error) => {
-                console.log(error);
-            });
-    }
+        .catch((error) => {
+            console.log(error);
+        });
 }
 
 async function loadAsync(model, id, update) {
@@ -386,9 +374,11 @@ async function callWebServiceAsync(url, api, method, headersUnused, body) {
     return result;
 }
 
-async function showWebServiceCallErrorsAsync(result, acceptStatus) {
+async function showWebServiceCallErrorsAsync(result, acceptStatus, showUI = true) {
     if (!result || !result.status) {
-        await Alert.alert('Error', 'Please check your network connection');
+        if (showUI) {
+            await Alert.alert('Error', 'Please check your network connection');
+        }
     }
     else if (acceptStatus) {
         if (result.status == acceptStatus) {
@@ -406,7 +396,9 @@ async function showWebServiceCallErrorsAsync(result, acceptStatus) {
                     message = message + "\n\n" + result.body.ExceptionType;
                 }
             }
-            await Alert.alert('Error', message);
+            if (showUI) {
+                await Alert.alert('Error', message);
+            }
         }
         return false;
     }

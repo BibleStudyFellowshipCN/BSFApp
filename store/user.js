@@ -321,10 +321,10 @@ export default class User {
     }
   }
 
-  async getRemoteDataVersion() {
+  async getRemoteDataVersion(showUI) {
     try {
       const result = await callWebServiceAsync(Models.DownloadUrl + 'version.json', '', 'GET');
-      const succeed = await showWebServiceCallErrorsAsync(result, 200);
+      const succeed = await showWebServiceCallErrorsAsync(result, 200, showUI);
       if (succeed) {
         console.log('RemoteVersion: ' + result.body.version);
         return result.body.version;
@@ -333,6 +333,18 @@ export default class User {
       console.log(e);
     }
     return '';
+  }
+
+  async getContentVersions(showUI) {
+    const remoteVersionString = await this.getRemoteDataVersion(showUI);
+    if (remoteVersion == '') {
+      return;
+    }
+    const localVersionString = await this.getLocalDataVersion();
+    const localVersion = this.getVersionNumber(localVersionString);
+    const remoteVersion = this.getVersionNumber(remoteVersionString);
+    console.log("Check lesson content versions " + localVersion + ' ' + remoteVersion + ' showUI=' + showUI);
+    return { localVersion, remoteVersion, localVersionString, remoteVersionString };
   }
 
   async migrateAsync() {

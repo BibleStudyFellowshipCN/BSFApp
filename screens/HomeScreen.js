@@ -29,7 +29,7 @@ class HomeScreen extends React.Component {
       title: getI18nText(title),
       headerRight: (
         <View style={{ marginRight: 20, flexDirection: 'row' }}>
-          <TouchableOpacity onPress={() => { checkForContentUpdate(); }}>
+          <TouchableOpacity onPress={() => { checkForContentUpdate(true); }}>
             <FontAwesome name='download' size={28} color='#fff' />
           </TouchableOpacity>
         </View>)
@@ -42,8 +42,11 @@ class HomeScreen extends React.Component {
     downloading: false
   };
 
+  lastCheckForContentUpdateDate = 0;
+
   componentWillMount() {
     pokeServer(Models.Book, '');
+    this.checkForContentUpdate(false);
 
     if (!this.props.booklist) {
       this.props.requestBooks();
@@ -61,30 +64,24 @@ class HomeScreen extends React.Component {
     this.setState({ downloadProgress: progress });
   }
 
-  async checkForContentUpdate() {
+  async checkForContentUpdate(showUI) {
     if (this.checkingForContentUpdate) {
       return;
     }
     this.checkingForContentUpdate = true;
 
+    this.lastCheckForContentUpdateDate = (new Date()).getDate();
     try {
-      // Get versions
-      const remoteVersionString = await getCurrentUser().getRemoteDataVersion();
-      if (remoteVersion == '') {
-        return;
-      }
-      const localVersionString = await getCurrentUser().getLocalDataVersion();
-      const localVersion = getCurrentUser().getVersionNumber(localVersionString);
-      const remoteVersion = getCurrentUser().getVersionNumber(remoteVersionString);
-      this.setState({ remoteVersion: remoteVersionString });
-      console.log("Check lesson content versions " + localVersion + ' ' + remoteVersion);
+      const { localVersion, remoteVersion, localVersionString, remoteVersionString } = await getCurrentUser().getContentVersions(showUI);
       if (localVersion == remoteVersion) {
-        Alert.alert(getI18nText('课程没有更新'), getI18nText('是否重新下载？') + '[' + remoteVersionString + ']', [
-          { text: 'Yes', onPress: () => { this.downloadContent(); } },
-          { text: 'No', onPress: () => { } },
-        ])
+        if (showUI) {
+          Alert.alert(getI18nText('课程没有更新'), getI18nText('是否重新下载？') + '[' + remoteVersionString + ']', [
+            { text: 'Yes', onPress: () => { this.downloadContent(remoteVersionString); } },
+            { text: 'No', onPress: () => { } },
+          ]);
+        }
       } else {
-        await this.downloadContent();
+        this.downloadContent(remoteVersionString);
       }
     } catch (e) {
       console.log(e);
@@ -93,10 +90,10 @@ class HomeScreen extends React.Component {
     this.checkingForContentUpdate = false;
   }
 
-  async downloadContent() {
+  async downloadContent(remoteVersion) {
     this.downloadFiles = Models.DownloadList.length;
     this.downloadedFiles = 0;
-    this.setState({ downloadProgress: 0, downloading: true });
+    this.setState({ downloadProgress: 0, downloading: true, remoteVersion });
     for (var i in Models.DownloadList) {
       const remoteUri = Models.DownloadUrl + Models.DownloadList[i] + '.json';
       const localUri = FileSystem.documentDirectory + Models.DownloadList[i] + '.json';
@@ -126,6 +123,13 @@ class HomeScreen extends React.Component {
   }
 
   goToLesson(lesson) {
+    // Check for update every day
+    const dayOfToday = (new Date()).getDate();
+    console.log('LastCheckForContentUpdateDate: ' + this.lastCheckForContentUpdateDate + ' DayOfToday: ' + dayOfToday);
+    if (dayOfToday != this.lastCheckForContentUpdateDate) {
+      this.checkForContentUpdate(false);
+    }
+
     let parsed = lesson.name.split(' ');
     this.props.navigation.navigate('Lesson', { lesson, title: parsed[1] });
   }
@@ -138,14 +142,14 @@ class HomeScreen extends React.Component {
         {
           this.state.downloading && Platform.OS === 'ios' &&
           <View>
-            <Text style={styles.progress} >{progressText}</Text>
+            <Text style={styles.progress}>{progressText}</Text>
             <ProgressViewIOS style={styles.progress} progress={progress} />
           </View>
         }
         {
           this.state.downloading && Platform.OS === 'android' &&
           <View>
-            <Text style={styles.progress} >{progressText}</Text>
+            <Text style={styles.progress}>{progressText}</Text>
             <ProgressBarAndroid style={styles.progress} styleAttr="Horizontal" indeterminate={false} progress={progress} />
           </View>
         }

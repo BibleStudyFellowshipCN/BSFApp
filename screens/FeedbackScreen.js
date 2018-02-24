@@ -95,7 +95,7 @@ export default class FeedbackScreen extends React.Component {
     return (
       <KeyboardAvoidingView style={styles.container} behavior='padding' keyboardVerticalOffset={0}>
         <ScrollView
-          style={{ backgroundColor: 'white' }}
+          style={{ backgroundColor: 'white', flex: 1 }}
           ref={ref => this.scrollView = ref}
           onContentSizeChange={(contentWidth, contentHeight) => {
             if (this.state.keyboard) {
@@ -141,6 +141,7 @@ export default class FeedbackScreen extends React.Component {
                 onPress={() => { getCurrentUser().migrateAsync() }} />
             </View>
           }
+          <Text style={{ fontSize: 20, margin: 12 }}>Feedback is anonymous, please leave your email if you want to hear back from us</Text>
         </ScrollView>
       </KeyboardAvoidingView>
     );
