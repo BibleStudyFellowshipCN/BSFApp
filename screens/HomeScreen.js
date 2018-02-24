@@ -79,7 +79,7 @@ class HomeScreen extends React.Component {
       this.setState({ remoteVersion: remoteVersionString });
       console.log("Check lesson content versions " + localVersion + ' ' + remoteVersion);
       if (localVersion == remoteVersion) {
-        Alert.alert(getI18nText('课程没有更新'), getI18nText('是否重新下载？' + '[' + remoteVersionString + ']'), [
+        Alert.alert(getI18nText('课程没有更新'), getI18nText('是否重新下载？') + '[' + remoteVersionString + ']', [
           { text: 'Yes', onPress: () => { this.downloadContent(); } },
           { text: 'No', onPress: () => { } },
         ])
