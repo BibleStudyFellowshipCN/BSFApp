@@ -1,7 +1,7 @@
 import { Alert, AsyncStorage, Platform } from 'react-native';
 import { debounce } from 'lodash';
 import Storage from 'react-native-storage';
-import { Constants } from 'expo';
+import { Constants, FileSystem } from 'expo';
 import { Models, CachePolicy } from './models';
 import { getCurrentUser } from '../store/user';
 
@@ -15,10 +15,6 @@ if (!global.storage) {
 }
 
 const storage = global.storage;
-
-if (!global.cache) {
-    global.cache = [];
-}
 
 if (!global.deviceInfo) {
     global.deviceInfo = {
@@ -44,71 +40,101 @@ function encode(idOrKey) {
     return idOrKey.replace(/_/g, '##-##');
 }
 
-function getFromCache(key, keyString) {
+global_cache = [];
+async function reloadGlobalCache(name) {
+    console.log("reloadGlobalCache: " + name);
+    global_cache[name] = null;
+    try {
+        const localUri = FileSystem.documentDirectory + name + '.json';
+        var data = await FileSystem.readAsStringAsync(localUri);
+        global_cache[name] = JSON.parse(data);
+    } catch (e) {
+        global_cache[name] = null;
+        console.log(e);
+    }
+}
+
+function getCacheData(name, key) {
+    if (global_cache[name]) {
+        const data = global_cache[name][key];
+        if (data) {
+            console.log("Load from global cache:" + name + ':' + key);
+            return data;
+        }
+    }
+
+    // If fails to get from downloaded cache, return the default ones
     let cache;
+    switch (name) {
+        case 'chs':
+            cache = require("../assets/json/chs.json");
+            break;
+        case 'cht':
+            cache = require("../assets/json/cht.json");
+            break;
+        case 'eng':
+            cache = require("../assets/json/eng.json");
+            break;
+        case 'spa':
+            cache = require("../assets/json/spa.json");
+            break;
+        case 'ccb':
+            cache = require("../assets/json/ccb.json");
+            break;
+        case 'cnvt':
+            cache = require("../assets/json/cnvt.json");
+            break;
+        case 'esv':
+            cache = require("../assets/json/esv.json");
+            break;
+        case 'kjv':
+            cache = require("../assets/json/kjv.json");
+            break;
+        case 'nivavd1984':
+            cache = require("../assets/json/niv1984.json");
+            break;
+        case 'niv2011':
+            cache = require("../assets/json/niv2011.json");
+            break;
+        case 'nvi':
+            cache = require("../assets/json/nvi.json");
+            break;
+        case 'rcuvss':
+            cache = require("../assets/json/rcuvss.json");
+            break;
+        case 'rcuvts':
+            cache = require("../assets/json/rcuvts.json");
+            break;
+        case 'rvr1995':
+            cache = require("../assets/json/rvr1995.json");
+            break;
+    }
+    if (cache) {
+        const data = cache[key];
+        if (data) {
+            console.log("Load from local cache:" + name + ':' + key);
+            return data;
+        }
+    }
+
+    console.log("No cache hit for " + name + ':' + key);
+    return null;
+}
+
+function getFromCache(key, keyString) {
     // Load from book/lesson cache
     if (key == Models.Lesson.key || key == Models.Book.key) {
-        switch (getCurrentUser().getLanguage()) {
-            case 'chs':
-                cache = require("../assets/json/chs.json");
-                break;
-            case 'cht':
-                cache = require("../assets/json/cht.json");
-                break;
-            case 'eng':
-                cache = require("../assets/json/eng.json");
-                break;
-            case 'spa':
-                cache = require("../assets/json/spa.json");
-                break;
-            default:
-                cache = require("../assets/json/eng.json");
-                break;
-        }
-        if (cache[keyString]) {
-            return cache[keyString];
+        const data = getCacheData(getCurrentUser().getLanguage(), keyString);
+        if (data) {
+            return data;
         }
     }
 
     // Load from passage cache
     if (key == Models.Passage.key) {
-        switch (getCurrentUser().getBibleVersion()) {
-            case 'ccb':
-                cache = require("../assets/json/ccb.json");
-                break;
-            case 'cnvt':
-                cache = require("../assets/json/cnvt.json");
-                break;
-            case 'esv':
-                cache = require("../assets/json/esv.json");
-                break;
-            case 'kjv':
-                cache = require("../assets/json/kjv.json");
-                break;
-            case 'niv1984':
-                cache = require("../assets/json/niv1984.json");
-                break;
-            case 'niv2011':
-                cache = require("../assets/json/niv2011.json");
-                break;
-            case 'nvi':
-                cache = require("../assets/json/nvi.json");
-                break;
-            case 'rcuvss':
-                cache = require("../assets/json/rcuvss.json");
-                break;
-            case 'rcuvts':
-                cache = require("../assets/json/rcuvts.json");
-                break;
-            case 'rvr1995':
-                cache = require("../assets/json/rvr1995.json");
-                break;
-            default:
-                cache = require("../assets/json/niv2011.json");
-                break;
-        }
-        if (cache[keyString]) {
-            return cache[keyString];
+        const data = getCacheData(getCurrentUser().getBibleVersion(), keyString);
+        if (data) {
+            return data;
         }
     }
 
@@ -133,8 +159,7 @@ function getHttpHeaders() {
 }
 
 let pokeInfo = {
-    lastUploadTime: 0,
-    lastCheckForUpdateTime: new Date(),
+    lastPokeDay: 0,
     message: []
 };
 
@@ -148,42 +173,31 @@ async function pokeServer(model, id) {
     console.log('>Poke:' + message + ' => ' + JSON.stringify(pokeInfo));
     pokeInfo.message.push(message);
 
-    const now = new Date();
-
-    // Check for update every 10 mins
-    let seconds = Math.floor((now - pokeInfo.lastCheckForUpdateTime) / 1000);
-    checkForUpdateTimer = 10 * 60;
-    if (seconds < checkForUpdateTimer) {
-        console.log((checkForUpdateTimer - seconds) + "s to CheckForUpdate");
-    } else {
-        pokeInfo.message.push('CheckForUpdate');
-        pokeInfo.lastCheckForUpdateTime = now;
-        getCurrentUser().checkForUpdate(true);
+    // Check is done daily
+    const dayOfToday = (new Date()).getDate();
+    console.log('LastCheckForPokeDate: ' + pokeInfo.lastPokeDay + ' DayOfToday: ' + dayOfToday);
+    if (dayOfToday == pokeInfo.lastPokeDay) {
+        return;
     }
 
-    // Queue poke data up to 5 mins
-    pokeTimer = 5 * 60;
-    seconds = Math.floor((now - pokeInfo.lastUploadTime) / 1000);
-    if (seconds < pokeTimer) {
-        console.log((pokeTimer - seconds) + "s to Poke");
-    } else {
-        const data = JSON.stringify(pokeInfo.message);
-        pokeInfo.message = [];
-        pokeInfo.lastUploadTime = now;
+    pokeInfo.message.push('CheckForUpdate');
+    getCurrentUser().checkForUpdate(true);
 
-        console.log('Uploading: ' + JSON.stringify(getHttpHeaders()) + data);
-        fetch(Models.Poke.restUri, {
-            method: 'POST',
-            headers: getHttpHeaders(),
-            body: JSON.stringify({ data })
+    const data = JSON.stringify(pokeInfo.message);
+    pokeInfo.message = [];
+
+    fetch(Models.Poke.restUri, {
+        method: 'POST',
+        headers: getHttpHeaders(),
+        body: JSON.stringify({ data })
+    })
+        .then((response) => {
+            console.log('>' + response.status);
+            pokeInfo.lastPokeDay = dayOfToday;
         })
-            .then((response) => {
-                console.log('>' + response.status);
-            })
-            .catch((error) => {
-                console.log(error);
-            });
-    }
+        .catch((error) => {
+            console.log(error);
+        });
 }
 
 async function loadAsync(model, id, update) {
@@ -216,10 +230,7 @@ async function loadAsync(model, id, update) {
 
     // store to cache
     if (data) {
-        if (model.cachePolicy == CachePolicy.Memory) {
-            global.cache[keyString] = data;
-        }
-        else if (model.cachePolicy == CachePolicy.AsyncStorage) {
+        if (model.cachePolicy == CachePolicy.AsyncStorage) {
             saveToOffilneStorageAsync(data, model.key, id);
         }
         console.log("finish load " + JSON.stringify({ model, id }));
@@ -228,10 +239,7 @@ async function loadAsync(model, id, update) {
         console.log("failed to load" + JSON.stringify({ model, id }));
 
         // then try to load from cache
-        if (model.cachePolicy == CachePolicy.Memory) {
-            data = global.cache[keyString];
-        }
-        else if (model.cachePolicy == CachePolicy.AsyncStorage) {
+        if (model.cachePolicy == CachePolicy.AsyncStorage) {
             data = await loadFromOffilneStorageAsync(model.key, id);
         }
     }
@@ -366,9 +374,11 @@ async function callWebServiceAsync(url, api, method, headersUnused, body) {
     return result;
 }
 
-async function showWebServiceCallErrorsAsync(result, acceptStatus) {
-    if (!result) {
-        await Alert.alert('Error', 'Please check your network connection');
+async function showWebServiceCallErrorsAsync(result, acceptStatus, showUI = true) {
+    if (!result || !result.status) {
+        if (showUI) {
+            await Alert.alert('Error', 'Please check your network connection');
+        }
     }
     else if (acceptStatus) {
         if (result.status == acceptStatus) {
@@ -386,7 +396,9 @@ async function showWebServiceCallErrorsAsync(result, acceptStatus) {
                     message = message + "\n\n" + result.body.ExceptionType;
                 }
             }
-            await Alert.alert('Error', message);
+            if (showUI) {
+                await Alert.alert('Error', message);
+            }
         }
         return false;
     }
@@ -394,4 +406,4 @@ async function showWebServiceCallErrorsAsync(result, acceptStatus) {
     return true;
 }
 
-export { loadAsync, saveAsync, clearStorageAsync, callWebServiceAsync, showWebServiceCallErrorsAsync, pokeServer };
+export { loadAsync, saveAsync, clearStorageAsync, callWebServiceAsync, showWebServiceCallErrorsAsync, pokeServer, reloadGlobalCache };

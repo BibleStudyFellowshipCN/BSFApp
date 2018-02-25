@@ -10,7 +10,7 @@ import { callWebServiceAsync, showWebServiceCallErrorsAsync } from '../dataStora
 export default class AttendanceScreen extends React.Component {
   static navigationOptions = ({ navigation }) => {
     return {
-      title: getI18nText('考勤表') + '  (' + navigation.state.params.data.date + ')'
+      title: navigation.state.params.data.date
     };
   };
 
@@ -50,6 +50,14 @@ export default class AttendanceScreen extends React.Component {
     this.setState({ users });
   }
 
+  getTitle(keyIndex, user) {
+    if (user.cellphone) {
+      return `#${keyIndex}: ${user.name} (${user.cellphone})`;
+    } else {
+      return `#${keyIndex}: ${user.name}`;
+    }
+  }
+
   render() {
     let keyIndex = 0;
     return (
@@ -63,7 +71,7 @@ export default class AttendanceScreen extends React.Component {
                 <CheckBox
                   containerStyle={{ width: Layout.window.width - 20 }}
                   key={keyIndex++}
-                  title={`#${keyIndex}: ${user.name} (${user.cellphone})`}
+                  title={this.getTitle(keyIndex, user)}
                   checked={user.checked}
                   onPress={() => { this.onCheck(user) }} />
               ))
@@ -91,12 +99,5 @@ export default class AttendanceScreen extends React.Component {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-  },
-  cellphoneInput: {
-    margin: 10,
-    height: 80,
-    fontSize: 24,
-    padding: 5,
-    backgroundColor: 'whitesmoke',
   }
 });

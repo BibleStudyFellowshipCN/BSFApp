@@ -81,7 +81,7 @@ export default class FeedbackScreen extends React.Component {
     return (
       <KeyboardAvoidingView style={styles.container} behavior='padding' keyboardVerticalOffset={0}>
         <ScrollView
-          style={{ backgroundColor: 'white' }}
+          style={{ backgroundColor: 'white', flex: 1 }}
           ref={ref => this.scrollView = ref}
           onContentSizeChange={(contentWidth, contentHeight) => {
             if (this.state.keyboard) {
@@ -99,7 +99,7 @@ export default class FeedbackScreen extends React.Component {
           }}>
           <View style={styles.answerContainer}>
             <TextInput
-              style={styles.answerInput}
+              style={[styles.answerInput, { fontSize: getCurrentUser().getLessonFontSize() }]}
               ref={(input) => this.feedbackInput = input}
               blurOnSubmit={false}
               placeholder={getI18nText('反馈意见')}
@@ -133,7 +133,6 @@ const styles = StyleSheet.create({
   },
   answerInput: {
     height: 150,
-    fontSize: 16,
     textAlignVertical: 'top'
   }
 });

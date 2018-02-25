@@ -1,6 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux'
-import { ScrollView, StyleSheet, View, Alert, KeyboardAvoidingView, Platform, AsyncStorage } from 'react-native';
+import { ScrollView, StyleSheet, View, Alert, KeyboardAvoidingView, Platform, AsyncStorage, Linking } from 'react-native';
 import Expo, { Constants } from 'expo';
 import { Models } from '../dataStorage/models';
 import { callWebServiceAsync, showWebServiceCallErrorsAsync } from '../dataStorage/storage';
@@ -10,6 +10,7 @@ import SettingsList from 'react-native-settings-list';
 import { getI18nText } from '../store/I18n';
 import { clearLesson } from '../store/lessons.js'
 import { clearPassage } from '../store/passage.js'
+import { clearBooks } from '../store/books.js'
 import { connectActionSheet } from '@expo/react-native-action-sheet';
 import { NavigationActions } from 'react-navigation'
 
@@ -24,6 +25,7 @@ import { NavigationActions } from 'react-navigation'
   state = {
     language: getCurrentUser().getLanguageDisplayName(),
     bibleVersion: getCurrentUser().getBibleVersionDisplayName(),
+    fontSize: getCurrentUser().getFontSize(),
     user: {}
   };
 
@@ -52,7 +54,7 @@ import { NavigationActions } from 'react-navigation'
       this.updateBibleVersionBasedOnLanguage(language);
 
       this.props.clearLesson();
-      this.props.requestBooks(language);
+      this.props.requestBooks();
       this.setState({ language: getCurrentUser().getLanguageDisplayName() });
 
       const setParamsAction = NavigationActions.setParams({
@@ -70,6 +72,18 @@ import { NavigationActions } from 'react-navigation'
 
       this.props.clearPassage();
       this.setState({ bibleVersion: getCurrentUser().getBibleVersionDisplayName() });
+    }
+  }
+
+  checkAppUpdate() {
+    getCurrentUser().checkForUpdate(false);
+  }
+
+  checkStoreUpdate() {
+    if (Platform.OS == 'ios') {
+      Linking.openURL('itms://itunes.apple.com/us/app/apple-store/id1229869018?mt=8').catch(err => alert(err));
+    } else if (Platform.OS == 'android') {
+      Linking.openURL('market://details?id=org.cbsfappv1.bsfclass').catch(err => alert(err));
     }
   }
 
@@ -121,8 +135,46 @@ import { NavigationActions } from 'react-navigation'
     );
   }
 
+  getFontText() {
+    switch (this.state.fontSize) {
+      case 1:
+        return getI18nText('小');
+      case 2:
+        return getI18nText('中');
+      case 3:
+        return getI18nText('大');
+    }
+  }
+
+  async onFontSizeChange(value) {
+    getCurrentUser().setFontSizeAsync(value);
+    this.setState({ fontSize: value });
+    this.props.clearLesson();
+    this.props.clearBooks();
+    this.props.requestBooks();
+  }
+
   onFontSize() {
-    alert("TODO: onFontSize");
+    let options = [
+      getI18nText('小'),
+      getI18nText('中'),
+      getI18nText('大'),
+    ];
+    options.push('Cancel');
+    let cancelButtonIndex = options.length - 1;
+    let destructiveButtonIndex = cancelButtonIndex;
+    this.props.showActionSheetWithOptions(
+      {
+        options,
+        cancelButtonIndex,
+        destructiveButtonIndex,
+      },
+      buttonIndex => {
+        if (buttonIndex != cancelButtonIndex) {
+          this.onFontSizeChange(buttonIndex + 1);
+        }
+      }
+    );
   }
 
   onFeedback() {
@@ -163,6 +215,7 @@ import { NavigationActions } from 'react-navigation'
   render() {
     const { manifest } = Constants;
     phone = getCurrentUser().getCellphone();
+    const fontSize = getCurrentUser().getSettingFontSize();
     return (
       <KeyboardAvoidingView style={styles.container} behavior='padding' keyboardVerticalOffset={0}>
         <ScrollView
@@ -174,26 +227,30 @@ import { NavigationActions } from 'react-navigation'
               <SettingsList.Item
                 title={getI18nText('显示语言')}
                 titleInfo={this.state.language}
-                titleInfoStyle={styles.titleInfoStyle}
+                titleStyle={{ fontSize }}
+                titleInfoStyle={{ fontSize }}
                 onPress={this.onLanguage.bind(this)}
               />
               <SettingsList.Item
                 title={getI18nText('圣经版本')}
                 titleInfo={this.state.bibleVersion}
-                titleInfoStyle={styles.titleInfoStyle}
+                titleStyle={{ fontSize }}
+                titleInfoStyle={{ fontSize }}
                 onPress={this.onBibleVerse.bind(this)}
               />
-              {/*<SettingsList.Item
-                title='字体大小'
-                titleInfo='中等'
-                titleInfoStyle={styles.titleInfoStyle}
+              <SettingsList.Item
+                title={getI18nText('字体大小')}
+                titleInfo={this.getFontText()}
+                titleStyle={{ fontSize }}
+                titleInfoStyle={{ fontSize }}
                 onPress={this.onFontSize.bind(this)}
-              />*/}
+              />
               <SettingsList.Item
                 title={getI18nText('手机号码')}
                 titleInfo={getI18nText(phone == '' ? '设置' : '更改')}
                 hasNavArrow={true}
-                titleInfoStyle={styles.titleInfoStyle}
+                titleStyle={{ fontSize }}
+                titleInfoStyle={{ fontSize }}
                 onPress={this.onSetPhoneNumber.bind(this)}
               />
               {
@@ -201,7 +258,8 @@ import { NavigationActions } from 'react-navigation'
                 <SettingsList.Item
                   title={getI18nText('考勤表')}
                   hasNavArrow={true}
-                  titleInfoStyle={styles.titleInfoStyle}
+                  titleStyle={{ fontSize }}
+                  titleInfoStyle={{ fontSize }}
                   onPress={this.onAttendance.bind(this)}
                 />
               }
@@ -210,7 +268,8 @@ import { NavigationActions } from 'react-navigation'
                 <SettingsList.Item
                   title={getI18nText('讲道录音')}
                   hasNavArrow={true}
-                  titleInfoStyle={styles.titleInfoStyle}
+                  titleStyle={{ fontSize }}
+                  titleInfoStyle={{ fontSize }}
                   onPress={this.onAudio.bind(this)}
                 />
               }
@@ -218,13 +277,15 @@ import { NavigationActions } from 'react-navigation'
               <SettingsList.Item
                 title={getI18nText('版本') + ': ' + manifest.version}
                 titleInfo={getI18nText('检查更新')}
-                titleInfoStyle={styles.titleInfoStyle}
-                onPress={() => { getCurrentUser().checkForUpdate(); }}
+                titleStyle={{ fontSize }}
+                titleInfoStyle={{ fontSize }}
+                onPress={this.checkAppUpdate.bind(this)}
               />
               <SettingsList.Item
                 title={getI18nText('反馈意见')}
                 hasNavArrow={true}
-                titleInfoStyle={styles.titleInfoStyle}
+                titleStyle={{ fontSize }}
+                titleInfoStyle={{ fontSize }}
                 onPress={this.onFeedback.bind(this)}
               />
             </SettingsList>
@@ -244,7 +305,8 @@ const mapDispatchToProps = (dispatch, ownProps) => {
   return {
     requestBooks: () => dispatch(requestBooks()),
     clearLesson: () => dispatch(clearLesson()),
-    clearPassage: () => dispatch(clearPassage())
+    clearPassage: () => dispatch(clearPassage()),
+    clearBooks: () => dispatch(clearBooks())
   }
 };
 

@@ -1,7 +1,7 @@
-import { AsyncStorage, Alert } from 'react-native';
+import { AsyncStorage, Alert, Platform } from 'react-native';
 import { Models } from '../dataStorage/models';
-import { callWebServiceAsync, showWebServiceCallErrorsAsync } from '../dataStorage/storage';
-import Expo, { Constants } from 'expo';
+import { callWebServiceAsync, showWebServiceCallErrorsAsync, pokeServer } from '../dataStorage/storage';
+import Expo, { Constants, FileSystem } from 'expo';
 import { getI18nText } from '../store/I18n';
 
 let currentUser;
@@ -53,6 +53,7 @@ export default class User {
   language = Models.DefaultLanguage;
   bibleVersion = Models.DefaultBibleVersion;
   audioBook = 1 * 1000 + 1;
+  fontSize = Models.DefaultFontSize;
 
   async loadExistingUserAsync() {
     let existingUser = await loadUser();
@@ -69,8 +70,14 @@ export default class User {
       }
       if (existingUser.audioBook) {
         this.audioBook = existingUser.audioBook;
-        if (this.audioBook < 1 * 1000 || this.audioBook > 66 * 1000) {
+        if (this.audioBook % 1000 < 1 || this.audioBook / 1000 % 1000 > 66) {
           this.audioBook = 1 * 1000 + 1;
+        }
+      }
+      if (existingUser.fontSize) {
+        this.fontSize = existingUser.fontSize;
+        if (this.fontSize < 1 || this.fontSize > 3) {
+          this.fontSize = 2;
         }
       }
       this.loggedOn = true;
@@ -161,6 +168,43 @@ export default class User {
     this.logUserInfo();
   }
 
+  async setFontSizeAsync(size) {
+    if (!this.isLoggedOn()) {
+      return;
+    }
+
+    this.fontSize = size;
+    await saveUserAsync(this.getUserInfo());
+    this.logUserInfo();
+  }
+
+  getFontSize() {
+    if (!this.isLoggedOn()) {
+      return Models.DefaultFontSize;
+    }
+    return this.fontSize;
+  }
+
+  getHomeTitleFontSize() {
+    return 14 + this.getFontSize() * 3;
+  }
+
+  getHomeFontSize() {
+    return 12 + this.getFontSize() * 3;
+  }
+
+  getBibleFontSize() {
+    return 12 + this.getFontSize() * 3;
+  }
+
+  getLessonFontSize() {
+    return 12 + this.getFontSize() * 3;
+  }
+
+  getSettingFontSize() {
+    return 9 + this.getFontSize() * 3;
+  }
+
   getBibleVersion() {
     if (!this.isLoggedOn()) {
       return Models.DefaultBibleVersion;
@@ -222,7 +266,7 @@ export default class User {
 
   async checkForUpdate(onlyShowUpdateUI) {
     const { manifest } = Constants;
-    const result = await callWebServiceAsync('https://expo.io/@turbozv/CBSFApp/index.exp?sdkVersion=' + manifest.sdkVersion, '', 'GET');
+    const result = await callWebServiceAsync('https://expo.io/@turbozv/CBSFApp/index.exp?sdkVersion=25.0.0,24.0.0,23.0.0', '', 'GET');
     let succeed;
     if (onlyShowUpdateUI) {
       succeed = result && result.status == 200;
@@ -235,11 +279,12 @@ export default class User {
       console.log('checkForUpdate:' + clientVersion + '-' + serverVersion);
       if (clientVersion < serverVersion) {
         Alert.alert(getI18nText('发现更新') + ': ' + result.body.version, getI18nText('程序将重新启动'), [
-          { text: 'OK', onPress: () => Expo.Util.reload() },
+          { text: 'OK', onPress: () => Expo.Util.reload() }
         ]);
       } else if (!onlyShowUpdateUI) {
         Alert.alert(getI18nText('您已经在使用最新版本'), getI18nText('版本') + ': ' + manifest.version + ' (SDK' + manifest.sdkVersion + ')', [
           { text: 'OK', onPress: () => { } },
+          { text: 'Reload', onPress: () => { Expo.Util.reload() } },
         ]);
       }
     }
@@ -250,7 +295,53 @@ export default class User {
   }
 
   getUserInfo() {
-    return { cellphone: this.cellphone, language: this.language, bibleVersion: this.bibleVersion, offlineMode: this.offlineMode, audioBook: this.audioBook };
+    return {
+      cellphone: this.cellphone,
+      language: this.language,
+      bibleVersion: this.bibleVersion,
+      offlineMode: this.offlineMode,
+      audioBook: this.audioBook,
+      fontSize: this.fontSize
+    };
+  }
+
+  async getLocalDataVersion() {
+    try {
+      const localUri = FileSystem.documentDirectory + 'version.json';
+      const data = await FileSystem.readAsStringAsync(localUri);
+      const version = JSON.parse(data);
+      console.log('LocalVersion: ' + version.version);
+      return version.version;
+    } catch (e) {
+      console.log(e);
+      return '';
+    }
+  }
+
+  async getRemoteDataVersion(showUI) {
+    try {
+      const result = await callWebServiceAsync(Models.DownloadUrl + 'version.json', '', 'GET');
+      const succeed = await showWebServiceCallErrorsAsync(result, 200, showUI);
+      if (succeed) {
+        console.log('RemoteVersion: ' + result.body.version);
+        return result.body.version;
+      }
+    } catch (e) {
+      console.log(e);
+    }
+    return '';
+  }
+
+  async getContentVersions(showUI) {
+    const remoteVersionString = await this.getRemoteDataVersion(showUI);
+    if (remoteVersion == '') {
+      return;
+    }
+    const localVersionString = await this.getLocalDataVersion();
+    const localVersion = this.getVersionNumber(localVersionString);
+    const remoteVersion = this.getVersionNumber(remoteVersionString);
+    console.log("Check lesson content versions " + localVersion + ' ' + remoteVersion + ' showUI=' + showUI);
+    return { localVersion, remoteVersion, localVersionString, remoteVersionString };
   }
 }
 

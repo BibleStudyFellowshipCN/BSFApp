@@ -76,6 +76,7 @@ function onBibleVerse() { }
 
   render() {
     if (this.props.passage) {
+      const fontSize = getCurrentUser().getBibleFontSize();
       const paragraphs = this.props.passage.paragraphs;
 
       // Using text (some Android device cannot show CJK in WebView)
@@ -94,7 +95,7 @@ function onBibleVerse() { }
           <View style={{ flex: 1, backgroundColor: 'white' }}>
             <ScrollView>
               <Text selectable={true} style={{
-                marginVertical: 2, marginHorizontal: 4, fontSize: 20, lineHeight: 32,
+                marginVertical: 2, marginHorizontal: 4, fontSize, lineHeight: 32,
               }}>{line}</Text>
             </ScrollView>
           </View>
@@ -102,7 +103,8 @@ function onBibleVerse() { }
       }
 
       // Using html
-      let html = '<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1" /></head><style> body { font-size: 19;} </style> <body>';
+      let html = '<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1" /></head>' +
+        '<style> body { font-size: ' + fontSize + ';} </style> <body>';
       for (var i in paragraphs) {
         for (var j in paragraphs[i].verses) {
           const verse = paragraphs[i].verses[j];

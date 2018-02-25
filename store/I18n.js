@@ -32,6 +32,19 @@ const text = {
     "发现更新",
     "程序将重新启动",
     "您已经在使用最新版本",
+    "考勤表",
+    "讲道录音",
+    "手机号码",
+    "设置",
+    "更改",
+    "字体大小",
+    "大",
+    "中",
+    "小",
+    "\n请强制关闭程序：\n\n1. 双击Home按钮\n\n2.向上划CBSF的预览界面关闭程序",
+    "课程没有更新",
+    "是否重新下载？",
+    "下载课程",
   ],
   cht: [
     "BSF課程",
@@ -63,6 +76,19 @@ const text = {
     "發現更新",
     "程式將重新啟動",
     "您已經在使用最新版本",
+    "考勤表",
+    "講道錄音",
+    "手機號碼",
+    "設置",
+    "更改",
+    "字體大小",
+    "大",
+    "中",
+    "小",
+    "\n請強制關閉程式：\n\n1. 雙擊Home按鈕\n\n2.向上劃CBSF的預覽界面關閉程式",
+    "課程沒有更新",
+    "是否重新下載？",
+    "下載課程",
   ],
   eng: [
     "BSF Lessons",
@@ -86,7 +112,7 @@ const text = {
     "Pause",
     "Play",
     "Chapter ",
-    "",
+    " ",
     "Offline Mode",
     "Information",
     "Please turn off offline mode first",
@@ -94,6 +120,19 @@ const text = {
     "Found update",
     "We will restart the app",
     "Your're already using the latest app",
+    "Attendance",
+    "Sermon recording",
+    "Cellphone",
+    "Setup",
+    "Update",
+    "Font size",
+    "Big",
+    "Medium",
+    "Small",
+    "\nPlease force close the app:\n\n1. Double-click the Home button\n\n2.Swipe up on the CBSF's preview to close the app",
+    "No update on lessons",
+    "Do you want to re-download?",
+    "Download lessons",
   ],
   spa: [
     "BSF Lecciones",
@@ -117,7 +156,7 @@ const text = {
     "Pausa",
     "Jugar",
     "Capítulo",
-    "",
+    " ",
     "Modo offline",
     "Información",
     "Por favor apague el modo fuera de línea primero",
@@ -125,6 +164,19 @@ const text = {
     "Actualización encontrada",
     "Vamos a reiniciar la aplicación",
     "Tu ya estás usando la última aplicación",
+    "Asistencia",
+    "Grabación de sermón",
+    "Teléfono móvil",
+    "Preparar",
+    "Actualizar",
+    "Tamaño de fuente",
+    "Grande",
+    "Medio",
+    "Pequeña",
+    "\nPor favor, cierre la aplicación:\n\n1. Haga doble clic en el botón de Inicio\n\n2. Descargue la vista previa de CBSF para cerrar la aplicación",
+    "Sin actualizaciones en las lecciones",
+    "¿Quieres volver a descargar?",
+    "Descargar lecciones",
   ]
 };
 
@@ -179,4 +231,23 @@ function getI18nBibleBook(origText) {
   return origText;
 }
 
-export { getI18nText, getI18nBibleBook };
+function getI18nBibleBookFromLang(origText, lang) {
+  //console.log("[getI18nBibleBook]" + lang + "{" + origText + "}");
+  if (lang == 'chs') {
+    return origText;
+  }
+
+  for (var j in Models.ValidLanguages) {
+    const checkLang = Models.ValidLanguages[j];
+    for (var i in BibleBookText[checkLang]) {
+      if (BibleBookText[checkLang][i] == origText) {
+        //console.log("=>" + BibleBookText[lang][i]);
+        return BibleBookText[lang][i];
+      }
+    }
+  }
+
+  return origText;
+}
+
+export { getI18nText, getI18nBibleBook, getI18nBibleBookFromLang };
