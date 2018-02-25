@@ -70,7 +70,7 @@ export default class User {
       }
       if (existingUser.audioBook) {
         this.audioBook = existingUser.audioBook;
-        if (this.audioBook < 1 * 1000 || this.audioBook > 66 * 1000) {
+        if (this.audioBook % 1000 < 1 || this.audioBook / 1000 % 1000 > 66) {
           this.audioBook = 1 * 1000 + 1;
         }
       }
