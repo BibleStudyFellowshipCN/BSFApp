@@ -86,7 +86,7 @@ export const Models = {
     { DisplayName: "English(KJV)", Value: "1" },
     { DisplayName: "Spanish", Value: "6" },
   ],
-  DownloadUrl: "http://bsf.turbozv.com/data/",
+  DownloadUrl: "http://mycbsf.org/data/",
   DownloadList: [
     'eng',
     'chs',
