@@ -8,6 +8,7 @@ import {
   Dimensions
 } from 'react-native';
 import { updateAnswer } from '../store/answers';
+import { getCurrentUser } from '../store/user';
 
 class Answer extends React.Component {
   state = {
@@ -40,7 +41,7 @@ class Answer extends React.Component {
       <View style={[styles.answerContainer, { height }]} onLayout={this.onLayout.bind(this)}>
         <TextInput
           ref={ref => this.answer = ref}
-          style={styles.answerInput}
+          style={[styles.answerInput, { fontSize: getCurrentUser().getLessonFontSize() }]}
           blurOnSubmit={false}
           multiline
           value={this.props.answer.answerText}
@@ -103,7 +104,6 @@ const styles = StyleSheet.create({
   },
   answerInput: {
     flex: 1,
-    fontSize: 16,
     textAlignVertical: 'top'
   },
 });

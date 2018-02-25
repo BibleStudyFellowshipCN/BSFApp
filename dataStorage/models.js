@@ -1,7 +1,5 @@
 
 export const CachePolicy = {
-  None: 0,
-  Memory: 1,
   AsyncStorage: 2,
 };
 
@@ -54,6 +52,11 @@ export const Models = {
     key: "ANSWER",
     cachePolicy: CachePolicy.AsyncStorage,
   },
+  Recover: {
+    key: "RECOVER",
+    api: "/recover",
+    restUri: HostServer + "/recover",
+  },
   DefaultLanguage: "chs",
   ValidLanguages: ["chs", "cht", "eng", "spa"],
   Languages: [
@@ -75,5 +78,30 @@ export const Models = {
     { DisplayName: "King James Version", Value: "kjv" },
     { DisplayName: "Nueva Versión Internacional", Value: "nvi" },
     { DisplayName: "Reina-Valera 1995", Value: "rvr1995" },
+  ],
+  DefaultFontSize: 2,  // 1 - small, 2 - medium, 3 - large
+  AudioBibles: [
+    { DisplayName: "普通话(CUV)", Value: "4" },
+    { DisplayName: "广东话(CUV)", Value: "13" },
+    { DisplayName: "English(KJV)", Value: "1" },
+    { DisplayName: "Spanish", Value: "6" },
+  ],
+  DownloadUrl: "http://bsf.turbozv.com/data/",
+  DownloadList: [
+    'eng',
+    'chs',
+    'cht',
+    'spa',
+    'niv2011',
+    'rcuvss',
+    'rcuvts',
+    'esv',
+    'rvr1995',
+    'ccb',
+    'cnvt',
+    'kjv',
+    'niv1984',
+    'nvi',
+    'version'
   ]
 }

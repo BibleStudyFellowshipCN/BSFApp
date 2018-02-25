@@ -1,19 +1,26 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { FontAwesome } from '@expo/vector-icons';
+import { FileSystem } from 'expo';
 import {
   ScrollView,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
+  Alert,
+  Platform,
+  ProgressViewIOS,
+  ProgressBarAndroid
 } from 'react-native';
 import Accordion from 'react-native-collapsible/Accordion';
-import { requestBooks } from "../store/books.js";
+import { requestBooks, clearBooks } from "../store/books.js";
+import { clearLesson } from '../store/lessons.js'
+import { clearPassage } from '../store/passage.js'
 import { getI18nText } from '../store/I18n';
 import { getCurrentUser } from '../store/user';
 import { Models } from '../dataStorage/models';
-import { pokeServer } from '../dataStorage/storage';
+import { pokeServer, reloadGlobalCache } from '../dataStorage/storage';
 
 class HomeScreen extends React.Component {
   static navigationOptions = ({ navigation }) => {
@@ -21,30 +28,131 @@ class HomeScreen extends React.Component {
     return {
       title: getI18nText(title),
       headerRight: (
-        <View style={{ marginRight: 20 }}>
-          <TouchableOpacity onPress={() => { getCurrentUser().checkForUpdate(); }}>
-            <FontAwesome name='refresh' size={28} color='#fff' />
+        <View style={{ marginRight: 20, flexDirection: 'row' }}>
+          <TouchableOpacity onPress={() => { checkForContentUpdate(true); }}>
+            <FontAwesome name='download' size={28} color='#fff' />
           </TouchableOpacity>
         </View>)
     };
   };
 
+  state = {
+    downloadProgress: '',
+    remoteVersion: '',
+    downloading: false
+  };
+
+  lastCheckForContentUpdateDate = 0;
+
   componentWillMount() {
     pokeServer(Models.Book, '');
+    this.checkForContentUpdate(false);
 
     if (!this.props.booklist) {
       this.props.requestBooks();
     }
+
+    checkForContentUpdate = this.checkForContentUpdate.bind(this);
+  }
+
+  downloadCallback(downloadProgress) {
+    if (downloadProgress.totalBytesExpectedToWrite == -1) {
+      progress = 1;
+    } else {
+      progress = downloadProgress.totalBytesWritten / downloadProgress.totalBytesExpectedToWrite;
+    }
+    this.setState({ downloadProgress: progress });
+  }
+
+  async checkForContentUpdate(showUI) {
+    if (this.checkingForContentUpdate) {
+      return;
+    }
+    this.checkingForContentUpdate = true;
+
+    this.lastCheckForContentUpdateDate = (new Date()).getDate();
+    try {
+      const { localVersion, remoteVersion, localVersionString, remoteVersionString } = await getCurrentUser().getContentVersions(showUI);
+      if (localVersion == remoteVersion) {
+        if (showUI) {
+          Alert.alert(getI18nText('课程没有更新'), getI18nText('是否重新下载？') + '[' + remoteVersionString + ']', [
+            { text: 'Yes', onPress: () => { this.downloadContent(remoteVersionString); } },
+            { text: 'No', onPress: () => { } },
+          ]);
+        }
+      } else {
+        this.downloadContent(remoteVersionString);
+      }
+    } catch (e) {
+      console.log(e);
+    }
+
+    this.checkingForContentUpdate = false;
+  }
+
+  async downloadContent(remoteVersion) {
+    this.downloadFiles = Models.DownloadList.length;
+    this.downloadedFiles = 0;
+    this.setState({ downloadProgress: 0, downloading: true, remoteVersion });
+    for (var i in Models.DownloadList) {
+      const remoteUri = Models.DownloadUrl + Models.DownloadList[i] + '.json';
+      const localUri = FileSystem.documentDirectory + Models.DownloadList[i] + '.json';
+      console.log(`Downlad ${remoteUri} to ${localUri}...`);
+
+      const downloadResumable = FileSystem.createDownloadResumable(remoteUri, localUri, {}, this.downloadCallback.bind(this));
+      try {
+        const { uri } = await downloadResumable.downloadAsync();
+
+        await reloadGlobalCache(Models.DownloadList[i]);
+
+        this.downloadedFiles++;
+        if (this.downloadedFiles >= Models.DownloadList.length) {
+          // reload all data
+          this.props.clearBooks();
+          this.props.clearLesson();
+          this.props.clearPassage();
+          this.props.requestBooks();
+          this.setState({ downloading: false });
+        }
+      } catch (e) {
+        console.log(e);
+        this.setState({ downloading: false });
+        return;
+      }
+    }
   }
 
   goToLesson(lesson) {
+    // Check for update every day
+    const dayOfToday = (new Date()).getDate();
+    console.log('LastCheckForContentUpdateDate: ' + this.lastCheckForContentUpdateDate + ' DayOfToday: ' + dayOfToday);
+    if (dayOfToday != this.lastCheckForContentUpdateDate) {
+      this.checkForContentUpdate(false);
+    }
+
     let parsed = lesson.name.split(' ');
     this.props.navigation.navigate('Lesson', { lesson, title: parsed[1] });
   }
 
   render() {
+    const progress = (this.state.downloadProgress + this.downloadedFiles) / this.downloadFiles;
+    const progressText = getI18nText('下载课程') + ' ' + this.state.remoteVersion + ' (' + parseInt(progress * 100) + '%)';
     return (
       <View style={styles.container}>
+        {
+          this.state.downloading && Platform.OS === 'ios' &&
+          <View>
+            <Text style={styles.progress}>{progressText}</Text>
+            <ProgressViewIOS style={styles.progress} progress={progress} />
+          </View>
+        }
+        {
+          this.state.downloading && Platform.OS === 'android' &&
+          <View>
+            <Text style={styles.progress}>{progressText}</Text>
+            <ProgressBarAndroid style={styles.progress} styleAttr="Horizontal" indeterminate={false} progress={progress} />
+          </View>
+        }
         <ScrollView
           style={styles.container}
           contentContainerStyle={styles.contentContainer}>
@@ -78,7 +186,7 @@ class HomeScreen extends React.Component {
           name={isActive ? 'minus' : 'plus'}
           size={18}
         />
-        <Text style={styles.bookHeaderText}>    {book} ({year})</Text>
+        <Text style={[styles.bookHeaderText, { fontSize: getCurrentUser().getHomeTitleFontSize() }]}>    {book} ({year})</Text>
       </View>
     )
   }
@@ -111,7 +219,7 @@ const Lesson = (props) => {
             {date} {lessonNumber}
           </Text>
         </View>
-        <Text style={styles.lessonText}>
+        <Text style={{ marginVertical: 4, fontSize: getCurrentUser().getHomeFontSize() }}>
           {name}
         </Text>
       </View>
@@ -134,7 +242,10 @@ const mapStateToProps = (state) => {
 
 const mapDispatchToProps = (dispatch, ownProps) => {
   return {
-    requestBooks: () => dispatch(requestBooks())
+    requestBooks: () => dispatch(requestBooks()),
+    clearLesson: () => dispatch(clearLesson()),
+    clearPassage: () => dispatch(clearPassage()),
+    clearBooks: () => dispatch(clearBooks())
   }
 }
 
@@ -154,13 +265,11 @@ const styles = StyleSheet.create({
     paddingVertical: 2,
     backgroundColor: '#FFECC4',
     alignItems: 'center',
-    height: 60,
     paddingLeft: 15,
     marginTop: 2,
     marginBottom: 2
   },
   bookHeaderText: {
-    fontSize: 20,
     marginVertical: 6,
     fontWeight: '400',
   },
@@ -169,7 +278,6 @@ const styles = StyleSheet.create({
     paddingLeft: 25,
     paddingVertical: 5,
     backgroundColor: 'white',
-    height: 60,
   },
   lessonChevron: {
     position: 'absolute',
@@ -183,7 +291,8 @@ const styles = StyleSheet.create({
   lessonMetadataText: {
     color: 'grey',
   },
-  lessonText: {
-    fontSize: 18,
-  },
+  progress: {
+    marginHorizontal: 10,
+    marginVertical: 5,
+  }
 });
