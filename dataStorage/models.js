@@ -3,7 +3,7 @@ export const CachePolicy = {
   AsyncStorage: 2,
 };
 
-const HostServer = 'http://cbsf.southcentralus.cloudapp.azure.com:3000';
+const HostServer = 'http://mycbsf.org:3000';
 export const Models = {
   Book: {
     key: "BOOK",
