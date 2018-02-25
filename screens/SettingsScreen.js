@@ -13,7 +13,6 @@ import { clearPassage } from '../store/passage.js'
 import { clearBooks } from '../store/books.js'
 import { connectActionSheet } from '@expo/react-native-action-sheet';
 import { NavigationActions } from 'react-navigation'
-import { LegacyAsyncStorage } from 'expo';
 
 @connectActionSheet class SettingsScreen extends React.Component {
   static navigationOptions = ({ navigation }) => {
@@ -27,23 +26,10 @@ import { LegacyAsyncStorage } from 'expo';
     language: getCurrentUser().getLanguageDisplayName(),
     bibleVersion: getCurrentUser().getBibleVersionDisplayName(),
     fontSize: getCurrentUser().getFontSize(),
-    showMigration: false,
     user: {}
   };
 
   componentWillMount() {
-    if (Platform.OS == 'ios') {
-      LegacyAsyncStorage.getItem('ANSWER', (err, oldData) => {
-        if (err || !oldData) {
-          oldData = "{}";
-        }
-        let oldAnswer = JSON.parse(oldData);
-        if (oldAnswer.rawData) {
-          this.setState({ showMigration: true });
-        }
-      });
-    }
-
     this.onCellphoneChanged();
   }
 
@@ -87,6 +73,10 @@ import { LegacyAsyncStorage } from 'expo';
       this.props.clearPassage();
       this.setState({ bibleVersion: getCurrentUser().getBibleVersionDisplayName() });
     }
+  }
+
+  checkAppUpdate() {
+    getCurrentUser().checkForUpdate(false);
   }
 
   checkStoreUpdate() {
@@ -289,7 +279,7 @@ import { LegacyAsyncStorage } from 'expo';
                 titleInfo={getI18nText('检查更新')}
                 titleStyle={{ fontSize }}
                 titleInfoStyle={{ fontSize }}
-                onPress={this.checkStoreUpdate.bind(this)}
+                onPress={this.checkAppUpdate.bind(this)}
               />
               <SettingsList.Item
                 title={getI18nText('反馈意见')}
@@ -298,16 +288,6 @@ import { LegacyAsyncStorage } from 'expo';
                 titleInfoStyle={{ fontSize }}
                 onPress={this.onFeedback.bind(this)}
               />
-              {
-                this.state.showMigration &&
-                <SettingsList.Item
-                  title='Recover missing answers'
-                  hasNavArrow={true}
-                  titleStyle={{ color: 'red', fontSize }}
-                  titleInfoStyle={{ fontSize }}
-                  onPress={() => getCurrentUser().migrateAsync()}
-                />
-              }
             </SettingsList>
           </View>
         </ScrollView>

@@ -1,6 +1,6 @@
 import React from 'react';
 import { Platform, StatusBar, StyleSheet, View, Alert } from 'react-native';
-import Expo, { LegacyAsyncStorage, AppLoading } from 'expo';
+import Expo, { AppLoading } from 'expo';
 import RootNavigation from './navigation/RootNavigation';
 import createStore from './store/createStore'
 import { loadAsync, reloadGlobalCache } from './dataStorage/storage';
@@ -75,14 +75,6 @@ export default class App extends React.Component {
   }
 
   _loadResourcesAsync = async () => {
-
-    // migrate data
-    try {
-      await LegacyAsyncStorage.migrateItems(['ANSWER']);
-    } catch (error) {
-      console.log(error);
-    }
-
     // initialize existing user
     try {
       await this.loadUserInfo();

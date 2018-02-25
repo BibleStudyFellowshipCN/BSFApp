@@ -1,7 +1,7 @@
 import { AsyncStorage, Alert, Platform } from 'react-native';
 import { Models } from '../dataStorage/models';
 import { callWebServiceAsync, showWebServiceCallErrorsAsync, pokeServer } from '../dataStorage/storage';
-import Expo, { LegacyAsyncStorage, Constants, FileSystem } from 'expo';
+import Expo, { Constants, FileSystem } from 'expo';
 import { getI18nText } from '../store/I18n';
 
 let currentUser;
@@ -266,7 +266,7 @@ export default class User {
 
   async checkForUpdate(onlyShowUpdateUI) {
     const { manifest } = Constants;
-    const result = await callWebServiceAsync('https://expo.io/@turbozv/CBSFApp/index.exp?sdkVersion=' + manifest.sdkVersion, '', 'GET');
+    const result = await callWebServiceAsync('https://expo.io/@turbozv/CBSFApp/index.exp?sdkVersion=25.0.0,24.0.0,23.0.0', '', 'GET');
     let succeed;
     if (onlyShowUpdateUI) {
       succeed = result && result.status == 200;
@@ -278,16 +278,13 @@ export default class User {
       const serverVersion = this.getVersionNumber(result.body.version);
       console.log('checkForUpdate:' + clientVersion + '-' + serverVersion);
       if (clientVersion < serverVersion) {
-        if (Platform.OS === 'ios') {
-          Alert.alert(getI18nText('发现更新') + ': ' + result.body.version, getI18nText("\n请强制关闭程序：\n\n1. 双击Home按钮\n\n2.向上划CBSF的预览界面关闭程序"));
-        } else {
-          Alert.alert(getI18nText('发现更新') + ': ' + result.body.version, getI18nText('程序将重新启动'), [
-            { text: 'OK', onPress: () => Expo.Util.reload() },
-          ]);
-        }
+        Alert.alert(getI18nText('发现更新') + ': ' + result.body.version, getI18nText('程序将重新启动'), [
+          { text: 'OK', onPress: () => Expo.Util.reload() }
+        ]);
       } else if (!onlyShowUpdateUI) {
         Alert.alert(getI18nText('您已经在使用最新版本'), getI18nText('版本') + ': ' + manifest.version + ' (SDK' + manifest.sdkVersion + ')', [
           { text: 'OK', onPress: () => { } },
+          { text: 'Reload', onPress: () => { Expo.Util.reload() } },
         ]);
       }
     }
@@ -345,64 +342,6 @@ export default class User {
     const remoteVersion = this.getVersionNumber(remoteVersionString);
     console.log("Check lesson content versions " + localVersion + ' ' + remoteVersion + ' showUI=' + showUI);
     return { localVersion, remoteVersion, localVersionString, remoteVersionString };
-  }
-
-  async migrateAsync() {
-    try {
-      pokeServer(Models.Recover, '');
-    } catch (e) {
-      console.log(e);
-    }
-
-    const key = 'ANSWER';
-    await LegacyAsyncStorage.migrateItems([key]);
-
-    LegacyAsyncStorage.getItem(key, (err, oldData) => {
-      if (err || !oldData) {
-        oldData = "{}";
-      }
-      let oldAnswer = JSON.parse(oldData);
-      if (!oldAnswer.rawData) {
-        Alert.alert("No need to recover", "We don't find any data from previous version");
-        return;
-      }
-      console.log(JSON.stringify(oldAnswer));
-
-      AsyncStorage.getItem(key, (err, newData) => {
-        if (err || !newData) {
-          newData = "{}";
-        }
-
-        let newAnswer = JSON.parse(newData);
-        if (!newAnswer.rawData) {
-          newAnswer.rawData = {
-            answers: {}
-          };
-        }
-        console.log(JSON.stringify(newAnswer));
-
-        let mergeData = JSON.parse(JSON.stringify(newAnswer));
-        for (var item in oldAnswer.rawData.answers) {
-          let currentItem = oldAnswer.rawData.answers[item];
-          let targetItem = mergeData.rawData.answers[item];
-          if (!targetItem) {
-            mergeData.rawData.answers[item] = currentItem;
-          } else {
-            if (targetItem.answerText.indexOf(currentItem.answerText) == -1) {
-              mergeData.rawData.answers[item].answerText = currentItem.answerText + "\n" + mergeData.rawData.answers[item].answerText;
-            }
-          }
-        }
-
-        console.log(JSON.stringify(mergeData));
-        AsyncStorage.setItem(key, JSON.stringify(mergeData), () => {
-          Alert.alert("Completed!", "App will restart to show the recovered answers", [
-            { text: 'OK', onPress: () => Expo.Util.reload() },
-          ]);
-        });
-      });
-
-    });
   }
 }
 
