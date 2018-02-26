@@ -38,13 +38,9 @@ export default class App extends React.Component {
       return (
         <ActionSheetProvider>
           <Provider store={store}>
-            <View style={styles.container}>
-              {Platform.OS === 'ios' && <StatusBar barStyle="default" />}
-              {Platform.OS === 'android' && <View style={styles.statusBarUnderlay} />}
-              <RootNavigation />
-            </View>
+            <RootNavigation />
           </Provider>
-        </ActionSheetProvider>
+        </ActionSheetProvider >
       );
     }
   }
