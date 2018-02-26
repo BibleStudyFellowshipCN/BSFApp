@@ -302,6 +302,15 @@ import { LegacyAsyncStorage } from 'expo';
                 titleInfoStyle={{ fontSize }}
                 onPress={this.onFeedback.bind(this)}
               />
+              <SettingsList.Item
+                title={getI18nText('Chat room')}
+                hasNavArrow={true}
+                titleStyle={{ fontSize }}
+                titleInfoStyle={{ fontSize }}
+                onPress={() => {
+                  this.props.navigation.navigate('GlobalChat', { user: this.state.user });
+                }}
+              />
               {
                 this.state.showMigration &&
                 <SettingsList.Item

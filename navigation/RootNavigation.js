@@ -10,6 +10,7 @@ import FeedbackScreen from '../screens/FeedbackScreen';
 import SetPhoneScreen from '../screens/SetPhoneScreen';
 import AttendanceScreen from '../screens/AttendanceScreen';
 import SermonAudioScreen from '../screens/SermonAudioScreen';
+import GlobalChatScreen from '../screens/GlobalChatScreen';
 
 const RootStackNavigator = StackNavigator(
   {
@@ -33,6 +34,9 @@ const RootStackNavigator = StackNavigator(
     },
     SermonAudio: {
       screen: SermonAudioScreen
+    },
+    GlobalChat: {
+      screen: GlobalChatScreen
     }
   },
   {
