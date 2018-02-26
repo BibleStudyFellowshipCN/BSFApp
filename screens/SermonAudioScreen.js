@@ -20,7 +20,7 @@ export default class SermonAudioScreen extends React.Component {
   }
 
   render() {
-    const uri = 'http://cbsf.southcentralus.cloudapp.azure.com/bsf/audio.php?cellphone=' + getCurrentUser().getCellphone();
+    const uri = 'http://mycbsf.org/audio.php?cellphone=' + getCurrentUser().getCellphone();
     return (
       <WebView
         source={{ uri }}

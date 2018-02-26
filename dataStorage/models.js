@@ -3,7 +3,7 @@ export const CachePolicy = {
   AsyncStorage: 2,
 };
 
-const HostServer = 'http://cbsf.southcentralus.cloudapp.azure.com:3000';
+const HostServer = 'http://mycbsf.org:3000';
 export const Models = {
   Book: {
     key: "BOOK",
@@ -86,7 +86,7 @@ export const Models = {
     { DisplayName: "English(KJV)", Value: "1" },
     { DisplayName: "Spanish", Value: "6" },
   ],
-  DownloadUrl: "http://bsf.turbozv.com/data/",
+  DownloadUrl: "http://mycbsf.org/data/",
   DownloadList: [
     'eng',
     'chs',

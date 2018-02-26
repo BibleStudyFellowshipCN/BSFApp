@@ -90,15 +90,6 @@ export default class App extends React.Component {
       console.log(error);
     }
 
-    // load global cache for current language
-    try {
-      for (var i in Models.DownloadList) {
-        await reloadGlobalCache(Models.DownloadList[i]);
-      }
-    } catch (error) {
-      console.log(error);
-    }
-
     let bootValues;
     try {
       bootValues = await Promise.all([

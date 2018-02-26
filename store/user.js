@@ -70,7 +70,7 @@ export default class User {
       }
       if (existingUser.audioBook) {
         this.audioBook = existingUser.audioBook;
-        if (this.audioBook < 1 * 1000 || this.audioBook > 66 * 1000) {
+        if (this.audioBook % 1000 < 1 || this.audioBook / 1000 % 1000 > 66) {
           this.audioBook = 1 * 1000 + 1;
         }
       }
@@ -266,7 +266,7 @@ export default class User {
 
   async checkForUpdate(onlyShowUpdateUI) {
     const { manifest } = Constants;
-    const result = await callWebServiceAsync('https://expo.io/@turbozv/CBSFApp/index.exp?sdkVersion=' + manifest.sdkVersion, '', 'GET');
+    const result = await callWebServiceAsync('https://expo.io/@turbozv/CBSFApp/index.exp?sdkVersion=25.0.0,24.0.0,23.0.0', '', 'GET');
     let succeed;
     if (onlyShowUpdateUI) {
       succeed = result && result.status == 200;
@@ -278,16 +278,13 @@ export default class User {
       const serverVersion = this.getVersionNumber(result.body.version);
       console.log('checkForUpdate:' + clientVersion + '-' + serverVersion);
       if (clientVersion < serverVersion) {
-        if (Platform.OS === 'ios') {
-          Alert.alert(getI18nText('发现更新') + ': ' + result.body.version, getI18nText("\n请强制关闭程序：\n\n1. 双击Home按钮\n\n2.向上划CBSF的预览界面关闭程序"));
-        } else {
-          Alert.alert(getI18nText('发现更新') + ': ' + result.body.version, getI18nText('程序将重新启动'), [
-            { text: 'OK', onPress: () => Expo.Util.reload() },
-          ]);
-        }
+        Alert.alert(getI18nText('发现更新') + ': ' + result.body.version, getI18nText('程序将重新启动'), [
+          { text: 'OK', onPress: () => Expo.Util.reload() }
+        ]);
       } else if (!onlyShowUpdateUI) {
         Alert.alert(getI18nText('您已经在使用最新版本'), getI18nText('版本') + ': ' + manifest.version + ' (SDK' + manifest.sdkVersion + ')', [
           { text: 'OK', onPress: () => { } },
+          { text: 'Reload', onPress: () => { Expo.Util.reload() } },
         ]);
       }
     }

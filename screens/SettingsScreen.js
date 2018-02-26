@@ -89,6 +89,10 @@ import { LegacyAsyncStorage } from 'expo';
     }
   }
 
+  checkAppUpdate() {
+    getCurrentUser().checkForUpdate(false);
+  }
+
   checkStoreUpdate() {
     if (Platform.OS == 'ios') {
       Linking.openURL('itms://itunes.apple.com/us/app/apple-store/id1229869018?mt=8').catch(err => alert(err));
@@ -289,7 +293,7 @@ import { LegacyAsyncStorage } from 'expo';
                 titleInfo={getI18nText('检查更新')}
                 titleStyle={{ fontSize }}
                 titleInfoStyle={{ fontSize }}
-                onPress={this.checkStoreUpdate.bind(this)}
+                onPress={this.checkAppUpdate.bind(this)}
               />
               <SettingsList.Item
                 title={getI18nText('反馈意见')}
