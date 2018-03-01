@@ -188,7 +188,7 @@ const BSFQuestion = (props) => (
             text: props.question.questionText
           });
         }}>
-          <FontAwesome name='commenting-o' size={28} color='#f39c12' />
+          <FontAwesome name='commenting-o' size={28} color='#95a5a6' />
         </TouchableOpacity>
       </View>
     </View>
