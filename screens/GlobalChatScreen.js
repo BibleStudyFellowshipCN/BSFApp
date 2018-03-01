@@ -37,19 +37,6 @@ export default class GlobalChatScreen extends React.Component {
     Chat.closeChat();
   }
 
-  renderBubble(props) {
-    return (
-      <Bubble
-        {...props}
-        wrapperStyle={{
-          left: {
-            backgroundColor: '#f0f0f0',
-          }
-        }}
-      />
-    );
-  }
-
   render() {
     return (
       <View style={styles.container}>
@@ -61,10 +48,8 @@ export default class GlobalChatScreen extends React.Component {
           }}
           user={{
             _id: Platform.OS + ' ' + Constants['deviceId'],
-            name: 'B',
-            avatar: 'https://raw.githubusercontent.com/turbozv/BSFApp/master/assets/images/icon.png'
+            name: 'B'
           }}
-          renderBubble={this.renderBubble.bind(this)}
         />
         {
           Platform.OS == 'android' &&

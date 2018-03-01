@@ -46,7 +46,7 @@ class Chat {
         text: message.text,
         createAt: new Date(message.createdAt),
         user: {
-          id: message.user.id,
+          _id: message.user._id,
           name: message.user.name
         }
       })
