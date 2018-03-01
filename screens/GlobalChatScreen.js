@@ -10,8 +10,9 @@ import KeyboardSpacer from 'react-native-keyboard-spacer';
 
 export default class GlobalChatScreen extends React.Component {
   static navigationOptions = ({ navigation }) => {
+    const title = navigation.state.params && navigation.state.params.title ? navigation.state.params.title : getI18nText('聊天室');
     return {
-      title: getI18nText('Chat room')
+      title
     };
   };
 
@@ -19,11 +20,35 @@ export default class GlobalChatScreen extends React.Component {
     messages: [],
   }
 
+  constructor(props) {
+    super(props);
+    var id = '';
+    if (props.navigation.state.params) {
+      if (props.navigation.state.params.id) {
+        id = props.navigation.state.params.id
+      }
+      if (props.navigation.state.params.text) {
+        this.state.messages = [
+          {
+            _id: Math.round(Math.random() * 1000000),
+            text: props.navigation.state.params.text,
+            createdAt: new Date(2018, 2, 28),
+            user: {
+              _id: 0,
+              name: 'Q',
+            }
+          }
+        ];
+      }
+    }
+    this.chatServer = new Chat(id);
+  }
+
   componentWillMount() {
   }
 
   componentDidMount() {
-    Chat.loadMessages((message) => {
+    this.chatServer.loadMessages((message) => {
       console.log("New message: " + JSON.stringify(message));
       this.setState((previousState) => {
         return {
@@ -34,7 +59,7 @@ export default class GlobalChatScreen extends React.Component {
   }
 
   componentWillUnmount() {
-    Chat.closeChat();
+    this.chatServer.closeChat();
   }
 
   render() {
@@ -44,7 +69,7 @@ export default class GlobalChatScreen extends React.Component {
           messages={this.state.messages}
           isAnimated={true}
           onSend={(message) => {
-            Chat.sendMessage(message);
+            this.chatServer.sendMessage(message);
           }}
           user={{
             _id: Platform.OS + ' ' + Constants['deviceId'],

@@ -20,6 +20,7 @@ import { getI18nText, getI18nBibleBook } from '../store/I18n';
 import { Models } from '../dataStorage/models';
 import { pokeServer } from '../dataStorage/storage';
 import { getCurrentUser } from '../store/user';
+import { FontAwesome } from '@expo/vector-icons';
 
 class LessonScreen extends React.Component {
   static navigationOptions = ({ navigation }) => {
@@ -42,6 +43,8 @@ class LessonScreen extends React.Component {
   componentWillMount() {
     pokeServer(Models.Lesson, this.props.navigation.state.params.lesson.id);
 
+    navigateTo = this.navigateTo.bind(this);
+
     if (!this.props.lesson) {
       this.props.loadLesson();
     }
@@ -55,6 +58,11 @@ class LessonScreen extends React.Component {
     if (Platform.OS != 'ios') {
       clearInterval(this.intervalId);
     }
+  }
+
+  navigateTo(page, data) {
+    data.text = this.props.lesson.name + '\n' + data.text;
+    this.props.navigation.navigate(page, data);
   }
 
   goToFirstPage() {
@@ -166,8 +174,25 @@ const BSFQuestion = (props) => (
         <BibleQuote key={quote.book + quote.verse} book={quote.book} verse={quote.verse} goToPassage={props.goToPassage} />
       ))}
     </View>
-    <Answer questionId={props.question.id} />
-  </View>
+    <View>
+      <Answer questionId={props.question.id} />
+      <View style={{
+        position: 'absolute',
+        top: -26,
+        right: -11
+      }}>
+        <TouchableOpacity onPress={() => {
+          navigateTo('GlobalChat', {
+            id: props.question.id,
+            title: getI18nText('问题讨论') + ' ' + props.question.id,
+            text: props.question.questionText
+          });
+        }}>
+          <FontAwesome name='commenting-o' size={28} color='#f39c12' />
+        </TouchableOpacity>
+      </View>
+    </View>
+  </View >
 )
 
 const QuestionText = (props) => (

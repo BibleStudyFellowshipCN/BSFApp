@@ -12,11 +12,16 @@ const firebaseConfig = {
 
 firebase.initializeApp(firebaseConfig);
 
-class Chat {
+export default class Chat {
   uid = '';
   messagesRef = null;
+  databaseId = null;
 
-  constructor() {
+  constructor(id) {
+    if (id) {
+      this.databaseId = id;
+    }
+
     firebase.auth().onAuthStateChanged((user) => {
       if (user) {
         this.setUid(user.uid);
@@ -36,15 +41,23 @@ class Chat {
     return this.uid;
   }
 
+  getDatabaseName() {
+    if (this.databaseId) {
+      return 'messages' + this.databaseId;
+    } else {
+      return 'messages';
+    }
+  }
+
   loadMessages(callback) {
-    this.messagesRef = firebase.database().ref('messages');
+    this.messagesRef = firebase.database().ref(this.getDatabaseName());
     this.messagesRef.off();
     const onReceive = (data) => {
       const message = data.val();
       callback({
         _id: data.key,
         text: message.text,
-        createAt: new Date(message.createdAt),
+        createdAt: new Date(message.createdAt),
         user: {
           _id: message.user._id,
           name: message.user.name
@@ -72,5 +85,3 @@ class Chat {
     }
   }
 }
-
-export default new Chat();

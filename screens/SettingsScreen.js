@@ -303,12 +303,12 @@ import { LegacyAsyncStorage } from 'expo';
                 onPress={this.onFeedback.bind(this)}
               />
               <SettingsList.Item
-                title={getI18nText('Chat room')}
+                title={getI18nText('聊天室')}
                 hasNavArrow={true}
                 titleStyle={{ fontSize }}
                 titleInfoStyle={{ fontSize }}
                 onPress={() => {
-                  this.props.navigation.navigate('GlobalChat', { user: this.state.user });
+                  this.props.navigation.navigate('GlobalChat', { title: getI18nText('聊天室') });
                 }}
               />
               {
