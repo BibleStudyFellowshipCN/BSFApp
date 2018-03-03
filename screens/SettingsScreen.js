@@ -302,15 +302,18 @@ import { LegacyAsyncStorage } from 'expo';
                 titleInfoStyle={{ fontSize }}
                 onPress={this.onFeedback.bind(this)}
               />
-              <SettingsList.Item
-                title={getI18nText('聊天室')}
-                hasNavArrow={true}
-                titleStyle={{ fontSize }}
-                titleInfoStyle={{ fontSize }}
-                onPress={() => {
-                  this.props.navigation.navigate('GlobalChat', { title: getI18nText('聊天室') });
-                }}
-              />
+              {
+                this.state.user.audio &&
+                <SettingsList.Item
+                  title={getI18nText('聊天室')}
+                  hasNavArrow={true}
+                  titleStyle={{ fontSize }}
+                  titleInfoStyle={{ fontSize }}
+                  onPress={() => {
+                    this.props.navigation.navigate('GlobalChat', { title: getI18nText('聊天室') });
+                  }}
+                />
+              }
               {
                 this.state.showMigration &&
                 <SettingsList.Item
