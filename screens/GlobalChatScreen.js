@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, View, Platform } from 'react-native';
+import { StyleSheet, View, Platform, ActivityIndicator } from 'react-native';
 import { getI18nText } from '../store/I18n';
 import { Button } from 'react-native-elements';
 import { getCurrentUser } from '../store/user';
@@ -17,6 +17,7 @@ export default class GlobalChatScreen extends React.Component {
   };
 
   state = {
+    loading: true,
     messages: [],
   }
 
@@ -32,7 +33,6 @@ export default class GlobalChatScreen extends React.Component {
           {
             _id: Math.round(Math.random() * 1000000),
             text: props.navigation.state.params.text,
-            createdAt: new Date(2018, 2, 28),
             user: {
               _id: 0,
               name: 'Q',
@@ -41,20 +41,26 @@ export default class GlobalChatScreen extends React.Component {
         ];
       }
     }
-    this.chatServer = new Chat(id);
+    this.chatServer = new Chat(id, this.onNewMessage.bind(this));
   }
 
   componentWillMount() {
   }
 
   componentDidMount() {
-    this.chatServer.loadMessages((message) => {
-      console.log("New message: " + JSON.stringify(message));
-      this.setState((previousState) => {
-        return {
-          messages: GiftedChat.append(previousState.messages, message),
-        };
-      });
+    console.log('loading messages');
+    this.chatServer.loadMessages().then(() => {
+      this.setState({ loading: false });
+      console.log('loading messages done!');
+    });
+  }
+
+  onNewMessage(message) {
+    console.log("New message: " + JSON.stringify(message));
+    this.setState((previousState) => {
+      return {
+        messages: GiftedChat.append(previousState.messages, message),
+      };
     });
   }
 
@@ -65,17 +71,27 @@ export default class GlobalChatScreen extends React.Component {
   render() {
     return (
       <View style={styles.container}>
-        <GiftedChat
-          messages={this.state.messages}
-          isAnimated={true}
-          onSend={(message) => {
-            this.chatServer.sendMessage(message);
-          }}
-          user={{
-            _id: Platform.OS + ' ' + Constants['deviceId'],
-            name: 'B'
-          }}
-        />
+        {
+          this.state.loading &&
+          <ActivityIndicator
+            style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}
+            size="large"
+            color="#0000ff" />
+        }
+        {
+          !this.state.loading &&
+          <GiftedChat
+            messages={this.state.messages}
+            isAnimated={true}
+            onSend={(message) => {
+              this.chatServer.sendMessage(message);
+            }}
+            user={{
+              _id: Platform.OS + ' ' + Constants['deviceId'],
+              name: 'B'
+            }}
+          />
+        }
         {
           Platform.OS == 'android' &&
           <KeyboardSpacer />

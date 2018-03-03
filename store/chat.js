@@ -1,36 +1,26 @@
-import * as firebase from 'firebase';
+import { callWebServiceAsync, showWebServiceCallErrorsAsync } from '../dataStorage/storage';
+import { Models } from '../dataStorage/models';
 
-// Initialize Firebase
-const firebaseConfig = {
-  apiKey: "AIzaSyCL8FEywFF_3Yh2g6xBtURUWfQRQCqtzu4",
-  authDomain: "cbsf-cc2d3.firebaseapp.com",
-  databaseURL: "https://cbsf-cc2d3.firebaseio.com",
-  projectId: "cbsf-cc2d3",
-  storageBucket: "cbsf-cc2d3.appspot.com",
-  messagingSenderId: "674960542552"
-};
-
-firebase.initializeApp(firebaseConfig);
+const io = require('socket.io-client');
 
 export default class Chat {
   uid = '';
-  messagesRef = null;
-  databaseId = null;
+  roomId = null;
+  socket = null;
+  callback = null;
 
-  constructor(id) {
-    if (id) {
-      this.databaseId = id;
-    }
+  constructor(id, callback) {
+    this.roomId = id;
+    this.callback = callback;
 
-    firebase.auth().onAuthStateChanged((user) => {
-      if (user) {
-        this.setUid(user.uid);
-      } else {
-        firebase.auth().signInAnonymously().catch((error) => {
-          alert(error.message);
-        })
-      }
-    })
+    this.socket = io(Models.HostServer, {
+      transports: ['websocket'],
+    });
+
+    this.socket.on('newMessage', (data) => {
+      console.log('newMessage: ' + JSON.stringify(data))
+      this.onNewMessage(data);
+    });
   }
 
   setUid(value) {
@@ -41,47 +31,73 @@ export default class Chat {
     return this.uid;
   }
 
-  getDatabaseName() {
-    if (this.databaseId) {
-      return 'messages' + this.databaseId;
+  getRoom() {
+    if (this.roomId) {
+      return this.roomId;
     } else {
-      return 'messages';
+      return 'chat';
     }
   }
 
-  loadMessages(callback) {
-    this.messagesRef = firebase.database().ref(this.getDatabaseName());
-    this.messagesRef.off();
-    const onReceive = (data) => {
-      const message = data.val();
-      callback({
-        _id: data.key,
-        text: message.text,
-        createdAt: new Date(message.createdAt),
+  async loadMessages() {
+    const result = await callWebServiceAsync(Models.HostServer + '/messages/', this.getRoom(), 'GET');
+    succeed = await showWebServiceCallErrorsAsync(result, 200);
+    if (succeed) {
+      for (var i in result.body) {
+        const data = result.body[i];
+        this.callback({
+          _id: i,
+          text: data.message,
+          createdAt: new Date(data.createdAt),
+          user: {
+            _id: data.user,
+            name: 'B'
+          }
+        });
+      }
+    } else {
+      this.callback({
+        _id: 0,
+        text: 'Failed to load messages, please try again later',
+        createdAt: new Date(),
         user: {
-          _id: message.user._id,
-          name: message.user.name
+          _id: 0,
+          name: 'System'
         }
-      })
-    };
+      });
+    }
+  }
 
-    this.messagesRef.limitToLast(100).on('child_added', onReceive);
+  onNewMessage(data) {
+    console.log("receiveMessage: " + JSON.stringify(data));
+
+    if (data.room == this.getRoom()) {
+      this.callback({
+        _id: Math.round(Math.random() * 1000000),
+        text: data.message,
+        createdAt: new Date(data.createdAt),
+        user: {
+          _id: data.user,
+          name: 'B'
+        }
+      });
+    }
   }
 
   sendMessage(message) {
     for (i = 0; i < message.length; i++) {
       console.log("sendMessage: " + JSON.stringify(message[i]));
-      this.messagesRef.push({
-        text: message[i].text,
-        user: message[i].user,
-        createdAt: firebase.database.ServerValue.TIMESTAMP
-      })
+
+      this.callback(message[i]);
+
+      this.socket.emit('newMessage', {
+        room: this.getRoom(),
+        user: message[i].user._id,
+        message: message[i].text
+      });
     }
   }
 
   closeChat() {
-    if (this.messagesRef) {
-      this.messagesRef.off();
-    }
   }
 }
