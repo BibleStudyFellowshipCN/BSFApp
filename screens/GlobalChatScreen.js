@@ -28,6 +28,12 @@ export default class GlobalChatScreen extends React.Component {
       if (props.navigation.state.params.id) {
         id = props.navigation.state.params.id
       }
+
+      if (props.navigation.state.params.defaultUserName) {
+        this.defaultUserName = props.navigation.state.params.defaultUserName;
+      } else {
+        this.defaultUserName = 'B';
+      }
       if (props.navigation.state.params.text) {
         this.state.messages = [
           {
@@ -41,7 +47,7 @@ export default class GlobalChatScreen extends React.Component {
         ];
       }
     }
-    this.chatServer = new Chat(id, this.onNewMessage.bind(this));
+    this.chatServer = new Chat(id, this.onNewMessage.bind(this), this.defaultUserName);
   }
 
   componentWillMount() {
@@ -88,7 +94,7 @@ export default class GlobalChatScreen extends React.Component {
             }}
             user={{
               _id: Platform.OS + ' ' + Constants['deviceId'],
-              name: 'B'
+              name: this.defaultUserName
             }}
           />
         }

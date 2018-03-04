@@ -8,10 +8,15 @@ export default class Chat {
   roomId = null;
   socket = null;
   callback = null;
+  defaultUserName = 'B';
 
-  constructor(id, callback) {
+  constructor(id, callback, defaultUserName) {
     this.roomId = id;
     this.callback = callback;
+
+    if (defaultUserName) {
+      this.defaultUserName = defaultUserName;
+    }
 
     this.socket = io(Models.HostServer, {
       transports: ['websocket'],
@@ -51,7 +56,7 @@ export default class Chat {
           createdAt: new Date(data.createdAt),
           user: {
             _id: data.user,
-            name: 'B'
+            name: this.defaultUserName
           }
         });
       }
@@ -78,7 +83,7 @@ export default class Chat {
         createdAt: new Date(data.createdAt),
         user: {
           _id: data.user,
-          name: 'B'
+          name: this.defaultUserName
         }
       });
     }
