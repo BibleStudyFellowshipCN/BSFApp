@@ -99,5 +99,6 @@ export default class Chat {
   }
 
   closeChat() {
+    this.socket.close();
   }
 }
