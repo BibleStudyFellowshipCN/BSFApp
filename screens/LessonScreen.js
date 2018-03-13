@@ -15,6 +15,7 @@ import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view
 import { loadLesson } from '../store/lessons.js'
 import Answer from '../components/Answer'
 import ExportAnswer from '../components/ExportAnswer.js';
+import SyncAnswerToServer from '../components/SyncAnswerToServer.js';
 import Colors from '../constants/Colors'
 import { getI18nText, getI18nBibleBook } from '../store/I18n';
 import { Models } from '../dataStorage/models';
@@ -138,7 +139,10 @@ const DayQuestions = (props) => {
           />
         ))
       }
-    </View >
+      {
+        <SyncAnswerToServer lessonDay={props.day} />
+      }
+    </View>
   );
 
   return (Platform.OS === 'ios') ? (

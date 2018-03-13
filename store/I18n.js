@@ -45,6 +45,8 @@ const text = {
     "课程没有更新",
     "是否重新下载？",
     "下载课程",
+    "下载答案",
+    "上传答案",
   ],
   cht: [
     "BSF課程",
@@ -89,6 +91,8 @@ const text = {
     "課程沒有更新",
     "是否重新下載？",
     "下載課程",
+    "下載答案",
+    "上傳答案",
   ],
   eng: [
     "BSF Lessons",
@@ -133,6 +137,8 @@ const text = {
     "No update on lessons",
     "Do you want to re-download?",
     "Download lessons",
+    "Download Answers",
+    "Upload Answers",
   ],
   spa: [
     "BSF Lecciones",
@@ -177,6 +183,8 @@ const text = {
     "Sin actualizaciones en las lecciones",
     "¿Quieres volver a descargar?",
     "Descargar lecciones",
+    "Descargar respuestas",
+    "Subir respuestas",
   ]
 };
 

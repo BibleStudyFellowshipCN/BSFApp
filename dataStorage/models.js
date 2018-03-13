@@ -3,7 +3,7 @@ export const CachePolicy = {
   AsyncStorage: 2,
 };
 
-const HostServer = 'http://cbsf.southcentralus.cloudapp.azure.com:3000';
+const HostServer = 'http://mycbsf.org:3000';
 export const Models = {
   Book: {
     key: "BOOK",
@@ -57,6 +57,17 @@ export const Models = {
     api: "/recover",
     restUri: HostServer + "/recover",
   },
+  GetAnswer: {
+    key: "GET_ANSWER",
+    api: "/get_answer",
+    restUri: "http://192.168.1.147:3000/get_answer",
+  },
+  UploadAnswer: {
+    key: "UPLOAD_ANSWER",
+    api: "/save_answer",
+    restUri: "http://192.168.1.147:3000/save_answer",
+  },
+
   DefaultLanguage: "chs",
   ValidLanguages: ["chs", "cht", "eng", "spa"],
   Languages: [
@@ -86,7 +97,7 @@ export const Models = {
     { DisplayName: "English(KJV)", Value: "1" },
     { DisplayName: "Spanish", Value: "6" },
   ],
-  DownloadUrl: "http://bsf.turbozv.com/data/",
+  DownloadUrl: "http://mycbsf.org/data/",
   DownloadList: [
     'eng',
     'chs',
