@@ -54,6 +54,7 @@ export default class User {
   bibleVersion = Models.DefaultBibleVersion;
   audioBook = 1 * 1000 + 1;
   fontSize = Models.DefaultFontSize;
+  permissions = {};
 
   async loadExistingUserAsync() {
     let existingUser = await loadUser();
@@ -82,6 +83,16 @@ export default class User {
       }
       this.loggedOn = true;
       console.log("loadExistingUser: " + JSON.stringify(this.getUserInfo()));
+
+      const result = await callWebServiceAsync(Models.User.restUri, '/' + this.cellphone, 'GET');
+      const succeed = await showWebServiceCallErrorsAsync(result);
+      if (succeed && result.status == 200) {
+        this.permissions = result.body;
+      }
+      else {
+        this.permissions = {}
+      }
+      console.log("loadExistingUserPermission: " + JSON.stringify(this.permissions));
     }
   }
 
@@ -137,6 +148,15 @@ export default class User {
     this.cellphone = celphone;
     await saveUserAsync(this.getUserInfo());
     this.logUserInfo();
+
+    const result = await callWebServiceAsync(Models.User.restUri, '/' + this.cellphone, 'GET');
+    const succeed = await showWebServiceCallErrorsAsync(result);
+    if (succeed && result.status == 200) {
+      this.permissions = result.body;
+    }
+    else {
+      this.permissions = {}
+    }
   }
 
   async setAudioBibleBook(id) {
@@ -277,7 +297,8 @@ export default class User {
       const clientVersion = this.getVersionNumber(manifest.version);
       const serverVersion = this.getVersionNumber(result.body.version);
       console.log('checkForUpdate:' + clientVersion + '-' + serverVersion);
-      if (clientVersion < serverVersion) {
+      // TODO: For some reason the partial updated app doesn't have sdkVersion, so we need to reload
+      if (clientVersion < serverVersion || manifest.sdkVersion.length < 6) {
         Alert.alert(getI18nText('发现更新') + ': ' + result.body.version, getI18nText('程序将重新启动'), [
           { text: 'OK', onPress: () => Expo.Util.reload() }
         ]);
@@ -342,6 +363,14 @@ export default class User {
     const remoteVersion = this.getVersionNumber(remoteVersionString);
     console.log("Check lesson content versions " + localVersion + ' ' + remoteVersion + ' showUI=' + showUI);
     return { localVersion, remoteVersion, localVersionString, remoteVersionString };
+  }
+
+  getUserPermissions() {
+    if (!this.isLoggedOn()) {
+      return {};
+    }
+
+    return this.permissions;
   }
 
   async migrateAsync() {

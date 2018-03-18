@@ -177,23 +177,22 @@ const BSFQuestion = (props) => (
     <View>
       <Answer questionId={props.question.id} />
       {
-        /* Disable discussion per request from BSF HQ
-          <View style={{
-            position: 'absolute',
-            top: -26,
-            right: -11
+        getCurrentUser().getUserPermissions().chat &&
+        <View style={{
+          position: 'absolute',
+          top: -26,
+          right: -11
+        }}>
+          <TouchableOpacity onPress={() => {
+            navigateTo('GlobalChat', {
+              id: props.question.id,
+              title: getI18nText('问题讨论') + ' ' + props.question.id,
+              text: props.question.questionText
+            });
           }}>
-            <TouchableOpacity onPress={() => {
-              navigateTo('GlobalChat', {
-                id: props.question.id,
-                title: getI18nText('问题讨论') + ' ' + props.question.id,
-                text: props.question.questionText
-              });
-            }}>
-              <FontAwesome name='commenting-o' size={28} color='#95a5a6' />
-            </TouchableOpacity>
-          </View>
-        */
+            <FontAwesome name='commenting-o' size={28} color='#95a5a6' />
+          </TouchableOpacity>
+        </View>
       }
     </View>
   </View >
