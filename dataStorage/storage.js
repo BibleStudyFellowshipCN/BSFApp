@@ -43,18 +43,20 @@ function encode(idOrKey) {
 global_cache = [];
 async function reloadGlobalCache(name) {
     console.log("reloadGlobalCache: " + name);
-    global_cache[name] = null;
     try {
         const localUri = FileSystem.documentDirectory + name + '.json';
         var data = await FileSystem.readAsStringAsync(localUri);
         global_cache[name] = JSON.parse(data);
     } catch (e) {
-        global_cache[name] = null;
+        global_cache[name] = [];
         console.log(e);
     }
 }
 
-function getCacheData(name, key) {
+async function getCacheData(name, key) {
+    if (!global_cache[name]) {
+        await reloadGlobalCache(name);
+    }
     if (global_cache[name]) {
         const data = global_cache[name][key];
         if (data) {
@@ -121,10 +123,10 @@ function getCacheData(name, key) {
     return null;
 }
 
-function getFromCache(key, keyString) {
+async function getFromCache(key, keyString) {
     // Load from book/lesson cache
     if (key == Models.Lesson.key || key == Models.Book.key) {
-        const data = getCacheData(getCurrentUser().getLanguage(), keyString);
+        const data = await getCacheData(getCurrentUser().getLanguage(), keyString);
         if (data) {
             return data;
         }
@@ -132,7 +134,7 @@ function getFromCache(key, keyString) {
 
     // Load from passage cache
     if (key == Models.Passage.key) {
-        const data = getCacheData(getCurrentUser().getBibleVersion(), keyString);
+        const data = await getCacheData(getCurrentUser().getBibleVersion(), keyString);
         if (data) {
             return data;
         }
@@ -219,7 +221,7 @@ async function loadAsync(model, id, update) {
 
     // load from cache first
     if (model.restUri) {
-        let data = getFromCache(model.key, keyString);
+        let data = await getFromCache(model.key, keyString);
         if (data) {
             return data;
         }

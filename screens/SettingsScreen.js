@@ -179,6 +179,11 @@ import { NavigationActions } from 'react-navigation'
 
   onFeedback() {
     this.props.navigation.navigate('Feedback');
+    this.props.navigation.navigate('GlobalChat', {
+      id: Constants['deviceId'],
+      title: getI18nText('反馈意见'),
+      defaultUserName: 'S'
+    });
   }
 
   onSetPhoneNumber() {
@@ -198,6 +203,9 @@ import { NavigationActions } from 'react-navigation'
     else {
       this.setState({ user: {} });
     }
+    const user = getCurrentUser().getUserPermissions();
+    console.log("UserPermissions: " + JSON.stringify(user));
+    this.setState({ user });
   }
 
   async onAttendance() {
@@ -288,6 +296,18 @@ import { NavigationActions } from 'react-navigation'
                 titleInfoStyle={{ fontSize }}
                 onPress={this.onFeedback.bind(this)}
               />
+              {
+                this.state.user.chat &&
+                <SettingsList.Item
+                  title={getI18nText('聊天室')}
+                  hasNavArrow={true}
+                  titleStyle={{ fontSize }}
+                  titleInfoStyle={{ fontSize }}
+                  onPress={() => {
+                    this.props.navigation.navigate('GlobalChat', { title: getI18nText('聊天室') });
+                  }}
+                />
+              }
             </SettingsList>
           </View>
         </ScrollView>
