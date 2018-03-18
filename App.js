@@ -38,13 +38,9 @@ export default class App extends React.Component {
       return (
         <ActionSheetProvider>
           <Provider store={store}>
-            <View style={styles.container}>
-              {Platform.OS === 'ios' && <StatusBar barStyle="default" />}
-              {Platform.OS === 'android' && <View style={styles.statusBarUnderlay} />}
-              <RootNavigation />
-            </View>
+            <RootNavigation />
           </Provider>
-        </ActionSheetProvider>
+        </ActionSheetProvider >
       );
     }
   }
@@ -78,15 +74,6 @@ export default class App extends React.Component {
     // initialize existing user
     try {
       await this.loadUserInfo();
-    } catch (error) {
-      console.log(error);
-    }
-
-    // load global cache for current language
-    try {
-      for (var i in Models.DownloadList) {
-        await reloadGlobalCache(Models.DownloadList[i]);
-      }
     } catch (error) {
       console.log(error);
     }

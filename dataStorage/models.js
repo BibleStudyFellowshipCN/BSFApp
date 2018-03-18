@@ -5,6 +5,7 @@ export const CachePolicy = {
 
 const HostServer = 'http://mycbsf.org:3000';
 export const Models = {
+  HostServer,
   Book: {
     key: "BOOK",
     api: "/lessons",
