@@ -39,11 +39,6 @@ export const Models = {
     api: "/attendance",
     restUri: HostServer + "/attendance"
   },
-  Poke: {
-    key: "Poke",
-    api: "/poke",
-    restUri: HostServer + "/poke"
-  },
   User: {
     key: "User",
     api: "/user",

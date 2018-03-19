@@ -144,7 +144,6 @@ async function getFromCache(key, keyString) {
 }
 
 function getHttpHeaders() {
-
     return {
         'pragma': 'no-cache',
         'cache-control': 'no-cache',
@@ -160,10 +159,7 @@ function getHttpHeaders() {
     };
 }
 
-let pokeInfo = {
-    lastPokeDay: 0,
-    message: []
-};
+let lastPokeDay = 0;
 
 async function pokeServer(model, id) {
     // Don't poke from non-device
@@ -171,35 +167,16 @@ async function pokeServer(model, id) {
         return;
     }*/
 
-    const message = model.api + '/' + id;
-    console.log('>Poke:' + message + ' => ' + JSON.stringify(pokeInfo));
-    pokeInfo.message.push(message);
-
     // Check is done daily
     const dayOfToday = (new Date()).getDate();
-    console.log('LastCheckForPokeDate: ' + pokeInfo.lastPokeDay + ' DayOfToday: ' + dayOfToday);
-    if (dayOfToday == pokeInfo.lastPokeDay) {
+    console.log('LastCheckForPokeDate: ' + lastPokeDay + ' DayOfToday: ' + dayOfToday);
+    if (dayOfToday == lastPokeDay) {
         return;
     }
 
-    pokeInfo.message.push('CheckForUpdate');
     getCurrentUser().checkForUpdate(true);
 
-    const data = JSON.stringify(pokeInfo.message);
-    pokeInfo.message = [];
-
-    fetch(Models.Poke.restUri, {
-        method: 'POST',
-        headers: getHttpHeaders(),
-        body: JSON.stringify({ data })
-    })
-        .then((response) => {
-            console.log('>' + response.status);
-            pokeInfo.lastPokeDay = dayOfToday;
-        })
-        .catch((error) => {
-            console.log(error);
-        });
+    lastPokeDay = dayOfToday;
 }
 
 async function loadAsync(model, id, update) {
