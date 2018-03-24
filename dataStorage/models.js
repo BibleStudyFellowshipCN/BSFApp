@@ -84,6 +84,9 @@ export const Models = {
   ],
   DownloadUrl: "http://mycbsf.org/data/",
   DownloadList: [
+    'books',
+    'homeDiscussion',
+    'homeTraining',
     'eng',
     'chs',
     'cht',

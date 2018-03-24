@@ -1,0 +1,128 @@
+{
+  "eng/2017_29": {
+    "title": "The Church in Rome and in Corinth",
+    "dayQuestions": {
+      "one": {
+        "title": "Day 1: Review of Romans 15:14-23: Paul’s Ministry and Plans",
+        "readVerse": [
+          {
+            "book": "Romans",
+            "verse": "15:14-23"
+          }
+        ],
+        "mainTruth": "God allows people to share in His work",
+        "principles": [
+          "Successful Christian workers submit to God’s plans, place and time.",
+          "Successful Christian workers embrace giving and receiving.",
+          "Successful Christian work includes prayer."
+        ],
+        "questions": [
+          {
+            "id": "HD_2017_29_1_1",
+            "text": "What work has God called you to do, and how have you prayerfully embraced it with obedience and joy?"
+          }
+        ]
+      },
+      "two": {
+        "title": "Day 2: Read Romans 16:1-16.",
+        "readVerse": [
+          {
+            "book": "Romans",
+            "verse": "16:1-16"
+          }
+        ],
+        "description": "Paul commends his many fellow workers",
+        "questions": [
+          {
+            "id": "HD_2017_29_2_1",
+            "text": "Which of the people in these verses interests you most? Why?"
+          },
+          {
+            "id": "HD_2017_29_2_2",
+            "text": "What do you learn from these verses about men and women working in the Church?",
+          }
+        ]
+      },
+      "three": {
+        "title": "Day 3: Read Romans 16:17-20.",
+        "readVerse": [
+          {
+            "book": "Romans",
+            "verse": "16:17-20"
+          }
+        ],
+        "description": "Paul warns the Romans of divisive and deceptive people",
+        "questions": [
+          {
+            "id": "HD_2017_29_3_1",
+            "text": "How can you recognize divisive and deceptive people?"
+          },
+          {
+            "id": "HD_2017_29_3_2",
+            "text": "Describe a person today who is “wise about what is good and innocent about what is evil.”",
+          }
+        ]
+      },
+      "four": {
+        "title": "Day 4: Read Romans 16:20-25.",
+        "readVerse": [
+          {
+            "book": "Romans",
+            "verse": "16:20-25"
+          }
+        ],
+        "description": "Paul sends greetings of other fellow workers",
+        "questions": [
+          {
+            "id": "HD_2017_29_4_1",
+            "text": "What did Paul say about Timothy, Tertius, Gaius and Erastus?"
+          },
+          {
+            "id": "HD_2017_29_4_2",
+            "text": "What complimentary things could you say about your family members, pastor or Sunday school teacher? Will you take time to say thank you to each one this week?",
+          }
+        ]
+      },
+      "five": {
+        "title": "Day 5: Read Romans 16:25-27.",
+        "readVerse": [
+          {
+            "book": "Romans",
+            "verse": "16:25-27"
+          }
+        ],
+        "description": "Paul gives glory to God.",
+        "questions": [
+          {
+            "id": "HD_2017_29_5_1",
+            "text": "For what did Paul give glory to God?"
+          },
+          {
+            "id": "HD_2017_29_5_2",
+            "text": "How will you give glory to God for all He has done in history and in your life this year?",
+          }
+        ]
+      },
+      "six": {
+        "title": "Day 6: Review Romans 16.",
+        "readVerse": [
+          {
+            "book": "Romans",
+            "verse": "16:1-16"
+          }
+        ],
+        "description": "Paul gave Romans greetings, commendations, warnings and glory to God",
+        "questions": [
+          {
+            "id": "HD_2017_29_6_1",
+            "text": "How can you be wise about what is good and innocent about what is evil so that you can warn others?"
+          },
+          {
+            "id": "HD_2017_29_6_2",
+            "text": "To whom could you express your confidence in God’s ability to establish you by the gospel?",
+          }
+        ]
+      }
+    }
+  }
+}
