@@ -39,11 +39,6 @@ export const Models = {
     api: "/attendance",
     restUri: HostServer + "/attendance"
   },
-  Poke: {
-    key: "Poke",
-    api: "/poke",
-    restUri: HostServer + "/poke"
-  },
   User: {
     key: "User",
     api: "/user",
@@ -89,6 +84,9 @@ export const Models = {
   ],
   DownloadUrl: "http://mycbsf.org/data/",
   DownloadList: [
+    'books',
+    'homeDiscussion',
+    'homeTraining',
     'eng',
     'chs',
     'cht',

@@ -11,6 +11,8 @@ import SetPhoneScreen from '../screens/SetPhoneScreen';
 import AttendanceScreen from '../screens/AttendanceScreen';
 import SermonAudioScreen from '../screens/SermonAudioScreen';
 import GlobalChatScreen from '../screens/GlobalChatScreen';
+import HomeTrainingScreen from '../screens/HomeTrainingScreen';
+import HomeDiscussionScreen from '../screens/HomeDiscussionScreen';
 
 const RootStackNavigator = StackNavigator(
   {
@@ -37,6 +39,12 @@ const RootStackNavigator = StackNavigator(
     },
     GlobalChat: {
       screen: GlobalChatScreen
+    },
+    HomeTraining: {
+      screen: HomeTrainingScreen
+    },
+    HomeDiscussion: {
+      screen: HomeDiscussionScreen
     }
   },
   {

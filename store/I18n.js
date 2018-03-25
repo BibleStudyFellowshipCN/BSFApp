@@ -48,6 +48,10 @@ const text = {
     "设置手机号码",
     "问题讨论",
     "聊天室",
+    "教养孩童指南",
+    "家庭查经讨论",
+    "基本真理：",
+    "属灵原则：",
   ],
   cht: [
     "BSF課程",
@@ -95,6 +99,10 @@ const text = {
     "設置手機號碼",
     "問題討論",
     "聊天室",
+    "教養孩童指南",
+    "家庭查經討論",
+    "基本真理：",
+    "屬靈原則：",
   ],
   eng: [
     "BSF Lessons",
@@ -142,6 +150,10 @@ const text = {
     "Set up cellphone",
     "Discussion",
     "Chat room",
+    "Home Training",
+    "Home Discussion",
+    "Main Truth: ",
+    "Principles: ",
   ],
   spa: [
     "BSF Lecciones",
@@ -189,6 +201,10 @@ const text = {
     "Configurar el teléfono celular",
     "Discusión",
     "Sala de chat",
+    "Entrenamiento en casa",
+    "Discusión en casa",
+    "Verdad principal:",
+    "Principios:",
   ]
 };
 

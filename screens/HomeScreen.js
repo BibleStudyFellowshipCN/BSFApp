@@ -1,6 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { FontAwesome } from '@expo/vector-icons';
+import { FontAwesome, Octicons, Ionicons } from '@expo/vector-icons';
 import { FileSystem } from 'expo';
 import {
   ScrollView,
@@ -20,7 +20,7 @@ import { clearPassage } from '../store/passage.js'
 import { getI18nText } from '../store/I18n';
 import { getCurrentUser } from '../store/user';
 import { Models } from '../dataStorage/models';
-import { pokeServer, reloadGlobalCache } from '../dataStorage/storage';
+import { pokeServer, reloadGlobalCache, loadFromCacheAsync } from '../dataStorage/storage';
 
 class HomeScreen extends React.Component {
   static navigationOptions = ({ navigation }) => {
@@ -134,6 +134,16 @@ class HomeScreen extends React.Component {
     this.props.navigation.navigate('Lesson', { lesson, title: parsed[1] });
   }
 
+  goToHomeDiscussion(lesson) {
+    let parsed = lesson.name.split(' ');
+    this.props.navigation.navigate('HomeDiscussion', { id: lesson.id, title: ' ' + parsed[0] });
+  }
+
+  goToHomeTraining(lesson) {
+    let parsed = lesson.name.split(' ');
+    this.props.navigation.navigate('HomeTraining', { id: lesson.id, title: ' ' + parsed[0] });
+  }
+
   render() {
     const progress = (this.state.downloadProgress + this.downloadedFiles) / this.downloadFiles;
     const progressText = getI18nText('下载课程') + ' ' + this.state.remoteVersion + ' (' + parseInt(progress * 100) + '%)';
@@ -198,6 +208,8 @@ class HomeScreen extends React.Component {
           <Lesson
             key={lesson.id}
             goToLesson={() => this.goToLesson(lesson)}
+            goToHomeDiscussion={() => this.goToHomeDiscussion(lesson)}
+            goToHomeTraining={() => this.goToHomeTraining(lesson)}
             lesson={lesson}
           />))}
       </View>
@@ -207,30 +219,52 @@ class HomeScreen extends React.Component {
 
 const Lesson = (props) => {
   // TODO: clean up backend api for this to work
-  const parsed = props.lesson.name.split(' ')
-  const lessonNumber = parsed[0]
-  const name = parsed[1]
-  const date = parsed[2]
+  const parsed = props.lesson.name.split(' ');
+  const lessonNumber = parsed[0];
+  const name = parsed[1];
+  const date = parsed[2];
   return (
-    <TouchableOpacity style={styles.lessonContainer} onPress={() => props.goToLesson()}>
-      <View>
-        <View style={styles.lessonMetadata}>
-          <Text style={styles.lessonMetadataText}>
-            {date} {lessonNumber}
+    <View>
+      <TouchableOpacity style={styles.lessonContainer} onPress={() => props.goToLesson()}>
+        <View>
+          <View style={styles.lessonMetadata}>
+            <Text style={styles.lessonMetadataText}>
+              {date} {lessonNumber}
+            </Text>
+          </View>
+          <Text style={{ marginVertical: 4, fontSize: getCurrentUser().getHomeFontSize() }}>
+            {name}
           </Text>
         </View>
-        <Text style={{ marginVertical: 4, fontSize: getCurrentUser().getHomeFontSize() }}>
-          {name}
-        </Text>
-      </View>
-      <View style={styles.lessonChevron}>
-        <FontAwesome
-          name='chevron-right'
-          color='grey'
-          size={16}
-        />
-      </View>
-    </TouchableOpacity>
+        <View style={styles.lessonChevron}>
+          {
+            props.lesson.homeDiscussion &&
+            <TouchableOpacity onPress={() => props.goToHomeDiscussion()}>
+              <Octicons
+                style={{ marginRight: 24 }}
+                name={'comment-discussion'}
+                size={20}
+              />
+            </TouchableOpacity>
+          }
+          {
+            props.lesson.homeTraining &&
+            <TouchableOpacity onPress={() => props.goToHomeTraining()}>
+              <Ionicons
+                style={{ top: -6, marginRight: 24 }}
+                name={'ios-people-outline'}
+                size={30}
+              />
+            </TouchableOpacity>
+          }
+          <FontAwesome
+            name='chevron-right'
+            color='grey'
+            size={16}
+          />
+        </View>
+      </TouchableOpacity>
+    </View>
   )
 }
 
@@ -273,7 +307,6 @@ const styles = StyleSheet.create({
     marginVertical: 6,
     fontWeight: '400',
   },
-
   lessonContainer: {
     paddingLeft: 25,
     paddingVertical: 5,
@@ -281,6 +314,7 @@ const styles = StyleSheet.create({
   },
   lessonChevron: {
     position: 'absolute',
+    flexDirection: 'row',
     right: 15,
     top: 25,
   },
