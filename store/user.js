@@ -84,15 +84,19 @@ export default class User {
       this.loggedOn = true;
       console.log("loadExistingUser: " + JSON.stringify(this.getUserInfo()));
 
-      const result = await callWebServiceAsync(Models.User.restUri, '/' + this.cellphone, 'GET');
-      const succeed = await showWebServiceCallErrorsAsync(result);
-      if (succeed && result.status == 200) {
-        this.permissions = result.body;
-      }
-      else {
-        this.permissions = {}
-      }
+      await this.loadUserPermissionsAsync(this.cellphone);
       console.log("loadExistingUserPermission: " + JSON.stringify(this.permissions));
+    }
+  }
+
+  async loadUserPermissionsAsync(cellphone) {
+    const result = await callWebServiceAsync(Models.User.restUri, '/' + cellphone, 'GET');
+    const succeed = await showWebServiceCallErrorsAsync(result);
+    if (succeed && result.status == 200) {
+      this.permissions = result.body;
+    }
+    else {
+      this.permissions = {};
     }
   }
 
@@ -149,14 +153,7 @@ export default class User {
     await saveUserAsync(this.getUserInfo());
     this.logUserInfo();
 
-    const result = await callWebServiceAsync(Models.User.restUri, '/' + this.cellphone, 'GET');
-    const succeed = await showWebServiceCallErrorsAsync(result);
-    if (succeed && result.status == 200) {
-      this.permissions = result.body;
-    }
-    else {
-      this.permissions = {}
-    }
+    await this.loadUserPermissionsAsync(this.cellphone);
   }
 
   async setAudioBibleBook(id) {
@@ -285,6 +282,10 @@ export default class User {
   }
 
   async checkForUpdate(onlyShowUpdateUI) {
+    // Check for user update
+    await this.loadUserPermissionsAsync(this.cellphone);
+
+    // Check for app update
     const { manifest } = Constants;
     const result = await callWebServiceAsync('https://expo.io/@turbozv/CBSFApp/index.exp?sdkVersion=' + manifest.sdkVersion, '', 'GET');
     let succeed;

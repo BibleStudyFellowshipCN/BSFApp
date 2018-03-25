@@ -68,6 +68,9 @@ async function getCacheData(name, key) {
     // If fails to get from downloaded cache, return the default ones
     let cache;
     switch (name) {
+        case 'books':
+            cache = require("../assets/json/books.json");
+            break;
         case 'chs':
             cache = require("../assets/json/chs.json");
             break;
@@ -110,6 +113,12 @@ async function getCacheData(name, key) {
         case 'rvr1995':
             cache = require("../assets/json/rvr1995.json");
             break;
+        case 'homeDiscussion':
+            cache = require("../assets/json/homeDiscussion.json");
+            break;
+        case 'homeTraining':
+            cache = require("../assets/json/homeTraining.json");
+            break;
     }
     if (cache) {
         const data = cache[key];
@@ -124,8 +133,16 @@ async function getCacheData(name, key) {
 }
 
 async function getFromCache(key, keyString) {
-    // Load from book/lesson cache
-    if (key == Models.Lesson.key || key == Models.Book.key) {
+    // Load from book cache
+    if (key == Models.Book.key) {
+        const data = await getCacheData('books', getCurrentUser().getLanguage());
+        if (data) {
+            return data;
+        }
+    }
+
+    // Load from lesson cache
+    if (key == Models.Lesson.key) {
         const data = await getCacheData(getCurrentUser().getLanguage(), keyString);
         if (data) {
             return data;
@@ -144,7 +161,6 @@ async function getFromCache(key, keyString) {
 }
 
 function getHttpHeaders() {
-
     return {
         'pragma': 'no-cache',
         'cache-control': 'no-cache',
@@ -160,10 +176,7 @@ function getHttpHeaders() {
     };
 }
 
-let pokeInfo = {
-    lastPokeDay: 0,
-    message: []
-};
+let lastPokeDay = 0;
 
 async function pokeServer(model, id) {
     // Don't poke from non-device
@@ -171,35 +184,16 @@ async function pokeServer(model, id) {
         return;
     }*/
 
-    const message = model.api + '/' + id;
-    console.log('>Poke:' + message + ' => ' + JSON.stringify(pokeInfo));
-    pokeInfo.message.push(message);
-
     // Check is done daily
     const dayOfToday = (new Date()).getDate();
-    console.log('LastCheckForPokeDate: ' + pokeInfo.lastPokeDay + ' DayOfToday: ' + dayOfToday);
-    if (dayOfToday == pokeInfo.lastPokeDay) {
+    console.log('LastCheckForPokeDate: ' + lastPokeDay + ' DayOfToday: ' + dayOfToday);
+    if (dayOfToday == lastPokeDay) {
         return;
     }
 
-    pokeInfo.message.push('CheckForUpdate');
     getCurrentUser().checkForUpdate(true);
 
-    const data = JSON.stringify(pokeInfo.message);
-    pokeInfo.message = [];
-
-    fetch(Models.Poke.restUri, {
-        method: 'POST',
-        headers: getHttpHeaders(),
-        body: JSON.stringify({ data })
-    })
-        .then((response) => {
-            console.log('>' + response.status);
-            pokeInfo.lastPokeDay = dayOfToday;
-        })
-        .catch((error) => {
-            console.log(error);
-        });
+    lastPokeDay = dayOfToday;
 }
 
 async function loadAsync(model, id, update) {
@@ -305,6 +299,10 @@ async function loadFromCloudAsync(model, id, silentLoad) {
     return responseJson;
 }
 
+async function loadFromCacheAsync(file, id) {
+    return await getCacheData(file, getLanguage() + '/' + id);
+}
+
 const debouncedSaveToCloud = debounce(saveToCloud, wait = 500)
 
 async function saveAsync(data, model, id) {
@@ -408,4 +406,4 @@ async function showWebServiceCallErrorsAsync(result, acceptStatus, showUI = true
     return true;
 }
 
-export { loadAsync, saveAsync, clearStorageAsync, callWebServiceAsync, showWebServiceCallErrorsAsync, pokeServer, reloadGlobalCache };
+export { loadAsync, saveAsync, clearStorageAsync, callWebServiceAsync, showWebServiceCallErrorsAsync, pokeServer, reloadGlobalCache, loadFromCacheAsync };
