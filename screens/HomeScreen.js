@@ -149,6 +149,10 @@ class HomeScreen extends React.Component {
     this.props.navigation.navigate('Notes', { uri: lesson.notesUri, title: ' ' + parsed[0] });
   }
 
+  goToAudio(lesson) {
+    this.props.navigation.navigate('SermonAudio', { id: lesson.id });
+  }
+
   render() {
     const progress = (this.state.downloadProgress + this.downloadedFiles) / this.downloadFiles;
     const progressText = getI18nText('下载课程') + ' ' + this.state.remoteVersion + ' (' + parseInt(progress * 100) + '%)';
@@ -216,6 +220,7 @@ class HomeScreen extends React.Component {
             goToHomeDiscussion={() => this.goToHomeDiscussion(lesson)}
             goToHomeTraining={() => this.goToHomeTraining(lesson)}
             goToNotes={() => this.goToNotes(lesson)}
+            goToAudio={() => this.goToAudio(lesson)}
             lesson={lesson}
           />))}
       </View>
@@ -229,6 +234,8 @@ const Lesson = (props) => {
   const lessonNumber = parsed[0];
   const name = parsed[1];
   const date = parsed[2];
+  const permissions = getCurrentUser().getUserPermissions();
+  const hasAudio = permissions.audios && (permissions.audios.indexOf(props.lesson.id) != -1)
   return (
     <View>
       <TouchableOpacity style={styles.lessonContainer} onPress={() => props.goToLesson()}>
@@ -243,6 +250,16 @@ const Lesson = (props) => {
           </Text>
         </View>
         <View style={styles.lessonChevron}>
+          {
+            hasAudio &&
+            <TouchableOpacity onPress={() => props.goToAudio()}>
+              <FontAwesome
+                style={{ marginRight: 24 }}
+                name={'volume-up'}
+                size={20}
+              />
+            </TouchableOpacity>
+          }
           {
             props.lesson.homeDiscussion &&
             <TouchableOpacity onPress={() => props.goToHomeDiscussion()}>
