@@ -106,19 +106,24 @@
           },
           {
             "id": "2017_26",
-            "name": "第26课 罗马书14 (04/02)"
+            "name": "第26课 罗马书14 (04/02)",
+            "homeTraining": true
           },
           {
             "id": "2017_27",
-            "name": "第27课 罗马书15:1-13 (04/16)"
+            "name": "第27课 罗马书15:1-13 (04/16)",
+            "homeTraining": true
           },
           {
             "id": "2017_28",
-            "name": "第28课 罗马书15:14-33 (04/23)"
+            "name": "第28课 罗马书15:14-33 (04/23)",
+            "homeTraining": true
           },
           {
             "id": "2017_29",
-            "name": "第29课 罗马书16 (04/30)"
+            "name": "第29课 罗马书16 (04/30)",
+            "homeDiscussion": true,
+            "homeTraining": true
           }
         ]
       },
@@ -256,19 +261,24 @@
           },
           {
             "id": "2017_26",
-            "name": "第26課 羅馬書14 (04/02)"
+            "name": "第26課 羅馬書14 (04/02)",
+            "homeTraining": true
           },
           {
             "id": "2017_27",
-            "name": "第27課 羅馬書15:1-13 (04/16)"
+            "name": "第27課 羅馬書15:1-13 (04/16)",
+            "homeTraining": true
           },
           {
             "id": "2017_28",
-            "name": "第28課 羅馬書15:14-33 (04/23)"
+            "name": "第28課 羅馬書15:14-33 (04/23)",
+            "homeTraining": true
           },
           {
             "id": "2017_29",
-            "name": "第29課 羅馬書16 (04/30)"
+            "name": "第29課 羅馬書16 (04/30)",
+            "homeDiscussion": true,
+            "homeTraining": true
           }
         ]
       },
@@ -536,19 +546,24 @@
           },
           {
             "id": "2017_26",
-            "name": "Lección26 Romanos14 (04/02)"
+            "name": "Lección26 Romanos14 (04/02)",
+            "homeTraining": true
           },
           {
             "id": "2017_27",
-            "name": "Lección27 Romanos15:1-13 (04/16)"
+            "name": "Lección27 Romanos15:1-13 (04/16)",
+            "homeTraining": true
           },
           {
             "id": "2017_28",
-            "name": "Lección28 Romanos15:14-33 (04/23)"
+            "name": "Lección28 Romanos15:14-33 (04/23)",
+            "homeTraining": true
           },
           {
             "id": "2017_29",
-            "name": "Lección29 Romanos16 (04/30)"
+            "name": "Lección29 Romanos16 (04/30)",
+            "homeDiscussion": true,
+            "homeTraining": true
           }
         ]
       }
