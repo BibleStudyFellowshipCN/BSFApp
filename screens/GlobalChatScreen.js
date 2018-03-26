@@ -7,6 +7,7 @@ import { GiftedChat, Bubble } from 'react-native-gifted-chat';
 import Chat from '../store/chat';
 import { Constants } from 'expo';
 import KeyboardSpacer from 'react-native-keyboard-spacer';
+import Colors from '../constants/Colors';
 
 export default class GlobalChatScreen extends React.Component {
   static navigationOptions = ({ navigation }) => {
@@ -82,7 +83,7 @@ export default class GlobalChatScreen extends React.Component {
           <ActivityIndicator
             style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}
             size="large"
-            color="#0000ff" />
+            color={Colors.yellow} />
         }
         {
           !this.state.loading &&

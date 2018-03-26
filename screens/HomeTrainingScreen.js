@@ -4,6 +4,7 @@ import { getI18nText } from '../store/I18n';
 import { Button } from 'react-native-elements';
 import { getCurrentUser } from '../store/user';
 import { loadFromCacheAsync } from '../dataStorage/storage';
+import Colors from '../constants/Colors'
 
 export default class HomeTrainingScreen extends React.Component {
   static navigationOptions = ({ navigation }) => {
@@ -31,18 +32,18 @@ export default class HomeTrainingScreen extends React.Component {
           this.state.loading &&
           <ActivityIndicator
             size="large"
-            color="#0000ff" />
+            color={Colors.yellow} />
         }
         {
           !this.state.loading && !this.state.data &&
-          <Text style={{ fontSize: 20 }}>No content</Text>
+          <Text style={{ fontSize: getCurrentUser().getLessonFontSize() }}>No content</Text>
         }
         {
           !this.state.loading && this.state.data &&
           <ScrollView
             style={{ backgroundColor: 'white' }}
             ref={ref => this.scrollView = ref}>
-            <Text style={{ fontSize: 26, fontWeight: 'bold', margin: 7 }}>{this.state.data.title}</Text>
+            <Text style={{ fontSize: getCurrentUser().getHomeTitleFontSize(), fontWeight: 'bold', margin: 7 }}>{this.state.data.title}</Text>
             {
               this.state.data.content.map(paragraph => (
                 <Paragraph key={keyIndex++} type={paragraph.type} text={paragraph.text} />
@@ -59,7 +60,7 @@ class Paragraph extends React.Component {
   render() {
     if (this.props.type == 'p') {
       return (
-        <Text style={{ fontSize: 18, margin: 10 }}>
+        <Text style={{ fontSize: getCurrentUser().getLessonFontSize(), margin: 10 }}>
           <Text>       </Text>
           <Text>{this.props.text}</Text>
         </Text>
@@ -67,12 +68,12 @@ class Paragraph extends React.Component {
     }
 
     if (this.props.type == 'b') {
-      return (<Text style={{ fontSize: 22, margin: 10, fontWeight: 'bold' }}>{this.props.text}</Text>);
+      return (<Text style={{ fontSize: getCurrentUser().getLessonFontSize(), margin: 10, fontWeight: 'bold' }}>{this.props.text}</Text>);
     }
 
     if (this.props.type == 'li') {
       return (
-        <Text style={{ fontSize: 18, margin: 10, marginLeft: 24 }}>
+        <Text style={{ fontSize: getCurrentUser().getLessonFontSize(), margin: 10, marginLeft: 24 }}>
           <Text>■  </Text>
           <Text>{this.props.text}</Text>
         </Text>
