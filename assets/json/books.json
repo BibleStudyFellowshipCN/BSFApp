@@ -6,7 +6,8 @@
         "lessons": [
           {
             "id": "2017_1",
-            "name": "第1课 罗马书1:1-17 (09/18)"
+            "name": "第1课 罗马书1:1-17 (09/18)",
+            "notesUri": "http://cbsf.azurewebsites.net/files/en-US/Romans_2017_01-manual.html"
           },
           {
             "id": "2017_2",
@@ -161,7 +162,8 @@
         "lessons": [
           {
             "id": "2017_1",
-            "name": "第1課 羅馬書1:1-17 (09/18)"
+            "name": "第1課 羅馬書1:1-17 (09/18)",
+            "notesUri": "http://cbsf.azurewebsites.net/files/en-US/Romans_2017_01-manual.html"
           },
           {
             "id": "2017_2",

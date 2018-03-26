@@ -13,6 +13,7 @@ import SermonAudioScreen from '../screens/SermonAudioScreen';
 import GlobalChatScreen from '../screens/GlobalChatScreen';
 import HomeTrainingScreen from '../screens/HomeTrainingScreen';
 import HomeDiscussionScreen from '../screens/HomeDiscussionScreen';
+import NotesScreen from '../screens/NotesScreen';
 
 const RootStackNavigator = StackNavigator(
   {
@@ -45,6 +46,9 @@ const RootStackNavigator = StackNavigator(
     },
     HomeDiscussion: {
       screen: HomeDiscussionScreen
+    },
+    Notes: {
+      screen: NotesScreen
     }
   },
   {

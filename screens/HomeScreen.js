@@ -144,6 +144,11 @@ class HomeScreen extends React.Component {
     this.props.navigation.navigate('HomeTraining', { id: lesson.id, title: ' ' + parsed[0] });
   }
 
+  goToNotes(lesson) {
+    let parsed = lesson.name.split(' ');
+    this.props.navigation.navigate('Notes', { uri: lesson.notesUri, title: ' ' + parsed[0] });
+  }
+
   render() {
     const progress = (this.state.downloadProgress + this.downloadedFiles) / this.downloadFiles;
     const progressText = getI18nText('下载课程') + ' ' + this.state.remoteVersion + ' (' + parseInt(progress * 100) + '%)';
@@ -210,6 +215,7 @@ class HomeScreen extends React.Component {
             goToLesson={() => this.goToLesson(lesson)}
             goToHomeDiscussion={() => this.goToHomeDiscussion(lesson)}
             goToHomeTraining={() => this.goToHomeTraining(lesson)}
+            goToNotes={() => this.goToNotes(lesson)}
             lesson={lesson}
           />))}
       </View>
@@ -254,6 +260,16 @@ const Lesson = (props) => {
                 style={{ top: -6, marginRight: 24 }}
                 name={'ios-people-outline'}
                 size={30}
+              />
+            </TouchableOpacity>
+          }
+          {
+            getCurrentUser().getUserPermissions().isGroupLeader && props.lesson.notesUri &&
+            <TouchableOpacity onPress={() => props.goToNotes()}>
+              <Octicons
+                style={{ marginRight: 24 }}
+                name={'note'}
+                size={20}
               />
             </TouchableOpacity>
           }
