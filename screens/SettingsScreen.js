@@ -5,12 +5,11 @@ import Expo, { Constants } from 'expo';
 import { Models } from '../dataStorage/models';
 import { callWebServiceAsync, showWebServiceCallErrorsAsync } from '../dataStorage/storage';
 import { getCurrentUser } from '../store/user';
-import { requestBooks } from "../store/books.js";
+import { requestBooks, clearBooks } from "../store/books.js";
 import SettingsList from 'react-native-settings-list';
 import { getI18nText } from '../store/I18n';
 import { clearLesson } from '../store/lessons.js'
 import { clearPassage } from '../store/passage.js'
-import { clearBooks } from '../store/books.js'
 import { connectActionSheet } from '@expo/react-native-action-sheet';
 import { NavigationActions } from 'react-navigation'
 import { LegacyAsyncStorage } from 'expo';
@@ -60,6 +59,13 @@ import { LegacyAsyncStorage } from 'expo';
     getCurrentUser().logUserInfo();
   }
 
+  reload() {
+    this.props.clearBooks();
+    this.props.requestBooks();
+    this.props.clearLesson();
+    this.props.clearPassage();
+  }
+
   async onLanguageChange(language) {
     if (getCurrentUser().getLanguage() != language) {
       await getCurrentUser().setLanguageAsync(language);
@@ -67,8 +73,7 @@ import { LegacyAsyncStorage } from 'expo';
       // Also set the bible version based on language selection
       this.updateBibleVersionBasedOnLanguage(language);
 
-      this.props.clearLesson();
-      this.props.requestBooks();
+      this.reload();
       this.setState({ language: getCurrentUser().getLanguageDisplayName() });
 
       const setParamsAction = NavigationActions.setParams({
@@ -84,8 +89,8 @@ import { LegacyAsyncStorage } from 'expo';
       await getCurrentUser().setBibleVersionAsync(version);
       getCurrentUser().logUserInfo();
 
-      this.props.clearPassage();
       this.setState({ bibleVersion: getCurrentUser().getBibleVersionDisplayName() });
+      this.reload();
     }
   }
 
@@ -163,9 +168,7 @@ import { LegacyAsyncStorage } from 'expo';
   async onFontSizeChange(value) {
     getCurrentUser().setFontSizeAsync(value);
     this.setState({ fontSize: value });
-    this.props.clearLesson();
-    this.props.clearBooks();
-    this.props.requestBooks();
+    this.reload();
   }
 
   onFontSize() {
@@ -210,6 +213,8 @@ import { LegacyAsyncStorage } from 'expo';
     const user = getCurrentUser().getUserPermissions();
     console.log("UserPermissions: " + JSON.stringify(user));
     this.setState({ user });
+
+    this.reload();
   }
 
   async onAttendance() {

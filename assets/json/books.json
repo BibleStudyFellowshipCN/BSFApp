@@ -318,7 +318,8 @@
         "lessons": [
           {
             "id": "2017_1",
-            "name": "Lesson1 Romans1:1-17 (09/18)"
+            "name": "Lesson1 Romans1:1-17 (09/18)",
+            "notesUri": "http://cbsf.azurewebsites.net/files/en-US/Romans_2017_01-manual.html"
           },
           {
             "id": "2017_2",
@@ -448,7 +449,8 @@
         "lessons": [
           {
             "id": "2017_1",
-            "name": "Lección1 Romanos1:1-17 (09/18)"
+            "name": "Lección1 Romanos1:1-17 (09/18)",
+            "notesUri": "http://cbsf.azurewebsites.net/files/en-US/Romans_2017_01-manual.html"
           },
           {
             "id": "2017_2",

@@ -1,6 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { FontAwesome, Octicons, Ionicons } from '@expo/vector-icons';
+import { FontAwesome, Octicons, Ionicons, Feather } from '@expo/vector-icons';
 import { FileSystem } from 'expo';
 import {
   ScrollView,
@@ -20,7 +20,7 @@ import { clearPassage } from '../store/passage.js'
 import { getI18nText } from '../store/I18n';
 import { getCurrentUser } from '../store/user';
 import { Models } from '../dataStorage/models';
-import { pokeServer, reloadGlobalCache, loadFromCacheAsync } from '../dataStorage/storage';
+import { reloadGlobalCache, loadFromCacheAsync } from '../dataStorage/storage';
 
 class HomeScreen extends React.Component {
   static navigationOptions = ({ navigation }) => {
@@ -45,7 +45,6 @@ class HomeScreen extends React.Component {
   lastCheckForContentUpdateDate = 0;
 
   componentWillMount() {
-    pokeServer(Models.Book, '');
     this.checkForContentUpdate(false);
 
     if (!this.props.booklist) {
@@ -90,6 +89,14 @@ class HomeScreen extends React.Component {
     this.checkingForContentUpdate = false;
   }
 
+  reload() {
+    // reload all data
+    this.props.clearBooks();
+    this.props.clearLesson();
+    this.props.clearPassage();
+    this.props.requestBooks();
+  }
+
   async downloadContent(remoteVersion) {
     this.downloadFiles = Models.DownloadList.length;
     this.downloadedFiles = 0;
@@ -107,15 +114,12 @@ class HomeScreen extends React.Component {
 
         this.downloadedFiles++;
         if (this.downloadedFiles >= Models.DownloadList.length) {
-          // reload all data
-          this.props.clearBooks();
-          this.props.clearLesson();
-          this.props.clearPassage();
-          this.props.requestBooks();
+          this.reload();
           this.setState({ downloading: false });
         }
       } catch (e) {
         console.log(e);
+        this.reload();
         this.setState({ downloading: false });
         return;
       }
@@ -251,46 +255,47 @@ const Lesson = (props) => {
         </View>
         <View style={styles.lessonChevron}>
           {
-            hasAudio &&
-            <TouchableOpacity onPress={() => props.goToAudio()}>
-              <FontAwesome
-                style={{ marginRight: 24 }}
-                name={'volume-up'}
-                size={20}
-              />
-            </TouchableOpacity>
-          }
-          {
             props.lesson.homeDiscussion &&
             <TouchableOpacity onPress={() => props.goToHomeDiscussion()}>
               <Octicons
                 style={{ marginRight: 24 }}
                 name={'comment-discussion'}
-                size={20}
+                size={26}
               />
             </TouchableOpacity>
           }
           {
             props.lesson.homeTraining &&
             <TouchableOpacity onPress={() => props.goToHomeTraining()}>
-              <Ionicons
-                style={{ top: -6, marginRight: 24 }}
-                name={'ios-people-outline'}
-                size={30}
+              <Feather
+                style={{ marginRight: 20 }}
+                name={'users'}
+                size={24}
               />
             </TouchableOpacity>
           }
           {
             getCurrentUser().getUserPermissions().isGroupLeader && props.lesson.notesUri &&
             <TouchableOpacity onPress={() => props.goToNotes()}>
-              <Octicons
-                style={{ marginRight: 24 }}
-                name={'note'}
-                size={20}
+              <Feather
+                style={{ marginRight: 20 }}
+                name={'file-text'}
+                size={24}
+              />
+            </TouchableOpacity>
+          }
+          {
+            hasAudio &&
+            <TouchableOpacity onPress={() => props.goToAudio()}>
+              <Feather
+                style={{ marginRight: 20 }}
+                name={'volume-2'}
+                size={24}
               />
             </TouchableOpacity>
           }
           <FontAwesome
+            style={{ top: 4 }}
             name='chevron-right'
             color='grey'
             size={16}
