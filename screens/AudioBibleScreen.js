@@ -74,10 +74,18 @@ export default class AudioBibleScreen extends React.Component {
   async _resetAudio() {
     if (this.sound) {
       if (this.state.isPlaying) {
-        await this.sound.stopAsync();
+        try {
+          await this.sound.stopAsync();
+        } catch (e) {
+          console.log(e);
+        }
       }
       if (this.state.isLoaded) {
-        await this.sound.unloadAsync();
+        try {
+          await this.sound.unloadAsync();
+        } catch (e) {
+          console.log(e);
+        }
       }
     }
     this.setState({ isLoaded: false, isPlaying: false, isPaused: false, duration: 0, progress: 0 });
@@ -88,8 +96,9 @@ export default class AudioBibleScreen extends React.Component {
     console.log(JSON.stringify(status));
     if (status.didJustFinish || status.progress == 1) {
       console.log('didJustFinish ' + this.state.currentChapter);
-      this.setState({ isLoaded: false });
+
       await this.sound.unloadAsync();
+      this.setState({ isLoaded: false });
 
       var newBook = 1;
       var newChapter = 1;
@@ -174,15 +183,9 @@ export default class AudioBibleScreen extends React.Component {
   }
 
   async _onStop() {
-    if (this.state.isPlaying || this.state.isPaused) {
-      this.setState({ isLoading: true, isLoaded: false });
-      if (this.sound) {
-        await this.sound.stopAsync();
-      }
-      this.setState({ isPlaying: false, isPaused: false, progress: 0, isLoading: false });
-      console.log('stopped');
-      KeepAwake.deactivate();
-    }
+    this._resetAudio();
+    console.log('stopped');
+    KeepAwake.deactivate();
   }
 
   _onBookSelected = async (id) => {
