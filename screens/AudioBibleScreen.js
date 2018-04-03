@@ -28,28 +28,27 @@ export default class AudioBibleScreen extends React.Component {
   constructor(props) {
     super(props);
 
-    const currentLanguage = getCurrentUser().getLanguage();
     const value = parseInt(getCurrentUser().getAudioBibleBook());
 
     // set up default veresion based on language
     let currentVersion = parseInt(value / 1000 / 1000);
-    if (currentVersion == 0) {
-      currentVersion = 4;
-      if (currentLanguage == 'eng') {
-        currentVersion = 1
-      } else if (currentLanguage == 'spa') {
-        currentVersion = 6;
-      } else if (currentLanguage == 'cht') {
-        currentVersion = 13;
-      }
+    switch (currentVersion) {
+      case 1:
+        break;
+      case 4:
+        break;
+      case 6:
+        break;
+      case 13:
+        break;
+      default:
+        currentVersion = 1;
     }
     const currentBook = parseInt(value / 1000 % 1000);
     const currentChapter = parseInt(value % 1000);
-    console.log({ currentLanguage, currentVersion, currentBook, currentChapter });
 
     let book = audioBookId.find((element) => (element.id == currentBook));
     this.state = {
-      currentLanguage,
       currentVersion,
       currentBook,
       currentChapter,
@@ -62,7 +61,6 @@ export default class AudioBibleScreen extends React.Component {
       progress: 0,
       width: Dimensions.get('window').width
     };
-    console.log("Init state: " + JSON.stringify(this.state));
   }
 
   isSeeking = false;
@@ -129,7 +127,7 @@ export default class AudioBibleScreen extends React.Component {
   }
 
   getAudioUrl() {
-    let url = 'http://167.88.37.77/bsf/' + this.state.currentVersion + '/' + this.state.currentBook + '/' + this.state.currentChapter + '.mp3';
+    let url = 'http://mycbsf.org/mp3/' + this.state.currentVersion + '/' + this.state.currentBook + '/' + this.state.currentChapter + '.mp3';
     console.log(url);
     return url;
   }
@@ -254,14 +252,14 @@ export default class AudioBibleScreen extends React.Component {
 
   getBookName(name) {
     let lang = 'chs';
-    switch (this.state.currentVersion) {
-      case '1':
+    switch (parseInt(this.state.currentVersion)) {
+      case 1:
         lang = 'eng';
         break;
-      case '6':
+      case 6:
         lang = 'spa';
         break;
-      case '13':
+      case 13:
         lang = 'cht';
         break;
     }
@@ -269,16 +267,7 @@ export default class AudioBibleScreen extends React.Component {
   }
 
   getChapterName(name) {
-    let lang = 'chs';
-    switch (this.state.currentVersion) {
-      case '1':
-        return 'Chapter ' + name;
-      case '6':
-        return 'Capítulo ' + name;
-      case '13':
-        return '第' + name + '章';
-    }
-    return '第' + name + '章';
+    return name;
   }
 
   render() {
@@ -299,7 +288,7 @@ export default class AudioBibleScreen extends React.Component {
               onValueChange={this._onVersionSelected.bind(this)}>
               {
                 Models.AudioBibles.map(s => (
-                  <Picker.Item label={s.DisplayName} value={s.Value} key={s.Value} />
+                  <Picker.Item label={s.DisplayName} value={parseInt(s.Value)} key={s.Value} />
                 ))}
             </Picker>
           </View>

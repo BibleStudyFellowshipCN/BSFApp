@@ -77,9 +77,9 @@ export const Models = {
   ],
   DefaultFontSize: 2,  // 1 - small, 2 - medium, 3 - large
   AudioBibles: [
+    { DisplayName: "English(NIV)", Value: "1" },
     { DisplayName: "普通话(CUV)", Value: "4" },
     { DisplayName: "广东话(CUV)", Value: "13" },
-    { DisplayName: "English(NIV)", Value: "1" },
     { DisplayName: "Spanish", Value: "6" },
   ],
   DownloadUrl: "http://mycbsf.org/data/",
