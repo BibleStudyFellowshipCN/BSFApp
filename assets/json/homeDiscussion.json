@@ -108,7 +108,385 @@
         "readVerse": [
           {
             "book": "Romans",
+            "verse": "16:1-27"
+          }
+        ],
+        "description": "Paul gave Romans greetings, commendations, warnings and glory to God",
+        "questions": [
+          {
+            "id": "HD_2017_29_6_1",
+            "text": "How can you be wise about what is good and innocent about what is evil so that you can warn others?"
+          },
+          {
+            "id": "HD_2017_29_6_2",
+            "text": "To whom could you express your confidence in God’s ability to establish you by the gospel?",
+          }
+        ]
+      }
+    }
+  },
+  "chs/2017_29": {
+    "title": "罗马和哥林多的教会",
+    "dayQuestions": {
+      "one": {
+        "title": "第一天：复习罗马书15:14-33 —— 保罗的侍奉工作与计划",
+        "readVerse": [
+          {
+            "book": "罗马书",
+            "verse": "15:14-23"
+          }
+        ],
+        "mainTruth": "上帝容许世人在他的工作上有份",
+        "principles": [
+          "有果效的基督徒工人顺服上帝定下的计划、地点和时间",
+          "有果效的基督徒工人欣然付出与接受",
+          "有果效的基督徒工作必有祈祷"
+        ],
+        "questions": [
+          {
+            "id": "HD_2017_29_1_1",
+            "text": "上帝呼召了你去做什么工作？你怎样为此祷告，以顺服的心乐于接受这呼召？"
+          }
+        ]
+      },
+      "two": {
+        "title": "第二天：阅读罗马书16:1-16",
+        "readVerse": [
+          {
+            "book": "罗马书",
             "verse": "16:1-16"
+          }
+        ],
+        "description": "保罗赞扬他的多个同工",
+        "questions": [
+          {
+            "id": "HD_2017_29_2_1",
+            "text": "你对这十多节经文中的哪些人最感兴趣？原因是什么呢？"
+          },
+          {
+            "id": "HD_2017_29_2_2",
+            "text": "关于在教会里工作的弟兄姊妹，你从这些经文有什么认识？",
+          }
+        ]
+      },
+      "three": {
+        "title": "第三天：阅读罗马书16:17-20",
+        "readVerse": [
+          {
+            "book": "罗马书",
+            "verse": "16:17-20"
+          }
+        ],
+        "description": "保罗告诫罗马人要留意那些离间和诱惑他们的人",
+        "questions": [
+          {
+            "id": "HD_2017_29_3_1",
+            "text": "你怎样认出那些离间和诱惑信徒的人？"
+          },
+          {
+            "id": "HD_2017_29_3_2",
+            "text": "请描述今天“在善上聪明，在恶上愚拙”的人是怎样的。",
+          }
+        ]
+      },
+      "four": {
+        "title": "第四天：阅读罗马书16:20-25",
+        "readVerse": [
+          {
+            "book": "罗马书",
+            "verse": "16:20-25"
+          }
+        ],
+        "description": "保罗代其他同工向人问安",
+        "questions": [
+          {
+            "id": "HD_2017_29_4_1",
+            "text": "保罗谈到提摩太、德丢、该犹和以拉都之时，说了什么话？"
+          },
+          {
+            "id": "HD_2017_29_4_2",
+            "text": "谈到你的家人、牧师或主日学老师之时，你可以说什么赞扬他们的话？这星期你会花时间逐一向他们致谢吗？",
+          }
+        ]
+      },
+      "five": {
+        "title": "第五天：阅读罗马书16:25-27",
+        "readVerse": [
+          {
+            "book": "罗马书",
+            "verse": "16:25-27"
+          }
+        ],
+        "description": "保罗将荣耀归给上帝",
+        "questions": [
+          {
+            "id": "HD_2017_29_5_1",
+            "text": "保罗为了什么事将荣耀归给上帝？"
+          },
+          {
+            "id": "HD_2017_29_5_2",
+            "text": "为着上帝在历史中所做的一切，还有今年他在你生命中所做的事，你会怎样将荣耀归给上帝？",
+          }
+        ]
+      },
+      "six": {
+        "title": "第六天：复习罗马书第16章",
+        "readVerse": [
+          {
+            "book": "罗马书",
+            "verse": "16:1-27"
+          }
+        ],
+        "description": "保罗向罗马人问安，赞扬又告诫他们，并将荣耀归给上帝",
+        "questions": [
+          {
+            "id": "HD_2017_29_6_1",
+            "text": "你可以怎样在善上聪明、在恶上愚拙，好让你能告诫别人？"
+          },
+          {
+            "id": "HD_2017_29_6_2",
+            "text": "你可以向谁表明，你深信上帝有能力按照福音使你坚固？",
+          }
+        ]
+      }
+    }
+  },
+  "cht/2017_29": {
+    "title": "羅馬和哥林多的教會",
+    "dayQuestions": {
+      "one": {
+        "title": "第一天：復習羅馬書15:14-33 —— 保羅的侍奉工作與計劃",
+        "readVerse": [
+          {
+            "book": "羅馬書",
+            "verse": "15:14-23"
+          }
+        ],
+        "mainTruth": "上帝容許世人在他的工作上有份",
+        "principles": [
+          "有果效的基督徒工人順服上帝定下的計劃、地點和時間",
+          "有果效的基督徒工人欣然付出與接受",
+          "有果效的基督徒工作必有祈禱"
+        ],
+        "questions": [
+          {
+            "id": "HD_2017_29_1_1",
+            "text": "上帝呼召了你去做什麽工作？你怎樣為此禱告，以順服的心樂於接受這呼召？"
+          }
+        ]
+      },
+      "two": {
+        "title": "第二天：閱讀羅馬書16:1-16",
+        "readVerse": [
+          {
+            "book": "羅馬書",
+            "verse": "16:1-16"
+          }
+        ],
+        "description": "保羅贊揚他的多個同工",
+        "questions": [
+          {
+            "id": "HD_2017_29_2_1",
+            "text": "你對這十多節經文中的哪些人最感興趣？原因是什麽呢？"
+          },
+          {
+            "id": "HD_2017_29_2_2",
+            "text": "關於在教會裏工作的弟兄姊妹，你從這些經文有什麽認識？",
+          }
+        ]
+      },
+      "three": {
+        "title": "第三天：閱讀羅馬書16:17-20",
+        "readVerse": [
+          {
+            "book": "羅馬書",
+            "verse": "16:17-20"
+          }
+        ],
+        "description": "保羅告誡羅馬人要留意那些離間和誘惑他們的人",
+        "questions": [
+          {
+            "id": "HD_2017_29_3_1",
+            "text": "你怎樣認出那些離間和誘惑信徒的人？"
+          },
+          {
+            "id": "HD_2017_29_3_2",
+            "text": "請描述今天“在善上聰明，在惡上愚拙”的人是怎樣的。",
+          }
+        ]
+      },
+      "four": {
+        "title": "第四天：閱讀羅馬書16:20-25",
+        "readVerse": [
+          {
+            "book": "羅馬書",
+            "verse": "16:20-25"
+          }
+        ],
+        "description": "保羅代其他同工向人問安",
+        "questions": [
+          {
+            "id": "HD_2017_29_4_1",
+            "text": "保羅談到提摩太、德丟、該猶和以拉都之時，說了什麽話？"
+          },
+          {
+            "id": "HD_2017_29_4_2",
+            "text": "談到你的家人、牧師或主日學老師之時，你可以說什麽贊揚他們的話？這星期你會花時間逐一向他們致謝嗎？",
+          }
+        ]
+      },
+      "five": {
+        "title": "第五天：閱讀羅馬書16:25-27",
+        "readVerse": [
+          {
+            "book": "羅馬書",
+            "verse": "16:25-27"
+          }
+        ],
+        "description": "保羅將榮耀歸給上帝",
+        "questions": [
+          {
+            "id": "HD_2017_29_5_1",
+            "text": "保羅為了什麽事將榮耀歸給上帝？"
+          },
+          {
+            "id": "HD_2017_29_5_2",
+            "text": "為著上帝在歷史中所做的一切，還有今年他在你生命中所做的事，你會怎樣將榮耀歸給上帝？",
+          }
+        ]
+      },
+      "six": {
+        "title": "第六天：復習羅馬書第16章",
+        "readVerse": [
+          {
+            "book": "羅馬書",
+            "verse": "16:1-27"
+          }
+        ],
+        "description": "保羅向羅馬人問安，贊揚又告誡他們，並將榮耀歸給上帝",
+        "questions": [
+          {
+            "id": "HD_2017_29_6_1",
+            "text": "你可以怎樣在善上聰明、在惡上愚拙，好讓你能告誡別人？"
+          },
+          {
+            "id": "HD_2017_29_6_2",
+            "text": "你可以向誰表明，你深信上帝有能力按照福音使你堅固？",
+          }
+        ]
+      }
+    }
+  },
+  "spa/2017_29": {
+    "title": "The Church in Rome and in Corinth",
+    "dayQuestions": {
+      "one": {
+        "title": "Day 1: Review of Romans 15:14-23: Paul’s Ministry and Plans",
+        "readVerse": [
+          {
+            "book": "Romans",
+            "verse": "15:14-23"
+          }
+        ],
+        "mainTruth": "God allows people to share in His work",
+        "principles": [
+          "Successful Christian workers submit to God’s plans, place and time.",
+          "Successful Christian workers embrace giving and receiving.",
+          "Successful Christian work includes prayer."
+        ],
+        "questions": [
+          {
+            "id": "HD_2017_29_1_1",
+            "text": "What work has God called you to do, and how have you prayerfully embraced it with obedience and joy?"
+          }
+        ]
+      },
+      "two": {
+        "title": "Day 2: Read Romans 16:1-16.",
+        "readVerse": [
+          {
+            "book": "Romans",
+            "verse": "16:1-16"
+          }
+        ],
+        "description": "Paul commends his many fellow workers",
+        "questions": [
+          {
+            "id": "HD_2017_29_2_1",
+            "text": "Which of the people in these verses interests you most? Why?"
+          },
+          {
+            "id": "HD_2017_29_2_2",
+            "text": "What do you learn from these verses about men and women working in the Church?",
+          }
+        ]
+      },
+      "three": {
+        "title": "Day 3: Read Romans 16:17-20.",
+        "readVerse": [
+          {
+            "book": "Romans",
+            "verse": "16:17-20"
+          }
+        ],
+        "description": "Paul warns the Romans of divisive and deceptive people",
+        "questions": [
+          {
+            "id": "HD_2017_29_3_1",
+            "text": "How can you recognize divisive and deceptive people?"
+          },
+          {
+            "id": "HD_2017_29_3_2",
+            "text": "Describe a person today who is “wise about what is good and innocent about what is evil.”",
+          }
+        ]
+      },
+      "four": {
+        "title": "Day 4: Read Romans 16:20-25.",
+        "readVerse": [
+          {
+            "book": "Romans",
+            "verse": "16:20-25"
+          }
+        ],
+        "description": "Paul sends greetings of other fellow workers",
+        "questions": [
+          {
+            "id": "HD_2017_29_4_1",
+            "text": "What did Paul say about Timothy, Tertius, Gaius and Erastus?"
+          },
+          {
+            "id": "HD_2017_29_4_2",
+            "text": "What complimentary things could you say about your family members, pastor or Sunday school teacher? Will you take time to say thank you to each one this week?",
+          }
+        ]
+      },
+      "five": {
+        "title": "Day 5: Read Romans 16:25-27.",
+        "readVerse": [
+          {
+            "book": "Romans",
+            "verse": "16:25-27"
+          }
+        ],
+        "description": "Paul gives glory to God.",
+        "questions": [
+          {
+            "id": "HD_2017_29_5_1",
+            "text": "For what did Paul give glory to God?"
+          },
+          {
+            "id": "HD_2017_29_5_2",
+            "text": "How will you give glory to God for all He has done in history and in your life this year?",
+          }
+        ]
+      },
+      "six": {
+        "title": "Day 6: Review Romans 16.",
+        "readVerse": [
+          {
+            "book": "Romans",
+            "verse": "16:1-27"
           }
         ],
         "description": "Paul gave Romans greetings, commendations, warnings and glory to God",

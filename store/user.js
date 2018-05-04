@@ -6,6 +6,19 @@ import { getI18nText } from '../store/I18n';
 
 let currentUser;
 
+Expo.Updates.addListener((type, manifest, message) => {
+  console.log("[Update]:" + JSON.stringify({ type, manifest, message }));
+  if (type == Expo.Updates.EventType.DOWNLOAD_FINISHED) {
+    askForUpdate();
+  }
+});
+
+function askForUpdate() {
+  Alert.alert(getI18nText('发现更新'), getI18nText('程序将重新启动'), [
+    { text: 'OK', onPress: () => Expo.Updates.reload() }
+  ]);
+}
+
 function getCurrentUser() {
   if (!currentUser) {
     console.log("new User");
@@ -286,28 +299,22 @@ export default class User {
     await this.loadUserPermissionsAsync(this.cellphone);
 
     // Check for app update
-    const { manifest } = Constants;
-    const result = await callWebServiceAsync('https://expo.io/@turbozv/CBSFApp/index.exp?sdkVersion=' + manifest.sdkVersion, '', 'GET');
-    let succeed;
-    if (onlyShowUpdateUI) {
-      succeed = result && result.status == 200;
-    } else {
-      succeed = await showWebServiceCallErrorsAsync(result, 200);
-    }
-    if (succeed) {
-      const clientVersion = this.getVersionNumber(manifest.version);
-      const serverVersion = this.getVersionNumber(result.body.version);
-      console.log('checkForUpdate:' + clientVersion + '-' + serverVersion);
-      // TODO: For some reason the partial updated app doesn't have sdkVersion, so we need to reload
-      if (clientVersion < serverVersion || manifest.sdkVersion.length < 6) {
-        Alert.alert(getI18nText('发现更新') + ': ' + result.body.version, getI18nText('程序将重新启动'), [
-          { text: 'OK', onPress: () => Expo.Util.reload() }
-        ]);
-      } else if (!onlyShowUpdateUI) {
+    try {
+      const update = await Expo.Updates.checkForUpdateAsync();
+      if (update.isAvailable) {
+        await Expo.Updates.fetchUpdateAsync();
+        askForUpdate();
+      } else {
+        const { manifest } = Constants;
         Alert.alert(getI18nText('您已经在使用最新版本'), getI18nText('版本') + ': ' + manifest.version + ' (SDK' + manifest.sdkVersion + ')', [
           { text: 'OK', onPress: () => { } },
-          { text: 'Reload', onPress: () => { Expo.Util.reload() } },
+          { text: 'Reload', onPress: () => { Expo.Updates.reload() } },
         ]);
+      }
+    } catch (e) {
+      console.log(JSON.stringify(e));
+      if (!onlyShowUpdateUI) {
+        Alert.alert('Error', JSON.stringify(e));
       }
     }
   }

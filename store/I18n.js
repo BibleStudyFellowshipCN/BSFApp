@@ -52,6 +52,7 @@ const text = {
     "家庭查经讨论",
     "基本真理：",
     "属灵原则：",
+    "经文释义",
   ],
   cht: [
     "BSF課程",
@@ -103,6 +104,7 @@ const text = {
     "家庭查經討論",
     "基本真理：",
     "屬靈原則：",
+    "經文釋義",
   ],
   eng: [
     "BSF Lessons",
@@ -154,6 +156,7 @@ const text = {
     "Home Discussion",
     "Main Truth: ",
     "Principles: ",
+    "Notes",
   ],
   spa: [
     "BSF Lecciones",
@@ -205,6 +208,7 @@ const text = {
     "Discusión en casa",
     "Verdad principal:",
     "Principios:",
+    "Notes",
   ]
 };
 

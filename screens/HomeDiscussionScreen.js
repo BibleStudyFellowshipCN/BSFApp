@@ -50,7 +50,7 @@ export default class HomeDiscussionScreen extends React.Component {
         <View style={styles.container}>
           <ActivityIndicator
             size="large"
-            color="#0000ff" />
+            color={Colors.yellow} />
         </View>
       );
     }
@@ -86,6 +86,7 @@ export default class HomeDiscussionScreen extends React.Component {
 }
 
 const DayQuestions = (props) => {
+  let keyIndex = 0;
   const content = (
     <View style={styles.BSFQuestionContainer}>
       {
@@ -105,7 +106,7 @@ const DayQuestions = (props) => {
           <Text style={[styles.dayTitle, { fontSize: getCurrentUser().getLessonFontSize(), marginVertical: 3 }]} selectable={true}>{getI18nText('属灵原则：')}</Text>
           {
             props.day.principles.map((principle) => (
-              <Text style={[styles.dayTitle, { fontSize: getCurrentUser().getLessonFontSize(), fontWeight: 'normal' }]} selectable={true}>
+              <Text key={keyIndex++} style={[styles.dayTitle, { fontSize: getCurrentUser().getLessonFontSize(), fontWeight: 'normal' }]} selectable={true}>
                 <Text> ●  </Text>
                 <Text>{principle}</Text>
               </Text>

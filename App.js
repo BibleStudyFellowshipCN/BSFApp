@@ -12,14 +12,6 @@ import { getI18nText } from './store/I18n';
 
 let store;
 
-Expo.Util.addNewVersionListenerExperimental(() => updateClient());
-
-function updateClient() {
-  Alert.alert(getI18nText('发现更新'), getI18nText('程序将重新启动'), [
-    { text: 'OK', onPress: () => Expo.Util.reload() },
-  ]);
-}
-
 export default class App extends React.Component {
   state = {
     isLoadingComplete: false,
