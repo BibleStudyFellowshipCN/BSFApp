@@ -181,7 +181,6 @@ import { NavigationActions } from 'react-navigation'
   }
 
   onFeedback() {
-    this.props.navigation.navigate('Feedback');
     this.props.navigation.navigate('GlobalChat', {
       id: Constants['deviceId'],
       title: getI18nText('反馈意见'),
