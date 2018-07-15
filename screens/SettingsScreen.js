@@ -12,7 +12,6 @@ import { clearLesson } from '../store/lessons.js'
 import { clearPassage } from '../store/passage.js'
 import { connectActionSheet } from '@expo/react-native-action-sheet';
 import { NavigationActions } from 'react-navigation'
-import { LegacyAsyncStorage } from 'expo';
 
 @connectActionSheet class SettingsScreen extends React.Component {
   static navigationOptions = ({ navigation }) => {
@@ -31,18 +30,6 @@ import { LegacyAsyncStorage } from 'expo';
   };
 
   componentWillMount() {
-    if (Platform.OS == 'ios') {
-      LegacyAsyncStorage.getItem('ANSWER', (err, oldData) => {
-        if (err || !oldData) {
-          oldData = "{}";
-        }
-        let oldAnswer = JSON.parse(oldData);
-        if (oldAnswer.rawData) {
-          this.setState({ showMigration: true });
-        }
-      });
-    }
-
     this.onCellphoneChanged();
   }
 

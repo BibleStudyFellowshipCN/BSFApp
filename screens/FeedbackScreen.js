@@ -8,7 +8,6 @@ import { Layout } from '../constants/Layout';
 import { callWebServiceAsync, showWebServiceCallErrorsAsync } from '../dataStorage/storage';
 import { getI18nText } from '../store/I18n';
 import { Button } from 'react-native-elements';
-import { LegacyAsyncStorage } from 'expo';
 import { getCurrentUser } from '../store/user';
 
 export default class FeedbackScreen extends React.Component {
@@ -31,18 +30,6 @@ export default class FeedbackScreen extends React.Component {
     this.keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', (event) => {
       this.setState({ keyboard: false })
     });
-
-    if (Platform.OS == 'ios') {
-      LegacyAsyncStorage.getItem('ANSWER', (err, oldData) => {
-        if (err || !oldData) {
-          oldData = "{}";
-        }
-        let oldAnswer = JSON.parse(oldData);
-        if (oldAnswer.rawData) {
-          this.setState({ showMigration: true });
-        }
-      });
-    }
   }
 
   componentWillUnmount() {
