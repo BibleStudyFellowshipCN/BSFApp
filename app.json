@@ -4,17 +4,22 @@
     "description": "Chinese Bible Study Fellowship",
     "slug": "CBSFApp",
     "privacy": "public",
-    "sdkVersion": "25.0.0",
-    "version": "2018.03.18.0",    "primaryColor": "#cccccc",
+    "sdkVersion": "28.0.0",
+    "version": "2018.07.15",
+    "primaryColor": "#cccccc",
     "icon": "./assets/images/icon.png",
     "splash": {
       "image": "./assets/images/splash.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
+    "updates": {
+      "enabled": true,
+      "checkAutomatically": "ON_ERROR_RECOVERY",
+      "fallbackToCacheTimeout": 0
+    },
     "assetBundlePatterns": [
-      "assets/images/**",
-      "assets/json/**"
+      "**/*"
     ],
     "ios": {
       "icon": "./assets/images/icon-ios.png",
@@ -29,7 +34,7 @@
       "permissions": [
         "WAKE_LOCK"
       ],
-      "versionCode": 11
+      "versionCode": 14
     }
   }
 }

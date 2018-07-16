@@ -9,16 +9,9 @@ import { Provider } from 'react-redux';
 import { ActionSheetProvider } from '@expo/react-native-action-sheet';
 import { getCurrentUser } from './store/user';
 import { getI18nText } from './store/I18n';
+import { loadAnswer } from './store/answers';
 
 let store;
-
-Expo.Util.addNewVersionListenerExperimental(() => updateClient());
-
-function updateClient() {
-  Alert.alert(getI18nText('发现更新'), getI18nText('程序将重新启动'), [
-    { text: 'OK', onPress: () => Expo.Util.reload() },
-  ]);
-}
 
 export default class App extends React.Component {
   state = {
@@ -89,9 +82,8 @@ export default class App extends React.Component {
 
     // create the store with the boot data
     const initialstate = {
-      answers: bootValues[0] ? bootValues[0] : { answers: {} },
     }
-    console.log("Load answers: " + JSON.stringify(initialstate.answers));
+    await loadAnswer();
     store = createStore(initialstate);
   };
 

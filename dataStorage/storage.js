@@ -177,6 +177,7 @@ function getHttpHeaders() {
 }
 
 let lastPokeDay = 0;
+let lastSessionId = '';
 
 async function pokeServer(model, id) {
     // Don't poke from non-device
@@ -184,16 +185,14 @@ async function pokeServer(model, id) {
         return;
     }*/
 
-    // Check is done daily
+    // Check is done daily or sessionId is changed
     const dayOfToday = (new Date()).getDate();
     console.log('LastCheckForPokeDate: ' + lastPokeDay + ' DayOfToday: ' + dayOfToday);
-    if (dayOfToday == lastPokeDay) {
-        return;
+    if (dayOfToday != lastPokeDay || lastSessionId != Constants['sessionId']) {
+        getCurrentUser().checkForUpdate(true);
+        lastPokeDay = dayOfToday;
+        lastSessionId = Constants['sessionId'];
     }
-
-    getCurrentUser().checkForUpdate(true);
-
-    lastPokeDay = dayOfToday;
 }
 
 async function loadAsync(model, id, update) {
@@ -317,8 +316,8 @@ async function saveAsync(data, model, id) {
 async function saveToOffilneStorageAsync(payload, key, id) {
     console.log("save to storage: " + JSON.stringify({ key, id }));
     return !!id ?
-        await storage.save({ key: encode(key), id: encode(id), rawData: payload }) :
-        await storage.save({ key: encode(key), rawData: payload })
+        await storage.save({ key: encode(key), id: encode(id), data: payload }) :
+        await storage.save({ key: encode(key), data: payload })
 }
 
 function saveToCloud(data, model, id) {

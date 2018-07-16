@@ -1,6 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { FontAwesome, Octicons, Ionicons } from '@expo/vector-icons';
+import { FontAwesome, Octicons, Ionicons, Feather } from '@expo/vector-icons';
 import { FileSystem } from 'expo';
 import {
   ScrollView,
@@ -20,7 +20,7 @@ import { clearPassage } from '../store/passage.js'
 import { getI18nText } from '../store/I18n';
 import { getCurrentUser } from '../store/user';
 import { Models } from '../dataStorage/models';
-import { pokeServer, reloadGlobalCache, loadFromCacheAsync } from '../dataStorage/storage';
+import { reloadGlobalCache, loadFromCacheAsync } from '../dataStorage/storage';
 
 class HomeScreen extends React.Component {
   static navigationOptions = ({ navigation }) => {
@@ -45,7 +45,6 @@ class HomeScreen extends React.Component {
   lastCheckForContentUpdateDate = 0;
 
   componentWillMount() {
-    pokeServer(Models.Book, '');
     this.checkForContentUpdate(false);
 
     if (!this.props.booklist) {
@@ -90,6 +89,14 @@ class HomeScreen extends React.Component {
     this.checkingForContentUpdate = false;
   }
 
+  reload() {
+    // reload all data
+    this.props.clearBooks();
+    this.props.clearLesson();
+    this.props.clearPassage();
+    this.props.requestBooks();
+  }
+
   async downloadContent(remoteVersion) {
     this.downloadFiles = Models.DownloadList.length;
     this.downloadedFiles = 0;
@@ -107,15 +114,12 @@ class HomeScreen extends React.Component {
 
         this.downloadedFiles++;
         if (this.downloadedFiles >= Models.DownloadList.length) {
-          // reload all data
-          this.props.clearBooks();
-          this.props.clearLesson();
-          this.props.clearPassage();
-          this.props.requestBooks();
+          this.reload();
           this.setState({ downloading: false });
         }
       } catch (e) {
         console.log(e);
+        this.reload();
         this.setState({ downloading: false });
         return;
       }
@@ -142,6 +146,15 @@ class HomeScreen extends React.Component {
   goToHomeTraining(lesson) {
     let parsed = lesson.name.split(' ');
     this.props.navigation.navigate('HomeTraining', { id: lesson.id, title: ' ' + parsed[0] });
+  }
+
+  goToNotes(lesson) {
+    let parsed = lesson.name.split(' ');
+    this.props.navigation.navigate('Notes', { uri: lesson.notesUri, title: ' ' + parsed[0] });
+  }
+
+  goToAudio(lesson) {
+    this.props.navigation.navigate('SermonAudio', { id: lesson.id });
   }
 
   render() {
@@ -210,6 +223,8 @@ class HomeScreen extends React.Component {
             goToLesson={() => this.goToLesson(lesson)}
             goToHomeDiscussion={() => this.goToHomeDiscussion(lesson)}
             goToHomeTraining={() => this.goToHomeTraining(lesson)}
+            goToNotes={() => this.goToNotes(lesson)}
+            goToAudio={() => this.goToAudio(lesson)}
             lesson={lesson}
           />))}
       </View>
@@ -223,6 +238,8 @@ const Lesson = (props) => {
   const lessonNumber = parsed[0];
   const name = parsed[1];
   const date = parsed[2];
+  const permissions = getCurrentUser().getUserPermissions();
+  const hasAudio = permissions.audios && (permissions.audios.indexOf(props.lesson.id) != -1)
   return (
     <View>
       <TouchableOpacity style={styles.lessonContainer} onPress={() => props.goToLesson()}>
@@ -243,21 +260,42 @@ const Lesson = (props) => {
               <Octicons
                 style={{ marginRight: 24 }}
                 name={'comment-discussion'}
-                size={20}
+                size={26}
               />
             </TouchableOpacity>
           }
           {
             props.lesson.homeTraining &&
             <TouchableOpacity onPress={() => props.goToHomeTraining()}>
-              <Ionicons
-                style={{ top: -6, marginRight: 24 }}
-                name={'ios-people-outline'}
-                size={30}
+              <Feather
+                style={{ marginRight: 20 }}
+                name={'users'}
+                size={24}
+              />
+            </TouchableOpacity>
+          }
+          {
+            getCurrentUser().getUserPermissions().isGroupLeader && props.lesson.notesUri &&
+            <TouchableOpacity onPress={() => props.goToNotes()}>
+              <Feather
+                style={{ marginRight: 20 }}
+                name={'file-text'}
+                size={24}
+              />
+            </TouchableOpacity>
+          }
+          {
+            hasAudio &&
+            <TouchableOpacity onPress={() => props.goToAudio()}>
+              <Feather
+                style={{ marginRight: 20 }}
+                name={'volume-2'}
+                size={24}
               />
             </TouchableOpacity>
           }
           <FontAwesome
+            style={{ top: 4 }}
             name='chevron-right'
             color='grey'
             size={16}
