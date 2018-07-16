@@ -10,10 +10,16 @@ import { getAnswer, updateAnswer } from '../store/answers';
 import { getCurrentUser } from '../store/user';
 
 export default class Answer extends React.Component {
-  state = {
-    editMode: false,
-    height: 0
-  };
+
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      editMode: false,
+      height: 0,
+      answer: getAnswer(props.questionId)
+    };
+  }
 
   contentSize = null;
 
@@ -43,11 +49,12 @@ export default class Answer extends React.Component {
           style={[styles.answerInput, { fontSize: getCurrentUser().getLessonFontSize() }]}
           blurOnSubmit={false}
           multiline
-          value={getAnswer(this.props.questionId)}
+          value={this.state.answer}
           onChange={(e) => this.onContentSizeChange(e)}
           onContentSizeChange={(e) => this.onContentSizeChange(e)}
           onChangeText={(text) => {
-            updateAnswer(this.props.questionId, text, )
+            updateAnswer(this.props.questionId, text)
+            this.setState({ answer: text });
           }}
           onEndEditing={() => {
             this.setState({ editMode: false });

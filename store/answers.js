@@ -4,7 +4,7 @@ import { Models } from '../dataStorage/models';
 import { loadAsync } from '../dataStorage/storage';
 
 function saveAnswer(newState) {
-  console.log("Saving answers...");
+  console.log("Saving answers:" + JSON.stringify(newState));
   saveAsync(newState, Models.Answer);
 }
 const debouncedSaveAnswer = debounce(saveAnswer, wait = 500)
@@ -17,7 +17,7 @@ export async function loadAnswer() {
     answerContent = {};
   }
   if (!answerContent.answers) {
-    answerContent.answers = [];
+    answerContent.answers = {};
   }
   console.log("loadAnswer: " + JSON.stringify(answerContent));
 }
@@ -31,7 +31,6 @@ export function getAnswer(questionId) {
 
 export function updateAnswer(questionId, answerText) {
   console.log(`updateAnswer[${questionId}] => ${answerText}`);
-  answerContent.answers[questionId] = { questionId, answerText };
-  console.log(JSON.stringify(answerContent));
+  answerContent.answers[questionId] = { answerText };
   debouncedSaveAnswer(answerContent);
 }
