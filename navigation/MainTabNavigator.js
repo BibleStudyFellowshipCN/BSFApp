@@ -1,13 +1,12 @@
 import React from 'react';
 import { FontAwesome } from '@expo/vector-icons';
 import { TabNavigator, TabBarBottom } from 'react-navigation';
-import { createBottomTabNavigator, BottomTabBar } from 'react-navigation-tabs';
 import Colors from '../constants/Colors';
 import HomeScreen from '../screens/HomeScreen';
 import AudioBibleScreen from '../screens/AudioBibleScreen';
 import SettingsScreen from '../screens/SettingsScreen';
 
-export default createBottomTabNavigator(
+export default TabNavigator(
   {
     Home: {
       screen: HomeScreen,
@@ -44,7 +43,7 @@ export default createBottomTabNavigator(
         );
       },
     }),
-    tabBarComponent: BottomTabBar,
+    tabBarComponent: TabBarBottom,
     tabBarPosition: 'bottom',
     animationEnabled: false,
     swipeEnabled: false,
