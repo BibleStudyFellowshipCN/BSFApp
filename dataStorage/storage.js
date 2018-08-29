@@ -41,6 +41,12 @@ function encode(idOrKey) {
 }
 
 global_cache = [];
+
+function resetGlobalCache(name) {
+    console.log("resetGlobalCache: " + name);
+    delete global_cache[name];
+}
+
 async function reloadGlobalCache(name) {
     console.log("reloadGlobalCache: " + name);
     try {
@@ -405,4 +411,4 @@ async function showWebServiceCallErrorsAsync(result, acceptStatus, showUI = true
     return true;
 }
 
-export { loadAsync, saveAsync, clearStorageAsync, callWebServiceAsync, showWebServiceCallErrorsAsync, pokeServer, reloadGlobalCache, loadFromCacheAsync };
+export { loadAsync, saveAsync, clearStorageAsync, callWebServiceAsync, showWebServiceCallErrorsAsync, pokeServer, resetGlobalCache, reloadGlobalCache, loadFromCacheAsync };

@@ -20,7 +20,7 @@ import { clearPassage } from '../store/passage.js'
 import { getI18nText } from '../store/I18n';
 import { getCurrentUser } from '../store/user';
 import { Models } from '../dataStorage/models';
-import { reloadGlobalCache, loadFromCacheAsync } from '../dataStorage/storage';
+import { resetGlobalCache } from '../dataStorage/storage';
 
 class HomeScreen extends React.Component {
   static navigationOptions = ({ navigation }) => {
@@ -110,7 +110,7 @@ class HomeScreen extends React.Component {
       try {
         const { uri } = await downloadResumable.downloadAsync();
 
-        await reloadGlobalCache(Models.DownloadList[i]);
+        resetGlobalCache(Models.DownloadList[i]);
 
         this.downloadedFiles++;
         if (this.downloadedFiles >= Models.DownloadList.length) {
