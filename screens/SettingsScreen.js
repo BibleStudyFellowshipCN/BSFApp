@@ -229,6 +229,10 @@ import { LegacyAsyncStorage } from 'expo';
     this.props.navigation.navigate('SermonAudio', { user: this.state.user });
   }
 
+  async onAnswerManage() {
+    this.props.navigation.navigate('AnswerManage');
+  }
+
   render() {
     const { manifest } = Constants;
     phone = getCurrentUser().getCellphone();
@@ -290,6 +294,13 @@ import { LegacyAsyncStorage } from 'expo';
                   onPress={this.onAudio.bind(this)}
                 />
               }
+              <SettingsList.Item
+                title={getI18nText('答案管理')}
+                hasNavArrow={true}
+                titleStyle={{ fontSize }}
+                titleInfoStyle={{ fontSize }}
+                onPress={this.onAnswerManage.bind(this)}
+              />
               <SettingsList.Header headerText='MBSF - Mobile Bible Study Fellowship' headerStyle={{ color: 'black', marginTop: 15 }} />
               <SettingsList.Item
                 title={getI18nText('版本') + ': ' + manifest.version}

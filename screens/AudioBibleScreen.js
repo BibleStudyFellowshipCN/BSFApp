@@ -67,6 +67,7 @@ export default class AudioBibleScreen extends React.Component {
 
   componentDidMount() {
     Audio.setIsEnabledAsync(true);
+    Audio.setAudioModeAsync({ playsInSilentModeIOS: true });
   }
 
   async _resetAudio() {
