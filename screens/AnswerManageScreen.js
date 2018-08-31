@@ -1,6 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { TouchableOpacity, StyleSheet, View, Alert, TextInput, KeyboardAvoidingView, Text, Share, Dimensions } from 'react-native';
+import { TouchableOpacity, StyleSheet, View, Alert, TextInput, KeyboardAvoidingView, Text, Share, Dimensions, ScrollView } from 'react-native';
 import { Entypo } from '@expo/vector-icons';
 import { updateAnswer } from '../store/answers';
 import { loadAsync } from '../dataStorage/storage';
@@ -103,12 +103,14 @@ class AnswerManageScreen extends React.Component {
                   color='#e67e22' />
               </TouchableOpacity>
             </View>
-            <Text
-              selectable={true}
-              style={[styles.answersInput, {
-                fontSize: getCurrentUser().getLessonFontSize(),
-                width: Dimensions.get('window').width - 20
-              }]}>{this.state.answers}</Text>
+            <ScrollView>
+              <Text
+                selectable={true}
+                style={[styles.answersExport, {
+                  fontSize: getCurrentUser().getLessonFontSize(),
+                  width: Dimensions.get('window').width - 20
+                }]}>{this.state.answers}</Text>
+            </ScrollView>
           </View>
         }
 
@@ -117,7 +119,7 @@ class AnswerManageScreen extends React.Component {
           <View style={{ alignItems: 'center' }}>
             <Text style={{ fontSize: 14 }}>{getI18nText('请在以下粘贴导出的答案用于导入')} </Text>
             <TextInput
-              style={[styles.answersInput, {
+              style={[styles.answersImport, {
                 fontSize: getCurrentUser().getLessonFontSize(),
                 width: Dimensions.get('window').width - 20
               }]}
@@ -155,8 +157,15 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
-  answersInput: {
-    height: 190,
+  answersExport: {
+    margin: 10,
+    borderWidth: 1,
+    borderColor: 'whitesmoke',
+    textAlignVertical: 'top',
+    backgroundColor: 'whitesmoke'
+  },
+  answersImport: {
+    height: 170,
     margin: 10,
     borderWidth: 1,
     borderColor: 'whitesmoke',
