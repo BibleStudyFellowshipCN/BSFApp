@@ -60,6 +60,11 @@ async function reloadGlobalCache(name) {
 }
 
 async function getCacheData(name, key) {
+    // We break in one version for spa, we will not read from cache
+    if (name === 'books' && key === 'spa') {
+        return null;
+    }
+
     if (!global_cache[name]) {
         await reloadGlobalCache(name);
     }
@@ -88,36 +93,6 @@ async function getCacheData(name, key) {
             break;
         case 'spa':
             cache = require("../assets/json/spa.json");
-            break;
-        case 'ccb':
-            cache = require("../assets/json/ccb.json");
-            break;
-        case 'cnvt':
-            cache = require("../assets/json/cnvt.json");
-            break;
-        case 'esv':
-            cache = require("../assets/json/esv.json");
-            break;
-        case 'kjv':
-            cache = require("../assets/json/kjv.json");
-            break;
-        case 'nivavd1984':
-            cache = require("../assets/json/niv1984.json");
-            break;
-        case 'niv2011':
-            cache = require("../assets/json/niv2011.json");
-            break;
-        case 'nvi':
-            cache = require("../assets/json/nvi.json");
-            break;
-        case 'rcuvss':
-            cache = require("../assets/json/rcuvss.json");
-            break;
-        case 'rcuvts':
-            cache = require("../assets/json/rcuvts.json");
-            break;
-        case 'rvr1995':
-            cache = require("../assets/json/rvr1995.json");
             break;
         case 'homeDiscussion':
             cache = require("../assets/json/homeDiscussion.json");
