@@ -123,6 +123,7 @@ class LessonScreen extends React.Component {
 }
 
 const DayQuestions = (props) => {
+  lastBibleQuote = null;
   const content = (
     <View style={styles.BSFQuestionContainer}>
       {
@@ -132,9 +133,17 @@ const DayQuestions = (props) => {
       <Text style={[styles.dayTitle, { fontSize: getCurrentUser().getLessonFontSize() }]} selectable={true}>{props.day.title}</Text>
       {
         props.day.readVerse &&
-        props.day.readVerse.map((quote) => (
-          <BibleQuote key={quote.book + quote.verse} book={quote.book} verse={quote.verse} goToPassage={props.goToPassage} />
-        ))
+        <View style={{
+          flexDirection: 'row',
+          flexWrap: 'wrap',
+          maxWidth: Dimensions.get('window').width - 10
+        }}>
+          {
+            props.day.readVerse.map((quote) => (
+              <BibleQuote key={quote.book + quote.verse} book={quote.book} verse={quote.verse} goToPassage={props.goToPassage} />
+            ))
+          }
+        </View>
       }
       {
         props.day.questions &&
@@ -160,57 +169,66 @@ const DayQuestions = (props) => {
     );
 }
 
-const BSFQuestion = (props) => (
-  <View style={{ marginVertical: 12, }}>
-    <QuestionText>
-      {props.question.questionText}
-    </QuestionText>
-    <View style={{
-      flexDirection: 'row',
-      flexWrap: 'wrap',
-      maxWidth: Dimensions.get('window').width - 10
-    }}>
-      {props.question.quotes.map(quote => (
-        <BibleQuote key={quote.book + quote.verse} book={quote.book} verse={quote.verse} goToPassage={props.goToPassage} />
-      ))}
-    </View>
-    <View>
-      <Answer questionId={props.question.id} />
-      {
-        getCurrentUser().getUserPermissions().chat &&
-        <View style={{
-          position: 'absolute',
-          top: -26,
-          right: -11
-        }}>
-          <TouchableOpacity onPress={() => {
-            navigateTo('GlobalChat', {
-              id: props.question.id,
-              title: getI18nText('问题讨论') + ' ' + props.question.id,
-              text: props.question.questionText
-            });
+const BSFQuestion = (props) => {
+  lastBibleQuote = null;
+  return (
+    <View style={{ marginVertical: 12, }}>
+      <QuestionText>
+        {props.question.questionText}
+      </QuestionText>
+      <View style={{
+        flexDirection: 'row',
+        flexWrap: 'wrap',
+        maxWidth: Dimensions.get('window').width - 10
+      }}>
+        {props.question.quotes.map(quote => (
+          <BibleQuote key={quote.book + quote.verse} book={quote.book} verse={quote.verse} goToPassage={props.goToPassage} />
+        ))}
+      </View>
+      <View>
+        <Answer questionId={props.question.id} />
+        {
+          getCurrentUser().getUserPermissions().chat &&
+          <View style={{
+            position: 'absolute',
+            top: -26,
+            right: -11
           }}>
-            <FontAwesome name='commenting-o' size={28} color='#95a5a6' />
-          </TouchableOpacity>
-        </View>
-      }
+            <TouchableOpacity onPress={() => {
+              navigateTo('GlobalChat', {
+                id: props.question.id,
+                title: getI18nText('问题讨论') + ' ' + props.question.id,
+                text: props.question.questionText
+              });
+            }}>
+              <FontAwesome name='commenting-o' size={28} color='#95a5a6' />
+            </TouchableOpacity>
+          </View>
+        }
+      </View>
     </View>
-  </View >
-)
+  );
+}
 
 const QuestionText = (props) => (
   <Text style={{ color: 'black', marginBottom: 5, fontSize: getCurrentUser().getLessonFontSize() }} selectable={true}>{props.children}</Text>
 )
 
-const BibleQuote = (props) => (
-  <View style={{ flexDirection: 'row' }}>
-    <TouchableOpacity onPress={() => props.goToPassage(props.book, props.verse)}>
-      <View style={styles.bibleQuote}>
-        <Text style={{ color: 'white' }} selectable={true}> {getI18nBibleBook(props.book)} {props.verse}</Text>
-      </View>
-    </TouchableOpacity>
-  </View>
-)
+let lastBibleQuote = '';
+const BibleQuote = (props) => {
+  console.log(lastBibleQuote + "==" + props.book);
+  const repeat = lastBibleQuote === props.book ? true : false;
+  lastBibleQuote = props.book;
+  return (
+    <View style={{ flexDirection: 'row' }}>
+      <TouchableOpacity onPress={() => props.goToPassage(props.book, props.verse)}>
+        <View style={styles.bibleQuote}>
+          <Text style={{ color: 'white' }} selectable={true}>{repeat ? '' : getI18nBibleBook(props.book)}{props.verse}</Text>
+        </View>
+      </TouchableOpacity>
+    </View>
+  );
+}
 
 const mapStateToProps = (state, ownProps) => {
   return {

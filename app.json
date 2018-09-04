@@ -5,7 +5,7 @@
     "slug": "CBSFApp",
     "privacy": "public",
     "sdkVersion": "23.0.0",
-    "version": "2018.08.30.0",
+    "version": "2018.09.03.0",
     "primaryColor": "#cccccc",
     "icon": "./assets/images/icon.png",
     "splash": {
@@ -26,7 +26,7 @@
       "permissions": [
         "WAKE_LOCK"
       ],
-      "versionCode": 13
+      "versionCode": 15
     }
   }
 }
