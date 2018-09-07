@@ -124,13 +124,28 @@ class LessonScreen extends React.Component {
 
 const DayQuestions = (props) => {
   lastBibleQuote = null;
+  let dayTitle;
+  let subTitle;
+  const index = props.day.title.indexOf('\n');
+  if (index === -1) {
+    dayTitle = props.day.title;
+  } else {
+    dayTitle = props.day.title.substring(0, index);
+    subTitle = props.day.title.substring(index + 1).trim();
+  }
   const content = (
     <View style={styles.BSFQuestionContainer}>
       {
         props.memoryVerse &&
         <Text style={[styles.memoryVerse, { fontSize: getCurrentUser().getLessonFontSize() }]} selectable={true}>{getI18nText('背诵经文：')}{props.memoryVerse}</Text>
       }
-      <Text style={[styles.dayTitle, { fontSize: getCurrentUser().getLessonFontSize() }]} selectable={true}>{props.day.title}</Text>
+      <Text style={[styles.dayTitle, { fontSize: getCurrentUser().getLessonFontSize() }]} selectable={true}>{dayTitle}</Text>
+
+      {
+        subTitle &&
+        <Text style={[styles.subDayTitle, { fontSize: getCurrentUser().getLessonFontSize() }]} selectable={true}>{subTitle}</Text>
+      }
+
       {
         props.day.readVerse &&
         <View style={{
@@ -201,7 +216,7 @@ const BSFQuestion = (props) => {
                 text: props.question.questionText
               });
             }}>
-              <FontAwesome name='commenting-o' size={28} color='#95a5a6' />
+              <FontAwesome name='commenting-o' size={28} color='#95a5a6' style={{ backgroundColor: 'transparent' }} />
             </TouchableOpacity>
           </View>
         }
@@ -269,6 +284,10 @@ const styles = StyleSheet.create({
   dayTitle: {
     color: 'black',
     fontWeight: 'bold',
+  },
+  subDayTitle: {
+    color: 'black',
+    fontStyle: 'italic'
   },
   memoryVerse: {
     color: 'black',
