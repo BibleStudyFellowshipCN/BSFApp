@@ -51,8 +51,8 @@ export default class App extends React.Component {
     if (!getCurrentUser().isLoggedOn()) {
       let locale = await Expo.Util.getCurrentLocaleAsync();
       console.log(locale);
-      let lang = 'chs';
-      let bible = 'rcuvss';
+      let lang = 'eng';
+      let bible = 'niv2011';
       if (locale.substring(0, 2) == 'es') {
         lang = 'spa';
         bible = 'nvi';
@@ -62,6 +62,9 @@ export default class App extends React.Component {
       } else if (locale == 'zh-hk' || locale == 'zh-tw') {
         lang = 'cht';
         bible = 'rcuvts';
+      } else if (locale.substring(0, 2) == 'zh') {
+        lang = 'chs';
+        bible = 'rcuvss';
       }
 
       await getCurrentUser().loginAsync("0000000000", lang);

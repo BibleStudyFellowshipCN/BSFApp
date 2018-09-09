@@ -18,22 +18,30 @@ import { getCurrentUser } from '../store/user';
 const bookid = require('../assets/json/bookid.json');
 
 function onBibleVerse() { }
+function onBibleVerse2() { }
 
 @connectActionSheet class BibleScreen extends React.Component {
   static navigationOptions = ({ navigation }) => {
     return {
       title: navigation.state.params && navigation.state.params.title ? navigation.state.params.title : 'Bible',
       headerRight: (
-        <View style={{ marginRight: 20 }}>
+        <View style={{ marginRight: 20, flexDirection: 'row', backgroundColor: '#fcaf17', alignItems: 'baseline' }}>
           <TouchableOpacity onPress={() => onBibleVerse()}>
             <Octicons name='book' size={28} color='#fff' />
           </TouchableOpacity>
+          <Text style={{ marginLeft: 3, fontSize: 12, color: 'white' }}>1</Text>
+          <View style={{ width: 7 }} />
+          <TouchableOpacity onPress={() => onBibleVerse2()}>
+            <Octicons name='book' size={28} color='#fff' />
+          </TouchableOpacity>
+          <Text style={{ marginLeft: 3, fontSize: 12, color: 'white' }}>2</Text>
         </View>)
     };
   };
 
   componentWillMount() {
     onBibleVerse = this.onBibleVerse.bind(this);
+    onBibleVerse2 = this.onBibleVerse2.bind(this);
     const id = getId(this.props.navigation.state.params.book, this.props.navigation.state.params.verse);
     pokeServer(Models.Passage, id);
     if (!this.props.passage) {
@@ -43,9 +51,10 @@ function onBibleVerse() { }
 
   onBibleVerse() {
     let options = [];
+    const version = getCurrentUser().getBibleVersion();
     for (var i in Models.BibleVersions) {
       const text = Models.BibleVersions[i].DisplayName;
-      options.push(text);
+      options.push((version === Models.BibleVersions[i].Value) ? '>' + text : text);
     }
     options.push('Cancel');
     let cancelButtonIndex = options.length - 1;
@@ -64,9 +73,50 @@ function onBibleVerse() { }
     );
   }
 
+  onBibleVerse2() {
+    let options = [];
+    const version = getCurrentUser().getBibleVersion2();
+    let found = false;
+    for (var i in Models.BibleVersions) {
+      const text = Models.BibleVersions[i].DisplayName;
+      if (version === Models.BibleVersions[i].Value) {
+        options.push('>' + text);
+        found = true;
+      } else {
+        options.push(text);
+      }
+    }
+    options.unshift(found ? "N/A" : ">N/A");
+    options.push('Cancel');
+    let cancelButtonIndex = options.length - 1;
+    let destructiveButtonIndex = cancelButtonIndex;
+    this.props.showActionSheetWithOptions(
+      {
+        options,
+        cancelButtonIndex,
+        destructiveButtonIndex,
+      },
+      buttonIndex => {
+        if (buttonIndex != cancelButtonIndex) {
+          this.onBibleVerseChange2(buttonIndex === 0 ? null : Models.BibleVersions[buttonIndex - 1].Value);
+        }
+      }
+    );
+  }
+
   async onBibleVerseChange(version) {
     if (getCurrentUser().getBibleVersion() != version) {
       await getCurrentUser().setBibleVersionAsync(version);
+      getCurrentUser().logUserInfo();
+
+      this.props.clearPassage();
+      this.props.loadPassage();
+    }
+  }
+
+  async onBibleVerseChange2(version) {
+    if (getCurrentUser().getBibleVersion2() != version) {
+      await getCurrentUser().setBibleVersion2Async(version);
       getCurrentUser().logUserInfo();
 
       this.props.clearPassage();
@@ -81,8 +131,10 @@ function onBibleVerse() { }
 
       // Using text (some Android device cannot show CJK in WebView)
       const bible = getCurrentUser().getBibleVersion();
+      const bible2 = getCurrentUser().getBibleVersion2();
       if (Platform.OS == 'android' &&
-        (bible == 'rcuvss' || bible == 'ccb' || bible == 'rcuvts' || bible == 'cnvt')) {
+        (bible == 'rcuvss' || bible == 'ccb' || bible == 'rcuvts' || bible == 'cnvt' ||
+          bible2 == 'rcuvss' || bible2 == 'ccb' || bible2 == 'rcuvts' || bible2 == 'cnvt')) {
         let line = '';
         for (var i in paragraphs) {
           for (var j in paragraphs[i].verses) {
@@ -95,7 +147,7 @@ function onBibleVerse() { }
           <View style={{ flex: 1, backgroundColor: 'white' }}>
             <ScrollView>
               <Text selectable={true} style={{
-                marginVertical: 2, marginHorizontal: 4, fontSize, lineHeight: 32,
+                marginVertical: 3, marginHorizontal: 4, fontSize, lineHeight: 32
               }}>{line}</Text>
             </ScrollView>
           </View>
@@ -103,15 +155,16 @@ function onBibleVerse() { }
       }
 
       // Using html
-      let html = '<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1" /></head>' +
-        '<style> body { font-size: ' + fontSize + ';} </style> <body>';
+      let html = '<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0" /></head>' +
+        '<style> td { font-size: ' + fontSize + '; padding: 4px;} tr:nth-child(even) { background: #EEEEEE }</style><body><table>';
       for (var i in paragraphs) {
         for (var j in paragraphs[i].verses) {
           const verse = paragraphs[i].verses[j];
-          html += verse.verse + " " + verse.text + "<br>";
+          html += `<tr><td>${verse.verse} ${verse.text}</td></tr>`;
         }
       }
-      html += '</body>';
+      html += '</table></body>';
+      console.log(html);
       return (<WebView source={{ html }} />);
     } else {
       // Display loading screen

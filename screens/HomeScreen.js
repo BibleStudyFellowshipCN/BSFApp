@@ -64,10 +64,9 @@ class HomeScreen extends React.Component {
   }
 
   async checkForContentUpdate(showUI) {
-    if (this.checkingForContentUpdate) {
+    if (this.state.downloading) {
       return;
     }
-    this.checkingForContentUpdate = true;
 
     this.lastCheckForContentUpdateDate = (new Date()).getDate();
     try {
@@ -80,13 +79,11 @@ class HomeScreen extends React.Component {
           ]);
         }
       } else {
-        this.downloadContent(remoteVersionString);
+        await this.downloadContent(remoteVersionString);
       }
     } catch (e) {
       console.log(e);
     }
-
-    this.checkingForContentUpdate = false;
   }
 
   reload() {
@@ -100,7 +97,7 @@ class HomeScreen extends React.Component {
   async downloadContent(remoteVersion) {
     this.downloadFiles = Models.DownloadList.length;
     this.downloadedFiles = 0;
-    this.setState({ downloadProgress: 0, downloading: true, remoteVersion });
+    await this.setState({ downloadProgress: 0, downloading: true, remoteVersion });
     for (var i in Models.DownloadList) {
       const remoteUri = Models.DownloadUrl + Models.DownloadList[i] + '.json';
       const localUri = FileSystem.documentDirectory + Models.DownloadList[i] + '.json';

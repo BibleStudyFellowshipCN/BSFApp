@@ -274,12 +274,13 @@ const BibleBookText = {
 function getI18nText(origText) {
   const lang = getCurrentUser().getLanguage();
   //console.log("[I18n]" + lang + "{" + origText + "}");
-  if (lang == Models.DefaultLanguage) {
+  const UILanguage = 'chs';
+  if (lang == UILanguage) {
     return origText;
   }
 
-  for (var i in text[Models.DefaultLanguage]) {
-    if (text[Models.DefaultLanguage][i] == origText) {
+  for (var i in text[UILanguage]) {
+    if (text[UILanguage][i] == origText) {
       return text[lang][i] ? text[lang][i] : origText;
     }
   }

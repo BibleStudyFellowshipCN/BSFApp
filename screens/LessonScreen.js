@@ -231,7 +231,6 @@ const QuestionText = (props) => (
 
 let lastBibleQuote = '';
 const BibleQuote = (props) => {
-  console.log(lastBibleQuote + "==" + props.book);
   const repeat = lastBibleQuote === props.book ? true : false;
   lastBibleQuote = props.book;
   return (

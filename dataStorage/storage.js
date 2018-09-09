@@ -109,7 +109,6 @@ async function getCacheData(name, key) {
         }
     }
 
-    console.log("No cache hit for " + name + ':' + key);
     return null;
 }
 
@@ -132,7 +131,14 @@ async function getFromCache(key, keyString) {
 
     // Load from passage cache
     if (key == Models.Passage.key) {
-        const data = await getCacheData(getCurrentUser().getBibleVersion(), keyString);
+        const index = keyString.indexOf('?bibleVersion=');
+        if (index !== -1) {
+            version = keyString.substring(index + '?bibleVersion='.length);
+        } else {
+            version = getCurrentUser().getBibleVersion();
+        }
+
+        const data = await getCacheData(version, keyString);
         if (data) {
             return data;
         }
@@ -181,8 +187,6 @@ async function loadAsync(model, id, update) {
         throw "key is not defined";
     }
 
-    console.log("start load " + JSON.stringify({ model, id }));
-
     if (model.useLanguage) {
         if (id.indexOf('?') == -1) {
             id = id + '?lang=' + getLanguage();
@@ -197,6 +201,7 @@ async function loadAsync(model, id, update) {
     if (model.restUri) {
         let data = await getFromCache(model.key, keyString);
         if (data) {
+            console.log(`loadAsync(${id}) [cache]`);
             return data;
         }
     }
@@ -209,15 +214,14 @@ async function loadAsync(model, id, update) {
         if (model.cachePolicy == CachePolicy.AsyncStorage) {
             saveToOffilneStorageAsync(data, model.key, id);
         }
-        console.log("finish load " + JSON.stringify({ model, id }));
+        console.log(`loadAsync(${id}) [network]`);
     }
     else {
-        console.log("failed to load" + JSON.stringify({ model, id }));
-
         // then try to load from cache
         if (model.cachePolicy == CachePolicy.AsyncStorage) {
             data = await loadFromOffilneStorageAsync(model.key, id);
         }
+        console.log(`loadAsync(${id}) [local]`);
     }
 
     return data;
@@ -241,7 +245,7 @@ async function loadFromCloudAsync(model, id, silentLoad) {
         // The model deosn't support online fetch
         return null;
     }
-    console.log("load from cloud: " + JSON.stringify({ model, id, silentLoad, deviceInfo: global.deviceInfo }));
+    //console.log("load from cloud: " + JSON.stringify({ model, id, silentLoad, deviceInfo: global.deviceInfo }));
     const url = !!id ? (model.restUri + '/' + id) : model.restUri;
     let responseJson;
     try {
@@ -268,7 +272,7 @@ async function loadFromCloudAsync(model, id, silentLoad) {
             return null;
         }
 
-        console.log(url + " => " + JSON.stringify(responseJson));
+        console.log(url);
     } catch (err) {
         console.log(err);
         if (!silentLoad) {

@@ -52,6 +52,7 @@ export default class User {
   offlineMode = false;
   language = Models.DefaultLanguage;
   bibleVersion = Models.DefaultBibleVersion;
+  bibleVersion2 = Models.DefaultBibleVersion2;
   audioBook = 1 * 1000 + 1;
   fontSize = Models.DefaultFontSize;
   permissions = {};
@@ -65,6 +66,9 @@ export default class User {
       }
       if (Models.ValidBibleVersionsLanguages.indexOf(existingUser.bibleVersion) != -1) {
         this.bibleVersion = existingUser.bibleVersion;
+      }
+      if (Models.ValidBibleVersionsLanguages.indexOf(existingUser.bibleVersion2) != -1) {
+        this.bibleVersion2 = existingUser.bibleVersion2;
       }
       if (existingUser.offlineMode) {
         this.offlineMode = true;
@@ -238,6 +242,22 @@ export default class User {
     this.logUserInfo();
   }
 
+  getBibleVersion2() {
+    if (!this.isLoggedOn()) {
+      return Models.DefaultBibleVersion2;
+    }
+    return this.bibleVersion2;
+  }
+
+  async setBibleVersion2Async(version) {
+    if (!this.isLoggedOn()) {
+      return;
+    }
+    this.bibleVersion2 = version;
+    await saveUserAsync(this.getUserInfo());
+    this.logUserInfo();
+  }
+
   getBibleVersionDisplayName() {
     const verion = this.getBibleVersion();
     for (var i in Models.BibleVersions) {
@@ -323,7 +343,8 @@ export default class User {
       bibleVersion: this.bibleVersion,
       offlineMode: this.offlineMode,
       audioBook: this.audioBook,
-      fontSize: this.fontSize
+      fontSize: this.fontSize,
+      bibleVersion2: this.bibleVersion2
     };
   }
 
