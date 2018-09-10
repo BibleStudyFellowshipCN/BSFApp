@@ -55,7 +55,6 @@ async function reloadGlobalCache(name) {
         global_cache[name] = JSON.parse(data);
     } catch (e) {
         global_cache[name] = [];
-        console.log(e);
     }
 }
 
@@ -206,6 +205,15 @@ async function loadAsync(model, id, update) {
         }
     }
 
+    // try to load from local first
+    if (model.cachePolicy == CachePolicy.AsyncStorage) {
+        data = await loadFromOffilneStorageAsync(model.key, id);
+        if (data) {
+            console.log(`loadAsync(${id}) [local]`);
+            return data;
+        }
+    }
+
     // load from network first
     let data = await loadFromCloudAsync(model, id, /*silentLoad*/ true);
 
@@ -215,13 +223,6 @@ async function loadAsync(model, id, update) {
             saveToOffilneStorageAsync(data, model.key, id);
         }
         console.log(`loadAsync(${id}) [network]`);
-    }
-    else {
-        // then try to load from cache
-        if (model.cachePolicy == CachePolicy.AsyncStorage) {
-            data = await loadFromOffilneStorageAsync(model.key, id);
-        }
-        console.log(`loadAsync(${id}) [local]`);
     }
 
     return data;
@@ -392,45 +393,6 @@ async function showWebServiceCallErrorsAsync(result, acceptStatus, showUI = true
 
 async function getPassageAsync(version, passage) {
     let result = [];
-    let bible = null;
-    switch (version) {
-        case 'cunpss':
-        case 'rcuvss':
-            bible = require('../assets/bible/cunpss.json');
-            break;
-        case 'cunpts':
-        case 'rcuvts':
-            bible = require('../assets/bible/cunpts.json');
-            break;
-        case 'niv2011':
-            bible = require('../assets/bible/niv2011.json');
-            break;
-        case 'niv1984':
-            bible = require('../assets/bible/niv1984.json');
-            break;
-        case 'ccb':
-            bible = require('../assets/bible/ccb.json');
-            break;
-        case 'cnvt':
-            bible = require('../assets/bible/cnvt.json');
-            break;
-        case 'esv':
-            bible = require('../assets/bible/esv.json');
-            break;
-        case 'kjv':
-            bible = require('../assets/bible/kjv.json');
-            break;
-        case 'nvi':
-            bible = require('../assets/bible/nvi.json');
-            break;
-        case 'rvr1995':
-            bible = require('../assets/bible/rvr1995.json');
-            break;
-    }
-
-    if (!bible) {
-        return result;
-    }
 
     // parse book "<book>/..."
     const index = passage.indexOf('/');
@@ -439,57 +401,75 @@ async function getPassageAsync(version, passage) {
     }
     const book = parseInt(passage.substring(0, index));
 
+    let bible = {};
+    const content = await loadAsync(Models.Passage, `${passage}?bibleVersion=${version}`, true);
+    if (!content || !content.paragraphs) {
+        return result
+    }
+
+    for (let i in content.paragraphs) {
+        const paragraph = content.paragraphs[i];
+        for (let j in paragraph.verses) {
+            const verse = paragraph.verses[j];
+            const strs = verse.verse.split(':');
+            const id = book * 1000000 + parseInt(strs[0]) * 1000 + parseInt(strs[1]);
+            bible[id] = verse.text;
+        }
+    }
+
+    if (!bible) {
+        return result;
+    }
+
     const strs = passage.substring(index + 1).split(/(:|-)/g);
     if (strs.length === 1) {
         // parse chapter: 1
-        const chapter = parseInt(strs[0]);
-        for (let i = 1; i < 999; i++) {
-            if (!bible[book * 1000000 + chapter * 1000 + i]) break;
-            result.push({ verse: `${chapter}:${i}`, text: bible[book * 1000000 + chapter * 1000 + i] });
-        }
+        chapterFrom = parseInt(strs[0]);
+        verseFrom = 1;
+        chapterTo = chapterFrom;
+        verseTo = 999;
     } else if (strs.length === 3 && strs[1] === '-') {
         // parse chapter: 1-2
-        const chapterFrom = parseInt(strs[0]);
-        const chapterTo = parseInt(strs[2]);
-        for (let chapter = chapterFrom; chapter <= chapterTo; chapter++) {
-            for (let i = 1; i < 999; i++) {
-                if (!bible[book * 1000000 + chapter * 1000 + i]) break;
-                result.push({ verse: `${chapter}:${i}`, text: bible[book * 1000000 + chapter * 1000 + i] });
-            }
-        }
+        chapterFrom = parseInt(strs[0]);
+        verseFrom = 1;
+        chapterTo = parseInt(strs[2]);
+        verseTo = 999;
     } else if (strs.length === 3 && strs[1] === ':') {
         // parse chapter: 1:33
-        const chapter = parseInt(strs[0]);
-        const verse = parseInt(strs[2]);
-        result.push({ verse: `${chapter}:${verse}`, text: bible[book * 1000000 + chapter * 1000 + verse] });
+        chapterFrom = parseInt(strs[0]);
+        verseFrom = parseInt(strs[2]);
+        chapterTo = chapterFrom;
+        verseTo = chapterTo;
     } else if (strs.length === 5 && strs[1] === ':' && strs[3] === '-') {
         // parse chapter: 1:1-3
-        const chapter = parseInt(strs[0]);
-        const verseFrom = parseInt(strs[2]);
-        const verseTo = parseInt(strs[4]);
-        for (let i = verseFrom; i <= verseTo; i++) {
-            if (!bible[book * 1000000 + chapter * 1000 + i]) break;
-            result.push({ verse: `${chapter}:${i}`, text: bible[book * 1000000 + chapter * 1000 + i] });
-        }
+        chapterFrom = parseInt(strs[0]);
+        verseFrom = parseInt(strs[2]);
+        chapterTo = chapterFrom;
+        verseTo = parseInt(strs[4]);
     } else if (strs.length === 7 && strs[1] === ':' && strs[3] === '-' && strs[5] === ':') {
         // parse chapter: 1:1-2:10
-        const chapterFrom = parseInt(strs[0]);
-        const verseFrom = parseInt(strs[2]);
-        const chapterTo = parseInt(strs[4]);
-        const verseTo = parseInt(strs[6]);
-        let chapter = chapterFrom;
-        let verse = verseFrom;
-        while (chapter * 1000 + verse <= chapterTo * 1000 + verseTo) {
-            if (!bible[book * 1000000 + chapter * 1000 + verse]) {
-                chapter++;
-                verse = 1;
-            } else {
-                result.push({ verse: `${chapter}:${verse}`, text: bible[book * 1000000 + chapter * 1000 + verse] });
-                verse++;
-            }
-        }
+        chapterFrom = parseInt(strs[0]);
+        verseFrom = parseInt(strs[2]);
+        chapterTo = parseInt(strs[4]);
+        verseTo = parseInt(strs[6]);
     } else {
         alert('Error format: ' + passage);
+        return result;
+    }
+
+    let chapter = chapterFrom;
+    let verse = verseFrom;
+    while (chapter * 1000 + verse <= chapterTo * 1000 + verseTo) {
+        const id = book * 1000000 + chapter * 1000 + verse;
+        const text = bible[id] ? bible[id] : '';
+        // Chinese bible has some empty verse
+        if (!bible[id] && !bible[id + 1]) {
+            chapter++;
+            verse = 1;
+        } else {
+            result.push({ verse: `${chapter}:${verse}`, text });
+            verse++;
+        }
     }
 
     return result;

@@ -268,6 +268,16 @@ export default class User {
     return null;
   }
 
+  getBibleVersion2DisplayName() {
+    const verion = this.getBibleVersion2();
+    for (var i in Models.BibleVersions) {
+      if (verion == Models.BibleVersions[i].Value) {
+        return Models.BibleVersions[i].DisplayName;
+      }
+    }
+    return null;
+  }
+
   async logoutAsync() {
     if (this.loggedOn) {
       this.loggedOn = false;

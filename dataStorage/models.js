@@ -93,5 +93,20 @@ export const Models = {
     'cht',
     'spa',
     'version'
+  ],
+  DownloadBibleUrl: "http://mycbsf.org/bible/",
+  EmbedBibleList: [
+  ],
+  DownloadBibleList: [
+    'rcuvss',
+    'rcuvts',
+    'niv2011',
+    'esv',
+    'nvi',
+    'niv1984',
+    'cnvt',
+    'kjv',
+    'ccb',
+    'rvr1995'
   ]
 }

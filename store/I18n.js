@@ -64,6 +64,9 @@ const text = {
     "没有答案",
     "答案管理",
     "确认",
+    "清空下载文件",
+    "完成",
+    "下载圣经",
   ],
   cht: [
     "BSF課程",
@@ -127,6 +130,9 @@ const text = {
     "沒有答案",
     "答案管理",
     "確認",
+    "清空下載文件",
+    "完成",
+    "下載聖經",
   ],
   eng: [
     "BSF Lessons",
@@ -190,6 +196,9 @@ const text = {
     "No answers",
     "Answer management",
     "Confirm",
+    "Remove downloaded files",
+    "Done",
+    "Downloading bible",
   ],
   spa: [
     "BSF Lecciones",
@@ -253,6 +262,9 @@ const text = {
     "Sin respuestas",
     "Administración de respuestas",
     "Confirmar",
+    "Eliminar archivos descargados",
+    "Hecho",
+    "Descarga de la Biblia",
   ]
 };
 
