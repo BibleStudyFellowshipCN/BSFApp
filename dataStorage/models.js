@@ -92,16 +92,6 @@ export const Models = {
     'chs',
     'cht',
     'spa',
-    'niv2011',
-    'rcuvss',
-    'rcuvts',
-    'esv',
-    'rvr1995',
-    'ccb',
-    'cnvt',
-    'kjv',
-    'niv1984',
-    'nvi',
     'version'
   ]
 }

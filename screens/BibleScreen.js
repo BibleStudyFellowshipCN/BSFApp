@@ -127,7 +127,7 @@ function onBibleVerse2() { }
   render() {
     if (this.props.passage) {
       const fontSize = getCurrentUser().getBibleFontSize();
-      const paragraphs = this.props.passage.paragraphs;
+      const verses = this.props.passage;
 
       // Using text (some Android device cannot show CJK in WebView)
       const bible = getCurrentUser().getBibleVersion();
@@ -136,11 +136,9 @@ function onBibleVerse2() { }
         (bible == 'rcuvss' || bible == 'ccb' || bible == 'rcuvts' || bible == 'cnvt' ||
           bible2 == 'rcuvss' || bible2 == 'ccb' || bible2 == 'rcuvts' || bible2 == 'cnvt')) {
         let line = '';
-        for (var i in paragraphs) {
-          for (var j in paragraphs[i].verses) {
-            const verse = paragraphs[i].verses[j];
-            line += verse.verse + " " + verse.text + "\n";
-          }
+        for (var i in verses) {
+          const verse = verses[i];
+          line += verse.verse + " " + verse.text + "\n";
         }
 
         return (
@@ -157,11 +155,9 @@ function onBibleVerse2() { }
       // Using html
       let html = '<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0" /></head>' +
         '<style> td { font-size: ' + fontSize + '; padding: 4px;} tr:nth-child(even) { background: #EEEEEE }</style><body><table>';
-      for (var i in paragraphs) {
-        for (var j in paragraphs[i].verses) {
-          const verse = paragraphs[i].verses[j];
-          html += `<tr><td>${verse.verse} ${verse.text}</td></tr>`;
-        }
+      for (var i in verses) {
+        const verse = verses[i];
+        html += `<tr><td>${verse.verse} ${verse.text}</td></tr>`;
       }
       html += '</table></body>';
       console.log(html);

@@ -390,4 +390,111 @@ async function showWebServiceCallErrorsAsync(result, acceptStatus, showUI = true
     return true;
 }
 
-export { loadAsync, saveAsync, clearStorageAsync, callWebServiceAsync, showWebServiceCallErrorsAsync, pokeServer, resetGlobalCache, reloadGlobalCache, loadFromCacheAsync };
+async function getPassageAsync(version, passage) {
+    let result = [];
+    let bible = null;
+    switch (version) {
+        case 'cunpss':
+        case 'rcuvss':
+            bible = require('../assets/bible/cunpss.json');
+            break;
+        case 'cunpts':
+        case 'rcuvts':
+            bible = require('../assets/bible/cunpts.json');
+            break;
+        case 'niv2011':
+            bible = require('../assets/bible/niv2011.json');
+            break;
+        case 'niv1984':
+            bible = require('../assets/bible/niv1984.json');
+            break;
+        case 'ccb':
+            bible = require('../assets/bible/ccb.json');
+            break;
+        case 'cnvt':
+            bible = require('../assets/bible/cnvt.json');
+            break;
+        case 'esv':
+            bible = require('../assets/bible/esv.json');
+            break;
+        case 'kjv':
+            bible = require('../assets/bible/kjv.json');
+            break;
+        case 'nvi':
+            bible = require('../assets/bible/nvi.json');
+            break;
+        case 'rvr1995':
+            bible = require('../assets/bible/rvr1995.json');
+            break;
+    }
+
+    if (!bible) {
+        return result;
+    }
+
+    // parse book "<book>/..."
+    const index = passage.indexOf('/');
+    if (index === -1) {
+        return result;
+    }
+    const book = parseInt(passage.substring(0, index));
+
+    const strs = passage.substring(index + 1).split(/(:|-)/g);
+    if (strs.length === 1) {
+        // parse chapter: 1
+        const chapter = parseInt(strs[0]);
+        for (let i = 1; i < 999; i++) {
+            if (!bible[book * 1000000 + chapter * 1000 + i]) break;
+            result.push({ verse: `${chapter}:${i}`, text: bible[book * 1000000 + chapter * 1000 + i] });
+        }
+    } else if (strs.length === 3 && strs[1] === '-') {
+        // parse chapter: 1-2
+        const chapterFrom = parseInt(strs[0]);
+        const chapterTo = parseInt(strs[2]);
+        for (let chapter = chapterFrom; chapter <= chapterTo; chapter++) {
+            for (let i = 1; i < 999; i++) {
+                if (!bible[book * 1000000 + chapter * 1000 + i]) break;
+                result.push({ verse: `${chapter}:${i}`, text: bible[book * 1000000 + chapter * 1000 + i] });
+            }
+        }
+    } else if (strs.length === 3 && strs[1] === ':') {
+        // parse chapter: 1:33
+        const chapter = parseInt(strs[0]);
+        const verse = parseInt(strs[2]);
+        result.push({ verse: `${chapter}:${verse}`, text: bible[book * 1000000 + chapter * 1000 + verse] });
+    } else if (strs.length === 5 && strs[1] === ':' && strs[3] === '-') {
+        // parse chapter: 1:1-3
+        const chapter = parseInt(strs[0]);
+        const verseFrom = parseInt(strs[2]);
+        const verseTo = parseInt(strs[4]);
+        for (let i = verseFrom; i <= verseTo; i++) {
+            if (!bible[book * 1000000 + chapter * 1000 + i]) break;
+            result.push({ verse: `${chapter}:${i}`, text: bible[book * 1000000 + chapter * 1000 + i] });
+        }
+    } else if (strs.length === 7 && strs[1] === ':' && strs[3] === '-' && strs[5] === ':') {
+        // parse chapter: 1:1-2:10
+        const chapterFrom = parseInt(strs[0]);
+        const verseFrom = parseInt(strs[2]);
+        const chapterTo = parseInt(strs[4]);
+        const verseTo = parseInt(strs[6]);
+        let chapter = chapterFrom;
+        let verse = verseFrom;
+        while (chapter * 1000 + verse <= chapterTo * 1000 + verseTo) {
+            if (!bible[book * 1000000 + chapter * 1000 + verse]) {
+                chapter++;
+                verse = 1;
+            } else {
+                result.push({ verse: `${chapter}:${verse}`, text: bible[book * 1000000 + chapter * 1000 + verse] });
+                verse++;
+            }
+        }
+    } else {
+        alert('Error format: ' + passage);
+    }
+
+    return result;
+}
+
+export {
+    loadAsync, saveAsync, clearStorageAsync, callWebServiceAsync, showWebServiceCallErrorsAsync, pokeServer, resetGlobalCache, reloadGlobalCache, loadFromCacheAsync, getPassageAsync
+};

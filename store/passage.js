@@ -1,5 +1,5 @@
 import { Models } from '../dataStorage/models';
-import { loadAsync } from '../dataStorage/storage';
+import { getPassageAsync } from '../dataStorage/storage';
 import { getCurrentUser } from '../store/user';
 
 // ------------------------------------
@@ -18,21 +18,21 @@ export function loadPassage(passageId) {
       // we use the await syntax.
       const state = getState();
       if (!state.passages[passageId]) {
-        const passage = await loadAsync(Models.Passage, passageId + "?bibleVersion=" + getCurrentUser().getBibleVersion(), true);
+        const passage = await getPassageAsync(getCurrentUser().getBibleVersion(), passageId);
 
         let parsedPassage = JSON.parse(JSON.stringify(passage));
         const version = getCurrentUser().getBibleVersion2();
         if (version) {
           let verses = [];
-          const passage2 = await loadAsync(Models.Passage, passageId + "?bibleVersion=" + version, true);
+          const passage2 = await getPassageAsync(getCurrentUser().getBibleVersion2(), passageId);
           if (passage2) {
             // merge
-            const length = passage2.paragraphs[0].verses.length;
+            const length = passage2.length;
             for (let i = 0; i < length; i++) {
-              verses.push(passage.paragraphs[0].verses[i]);
-              verses.push(passage2.paragraphs[0].verses[i]);
+              verses.push(passage[i]);
+              verses.push(passage2[i]);
             }
-            parsedPassage.paragraphs[0].verses = verses;
+            parsedPassage = verses;
           }
         }
 
