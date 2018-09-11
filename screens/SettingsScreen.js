@@ -253,7 +253,7 @@ import { LegacyAsyncStorage } from 'expo';
           await Expo.FileSystem.deleteAsync(fileUri, { idempotent: true });
         }
       }
-      alert(getI18nText('完成'));
+      Alert.alert(getI18nText('完成'));
     } catch (e) {
       alert(JSON.stringify(e));
     }

@@ -66,6 +66,7 @@ const text = {
     "确认",
     "清空下载文件",
     "完成",
+    "正在下载圣经",
     "下载圣经",
   ],
   cht: [
@@ -132,6 +133,7 @@ const text = {
     "確認",
     "清空下載文件",
     "完成",
+    "正在下載聖經",
     "下載聖經",
   ],
   eng: [
@@ -199,6 +201,7 @@ const text = {
     "Remove downloaded files",
     "Done",
     "Downloading bible",
+    "Download bible",
   ],
   spa: [
     "BSF Lecciones",
@@ -265,6 +268,7 @@ const text = {
     "Eliminar archivos descargados",
     "Hecho",
     "Descarga de la Biblia",
+    "Descargar Biblia",
   ]
 };
 

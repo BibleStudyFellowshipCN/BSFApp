@@ -251,7 +251,7 @@ function onBibleVerse2() { }
     }
 
     const progress = this.state.downloadProgress;
-    const progressText = getI18nText('下载圣经') + ' (' + parseInt(progress * 100) + '%)';
+    const progressText = getI18nText('正在下载圣经') + ' (' + parseInt(progress * 100) + '%)';
     return (
       <View style={{ flex: 1 }}>
         {
