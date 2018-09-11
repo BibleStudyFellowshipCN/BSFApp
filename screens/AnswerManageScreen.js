@@ -67,7 +67,7 @@ class AnswerManageScreen extends React.Component {
               this.props.updateAnswer(item.id, item.value);
             }
 
-            Alert.alert(getI18nText('导出成功'));
+            Alert.alert(getI18nText('导入成功'));
           }
         },
         { text: 'Cancel', onPress: () => { } },

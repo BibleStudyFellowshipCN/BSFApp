@@ -301,6 +301,13 @@ import { LegacyAsyncStorage } from 'expo';
                 titleInfoStyle={{ fontSize }}
                 onPress={this.onAnswerManage.bind(this)}
               />
+              {/*<SettingsList.Item
+                title={getI18nText('清空下载文件')}
+                hasNavArrow={true}
+                titleStyle={{ fontSize }}
+                titleInfoStyle={{ fontSize }}
+                onPress={this.onClearDownloadFiles.bind(this)}
+              />*/}
               <SettingsList.Header headerText='MBSF - Mobile Bible Study Fellowship' headerStyle={{ color: 'black', marginTop: 15 }} />
               <SettingsList.Item
                 title={getI18nText('版本') + ': ' + manifest.version}
