@@ -29,8 +29,10 @@ export function loadPassage(passageId) {
             // merge
             const length = passage2.paragraphs[0].verses.length;
             for (let i = 0; i < length; i++) {
-              verses.push(passage.paragraphs[0].verses[i]);
-              verses.push(passage2.paragraphs[0].verses[i]);
+              let verse = passage.paragraphs[0].verses[i];
+              if (verse) verses.push(verse);
+              verse = passage2.paragraphs[0].verses[i];
+              if (verse) verses.push(verse);
             }
             parsedPassage.paragraphs[0].verses = verses;
           }
