@@ -1,7 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux'
 import { ScrollView, StyleSheet, View, Alert, KeyboardAvoidingView, Platform, AsyncStorage, Linking } from 'react-native';
-import Expo, { Constants } from 'expo';
+import Expo, { FileSystem, Constants } from 'expo';
 import { Models } from '../dataStorage/models';
 import { callWebServiceAsync, showWebServiceCallErrorsAsync } from '../dataStorage/storage';
 import { getCurrentUser } from '../store/user';
@@ -49,12 +49,16 @@ import { LegacyAsyncStorage } from 'expo';
   async updateBibleVersionBasedOnLanguage(language) {
     if (language == 'eng') {
       await this.onBibleVerseChange('niv2011');
+      await getCurrentUser().setBibleVersion2Async(null);
     } else if (language == 'cht') {
       await this.onBibleVerseChange('rcuvts');
+      await getCurrentUser().setBibleVersion2Async('niv2011');
     } else if (language == 'spa') {
       await this.onBibleVerseChange('nvi');
+      await getCurrentUser().setBibleVersion2Async('niv2011');
     } else {
       await this.onBibleVerseChange('rcuvss');
+      await getCurrentUser().setBibleVersion2Async('niv2011');
     }
     getCurrentUser().logUserInfo();
   }
@@ -233,6 +237,28 @@ import { LegacyAsyncStorage } from 'expo';
     this.props.navigation.navigate('AnswerManage');
   }
 
+  async onClearDownloadFiles() {
+    try {
+      let freeSize = 0;
+      const files = await Expo.FileSystem.readDirectoryAsync(FileSystem.documentDirectory);
+      for (let i in files) {
+        const file = files[i];
+        if (Models.DownloadList.indexOf(file) === -1) {
+          const fileUri = FileSystem.documentDirectory + file;
+          console.log(fileUri);
+          const info = await Expo.FileSystem.getInfoAsync(fileUri);
+          console.log(JSON.stringify(info));
+          freeSize += info.size;
+          console.log(freeSize);
+          await Expo.FileSystem.deleteAsync(fileUri, { idempotent: true });
+        }
+      }
+      Alert.alert(getI18nText('完成'));
+    } catch (e) {
+      alert(JSON.stringify(e));
+    }
+  }
+
   render() {
     const { manifest } = Constants;
     phone = getCurrentUser().getCellphone();
@@ -300,6 +326,13 @@ import { LegacyAsyncStorage } from 'expo';
                 titleStyle={{ fontSize }}
                 titleInfoStyle={{ fontSize }}
                 onPress={this.onAnswerManage.bind(this)}
+              />
+              <SettingsList.Item
+                title={getI18nText('清空下载文件')}
+                hasNavArrow={true}
+                titleStyle={{ fontSize }}
+                titleInfoStyle={{ fontSize }}
+                onPress={this.onClearDownloadFiles.bind(this)}
               />
               <SettingsList.Header headerText='MBSF - Mobile Bible Study Fellowship' headerStyle={{ color: 'black', marginTop: 15 }} />
               <SettingsList.Item
