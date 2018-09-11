@@ -59,6 +59,7 @@ async function reloadGlobalCache(name) {
 }
 
 async function getCacheData(name, key) {
+    console.log(`getCacheData(${name}, ${key})`);
     // We break in one version for spa, we will not read from cache
     if (name === 'books' && key === 'spa') {
         return null;
@@ -379,85 +380,111 @@ async function showWebServiceCallErrorsAsync(result, acceptStatus, showUI = true
     return true;
 }
 
+let global_bible_cache = [];
+
 async function getPassageAsync(version, passage) {
     let result = [];
 
-    // parse book "<book>/..."
-    const index = passage.indexOf('/');
-    if (index === -1) {
-        return result;
-    }
-    const book = parseInt(passage.substring(0, index));
-
-    let bible = {};
-    const content = await loadAsync(Models.Passage, `${passage}?bibleVersion=${version}`, true);
-    if (!content || !content.paragraphs) {
-        return result
-    }
-
-    for (let i in content.paragraphs) {
-        const paragraph = content.paragraphs[i];
-        for (let j in paragraph.verses) {
-            const verse = paragraph.verses[j];
-            const strs = verse.verse.split(':');
-            const id = book * 1000000 + parseInt(strs[0]) * 1000 + parseInt(strs[1]);
-            bible[id] = verse.text;
+    try {
+        // parse book "<book>/..."
+        const index = passage.indexOf('/');
+        if (index === -1) {
+            alert('wrong passage format');
+            return result;
         }
-    }
+        const book = parseInt(passage.substring(0, index));
 
-    if (!bible) {
-        return result;
-    }
+        let bible = {};
 
-    const strs = passage.substring(index + 1).split(/(:|-)/g);
-    if (strs.length === 1) {
-        // parse chapter: 1
-        chapterFrom = parseInt(strs[0]);
-        verseFrom = 1;
-        chapterTo = chapterFrom;
-        verseTo = 999;
-    } else if (strs.length === 3 && strs[1] === '-') {
-        // parse chapter: 1-2
-        chapterFrom = parseInt(strs[0]);
-        verseFrom = 1;
-        chapterTo = parseInt(strs[2]);
-        verseTo = 999;
-    } else if (strs.length === 3 && strs[1] === ':') {
-        // parse chapter: 1:33
-        chapterFrom = parseInt(strs[0]);
-        verseFrom = parseInt(strs[2]);
-        chapterTo = chapterFrom;
-        verseTo = chapterTo;
-    } else if (strs.length === 5 && strs[1] === ':' && strs[3] === '-') {
-        // parse chapter: 1:1-3
-        chapterFrom = parseInt(strs[0]);
-        verseFrom = parseInt(strs[2]);
-        chapterTo = chapterFrom;
-        verseTo = parseInt(strs[4]);
-    } else if (strs.length === 7 && strs[1] === ':' && strs[3] === '-' && strs[5] === ':') {
-        // parse chapter: 1:1-2:10
-        chapterFrom = parseInt(strs[0]);
-        verseFrom = parseInt(strs[2]);
-        chapterTo = parseInt(strs[4]);
-        verseTo = parseInt(strs[6]);
-    } else {
-        alert('Error format: ' + passage);
-        return result;
-    }
-
-    let chapter = chapterFrom;
-    let verse = verseFrom;
-    while (chapter * 1000 + verse <= chapterTo * 1000 + verseTo) {
-        const id = book * 1000000 + chapter * 1000 + verse;
-        const text = bible[id] ? bible[id] : '';
-        // Chinese bible has some empty verse
-        if (!bible[id] && !bible[id + 1]) {
-            chapter++;
-            verse = 1;
+        if (global_bible_cache[version]) {
+            console.log('Load bible from global_bible_cache[]');
+            bible = global_bible_cache[version];
         } else {
-            result.push({ verse: `${chapter}:${verse}`, text });
-            verse++;
+            const localUri = FileSystem.documentDirectory + 'book-' + version + '.json';
+            var info = await FileSystem.getInfoAsync(localUri);
+            if (info && info.exists) {
+                const content = await FileSystem.readAsStringAsync(localUri);
+                bible = JSON.parse(content);
+                console.log('Load bible from ' + localUri + ' ' + content.length);
+                global_bible_cache[version] = bible;
+            } else {
+                // Get from network/cache
+                const content = await loadAsync(Models.Passage, `${passage}?bibleVersion=${version}`, true);
+                if (!content || !content.paragraphs) {
+                    alert('wrong bible content');
+                    return result
+                }
+
+                for (let i in content.paragraphs) {
+                    const paragraph = content.paragraphs[i];
+                    for (let j in paragraph.verses) {
+                        const verse = paragraph.verses[j];
+                        const strs = verse.verse.split(':');
+                        const id = book * 1000000 + parseInt(strs[0]) * 1000 + parseInt(strs[1]);
+                        bible[id] = verse.text;
+                    }
+                }
+            }
         }
+
+        if (!bible) {
+            alert('no bible content');
+            return result;
+        }
+
+        const strs = passage.substring(index + 1).split(/(:|-)/g);
+        if (strs.length === 1) {
+            // parse chapter: 1
+            chapterFrom = parseInt(strs[0]);
+            verseFrom = 1;
+            chapterTo = chapterFrom;
+            verseTo = 999;
+        } else if (strs.length === 3 && strs[1] === '-') {
+            // parse chapter: 1-2
+            chapterFrom = parseInt(strs[0]);
+            verseFrom = 1;
+            chapterTo = parseInt(strs[2]);
+            verseTo = 999;
+        } else if (strs.length === 3 && strs[1] === ':') {
+            // parse chapter: 1:33
+            chapterFrom = parseInt(strs[0]);
+            verseFrom = parseInt(strs[2]);
+            chapterTo = chapterFrom;
+            verseTo = verseFrom;
+        } else if (strs.length === 5 && strs[1] === ':' && strs[3] === '-') {
+            // parse chapter: 1:1-3
+            chapterFrom = parseInt(strs[0]);
+            verseFrom = parseInt(strs[2]);
+            chapterTo = chapterFrom;
+            verseTo = parseInt(strs[4]);
+        } else if (strs.length === 7 && strs[1] === ':' && strs[3] === '-' && strs[5] === ':') {
+            // parse chapter: 1:1-2:10
+            chapterFrom = parseInt(strs[0]);
+            verseFrom = parseInt(strs[2]);
+            chapterTo = parseInt(strs[4]);
+            verseTo = parseInt(strs[6]);
+        } else {
+            alert('Error format: ' + passage);
+            return result;
+        }
+
+        console.log(`getPassageAsync(${version}, ${passage}) => ${chapterFrom}:${verseFrom}-${chapterTo}:${verseTo}`);
+        let chapter = chapterFrom;
+        let verse = verseFrom;
+        while (chapter * 1000 + verse <= chapterTo * 1000 + verseTo) {
+            const id = book * 1000000 + chapter * 1000 + verse;
+            const text = bible[id] ? bible[id] : '';
+            // Chinese bible has some empty verse
+            if (!bible[id] && !bible[id + 1]) {
+                chapter++;
+                verse = 1;
+            } else {
+                result.push({ verse: `${chapter}:${verse}`, text });
+                verse++;
+            }
+        }
+    } catch (e) {
+        console.log(e);
     }
 
     return result;
