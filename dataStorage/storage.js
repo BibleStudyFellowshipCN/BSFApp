@@ -81,18 +81,6 @@ async function getCacheData(name, key) {
         case 'books':
             cache = require("../assets/json/books.json");
             break;
-        case 'chs':
-            cache = require("../assets/json/chs.json");
-            break;
-        case 'cht':
-            cache = require("../assets/json/cht.json");
-            break;
-        case 'eng':
-            cache = require("../assets/json/eng.json");
-            break;
-        case 'spa':
-            cache = require("../assets/json/spa.json");
-            break;
         case 'homeDiscussion':
             cache = require("../assets/json/homeDiscussion.json");
             break;

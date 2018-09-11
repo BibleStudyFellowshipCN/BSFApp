@@ -27,10 +27,10 @@ export function loadPassage(passageId) {
           const passage2 = await getPassageAsync(getCurrentUser().getBibleVersion2(), passageId);
           if (passage2) {
             // merge
-            const length = passage2.length;
+            const length = passage.length > passage2.length ? passage.length : passage2.length;
             for (let i = 0; i < length; i++) {
-              verses.push(passage[i]);
-              verses.push(passage2[i]);
+              if (passage[i]) verses.push(passage[i]);
+              if (passage2[i]) verses.push(passage2[i]);
             }
             parsedPassage = verses;
           }
