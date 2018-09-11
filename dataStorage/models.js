@@ -22,6 +22,7 @@ export const Models = {
     key: "PASSAGE",
     api: "/verse",
     restUri: HostServer + "/verse",
+    cachePolicy: CachePolicy.AsyncStorage,
   },
   Logon: {
     key: "LOGON",
@@ -86,22 +87,25 @@ export const Models = {
   DownloadUrl: "http://mycbsf.org/data/",
   DownloadList: [
     'books',
-    'homeDiscussion',
-    'homeTraining',
     'eng',
     'chs',
     'cht',
     'spa',
-    'niv2011',
+    'version'
+  ],
+  DownloadBibleUrl: "http://mycbsf.org/bible/",
+  EmbedBibleList: [
+  ],
+  DownloadBibleList: [
     'rcuvss',
     'rcuvts',
+    'niv2011',
     'esv',
-    'rvr1995',
-    'ccb',
+    'nvi',
+    'niv1984',
     'cnvt',
     'kjv',
-    'niv1984',
-    'nvi',
-    'version'
+    'ccb',
+    'rvr1995'
   ]
 }

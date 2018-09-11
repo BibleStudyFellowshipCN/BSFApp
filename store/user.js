@@ -268,6 +268,16 @@ export default class User {
     return null;
   }
 
+  getBibleVersion2DisplayName() {
+    const verion = this.getBibleVersion2();
+    for (var i in Models.BibleVersions) {
+      if (verion == Models.BibleVersions[i].Value) {
+        return Models.BibleVersions[i].DisplayName;
+      }
+    }
+    return null;
+  }
+
   async logoutAsync() {
     if (this.loggedOn) {
       this.loggedOn = false;
@@ -352,12 +362,13 @@ export default class User {
     try {
       const localUri = FileSystem.documentDirectory + 'version.json';
       const data = await FileSystem.readAsStringAsync(localUri);
-      const version = JSON.parse(data);
-      console.log('LocalVersion: ' + version.version);
+      version = JSON.parse(data);
+      console.log('Local downloaded version: ' + JSON.stringify(version));
       return version.version;
     } catch (e) {
-      console.log(e);
-      return '';
+      console.log('Local embeded version: ' + JSON.stringify(version));
+      let version = require('../assets/json/version.json');
+      return version.version;
     }
   }
 
