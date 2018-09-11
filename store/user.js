@@ -366,9 +366,8 @@ export default class User {
       console.log('Local downloaded version: ' + JSON.stringify(version));
       return version.version;
     } catch (e) {
-      console.log('Local embeded version: ' + JSON.stringify(version));
-      let version = require('../assets/json/version.json');
-      return version.version;
+      console.log(e);
+      return 0;
     }
   }
 
