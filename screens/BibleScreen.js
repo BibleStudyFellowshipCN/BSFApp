@@ -49,7 +49,8 @@ function onBibleVerse2() { }
     bibleExist: true,
     bibleExist2: true,
     downloading: false,
-    downloadProgress: 0
+    downloadProgress: 0,
+    downloadBible: ''
   }
 
   componentWillMount() {
@@ -159,7 +160,17 @@ function onBibleVerse2() { }
 
   async checkBibleExistAsync() {
     const bibleExist = await this.isBibleExistAsync(getCurrentUser().getBibleVersion());
+    if (!bibleExist) {
+      await this.setState({ downloadBible: getCurrentUser().getBibleVersionDisplayName() });
+      await this.downloadBible(getCurrentUser().getBibleVersion());
+    }
+
     const bibleExist2 = await this.isBibleExistAsync(getCurrentUser().getBibleVersion2());
+    if (!bibleExist2) {
+      await this.setState({ downloadBible: getCurrentUser().getBibleVersion2DisplayName() });
+      await this.downloadBible(getCurrentUser().getBibleVersion2());
+    }
+
     this.setState({ bibleExist, bibleExist2 });
   }
 
@@ -193,10 +204,8 @@ function onBibleVerse2() { }
       await Expo.FileSystem.moveAsync({ from: localUri, to: finalUri });
     } catch (e) {
       console.log(e);
-      alert(JSON.stringify(e));
     } finally {
       await this.setState({ downloading: false });
-      await this.checkBibleExistAsync();
     }
   }
 
@@ -251,7 +260,7 @@ function onBibleVerse2() { }
     }
 
     const progress = this.state.downloadProgress;
-    const progressText = getI18nText('正在下载圣经') + ' (' + parseInt(progress * 100) + '%)';
+    const progressText = getI18nText('正在下载圣经') + this.state.downloadBible + ' (' + parseInt(progress * 100) + '%)';
     return (
       <View style={{ flex: 1 }}>
         {
@@ -266,32 +275,6 @@ function onBibleVerse2() { }
           <View>
             <Text style={[styles.progress, { fontSize }]}>{progressText}</Text>
             <ProgressBarAndroid style={styles.progress} styleAttr="Horizontal" indeterminate={false} progress={progress} />
-          </View>
-        }
-        {
-          !this.state.downloading && !this.state.bibleExist &&
-          <View>
-            <TouchableOpacity onPress={() => {
-              this.downloadBible(getCurrentUser().getBibleVersion());
-            }}>
-              <View style={{ flexDirection: 'row', alignItems: 'center', marginLeft: 10 }}>
-                <Octicons name='cloud-download' size={28} color='#fcaf17' />
-                <Text style={[styles.progress, { fontSize }]}>{getI18nText('下载圣经')}: {getCurrentUser().getBibleVersionDisplayName()}</Text>
-              </View>
-            </TouchableOpacity>
-          </View>
-        }
-        {
-          !this.state.downloading && !this.state.bibleExist2 &&
-          <View>
-            <TouchableOpacity onPress={() => {
-              this.downloadBible(getCurrentUser().getBibleVersion2());
-            }}>
-              <View style={{ flexDirection: 'row', alignItems: 'center', marginLeft: 10 }}>
-                <Octicons name='cloud-download' size={28} color='#fcaf17' />
-                <Text style={[styles.progress, { fontSize }]}>{getI18nText('下载圣经')}: {getCurrentUser().getBibleVersion2DisplayName()}</Text>
-              </View>
-            </TouchableOpacity>
           </View>
         }
         {contentUI}

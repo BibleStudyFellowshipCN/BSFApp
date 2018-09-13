@@ -1,6 +1,6 @@
 import React from 'react';
 import { Platform, StatusBar, StyleSheet, View, Alert } from 'react-native';
-import Expo, { LegacyAsyncStorage, AppLoading } from 'expo';
+import Expo, { AppLoading } from 'expo';
 import RootNavigation from './navigation/RootNavigation';
 import createStore from './store/createStore'
 import { loadAsync, reloadGlobalCache } from './dataStorage/storage';
@@ -12,12 +12,14 @@ import { getI18nText } from './store/I18n';
 
 let store;
 
-Expo.Util.addNewVersionListenerExperimental(() => updateClient());
+Expo.Updates.addListener(updateClient);
 
-function updateClient() {
-  Alert.alert(getI18nText('发现更新'), getI18nText('程序将重新启动'), [
-    { text: 'OK', onPress: () => Expo.Util.reload() },
-  ]);
+function updateClient(event) {
+  if (event === EventType.DownloadFinished) {
+    Alert.alert(getI18nText('发现更新'), getI18nText('程序将重新启动'), [
+      { text: 'OK', onPress: () => Expo.Util.reload() },
+    ]);
+  }
 }
 
 export default class App extends React.Component {
@@ -74,14 +76,6 @@ export default class App extends React.Component {
   }
 
   _loadResourcesAsync = async () => {
-
-    // migrate data
-    try {
-      await LegacyAsyncStorage.migrateItems(['ANSWER']);
-    } catch (error) {
-      console.log(error);
-    }
-
     // initialize existing user
     try {
       await this.loadUserInfo();

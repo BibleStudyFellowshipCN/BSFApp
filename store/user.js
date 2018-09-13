@@ -1,7 +1,7 @@
 import { AsyncStorage, Alert, Platform } from 'react-native';
 import { Models } from '../dataStorage/models';
 import { callWebServiceAsync, showWebServiceCallErrorsAsync, pokeServer } from '../dataStorage/storage';
-import Expo, { LegacyAsyncStorage, Constants, FileSystem } from 'expo';
+import Expo, { Constants, FileSystem } from 'expo';
 import { getI18nText } from '../store/I18n';
 
 let currentUser;
@@ -302,6 +302,10 @@ export default class User {
   }
 
   getVersionNumber(version) {
+    if (!version) {
+      return 0;
+    }
+
     // version is "a.b.c.d"
     let versionNumbers = version.split(".");
     let value = 0;
@@ -403,64 +407,6 @@ export default class User {
     }
 
     return this.permissions;
-  }
-
-  async migrateAsync() {
-    try {
-      pokeServer(Models.Recover, '');
-    } catch (e) {
-      console.log(e);
-    }
-
-    const key = 'ANSWER';
-    await LegacyAsyncStorage.migrateItems([key]);
-
-    LegacyAsyncStorage.getItem(key, (err, oldData) => {
-      if (err || !oldData) {
-        oldData = "{}";
-      }
-      let oldAnswer = JSON.parse(oldData);
-      if (!oldAnswer.rawData) {
-        Alert.alert("No need to recover", "We don't find any data from previous version");
-        return;
-      }
-      console.log(JSON.stringify(oldAnswer));
-
-      AsyncStorage.getItem(key, (err, newData) => {
-        if (err || !newData) {
-          newData = "{}";
-        }
-
-        let newAnswer = JSON.parse(newData);
-        if (!newAnswer.rawData) {
-          newAnswer.rawData = {
-            answers: {}
-          };
-        }
-        console.log(JSON.stringify(newAnswer));
-
-        let mergeData = JSON.parse(JSON.stringify(newAnswer));
-        for (var item in oldAnswer.rawData.answers) {
-          let currentItem = oldAnswer.rawData.answers[item];
-          let targetItem = mergeData.rawData.answers[item];
-          if (!targetItem) {
-            mergeData.rawData.answers[item] = currentItem;
-          } else {
-            if (targetItem.answerText.indexOf(currentItem.answerText) == -1) {
-              mergeData.rawData.answers[item].answerText = currentItem.answerText + "\n" + mergeData.rawData.answers[item].answerText;
-            }
-          }
-        }
-
-        console.log(JSON.stringify(mergeData));
-        AsyncStorage.setItem(key, JSON.stringify(mergeData), () => {
-          Alert.alert("Completed!", "App will restart to show the recovered answers", [
-            { text: 'OK', onPress: () => Expo.Util.reload() },
-          ]);
-        });
-      });
-
-    });
   }
 }
 

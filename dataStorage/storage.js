@@ -411,7 +411,6 @@ async function getPassageAsync(version, passage) {
                 // Get from network/cache
                 const content = await loadAsync(Models.Passage, `${passage}?bibleVersion=${version}`, true);
                 if (!content || !content.paragraphs) {
-                    alert('wrong bible content');
                     return result
                 }
 

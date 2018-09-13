@@ -11,8 +11,7 @@ import { getI18nText } from '../store/I18n';
 import { clearLesson } from '../store/lessons.js'
 import { clearPassage } from '../store/passage.js'
 import { connectActionSheet } from '@expo/react-native-action-sheet';
-import { NavigationActions } from 'react-navigation'
-import { LegacyAsyncStorage } from 'expo';
+import { NavigationActions } from 'react-navigation';
 
 @connectActionSheet class SettingsScreen extends React.Component {
   static navigationOptions = ({ navigation }) => {
@@ -31,18 +30,6 @@ import { LegacyAsyncStorage } from 'expo';
   };
 
   componentWillMount() {
-    if (Platform.OS == 'ios') {
-      LegacyAsyncStorage.getItem('ANSWER', (err, oldData) => {
-        if (err || !oldData) {
-          oldData = "{}";
-        }
-        let oldAnswer = JSON.parse(oldData);
-        if (oldAnswer.rawData) {
-          this.setState({ showMigration: true });
-        }
-      });
-    }
-
     this.onCellphoneChanged();
   }
 
@@ -243,7 +230,8 @@ import { LegacyAsyncStorage } from 'expo';
       const files = await Expo.FileSystem.readDirectoryAsync(FileSystem.documentDirectory);
       for (let i in files) {
         const file = files[i];
-        if (Models.DownloadList.indexOf(file) === -1) {
+        console.log(file);
+        if (file.toLocaleLowerCase().endsWith('.json')) {
           const fileUri = FileSystem.documentDirectory + file;
           console.log(fileUri);
           const info = await Expo.FileSystem.getInfoAsync(fileUri);
