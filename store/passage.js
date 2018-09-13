@@ -14,33 +14,29 @@ export const CLEAR_PASSAGE = 'CLEAR_PASSAGE';
 export function loadPassage(passageId) {
   return async (dispatch, getState) => {
     try {
-      // Then make the http request for the class (a placeholder url below)
-      // we use the await syntax.
-      const state = getState();
-      if (!state.passages[passageId]) {
-        const passage = await getPassageAsync(getCurrentUser().getBibleVersion(), passageId);
+      console.log(`loadPassage:${passageId}`);
+      const passage = await getPassageAsync(getCurrentUser().getBibleVersion(), passageId);
 
-        let parsedPassage = JSON.parse(JSON.stringify(passage));
-        const version = getCurrentUser().getBibleVersion2();
-        if (version) {
-          let verses = [];
-          const passage2 = await getPassageAsync(getCurrentUser().getBibleVersion2(), passageId);
-          if (passage2) {
-            // merge
-            const length = passage.length > passage2.length ? passage.length : passage2.length;
-            for (let i = 0; i < length; i++) {
-              if (passage[i]) verses.push(passage[i]);
-              if (passage2[i]) verses.push(passage2[i]);
-            }
-            parsedPassage = verses;
+      let parsedPassage = JSON.parse(JSON.stringify(passage));
+      const version = getCurrentUser().getBibleVersion2();
+      if (version) {
+        let verses = [];
+        const passage2 = await getPassageAsync(getCurrentUser().getBibleVersion2(), passageId);
+        if (passage2) {
+          // merge
+          const length = passage.length > passage2.length ? passage.length : passage2.length;
+          for (let i = 0; i < length; i++) {
+            if (passage[i]) verses.push(passage[i]);
+            if (passage2[i]) verses.push(passage2[i]);
           }
+          parsedPassage = verses;
         }
-
-        dispatch({
-          type: RECEIVE_PASSAGE,
-          payload: { id: passageId, passage: parsedPassage }
-        });
       }
+
+      dispatch({
+        type: RECEIVE_PASSAGE,
+        payload: { id: passageId, passage: parsedPassage }
+      });
     } catch (error) {
       console.log(error);
       alert(error);
@@ -49,6 +45,7 @@ export function loadPassage(passageId) {
 }
 
 export function clearPassage() {
+  console.log('clearPassage');
   return async (dispatch, getState) => {
     try {
       dispatch({

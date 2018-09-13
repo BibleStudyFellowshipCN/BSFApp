@@ -98,6 +98,8 @@ class HomeScreen extends React.Component {
     this.downloadFiles = Models.DownloadList.length;
     this.downloadedFiles = 0;
     await this.setState({ downloadProgress: 0, downloading: true, remoteVersion });
+
+    // download lessons
     for (var i in Models.DownloadList) {
       const remoteUri = Models.DownloadUrl + Models.DownloadList[i] + '.json';
       const localUri = FileSystem.documentDirectory + Models.DownloadList[i] + '.json';
@@ -106,21 +108,17 @@ class HomeScreen extends React.Component {
       const downloadResumable = FileSystem.createDownloadResumable(remoteUri, localUri, {}, this.downloadCallback.bind(this));
       try {
         const { uri } = await downloadResumable.downloadAsync();
-
-        resetGlobalCache(Models.DownloadList[i]);
-
         this.downloadedFiles++;
-        if (this.downloadedFiles >= Models.DownloadList.length) {
-          this.reload();
-          this.setState({ downloading: false });
-        }
+        resetGlobalCache(Models.DownloadList[i]);
       } catch (e) {
         console.log(e);
-        this.reload();
-        this.setState({ downloading: false });
-        return;
       }
     }
+
+    // TODO: we can also download bibles
+    
+    this.reload();
+    this.setState({ downloading: false });
   }
 
   goToLesson(lesson) {

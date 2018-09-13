@@ -9,13 +9,16 @@ import { Provider } from 'react-redux';
 import { ActionSheetProvider } from '@expo/react-native-action-sheet';
 import { getCurrentUser } from './store/user';
 import { getI18nText } from './store/I18n';
+import { DangerZone } from 'expo';
+const { Localization } = DangerZone;
 
 let store;
 
 Expo.Updates.addListener(updateClient);
 
 function updateClient(event) {
-  if (event === EventType.DownloadFinished) {
+  console.log('updateClient: ' + JSON.stringify(event));
+  if (event === Expo.Updates.EventType.DOWNLOAD_FINISHED) {
     Alert.alert(getI18nText('发现更新'), getI18nText('程序将重新启动'), [
       { text: 'OK', onPress: () => Expo.Util.reload() },
     ]);
@@ -40,7 +43,10 @@ export default class App extends React.Component {
       return (
         <ActionSheetProvider>
           <Provider store={store}>
-            <RootNavigation />
+            <View style={{ flex: 1 }}>
+              {Platform.OS !== 'ios' && <StatusBar barStyle="default" />}
+              <RootNavigation />
+            </View>
           </Provider>
         </ActionSheetProvider >
       );
@@ -51,7 +57,7 @@ export default class App extends React.Component {
     await getCurrentUser().loadExistingUserAsync();
     // TODO: [Wei] Workaround for now
     if (!getCurrentUser().isLoggedOn()) {
-      let locale = await Expo.Util.getCurrentLocaleAsync();
+      let locale = await Localization.getCurrentLocaleAsync();
       console.log(locale);
       let lang = 'eng';
       let bible = 'niv2011';

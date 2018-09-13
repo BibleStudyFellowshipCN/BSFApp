@@ -411,7 +411,8 @@ async function getPassageAsync(version, passage) {
                 // Get from network/cache
                 const content = await loadAsync(Models.Passage, `${passage}?bibleVersion=${version}`, true);
                 if (!content || !content.paragraphs) {
-                    return result
+                    alert('no network or server error');
+                    return result;
                 }
 
                 for (let i in content.paragraphs) {
@@ -489,6 +490,25 @@ async function getPassageAsync(version, passage) {
     return result;
 }
 
+async function downloadBibleAsync(bible, downloadCallback) {
+    console.log('downloadBibleAsync:' + bible);
+    try {
+        const remoteUri = Models.DownloadBibleUrl + bible + '.json';
+        const localUri = FileSystem.documentDirectory + 'temp.json';
+        console.log(`Downlad ${remoteUri} to ${localUri}...`);
+
+        const downloadResumable = FileSystem.createDownloadResumable(remoteUri, localUri, {}, downloadCallback);
+        const { uri } = await downloadResumable.downloadAsync();
+
+        const finalUri = FileSystem.documentDirectory + 'book-' + bible + '.json';
+        console.log(`Move ${localUri} to ${finalUri}...`);
+        await Expo.FileSystem.moveAsync({ from: localUri, to: finalUri });
+    } catch (e) {
+        console.log(e);
+    }
+}
+
 export {
-    loadAsync, saveAsync, clearStorageAsync, callWebServiceAsync, showWebServiceCallErrorsAsync, pokeServer, resetGlobalCache, reloadGlobalCache, loadFromCacheAsync, getPassageAsync
+    loadAsync, saveAsync, clearStorageAsync, callWebServiceAsync, showWebServiceCallErrorsAsync, pokeServer, resetGlobalCache, reloadGlobalCache, loadFromCacheAsync, getPassageAsync,
+    downloadBibleAsync
 };

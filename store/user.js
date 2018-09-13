@@ -320,8 +320,12 @@ export default class User {
     await this.loadUserPermissionsAsync(this.cellphone);
 
     // Check for app update
+    if (!__DEV__) {
+      Expo.Updates.fetchUpdateAsync();
+    }
+
     const { manifest } = Constants;
-    const result = await callWebServiceAsync('https://expo.io/@turbozv/CBSFApp/index.exp?sdkVersion=25.0.0,24.0.0,23.0.0', '', 'GET');
+    const result = await callWebServiceAsync('https://expo.io/@turbozv/CBSFApp/index.exp?sdkVersion=30.0.0,23.0.0', '', 'GET');
     let succeed;
     if (onlyShowUpdateUI) {
       succeed = result && result.status == 200;
@@ -344,6 +348,7 @@ export default class User {
         ]);
       }
     }
+
   }
 
   logUserInfo() {

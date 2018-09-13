@@ -89,14 +89,6 @@ import { NavigationActions } from 'react-navigation';
     getCurrentUser().checkForUpdate(false);
   }
 
-  checkStoreUpdate() {
-    if (Platform.OS == 'ios') {
-      Linking.openURL('itms://itunes.apple.com/us/app/apple-store/id1229869018?mt=8').catch(err => alert(err));
-    } else if (Platform.OS == 'android') {
-      Linking.openURL('market://details?id=org.cbsfappv1.bsfclass').catch(err => alert(err));
-    }
-  }
-
   feedback = '';
 
   onLanguage() {
@@ -231,7 +223,7 @@ import { NavigationActions } from 'react-navigation';
       for (let i in files) {
         const file = files[i];
         console.log(file);
-        if (file.toLocaleLowerCase().endsWith('.json')) {
+        if (file.toLocaleLowerCase().indexOf('book-') !== -1 && file.toLocaleLowerCase().endsWith('.json')) {
           const fileUri = FileSystem.documentDirectory + file;
           console.log(fileUri);
           const info = await Expo.FileSystem.getInfoAsync(fileUri);
@@ -315,13 +307,15 @@ import { NavigationActions } from 'react-navigation';
                 titleInfoStyle={{ fontSize }}
                 onPress={this.onAnswerManage.bind(this)}
               />
-              {/*<SettingsList.Item
-                title={getI18nText('清空下载文件')}
-                hasNavArrow={true}
-                titleStyle={{ fontSize }}
-                titleInfoStyle={{ fontSize }}
-                onPress={this.onClearDownloadFiles.bind(this)}
-              />*/}
+              {
+                true && <SettingsList.Item
+                  title={getI18nText('清空下载文件')}
+                  hasNavArrow={true}
+                  titleStyle={{ fontSize }}
+                  titleInfoStyle={{ fontSize }}
+                  onPress={this.onClearDownloadFiles.bind(this)}
+                />
+              }
               <SettingsList.Header headerText='MBSF - Mobile Bible Study Fellowship' headerStyle={{ color: 'black', marginTop: 15 }} />
               <SettingsList.Item
                 title={getI18nText('版本') + ': ' + manifest.version}
