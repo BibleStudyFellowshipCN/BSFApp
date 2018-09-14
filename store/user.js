@@ -306,11 +306,14 @@ export default class User {
       return 0;
     }
 
-    // version is "a.b.c.d"
+    // version is "a.b.c" or "a.b.c.d"
     let versionNumbers = version.split(".");
     let value = 0;
     for (let i in versionNumbers) {
       value = value * 1000 + parseInt(versionNumbers[i]);
+    }
+    if (versionNumbers.length === 3) {
+      value = value * 1000;
     }
     return value;
   }

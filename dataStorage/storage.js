@@ -60,10 +60,6 @@ async function reloadGlobalCache(name) {
 
 async function getCacheData(name, key) {
     console.log(`getCacheData(${name}, ${key})`);
-    // We break in one version for spa, we will not read from cache
-    if (name === 'books' && key === 'spa') {
-        return null;
-    }
 
     if (!global_cache[name]) {
         await reloadGlobalCache(name);
