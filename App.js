@@ -1,6 +1,6 @@
 import React from 'react';
 import { Platform, StatusBar, StyleSheet, View, Alert } from 'react-native';
-import Expo, { LegacyAsyncStorage, AppLoading } from 'expo';
+import Expo, { AppLoading } from 'expo';
 import RootNavigation from './navigation/RootNavigation';
 import createStore from './store/createStore'
 import { loadAsync, reloadGlobalCache } from './dataStorage/storage';
@@ -9,15 +9,20 @@ import { Provider } from 'react-redux';
 import { ActionSheetProvider } from '@expo/react-native-action-sheet';
 import { getCurrentUser } from './store/user';
 import { getI18nText } from './store/I18n';
+import { DangerZone } from 'expo';
+const { Localization } = DangerZone;
 
 let store;
 
-Expo.Util.addNewVersionListenerExperimental(() => updateClient());
+Expo.Updates.addListener(updateClient);
 
-function updateClient() {
-  Alert.alert(getI18nText('发现更新'), getI18nText('程序将重新启动'), [
-    { text: 'OK', onPress: () => Expo.Util.reload() },
-  ]);
+function updateClient(event) {
+  console.log('updateClient: ' + JSON.stringify(event));
+  if (event === Expo.Updates.EventType.DOWNLOAD_FINISHED) {
+    Alert.alert(getI18nText('发现更新'), getI18nText('程序将重新启动'), [
+      { text: 'OK', onPress: () => Expo.Util.reload() },
+    ]);
+  }
 }
 
 export default class App extends React.Component {
@@ -38,7 +43,10 @@ export default class App extends React.Component {
       return (
         <ActionSheetProvider>
           <Provider store={store}>
-            <RootNavigation />
+            <View style={{ flex: 1 }}>
+              {Platform.OS !== 'ios' && <StatusBar barStyle="default" />}
+              <RootNavigation />
+            </View>
           </Provider>
         </ActionSheetProvider >
       );
@@ -49,7 +57,7 @@ export default class App extends React.Component {
     await getCurrentUser().loadExistingUserAsync();
     // TODO: [Wei] Workaround for now
     if (!getCurrentUser().isLoggedOn()) {
-      let locale = await Expo.Util.getCurrentLocaleAsync();
+      let locale = await Localization.getCurrentLocaleAsync();
       console.log(locale);
       let lang = 'eng';
       let bible = 'niv2011';
@@ -74,14 +82,6 @@ export default class App extends React.Component {
   }
 
   _loadResourcesAsync = async () => {
-
-    // migrate data
-    try {
-      await LegacyAsyncStorage.migrateItems(['ANSWER']);
-    } catch (error) {
-      console.log(error);
-    }
-
     // initialize existing user
     try {
       await this.loadUserInfo();

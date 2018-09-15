@@ -1,7 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { FontAwesome, Octicons, Ionicons, Feather } from '@expo/vector-icons';
-import { FileSystem } from 'expo';
+import { Constants, FileSystem } from 'expo';
 import {
   ScrollView,
   StyleSheet,
@@ -43,6 +43,7 @@ class HomeScreen extends React.Component {
   };
 
   lastCheckForContentUpdateDate = 0;
+  sessionId = null;
 
   componentWillMount() {
     this.checkForContentUpdate(false);
@@ -98,6 +99,8 @@ class HomeScreen extends React.Component {
     this.downloadFiles = Models.DownloadList.length;
     this.downloadedFiles = 0;
     await this.setState({ downloadProgress: 0, downloading: true, remoteVersion });
+
+    // download lessons
     for (var i in Models.DownloadList) {
       const remoteUri = Models.DownloadUrl + Models.DownloadList[i] + '.json';
       const localUri = FileSystem.documentDirectory + Models.DownloadList[i] + '.json';
@@ -106,29 +109,35 @@ class HomeScreen extends React.Component {
       const downloadResumable = FileSystem.createDownloadResumable(remoteUri, localUri, {}, this.downloadCallback.bind(this));
       try {
         const { uri } = await downloadResumable.downloadAsync();
-
-        resetGlobalCache(Models.DownloadList[i]);
-
         this.downloadedFiles++;
-        if (this.downloadedFiles >= Models.DownloadList.length) {
-          this.reload();
-          this.setState({ downloading: false });
-        }
+        resetGlobalCache(Models.DownloadList[i]);
       } catch (e) {
         console.log(e);
-        this.reload();
-        this.setState({ downloading: false });
-        return;
       }
     }
+
+    // TODO: we can also download bibles
+
+    this.reload();
+    this.setState({ downloading: false });
   }
 
   goToLesson(lesson) {
     // Check for update every day
     const dayOfToday = (new Date()).getDate();
-    console.log('LastCheckForContentUpdateDate: ' + this.lastCheckForContentUpdateDate + ' DayOfToday: ' + dayOfToday);
+    const sessionId = Constants['sessionId'];
+    console.log(`[Session: ${sessionId}] LastCheckForContentUpdateDate: ${this.lastCheckForContentUpdateDate} DayOfToday: ${dayOfToday}`);
     if (dayOfToday != this.lastCheckForContentUpdateDate) {
       this.checkForContentUpdate(false);
+    }
+
+    if (this.sessionId !== sessionId) {
+      this.sessionId = sessionId;
+      try {
+        Expo.Updates.fetchUpdateAsync();
+      } catch (e) {
+        console.log(e);
+      };
     }
 
     let parsed = lesson.name.split(' ');

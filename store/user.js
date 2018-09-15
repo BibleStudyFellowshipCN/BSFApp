@@ -1,7 +1,7 @@
 import { AsyncStorage, Alert, Platform } from 'react-native';
 import { Models } from '../dataStorage/models';
 import { callWebServiceAsync, showWebServiceCallErrorsAsync, pokeServer } from '../dataStorage/storage';
-import Expo, { LegacyAsyncStorage, Constants, FileSystem } from 'expo';
+import Expo, { Constants, FileSystem } from 'expo';
 import { getI18nText } from '../store/I18n';
 
 let currentUser;
@@ -68,7 +68,8 @@ export default class User {
         this.bibleVersion = existingUser.bibleVersion;
       }
       if (Models.ValidBibleVersionsLanguages.indexOf(existingUser.bibleVersion2) != -1) {
-        this.bibleVersion2 = existingUser.bibleVersion2;
+        // we don't use the same version
+        this.bibleVersion2 = existingUser.bibleVersion2 === existingUser.bibleVersion? null: existingUser.bibleVersion2;
       }
       if (existingUser.offlineMode) {
         this.offlineMode = true;
@@ -302,11 +303,18 @@ export default class User {
   }
 
   getVersionNumber(version) {
-    // version is "a.b.c.d"
+    if (!version) {
+      return 0;
+    }
+
+    // version is "a.b.c" or "a.b.c.d"
     let versionNumbers = version.split(".");
     let value = 0;
     for (let i in versionNumbers) {
       value = value * 1000 + parseInt(versionNumbers[i]);
+    }
+    if (versionNumbers.length === 3) {
+      value = value * 1000;
     }
     return value;
   }
@@ -316,8 +324,12 @@ export default class User {
     await this.loadUserPermissionsAsync(this.cellphone);
 
     // Check for app update
+    if (!__DEV__) {
+      Expo.Updates.fetchUpdateAsync();
+    }
+
     const { manifest } = Constants;
-    const result = await callWebServiceAsync('https://expo.io/@turbozv/CBSFApp/index.exp?sdkVersion=25.0.0,24.0.0,23.0.0', '', 'GET');
+    const result = await callWebServiceAsync('https://expo.io/@turbozv/CBSFApp/index.exp?sdkVersion=30.0.0,23.0.0', '', 'GET');
     let succeed;
     if (onlyShowUpdateUI) {
       succeed = result && result.status == 200;
@@ -340,6 +352,7 @@ export default class User {
         ]);
       }
     }
+
   }
 
   logUserInfo() {
@@ -403,64 +416,6 @@ export default class User {
     }
 
     return this.permissions;
-  }
-
-  async migrateAsync() {
-    try {
-      pokeServer(Models.Recover, '');
-    } catch (e) {
-      console.log(e);
-    }
-
-    const key = 'ANSWER';
-    await LegacyAsyncStorage.migrateItems([key]);
-
-    LegacyAsyncStorage.getItem(key, (err, oldData) => {
-      if (err || !oldData) {
-        oldData = "{}";
-      }
-      let oldAnswer = JSON.parse(oldData);
-      if (!oldAnswer.rawData) {
-        Alert.alert("No need to recover", "We don't find any data from previous version");
-        return;
-      }
-      console.log(JSON.stringify(oldAnswer));
-
-      AsyncStorage.getItem(key, (err, newData) => {
-        if (err || !newData) {
-          newData = "{}";
-        }
-
-        let newAnswer = JSON.parse(newData);
-        if (!newAnswer.rawData) {
-          newAnswer.rawData = {
-            answers: {}
-          };
-        }
-        console.log(JSON.stringify(newAnswer));
-
-        let mergeData = JSON.parse(JSON.stringify(newAnswer));
-        for (var item in oldAnswer.rawData.answers) {
-          let currentItem = oldAnswer.rawData.answers[item];
-          let targetItem = mergeData.rawData.answers[item];
-          if (!targetItem) {
-            mergeData.rawData.answers[item] = currentItem;
-          } else {
-            if (targetItem.answerText.indexOf(currentItem.answerText) == -1) {
-              mergeData.rawData.answers[item].answerText = currentItem.answerText + "\n" + mergeData.rawData.answers[item].answerText;
-            }
-          }
-        }
-
-        console.log(JSON.stringify(mergeData));
-        AsyncStorage.setItem(key, JSON.stringify(mergeData), () => {
-          Alert.alert("Completed!", "App will restart to show the recovered answers", [
-            { text: 'OK', onPress: () => Expo.Util.reload() },
-          ]);
-        });
-      });
-
-    });
   }
 }
 

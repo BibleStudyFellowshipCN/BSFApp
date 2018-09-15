@@ -11,8 +11,7 @@ import { getI18nText } from '../store/I18n';
 import { clearLesson } from '../store/lessons.js'
 import { clearPassage } from '../store/passage.js'
 import { connectActionSheet } from '@expo/react-native-action-sheet';
-import { NavigationActions } from 'react-navigation'
-import { LegacyAsyncStorage } from 'expo';
+import { NavigationActions } from 'react-navigation';
 
 @connectActionSheet class SettingsScreen extends React.Component {
   static navigationOptions = ({ navigation }) => {
@@ -31,18 +30,6 @@ import { LegacyAsyncStorage } from 'expo';
   };
 
   componentWillMount() {
-    if (Platform.OS == 'ios') {
-      LegacyAsyncStorage.getItem('ANSWER', (err, oldData) => {
-        if (err || !oldData) {
-          oldData = "{}";
-        }
-        let oldAnswer = JSON.parse(oldData);
-        if (oldAnswer.rawData) {
-          this.setState({ showMigration: true });
-        }
-      });
-    }
-
     this.onCellphoneChanged();
   }
 
@@ -100,14 +87,6 @@ import { LegacyAsyncStorage } from 'expo';
 
   checkAppUpdate() {
     getCurrentUser().checkForUpdate(false);
-  }
-
-  checkStoreUpdate() {
-    if (Platform.OS == 'ios') {
-      Linking.openURL('itms://itunes.apple.com/us/app/apple-store/id1229869018?mt=8').catch(err => alert(err));
-    } else if (Platform.OS == 'android') {
-      Linking.openURL('market://details?id=org.cbsfappv1.bsfclass').catch(err => alert(err));
-    }
   }
 
   feedback = '';
@@ -243,7 +222,8 @@ import { LegacyAsyncStorage } from 'expo';
       const files = await Expo.FileSystem.readDirectoryAsync(FileSystem.documentDirectory);
       for (let i in files) {
         const file = files[i];
-        if (Models.DownloadList.indexOf(file) === -1) {
+        console.log(file);
+        if (file.toLocaleLowerCase().indexOf('book-') !== -1 && file.toLocaleLowerCase().endsWith('.json')) {
           const fileUri = FileSystem.documentDirectory + file;
           console.log(fileUri);
           const info = await Expo.FileSystem.getInfoAsync(fileUri);
@@ -327,13 +307,13 @@ import { LegacyAsyncStorage } from 'expo';
                 titleInfoStyle={{ fontSize }}
                 onPress={this.onAnswerManage.bind(this)}
               />
-              {/*<SettingsList.Item
+              <SettingsList.Item
                 title={getI18nText('清空下载文件')}
                 hasNavArrow={true}
                 titleStyle={{ fontSize }}
                 titleInfoStyle={{ fontSize }}
                 onPress={this.onClearDownloadFiles.bind(this)}
-              />*/}
+              />
               <SettingsList.Header headerText='MBSF - Mobile Bible Study Fellowship' headerStyle={{ color: 'black', marginTop: 15 }} />
               <SettingsList.Item
                 title={getI18nText('版本') + ': ' + manifest.version}

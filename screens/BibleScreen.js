@@ -12,7 +12,7 @@ import {
   ProgressBarAndroid
 } from 'react-native';
 import { loadPassage } from '../store/passage';
-import { pokeServer } from '../dataStorage/storage';
+import { pokeServer, downloadBibleAsync } from '../dataStorage/storage';
 import { Models } from '../dataStorage/models';
 import { Octicons } from '@expo/vector-icons';
 import { connectActionSheet } from '@expo/react-native-action-sheet';
@@ -46,10 +46,9 @@ function onBibleVerse2() { }
   };
 
   state = {
-    bibleExist: true,
-    bibleExist2: true,
     downloading: false,
-    downloadProgress: 0
+    downloadProgress: 0,
+    downloadBible: ''
   }
 
   componentWillMount() {
@@ -57,10 +56,10 @@ function onBibleVerse2() { }
     onBibleVerse2 = this.onBibleVerse2.bind(this);
     const id = getId(this.props.navigation.state.params.book, this.props.navigation.state.params.verse);
     pokeServer(Models.Passage, id);
-    this.checkBibleExistAsync();
-    if (!this.props.passage) {
+    this.ensureBibleIsDownloadedAsync().then(() => {
+      this.props.clearPassage();
       this.props.loadPassage();
-    }
+    });
   }
 
   onBibleVerse() {
@@ -81,7 +80,7 @@ function onBibleVerse2() { }
       },
       buttonIndex => {
         if (buttonIndex != cancelButtonIndex) {
-          this.onBibleVerseChange(Models.BibleVersions[buttonIndex].Value);
+          this.onBibleVerseChange(Models.BibleVersions[buttonIndex].Value, null);
         }
       }
     );
@@ -112,36 +111,46 @@ function onBibleVerse2() { }
       },
       buttonIndex => {
         if (buttonIndex != cancelButtonIndex) {
-          this.onBibleVerseChange2(buttonIndex === 0 ? null : Models.BibleVersions[buttonIndex - 1].Value);
+          this.onBibleVerseChange(null, buttonIndex === 0 ? null : Models.BibleVersions[buttonIndex - 1].Value);
         }
       }
     );
   }
 
-  async onBibleVerseChange(version) {
-    if (getCurrentUser().getBibleVersion() != version) {
-      await getCurrentUser().setBibleVersionAsync(version);
-      getCurrentUser().logUserInfo();
-
-      await this.checkBibleExistAsync();
-      this.props.clearPassage();
-      this.props.loadPassage();
+  async onBibleVerseChange(ver1, ver2) {
+    let targetVer1 = getCurrentUser().getBibleVersion();
+    let targetVer2 = getCurrentUser().getBibleVersion2();
+    let changed = false;
+    if (!ver1 && !ver2 && !targetVer2) {
+      targetVer2 = null;
+      changed = true;
     }
-  }
-
-  async onBibleVerseChange2(version) {
-    if (getCurrentUser().getBibleVersion2() != version) {
-      await getCurrentUser().setBibleVersion2Async(version);
-      getCurrentUser().logUserInfo();
-
-      await this.checkBibleExistAsync();
-      this.props.clearPassage();
-      this.props.loadPassage();
+    if (ver1 && targetVer1 !== version) {
+      targetVer1 = ver1;
+      changed = true;
     }
+    if (ver2 && targetVer2 !== version) {
+      targetVer2 = targetVer1 === ver2 ? null : ver2;
+      changed = true;
+    }
+    if (targetVer1 === targetVer2) {
+      targetVer2 = null;
+      changed = true;
+    }
+
+    console.log(`onBibleVerseChange: ${ver1}-${ver2} => ${targetVer1}-${targetVer2} [changed=${changed}]`);
+    if (!changed) {
+      return;
+    }
+
+    await getCurrentUser().setBibleVersionAsync(targetVer1);
+    await getCurrentUser().setBibleVersion2Async(targetVer2);
+    await this.ensureBibleIsDownloadedAsync();
+    this.props.clearPassage();
+    this.props.loadPassage();
   }
 
   async isBibleExistAsync(bible) {
-    console.log("check " + bible);
     if (!bible || Models.EmbedBibleList.indexOf(bible) !== -1) {
       return true;
     }
@@ -149,18 +158,31 @@ function onBibleVerse2() { }
     try {
       const localUri = FileSystem.documentDirectory + 'book-' + bible + '.json';
       var info = await FileSystem.getInfoAsync(localUri);
-      return (info && info.exists);
+      const exists = info && info.exists;
+      console.log(bible + ': ' + exists);
+      return exists;
     } catch (e) {
       console.log(e);
     }
 
+    console.log(bible + ': ' + false);
     return false;
   }
 
-  async checkBibleExistAsync() {
-    const bibleExist = await this.isBibleExistAsync(getCurrentUser().getBibleVersion());
-    const bibleExist2 = await this.isBibleExistAsync(getCurrentUser().getBibleVersion2());
-    this.setState({ bibleExist, bibleExist2 });
+  async ensureBibleIsDownloadedAsync() {
+    let bibleExist = await this.isBibleExistAsync(getCurrentUser().getBibleVersion());
+    if (!bibleExist) {
+      this.setState({ downloading: true, downloadBible: getCurrentUser().getBibleVersionDisplayName() });
+      await downloadBibleAsync(getCurrentUser().getBibleVersion(), this.downloadCallback.bind(this));
+      await this.setState({ downloading: false });
+    }
+
+    bibleExist = await this.isBibleExistAsync(getCurrentUser().getBibleVersion2());
+    if (!bibleExist) {
+      this.setState({ downloading: true, downloadBible: getCurrentUser().getBibleVersion2DisplayName() });
+      await downloadBibleAsync(getCurrentUser().getBibleVersion2(), this.downloadCallback.bind(this));
+      await this.setState({ downloading: false });
+    }
   }
 
   downloadCallback(downloadProgress) {
@@ -173,46 +195,9 @@ function onBibleVerse2() { }
     this.setState({ downloadProgress: progress });
   }
 
-  async downloadBible(bible) {
-    if (this.state.downloading) {
-      return;
-    }
-
-    try {
-      await this.setState({ downloading: true });
-
-      const remoteUri = Models.DownloadBibleUrl + bible + '.json';
-      const localUri = FileSystem.documentDirectory + 'temp.json';
-      console.log(`Downlad ${remoteUri} to ${localUri}...`);
-
-      const downloadResumable = FileSystem.createDownloadResumable(remoteUri, localUri, {}, this.downloadCallback.bind(this));
-      const { uri } = await downloadResumable.downloadAsync();
-
-      const finalUri = FileSystem.documentDirectory + 'book-' + bible + '.json';
-      console.log(`Move ${localUri} to ${finalUri}...`);
-      await Expo.FileSystem.moveAsync({ from: localUri, to: finalUri });
-    } catch (e) {
-      console.log(e);
-      alert(JSON.stringify(e));
-    } finally {
-      await this.setState({ downloading: false });
-      await this.checkBibleExistAsync();
-    }
-  }
-
   render() {
     const bible = getCurrentUser().getBibleVersion();
     const bible2 = getCurrentUser().getBibleVersion2();
-
-    if (!this.props.passage) {
-      // Display loading screen
-      return (
-        <View style={styles.BSFQuestionContainer}>
-          <Text style={{ marginVertical: 12, color: 'black' }}>Loading</Text>
-        </View>
-      );
-    }
-
     const fontSize = getCurrentUser().getBibleFontSize();
     const verses = this.props.passage;
     let contentUI;
@@ -239,19 +224,21 @@ function onBibleVerse2() { }
       );
     }
     else {
+      // For some reason, Android cannot show html with 'tr:nth-child(even)' css...
+      const moreStyle = Platform.OS === 'ios' ? 'tr:nth-child(even) { background: #EEEEEE }' : '';
       // Using html
       let html = '<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0" /></head>' +
-        '<style> td { font-size: ' + fontSize + '; padding: 4px;} tr:nth-child(even) { background: #EEEEEE }</style><body><table>';
+        '<style> td { font-size: ' + fontSize + '; padding: 4px;} ' + moreStyle + '</style><body><table>';
       for (var i in verses) {
         const verse = verses[i];
-        html += `<tr><td>${verse.verse} ${verse.text}</td></tr>`;
+        html += `<tr><td>${verse.verse} ${verse.text.replace(/\n/g, '<br>')}</td></tr>`;
       }
       html += '</table></body>';
       contentUI = (<WebView source={{ html }} />);
     }
 
     const progress = this.state.downloadProgress;
-    const progressText = getI18nText('正在下载圣经') + ' (' + parseInt(progress * 100) + '%)';
+    const progressText = getI18nText('正在下载圣经') + ' ' + this.state.downloadBible + ' (' + parseInt(progress * 100) + '%)';
     return (
       <View style={{ flex: 1 }}>
         {
@@ -268,35 +255,8 @@ function onBibleVerse2() { }
             <ProgressBarAndroid style={styles.progress} styleAttr="Horizontal" indeterminate={false} progress={progress} />
           </View>
         }
-        {
-          !this.state.downloading && !this.state.bibleExist &&
-          <View>
-            <TouchableOpacity onPress={() => {
-              this.downloadBible(getCurrentUser().getBibleVersion());
-            }}>
-              <View style={{ flexDirection: 'row', alignItems: 'center', marginLeft: 10 }}>
-                <Octicons name='cloud-download' size={28} color='#fcaf17' />
-                <Text style={[styles.progress, { fontSize }]}>{getI18nText('下载圣经')}: {getCurrentUser().getBibleVersionDisplayName()}</Text>
-              </View>
-            </TouchableOpacity>
-          </View>
-        }
-        {
-          !this.state.downloading && !this.state.bibleExist2 &&
-          <View>
-            <TouchableOpacity onPress={() => {
-              this.downloadBible(getCurrentUser().getBibleVersion2());
-            }}>
-              <View style={{ flexDirection: 'row', alignItems: 'center', marginLeft: 10 }}>
-                <Octicons name='cloud-download' size={28} color='#fcaf17' />
-                <Text style={[styles.progress, { fontSize }]}>{getI18nText('下载圣经')}: {getCurrentUser().getBibleVersion2DisplayName()}</Text>
-              </View>
-            </TouchableOpacity>
-          </View>
-        }
         {contentUI}
       </View>
-
     );
   }
 }
