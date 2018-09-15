@@ -210,9 +210,11 @@ function onBibleVerse2() { }
       );
     }
     else {
+      // For some reason, Android cannot show html with 'tr:nth-child(even)' css...
+      const moreStyle = Platform.OS === 'ios' ? 'tr:nth-child(even) { background: #EEEEEE }' : '';
       // Using html
       let html = '<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0" /></head>' +
-        '<style> td { font-size: ' + fontSize + '; padding: 4px;} tr:nth-child(even) { background: #EEEEEE }</style><body><table>';
+        '<style> td { font-size: ' + fontSize + '; padding: 4px;} ' + moreStyle + '</style><body><table>';
       for (var i in verses) {
         const verse = verses[i];
         html += `<tr><td>${verse.verse} ${verse.text}</td></tr>`;
