@@ -18,6 +18,9 @@
       "checkAutomatically": "ON_LOAD",
       "fallbackToCacheTimeout": 20000
     },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
     "ios": {
       "icon": "./assets/images/icon-ios.png",
       "buildNumber": "1",
