@@ -14,6 +14,7 @@ import GlobalChatScreen from '../screens/GlobalChatScreen';
 import HomeTrainingScreen from '../screens/HomeTrainingScreen';
 import HomeDiscussionScreen from '../screens/HomeDiscussionScreen';
 import NotesScreen from '../screens/NotesScreen';
+import AnswerManageScreen from '../screens/AnswerManageScreen';
 
 const RootStackNavigator = StackNavigator(
   {
@@ -49,6 +50,9 @@ const RootStackNavigator = StackNavigator(
     },
     Notes: {
       screen: NotesScreen
+    },
+    AnswerManage: {
+      screen: AnswerManageScreen
     }
   },
   {

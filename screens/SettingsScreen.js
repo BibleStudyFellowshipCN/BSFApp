@@ -1,7 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux'
 import { ScrollView, StyleSheet, View, Alert, KeyboardAvoidingView, Platform, AsyncStorage, Linking } from 'react-native';
-import Expo, { Constants } from 'expo';
+import Expo, { FileSystem, Constants } from 'expo';
 import { Models } from '../dataStorage/models';
 import { callWebServiceAsync, showWebServiceCallErrorsAsync } from '../dataStorage/storage';
 import { getCurrentUser } from '../store/user';
@@ -11,7 +11,7 @@ import { getI18nText } from '../store/I18n';
 import { clearLesson } from '../store/lessons.js'
 import { clearPassage } from '../store/passage.js'
 import { connectActionSheet } from '@expo/react-native-action-sheet';
-import { NavigationActions } from 'react-navigation'
+import { NavigationActions } from 'react-navigation';
 
 @connectActionSheet class SettingsScreen extends React.Component {
   static navigationOptions = ({ navigation }) => {
@@ -35,12 +35,16 @@ import { NavigationActions } from 'react-navigation'
   async updateBibleVersionBasedOnLanguage(language) {
     if (language == 'eng') {
       await this.onBibleVerseChange('niv2011');
+      await getCurrentUser().setBibleVersion2Async(null);
     } else if (language == 'cht') {
       await this.onBibleVerseChange('rcuvts');
+      await getCurrentUser().setBibleVersion2Async('niv2011');
     } else if (language == 'spa') {
       await this.onBibleVerseChange('nvi');
+      await getCurrentUser().setBibleVersion2Async('niv2011');
     } else {
       await this.onBibleVerseChange('rcuvss');
+      await getCurrentUser().setBibleVersion2Async('niv2011');
     }
     getCurrentUser().logUserInfo();
   }
@@ -82,14 +86,6 @@ import { NavigationActions } from 'react-navigation'
 
   checkAppUpdate() {
     getCurrentUser().checkForUpdate(false);
-  }
-
-  checkStoreUpdate() {
-    if (Platform.OS == 'ios') {
-      Linking.openURL('itms://itunes.apple.com/us/app/apple-store/id1229869018?mt=8').catch(err => alert(err));
-    } else if (Platform.OS == 'android') {
-      Linking.openURL('market://details?id=org.cbsfappv1.bsfclass').catch(err => alert(err));
-    }
   }
 
   feedback = '';
@@ -224,6 +220,33 @@ import { NavigationActions } from 'react-navigation'
     this.props.navigation.navigate('SermonAudio', { user: this.state.user });
   }
 
+  async onAnswerManage() {
+    this.props.navigation.navigate('AnswerManage');
+  }
+
+  async onClearDownloadFiles() {
+    try {
+      let freeSize = 0;
+      const files = await Expo.FileSystem.readDirectoryAsync(FileSystem.documentDirectory);
+      for (let i in files) {
+        const file = files[i];
+        console.log(file);
+        if (file.toLocaleLowerCase().indexOf('book-') !== -1 && file.toLocaleLowerCase().endsWith('.json')) {
+          const fileUri = FileSystem.documentDirectory + file;
+          console.log(fileUri);
+          const info = await Expo.FileSystem.getInfoAsync(fileUri);
+          console.log(JSON.stringify(info));
+          freeSize += info.size;
+          console.log(freeSize);
+          await Expo.FileSystem.deleteAsync(fileUri, { idempotent: true });
+        }
+      }
+      Alert.alert(getI18nText('完成'));
+    } catch (e) {
+      alert(JSON.stringify(e));
+    }
+  }
+
   render() {
     const { manifest } = Constants;
     phone = getCurrentUser().getCellphone();
@@ -285,6 +308,20 @@ import { NavigationActions } from 'react-navigation'
                   onPress={this.onAudio.bind(this)}
                 />
               }
+              <SettingsList.Item
+                title={getI18nText('答案管理')}
+                hasNavArrow={true}
+                titleStyle={{ fontSize }}
+                titleInfoStyle={{ fontSize }}
+                onPress={this.onAnswerManage.bind(this)}
+              />
+              <SettingsList.Item
+                title={getI18nText('清空下载文件')}
+                hasNavArrow={true}
+                titleStyle={{ fontSize }}
+                titleInfoStyle={{ fontSize }}
+                onPress={this.onClearDownloadFiles.bind(this)}
+              />
               <SettingsList.Header headerText='MBSF - Mobile Bible Study Fellowship' headerStyle={{ color: 'black', marginTop: 15 }} />
               <SettingsList.Item
                 title={getI18nText('版本') + ': ' + manifest.version}

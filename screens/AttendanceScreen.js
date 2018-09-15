@@ -1,7 +1,7 @@
 import React from 'react';
 import { ScrollView, StyleSheet, View, Alert, Text } from 'react-native';
 import { getI18nText } from '../store/I18n';
-import { getCurrentUser } from '../store/user';
+import { FontAwesome } from '@expo/vector-icons';
 import { CheckBox, Button, SearchBar, Grid, Col, List, ListItem } from 'react-native-elements';
 import Layout from '../constants/Layout';
 import { Models } from '../dataStorage/models';
@@ -14,9 +14,24 @@ export default class AttendanceScreen extends React.Component {
     };
   };
 
-  state = {
-    classDate: this.props.navigation.state.params.data.date,
-    users: this.props.navigation.state.params.data.attendees
+  constructor(props) {
+    super(props);
+
+    const users = this.props.navigation.state.params.data.attendees;
+    let groups = [];
+    for (let i in users) {
+      if (groups.indexOf(users[i].group) === -1) {
+        groups.push(users[i].group);
+      }
+    }
+
+    this.state = {
+      classDate: this.props.navigation.state.params.data.date,
+      groups,
+      users
+    };
+
+    console.log(JSON.stringify(this.state));
   }
 
   async onSubmit() {
@@ -60,23 +75,38 @@ export default class AttendanceScreen extends React.Component {
 
   render() {
     let keyIndex = 0;
+    let groupIndex = {}
+    for (let i in this.state.groups) {
+      groupIndex[this.state.groups[i]] = 0;
+    }
     return (
       <View style={{ flex: 1 }}>
         <ScrollView
           style={{ backgroundColor: 'white' }}
           ref={ref => this.scrollView = ref}>
-          <View style={{ alignItems: 'center', marginTop: 10, marginBottom: 50 }}>
-            {
-              this.state.users.map((user) => (
-                <CheckBox
-                  containerStyle={{ width: Layout.window.width - 20 }}
-                  key={keyIndex++}
-                  title={this.getTitle(keyIndex, user)}
-                  checked={user.checked}
-                  onPress={() => { this.onCheck(user) }} />
-              ))
-            }
-          </View>
+
+          {
+            this.state.groups.map((group) => (
+              <View style={{ alignItems: 'center', marginTop: 10, marginBottom: 10 }}>
+                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                  <FontAwesome name='group' size={28} color='#fcaf17' />
+                  <Text style={{ fontWeight: 'bold', marginLeft: 10, fontSize: 20 }}>Group#{group}</Text>
+                </View>
+                {
+                  this.state.users.map((user) => (
+                    user.group === group &&
+                    <CheckBox
+                      containerStyle={{ width: Layout.window.width - 20 }}
+                      key={keyIndex++}
+                      title={this.getTitle(++groupIndex[group], user)}
+                      checked={user.checked}
+                      onPress={() => { this.onCheck(user) }} />
+                  ))
+                }
+              </View>
+            ))
+          }
+          <View style={{ height: 100 }} />
         </ScrollView>
         <View style={{
           position: 'absolute',

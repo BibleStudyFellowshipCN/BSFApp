@@ -41,6 +41,12 @@ function encode(idOrKey) {
 }
 
 global_cache = [];
+
+function resetGlobalCache(name) {
+    console.log("resetGlobalCache: " + name);
+    delete global_cache[name];
+}
+
 async function reloadGlobalCache(name) {
     console.log("reloadGlobalCache: " + name);
     try {
@@ -49,11 +55,12 @@ async function reloadGlobalCache(name) {
         global_cache[name] = JSON.parse(data);
     } catch (e) {
         global_cache[name] = [];
-        console.log(e);
     }
 }
 
 async function getCacheData(name, key) {
+    console.log(`getCacheData(${name}, ${key})`);
+
     if (!global_cache[name]) {
         await reloadGlobalCache(name);
     }
@@ -71,48 +78,6 @@ async function getCacheData(name, key) {
         case 'books':
             cache = require("../assets/json/books.json");
             break;
-        case 'chs':
-            cache = require("../assets/json/chs.json");
-            break;
-        case 'cht':
-            cache = require("../assets/json/cht.json");
-            break;
-        case 'eng':
-            cache = require("../assets/json/eng.json");
-            break;
-        case 'spa':
-            cache = require("../assets/json/spa.json");
-            break;
-        case 'ccb':
-            cache = require("../assets/json/ccb.json");
-            break;
-        case 'cnvt':
-            cache = require("../assets/json/cnvt.json");
-            break;
-        case 'esv':
-            cache = require("../assets/json/esv.json");
-            break;
-        case 'kjv':
-            cache = require("../assets/json/kjv.json");
-            break;
-        case 'nivavd1984':
-            cache = require("../assets/json/niv1984.json");
-            break;
-        case 'niv2011':
-            cache = require("../assets/json/niv2011.json");
-            break;
-        case 'nvi':
-            cache = require("../assets/json/nvi.json");
-            break;
-        case 'rcuvss':
-            cache = require("../assets/json/rcuvss.json");
-            break;
-        case 'rcuvts':
-            cache = require("../assets/json/rcuvts.json");
-            break;
-        case 'rvr1995':
-            cache = require("../assets/json/rvr1995.json");
-            break;
         case 'homeDiscussion':
             cache = require("../assets/json/homeDiscussion.json");
             break;
@@ -128,7 +93,6 @@ async function getCacheData(name, key) {
         }
     }
 
-    console.log("No cache hit for " + name + ':' + key);
     return null;
 }
 
@@ -151,7 +115,14 @@ async function getFromCache(key, keyString) {
 
     // Load from passage cache
     if (key == Models.Passage.key) {
-        const data = await getCacheData(getCurrentUser().getBibleVersion(), keyString);
+        const index = keyString.indexOf('?bibleVersion=');
+        if (index !== -1) {
+            version = keyString.substring(index + '?bibleVersion='.length);
+        } else {
+            version = getCurrentUser().getBibleVersion();
+        }
+
+        const data = await getCacheData(version, keyString);
         if (data) {
             return data;
         }
@@ -200,8 +171,6 @@ async function loadAsync(model, id, update) {
         throw "key is not defined";
     }
 
-    console.log("start load " + JSON.stringify({ model, id }));
-
     if (model.useLanguage) {
         if (id.indexOf('?') == -1) {
             id = id + '?lang=' + getLanguage();
@@ -216,6 +185,16 @@ async function loadAsync(model, id, update) {
     if (model.restUri) {
         let data = await getFromCache(model.key, keyString);
         if (data) {
+            console.log(`loadAsync(${id}) [cache]`);
+            return data;
+        }
+    }
+
+    // try to load from local first
+    if (model.cachePolicy == CachePolicy.AsyncStorage) {
+        data = await loadFromOffilneStorageAsync(model.key, id);
+        if (data) {
+            console.log(`loadAsync(${id}) [local]`);
             return data;
         }
     }
@@ -228,15 +207,7 @@ async function loadAsync(model, id, update) {
         if (model.cachePolicy == CachePolicy.AsyncStorage) {
             saveToOffilneStorageAsync(data, model.key, id);
         }
-        console.log("finish load " + JSON.stringify({ model, id }));
-    }
-    else {
-        console.log("failed to load" + JSON.stringify({ model, id }));
-
-        // then try to load from cache
-        if (model.cachePolicy == CachePolicy.AsyncStorage) {
-            data = await loadFromOffilneStorageAsync(model.key, id);
-        }
+        console.log(`loadAsync(${id}) [network]`);
     }
 
     return data;
@@ -260,7 +231,7 @@ async function loadFromCloudAsync(model, id, silentLoad) {
         // The model deosn't support online fetch
         return null;
     }
-    console.log("load from cloud: " + JSON.stringify({ model, id, silentLoad, deviceInfo: global.deviceInfo }));
+    //console.log("load from cloud: " + JSON.stringify({ model, id, silentLoad, deviceInfo: global.deviceInfo }));
     const url = !!id ? (model.restUri + '/' + id) : model.restUri;
     let responseJson;
     try {
@@ -287,7 +258,7 @@ async function loadFromCloudAsync(model, id, silentLoad) {
             return null;
         }
 
-        console.log(url + " => " + JSON.stringify(responseJson));
+        console.log(url);
     } catch (err) {
         console.log(err);
         if (!silentLoad) {
@@ -405,4 +376,188 @@ async function showWebServiceCallErrorsAsync(result, acceptStatus, showUI = true
     return true;
 }
 
-export { loadAsync, saveAsync, clearStorageAsync, callWebServiceAsync, showWebServiceCallErrorsAsync, pokeServer, reloadGlobalCache, loadFromCacheAsync };
+const AnnotationWords = ['the', 'in', 'of', 'on', 'and', 'an', 'to', 'a', 'for'];
+function getVerseText(verseText) {
+    // Check to see if the first line is part of the bible
+    const firstLinePos = verseText.indexOf('\n');
+    if (firstLinePos != -1) {
+        const firstLine = verseText.substring(0, firstLinePos);
+        var annotation = true;
+        if (verseText.length > firstLinePos) {
+            // We have more than one lines
+            var words = firstLine.split(' ');
+            // It has to be more than one words
+            if (words.length > 1) {
+                // Check each word starts with upper case
+                for (var w in words) {
+                    if (AnnotationWords.indexOf(words[w]) == -1 && words[w][0] != words[w][0].toUpperCase()) {
+                        // Not upper case, not an annotation
+                        annotation = false;
+                        break;
+                    }
+                }
+
+                // Use "()" for annotation if found
+                if (annotation) {
+                    verseText = '[' + firstLine + '] ' + verseText.substring(firstLinePos + 1);
+                }
+            }
+        }
+    }
+
+    return verseText;
+}
+
+let global_bible_cache = [];
+
+async function getPassageAsync(version, passage) {
+    let result = [];
+
+    try {
+        // parse book "<book>/..."
+        const index = passage.indexOf('/');
+        if (index === -1) {
+            alert('wrong passage format');
+            return result;
+        }
+        const book = parseInt(passage.substring(0, index));
+
+        let bible = null;
+        let fromNetwork = false;
+        if (global_bible_cache[version]) {
+            console.log(`Load bible from global_bible_cache[${version}]`);
+            bible = global_bible_cache[version];
+        } else {
+            switch (version) {
+                case 'niv2011':
+                    bible = require("../assets/bible/niv2011.json");
+                    break;
+                case 'rcuvss':
+                case 'cunpss':
+                    bible = require("../assets/bible/cunpts.json");
+                    break;
+                case 'rcuvts':
+                case 'cunpts':
+                    bible = require("../assets/bible/cunpss.json");
+                    break;
+            }
+
+            if (bible) {
+                console.log('Load bible from embedded json');
+            } else {
+                const localUri = FileSystem.documentDirectory + 'book-' + version + '.json';
+                var info = await FileSystem.getInfoAsync(localUri);
+                if (info && info.exists) {
+                    const content = await FileSystem.readAsStringAsync(localUri);
+                    bible = JSON.parse(content);
+                    console.log('Load bible from ' + localUri + ' ' + content.length);
+                    global_bible_cache[version] = bible;
+                } else {
+                    // Get from network/cache
+                    console.log('Load bible from network');
+                    const content = await loadAsync(Models.Passage, `${passage}?bibleVersion=${version}`, true);
+                    if (!content || !content.paragraphs) {
+                        alert('no network or server error');
+                        return result;
+                    }
+
+                    fromNetwork = true;
+
+                    for (let i in content.paragraphs) {
+                        const paragraph = content.paragraphs[i];
+                        for (let j in paragraph.verses) {
+                            const verse = paragraph.verses[j];
+                            const strs = verse.verse.split(':');
+                            const id = book * 1000000 + parseInt(strs[0]) * 1000 + parseInt(strs[1]);
+                            bible[id] = verse.text;
+                        }
+                    }
+                }
+            }
+        }
+
+        if (!bible) {
+            alert('no bible content');
+            return result;
+        }
+
+        const strs = passage.substring(index + 1).split(/(:|-)/g);
+        if (strs.length === 1) {
+            // parse chapter: 1
+            chapterFrom = parseInt(strs[0]);
+            verseFrom = 1;
+            chapterTo = chapterFrom;
+            verseTo = 999;
+        } else if (strs.length === 3 && strs[1] === '-') {
+            // parse chapter: 1-2
+            chapterFrom = parseInt(strs[0]);
+            verseFrom = 1;
+            chapterTo = parseInt(strs[2]);
+            verseTo = 999;
+        } else if (strs.length === 3 && strs[1] === ':') {
+            // parse chapter: 1:33
+            chapterFrom = parseInt(strs[0]);
+            verseFrom = parseInt(strs[2]);
+            chapterTo = chapterFrom;
+            verseTo = verseFrom;
+        } else if (strs.length === 5 && strs[1] === ':' && strs[3] === '-') {
+            // parse chapter: 1:1-3
+            chapterFrom = parseInt(strs[0]);
+            verseFrom = parseInt(strs[2]);
+            chapterTo = chapterFrom;
+            verseTo = parseInt(strs[4]);
+        } else if (strs.length === 7 && strs[1] === ':' && strs[3] === '-' && strs[5] === ':') {
+            // parse chapter: 1:1-2:10
+            chapterFrom = parseInt(strs[0]);
+            verseFrom = parseInt(strs[2]);
+            chapterTo = parseInt(strs[4]);
+            verseTo = parseInt(strs[6]);
+        } else {
+            alert('Error format: ' + passage);
+            return result;
+        }
+
+        console.log(`getPassageAsync(${version}, ${passage}) => ${chapterFrom}:${verseFrom}-${chapterTo}:${verseTo}`);
+        let chapter = chapterFrom;
+        let verse = verseFrom;
+        while (chapter * 1000 + verse <= chapterTo * 1000 + verseTo) {
+            const id = book * 1000000 + chapter * 1000 + verse;
+            const text = bible[id] ? bible[id] : '';
+            // Chinese bible has some empty verse
+            if (!bible[id] && !bible[id + 1]) {
+                chapter++;
+                verse = 1;
+            } else {
+                result.push({ verse: `${chapter}:${verse}`, text: fromNetwork ? text : getVerseText(text) });
+                verse++;
+            }
+        }
+    } catch (e) {
+        console.log(e);
+    }
+
+    return result;
+}
+
+async function downloadBibleAsync(bible, downloadCallback) {
+    console.log('downloadBibleAsync:' + bible);
+    try {
+        const remoteUri = Models.DownloadBibleUrl + bible + '.json';
+        const localUri = FileSystem.documentDirectory + 'temp.json';
+        console.log(`Downlad ${remoteUri} to ${localUri}...`);
+
+        const downloadResumable = FileSystem.createDownloadResumable(remoteUri, localUri, {}, downloadCallback);
+        const { uri } = await downloadResumable.downloadAsync();
+
+        const finalUri = FileSystem.documentDirectory + 'book-' + bible + '.json';
+        console.log(`Move ${localUri} to ${finalUri}...`);
+        await Expo.FileSystem.moveAsync({ from: localUri, to: finalUri });
+    } catch (e) {
+        console.log(e);
+    }
+}
+
+export {
+    loadAsync, saveAsync, clearStorageAsync, callWebServiceAsync, showWebServiceCallErrorsAsync, pokeServer, resetGlobalCache, reloadGlobalCache, loadFromCacheAsync, getPassageAsync,
+    downloadBibleAsync
+};

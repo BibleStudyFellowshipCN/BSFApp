@@ -65,6 +65,7 @@ export default class User {
   offlineMode = false;
   language = Models.DefaultLanguage;
   bibleVersion = Models.DefaultBibleVersion;
+  bibleVersion2 = Models.DefaultBibleVersion2;
   audioBook = 1 * 1000 + 1;
   fontSize = Models.DefaultFontSize;
   permissions = {};
@@ -78,6 +79,10 @@ export default class User {
       }
       if (Models.ValidBibleVersionsLanguages.indexOf(existingUser.bibleVersion) != -1) {
         this.bibleVersion = existingUser.bibleVersion;
+      }
+      if (Models.ValidBibleVersionsLanguages.indexOf(existingUser.bibleVersion2) != -1) {
+        // we don't use the same version
+        this.bibleVersion2 = existingUser.bibleVersion2 === existingUser.bibleVersion? null: existingUser.bibleVersion2;
       }
       if (existingUser.offlineMode) {
         this.offlineMode = true;
@@ -251,8 +256,34 @@ export default class User {
     this.logUserInfo();
   }
 
+  getBibleVersion2() {
+    if (!this.isLoggedOn()) {
+      return Models.DefaultBibleVersion2;
+    }
+    return this.bibleVersion2;
+  }
+
+  async setBibleVersion2Async(version) {
+    if (!this.isLoggedOn()) {
+      return;
+    }
+    this.bibleVersion2 = version;
+    await saveUserAsync(this.getUserInfo());
+    this.logUserInfo();
+  }
+
   getBibleVersionDisplayName() {
     const verion = this.getBibleVersion();
+    for (var i in Models.BibleVersions) {
+      if (verion == Models.BibleVersions[i].Value) {
+        return Models.BibleVersions[i].DisplayName;
+      }
+    }
+    return null;
+  }
+
+  getBibleVersion2DisplayName() {
+    const verion = this.getBibleVersion2();
     for (var i in Models.BibleVersions) {
       if (verion == Models.BibleVersions[i].Value) {
         return Models.BibleVersions[i].DisplayName;
@@ -285,11 +316,18 @@ export default class User {
   }
 
   getVersionNumber(version) {
-    // version is "a.b.c.d"
+    if (!version) {
+      return 0;
+    }
+
+    // version is "a.b.c" or "a.b.c.d"
     let versionNumbers = version.split(".");
     let value = 0;
     for (let i in versionNumbers) {
       value = value * 1000 + parseInt(versionNumbers[i]);
+    }
+    if (versionNumbers.length === 3) {
+      value = value * 1000;
     }
     return value;
   }
@@ -299,13 +337,28 @@ export default class User {
     await this.loadUserPermissionsAsync(this.cellphone);
 
     // Check for app update
-    try {
-      const update = await Expo.Updates.checkForUpdateAsync();
-      if (update.isAvailable) {
-        await Expo.Updates.fetchUpdateAsync();
-        askForUpdate();
-      } else {
-        const { manifest } = Constants;
+    if (!__DEV__) {
+      Expo.Updates.fetchUpdateAsync();
+    }
+
+    const { manifest } = Constants;
+    const result = await callWebServiceAsync('https://expo.io/@turbozv/CBSFApp/index.exp?sdkVersion=30.0.0,23.0.0', '', 'GET');
+    let succeed;
+    if (onlyShowUpdateUI) {
+      succeed = result && result.status == 200;
+    } else {
+      succeed = await showWebServiceCallErrorsAsync(result, 200);
+    }
+    if (succeed) {
+      const clientVersion = this.getVersionNumber(manifest.version);
+      const serverVersion = this.getVersionNumber(result.body.version);
+      console.log('checkForUpdate:' + clientVersion + '-' + serverVersion);
+      // TODO: For some reason the partial updated app doesn't have sdkVersion, so we need to reload
+      if (clientVersion < serverVersion || manifest.sdkVersion.length < 6) {
+        Alert.alert(getI18nText('发现更新') + ': ' + result.body.version, getI18nText('程序将重新启动'), [
+          { text: 'OK', onPress: () => Expo.Util.reload() }
+        ]);
+      } else if (!onlyShowUpdateUI) {
         Alert.alert(getI18nText('您已经在使用最新版本'), getI18nText('版本') + ': ' + manifest.version + ' (SDK' + manifest.sdkVersion + ')', [
           { text: 'OK', onPress: () => { } },
           { text: 'Reload', onPress: () => { Expo.Updates.reload() } },
@@ -317,6 +370,7 @@ export default class User {
         Alert.alert('Error', JSON.stringify(e));
       }
     }
+
   }
 
   logUserInfo() {
@@ -330,7 +384,8 @@ export default class User {
       bibleVersion: this.bibleVersion,
       offlineMode: this.offlineMode,
       audioBook: this.audioBook,
-      fontSize: this.fontSize
+      fontSize: this.fontSize,
+      bibleVersion2: this.bibleVersion2
     };
   }
 
@@ -338,12 +393,12 @@ export default class User {
     try {
       const localUri = FileSystem.documentDirectory + 'version.json';
       const data = await FileSystem.readAsStringAsync(localUri);
-      const version = JSON.parse(data);
-      console.log('LocalVersion: ' + version.version);
+      version = JSON.parse(data);
+      console.log('Local downloaded version: ' + JSON.stringify(version));
       return version.version;
     } catch (e) {
       console.log(e);
-      return '';
+      return 0;
     }
   }
 

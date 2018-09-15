@@ -53,6 +53,21 @@ const text = {
     "基本真理：",
     "属灵原则：",
     "经文释义",
+    "请在以下粘贴导出的答案用于导入",
+    "请全选以下文本后复制，或者导出",
+    "导出",
+    "导入",
+    "错误",
+    "答案格式不正确",
+    "导入成功",
+    "如果本机已有对应的答案，内容将会被覆盖，请确认是否导入答案？",
+    "没有答案",
+    "答案管理",
+    "确认",
+    "清空下载文件",
+    "完成",
+    "正在下载圣经",
+    "下载圣经",
   ],
   cht: [
     "BSF課程",
@@ -105,6 +120,21 @@ const text = {
     "基本真理：",
     "屬靈原則：",
     "經文釋義",
+    "請在以下粘貼導出的答案用於導入",
+    "請全選以下文本後復制，或者導出",
+    "導出",
+    "導入",
+    "錯誤",
+    "答案格式不正確",
+    "導入成功",
+    "如果本機已有對應的答案，內容將會被覆蓋，請確認是否導入答案？",
+    "沒有答案",
+    "答案管理",
+    "確認",
+    "清空下載文件",
+    "完成",
+    "正在下載聖經",
+    "下載聖經",
   ],
   eng: [
     "BSF Lessons",
@@ -157,6 +187,21 @@ const text = {
     "Main Truth: ",
     "Principles: ",
     "Notes",
+    "Please paste the exported answers below to import",
+    "Please select all text and copy, or export",
+    "Export",
+    "Import",
+    "Error",
+    "Wrong answer format",
+    "Succeed",
+    "If you already have the answers, the content will be overwritten, please confirm if you want to continue?",
+    "No answers",
+    "Answer management",
+    "Confirm",
+    "Remove downloaded files",
+    "Done",
+    "Downloading bible",
+    "Download bible",
   ],
   spa: [
     "BSF Lecciones",
@@ -209,6 +254,21 @@ const text = {
     "Verdad principal:",
     "Principios:",
     "Notes",
+    "Pegue las respuestas exportadas a continuación para importar",
+    "Seleccione todo el texto y copie, o exporte",
+    "Exportar",
+    "Importar",
+    "Error",
+    "Formato de respuesta incorrecta",
+    "Tener éxito",
+    "Si ya tiene las respuestas, se sobrescribirá el contenido, confirme si desea continuar?",
+    "Sin respuestas",
+    "Administración de respuestas",
+    "Confirmar",
+    "Eliminar archivos descargados",
+    "Hecho",
+    "Descarga de la Biblia",
+    "Descargar Biblia",
   ]
 };
 
@@ -230,12 +290,13 @@ const BibleBookText = {
 function getI18nText(origText) {
   const lang = getCurrentUser().getLanguage();
   //console.log("[I18n]" + lang + "{" + origText + "}");
-  if (lang == Models.DefaultLanguage) {
+  const UILanguage = 'chs';
+  if (lang == UILanguage) {
     return origText;
   }
 
-  for (var i in text[Models.DefaultLanguage]) {
-    if (text[Models.DefaultLanguage][i] == origText) {
+  for (var i in text[UILanguage]) {
+    if (text[UILanguage][i] == origText) {
       return text[lang][i] ? text[lang][i] : origText;
     }
   }
