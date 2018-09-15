@@ -287,8 +287,8 @@ async function saveAsync(data, model, id) {
 async function saveToOffilneStorageAsync(payload, key, id) {
     console.log("save to storage: " + JSON.stringify({ key, id }));
     return !!id ?
-        await storage.save({ key: encode(key), id: encode(id), rawData: payload }) :
-        await storage.save({ key: encode(key), rawData: payload })
+        await storage.save({ key: encode(key), id: encode(id), data: payload }) :
+        await storage.save({ key: encode(key), data: payload })
 }
 
 function saveToCloud(data, model, id) {

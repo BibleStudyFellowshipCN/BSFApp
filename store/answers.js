@@ -1,53 +1,36 @@
 import { debounce } from 'lodash';
 import { saveAsync } from '../dataStorage/storage';
 import { Models } from '../dataStorage/models';
+import { loadAsync } from '../dataStorage/storage';
 
-// ------------------------------------
-// Constants
-// ------------------------------------
-export const RECEIVED_ANSWERS = 'RECEIVED_ANSWERS'
-
-export const LOAD_ANSWERS = 'LOAD_ANSWERS'
-export const UPDATE_ANSWER = 'UPDATE_ANSWER'
-
-export const ANSWER_KEY = 'answer'
-
-function saveAnswer (newState) {
-  console.log("Saving answers...");
+function saveAnswer(newState) {
+  console.log("Saving answers:" + JSON.stringify(newState));
   saveAsync(newState, Models.Answer);
 }
 const debouncedSaveAnswer = debounce(saveAnswer, wait = 500)
 
-export function updateAnswer (questionId, answerText) {
-  return (dispatch) => {
-    dispatch({
-      type: UPDATE_ANSWER,
-      payload: { questionId, answerText }
-    })
+let answerContent = {};
+
+export async function loadAnswer() {
+  answerContent = await loadAsync(Models.Answer, null, false);
+  if (!answerContent) {
+    answerContent = {};
   }
+  if (!answerContent.answers) {
+    answerContent.answers = {};
+  }
+  console.log("loadAnswer: " + JSON.stringify(answerContent));
 }
 
-// ------------------------------------
-// Reducer
-// ------------------------------------
-const initialState = {
-  answers: {}
+export function getAnswer(questionId) {
+  const item = answerContent.answers[questionId];
+  const value = item && item.answerText ? item.answerText : "";
+  console.log(`getAnswer[${questionId}] => ${value}`);
+  return value;
 }
 
-const ACTION_HANDLERS = {
-  [UPDATE_ANSWER]: (state, action) => {
-    const newState = Object.assign({}, state, {
-      answers: Object.assign({}, state.answers, {
-        [action.payload.questionId]: action.payload
-      })
-    });
-
-    debouncedSaveAnswer(newState)
-    return newState;
-  },
-}
-
-export default function booksReducer (state = initialState, action) {
-  const handler = ACTION_HANDLERS[action.type]
-  return handler ? handler(state, action) : state
+export function updateAnswer(questionId, answerText) {
+  console.log(`updateAnswer[${questionId}] => ${answerText}`);
+  answerContent.answers[questionId] = { answerText };
+  debouncedSaveAnswer(answerContent);
 }

@@ -18,8 +18,7 @@ export default class FeedbackScreen extends React.Component {
   };
 
   state = {
-    height: 120,
-    showMigration: false
+    height: 120
   };
 
   componentWillMount() {
@@ -116,18 +115,6 @@ export default class FeedbackScreen extends React.Component {
               title={getI18nText('提交')}
               onPress={this.onSubmitFeedback.bind(this)} />
           </View>
-          {
-            this.state.showMigration &&
-            <View style={{ alignItems: 'center', marginVertical: 7, marginHorizontal: 3 }}>
-              <Text style={{ fontSize: 20, color: 'red', marginBottom: 10 }}>Note: If you see missing answers after update, please click 'Recover' button</Text>
-              <Button
-                backgroundColor='#397EDC'
-                borderRadius={5}
-                containerViewStyle={{ width: 130 }}
-                title='Recover'
-                onPress={() => { getCurrentUser().migrateAsync() }} />
-            </View>
-          }
         </ScrollView>
       </KeyboardAvoidingView>
     );

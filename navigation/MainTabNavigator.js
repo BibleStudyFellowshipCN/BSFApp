@@ -1,12 +1,10 @@
 import React from 'react';
-import { View, Text, Platform } from 'react-native';
 import { FontAwesome } from '@expo/vector-icons';
 import { TabNavigator, TabBarBottom } from 'react-navigation';
 import Colors from '../constants/Colors';
 import HomeScreen from '../screens/HomeScreen';
 import AudioBibleScreen from '../screens/AudioBibleScreen';
 import SettingsScreen from '../screens/SettingsScreen';
-import { getI18nText } from '../store/I18n';
 
 export default TabNavigator(
   {
