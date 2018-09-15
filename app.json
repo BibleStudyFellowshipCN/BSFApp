@@ -5,7 +5,7 @@
     "slug": "CBSFApp",
     "privacy": "public",
     "sdkVersion": "30.0.0",
-    "version": "2018.09.13",
+    "version": "2018.09.15",
     "primaryColor": "#cccccc",
     "icon": "./assets/images/icon.png",
     "splash": {
@@ -13,12 +13,16 @@
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
+    "updates": {
+      "enabled": true,
+      "checkAutomatically": "ON_LOAD",
+      "fallbackToCacheTimeout": 20000
+    },
     "ios": {
       "icon": "./assets/images/icon-ios.png",
       "buildNumber": "1",
       "bundleIdentifier": "org.CBSF.bsfclass",
-      "supportsTablet": true,
-      "loadJSInBackgroundExperimental": true
+      "supportsTablet": true
     },
     "android": {
       "icon": "./assets/images/icon-android.png",
@@ -26,7 +30,7 @@
       "permissions": [
         "WAKE_LOCK"
       ],
-      "versionCode": 16
+      "versionCode": 17
     }
   }
 }

@@ -68,7 +68,8 @@ export default class User {
         this.bibleVersion = existingUser.bibleVersion;
       }
       if (Models.ValidBibleVersionsLanguages.indexOf(existingUser.bibleVersion2) != -1) {
-        this.bibleVersion2 = existingUser.bibleVersion2;
+        // we don't use the same version
+        this.bibleVersion2 = existingUser.bibleVersion2 === existingUser.bibleVersion? null: existingUser.bibleVersion2;
       }
       if (existingUser.offlineMode) {
         this.offlineMode = true;

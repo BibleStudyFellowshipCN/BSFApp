@@ -1,7 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { FontAwesome, Octicons, Ionicons, Feather } from '@expo/vector-icons';
-import { FileSystem } from 'expo';
+import { Constants, FileSystem } from 'expo';
 import {
   ScrollView,
   StyleSheet,
@@ -43,6 +43,7 @@ class HomeScreen extends React.Component {
   };
 
   lastCheckForContentUpdateDate = 0;
+  sessionId = null;
 
   componentWillMount() {
     this.checkForContentUpdate(false);
@@ -116,7 +117,7 @@ class HomeScreen extends React.Component {
     }
 
     // TODO: we can also download bibles
-    
+
     this.reload();
     this.setState({ downloading: false });
   }
@@ -124,9 +125,19 @@ class HomeScreen extends React.Component {
   goToLesson(lesson) {
     // Check for update every day
     const dayOfToday = (new Date()).getDate();
-    console.log('LastCheckForContentUpdateDate: ' + this.lastCheckForContentUpdateDate + ' DayOfToday: ' + dayOfToday);
+    const sessionId = Constants['sessionId'];
+    console.log(`[Session: ${sessionId}] LastCheckForContentUpdateDate: ${this.lastCheckForContentUpdateDate} DayOfToday: ${dayOfToday}`);
     if (dayOfToday != this.lastCheckForContentUpdateDate) {
       this.checkForContentUpdate(false);
+    }
+
+    if (this.sessionId !== sessionId) {
+      this.sessionId = sessionId;
+      try {
+        Expo.Updates.fetchUpdateAsync();
+      } catch (e) {
+        console.log(e);
+      };
     }
 
     let parsed = lesson.name.split(' ');

@@ -80,7 +80,7 @@ function onBibleVerse2() { }
       },
       buttonIndex => {
         if (buttonIndex != cancelButtonIndex) {
-          this.onBibleVerseChange(Models.BibleVersions[buttonIndex].Value);
+          this.onBibleVerseChange(Models.BibleVersions[buttonIndex].Value, null);
         }
       }
     );
@@ -111,33 +111,47 @@ function onBibleVerse2() { }
       },
       buttonIndex => {
         if (buttonIndex != cancelButtonIndex) {
-          this.onBibleVerseChange2(buttonIndex === 0 ? null : Models.BibleVersions[buttonIndex - 1].Value);
+          this.onBibleVerseChange(null, buttonIndex === 0 ? null : Models.BibleVersions[buttonIndex - 1].Value);
         }
       }
     );
   }
 
-  async onBibleVerseChange(version) {
-    if (getCurrentUser().getBibleVersion() != version) {
-      await getCurrentUser().setBibleVersionAsync(version);
-      await this.ensureBibleIsDownloadedAsync();
-      this.props.clearPassage();
-      this.props.loadPassage();
+  async onBibleVerseChange(ver1, ver2) {
+    let targetVer1 = getCurrentUser().getBibleVersion();
+    let targetVer2 = getCurrentUser().getBibleVersion2();
+    let changed = false;
+    if (!ver1 && !ver2 && !targetVer2) {
+      targetVer2 = null;
+      changed = true;
     }
-  }
+    if (ver1 && targetVer1 !== version) {
+      targetVer1 = ver1;
+      changed = true;
+    }
+    if (ver2 && targetVer2 !== version) {
+      targetVer2 = targetVer1 === ver2 ? null : ver2;
+      changed = true;
+    }
+    if (targetVer1 === targetVer2) {
+      targetVer2 = null;
+      changed = true;
+    }
 
-  async onBibleVerseChange2(version) {
-    if (getCurrentUser().getBibleVersion2() != version) {
-      await getCurrentUser().setBibleVersion2Async(version);
-      await this.ensureBibleIsDownloadedAsync();
-      this.props.clearPassage();
-      this.props.loadPassage();
+    console.log(`onBibleVerseChange: ${ver1}-${ver2} => ${targetVer1}-${targetVer2} [changed=${changed}]`);
+    if (!changed) {
+      return;
     }
+
+    await getCurrentUser().setBibleVersionAsync(targetVer1);
+    await getCurrentUser().setBibleVersion2Async(targetVer2);
+    await this.ensureBibleIsDownloadedAsync();
+    this.props.clearPassage();
+    this.props.loadPassage();
   }
 
   async isBibleExistAsync(bible) {
     if (!bible || Models.EmbedBibleList.indexOf(bible) !== -1) {
-      console.log(bible + ': ' + true);
       return true;
     }
 
@@ -217,7 +231,7 @@ function onBibleVerse2() { }
         '<style> td { font-size: ' + fontSize + '; padding: 4px;} ' + moreStyle + '</style><body><table>';
       for (var i in verses) {
         const verse = verses[i];
-        html += `<tr><td>${verse.verse} ${verse.text}</td></tr>`;
+        html += `<tr><td>${verse.verse} ${verse.text.replace(/\n/g, '<br>')}</td></tr>`;
       }
       html += '</table></body>';
       contentUI = (<WebView source={{ html }} />);

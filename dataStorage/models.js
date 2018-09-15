@@ -95,11 +95,13 @@ export const Models = {
   ],
   DownloadBibleUrl: "http://mycbsf.org/bible/",
   EmbedBibleList: [
-  ],
-  DownloadBibleList: [
     'rcuvss',
     'rcuvts',
+    'cunpss',
+    'cunpts',
     'niv2011',
+  ],
+  DownloadBibleList: [
     'esv',
     'nvi',
     'niv1984',

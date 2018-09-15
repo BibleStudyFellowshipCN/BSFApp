@@ -376,6 +376,38 @@ async function showWebServiceCallErrorsAsync(result, acceptStatus, showUI = true
     return true;
 }
 
+const AnnotationWords = ['the', 'in', 'of', 'on', 'and', 'an', 'to', 'a', 'for'];
+function getVerseText(verseText) {
+    // Check to see if the first line is part of the bible
+    const firstLinePos = verseText.indexOf('\n');
+    if (firstLinePos != -1) {
+        const firstLine = verseText.substring(0, firstLinePos);
+        var annotation = true;
+        if (verseText.length > firstLinePos) {
+            // We have more than one lines
+            var words = firstLine.split(' ');
+            // It has to be more than one words
+            if (words.length > 1) {
+                // Check each word starts with upper case
+                for (var w in words) {
+                    if (AnnotationWords.indexOf(words[w]) == -1 && words[w][0] != words[w][0].toUpperCase()) {
+                        // Not upper case, not an annotation
+                        annotation = false;
+                        break;
+                    }
+                }
+
+                // Use "()" for annotation if found
+                if (annotation) {
+                    verseText = '[' + firstLine + '] ' + verseText.substring(firstLinePos + 1);
+                }
+            }
+        }
+    }
+
+    return verseText;
+}
+
 let global_bible_cache = [];
 
 async function getPassageAsync(version, passage) {
@@ -390,34 +422,55 @@ async function getPassageAsync(version, passage) {
         }
         const book = parseInt(passage.substring(0, index));
 
-        let bible = {};
-
+        let bible = null;
+        let fromNetwork = false;
         if (global_bible_cache[version]) {
-            console.log('Load bible from global_bible_cache[]');
+            console.log(`Load bible from global_bible_cache[${version}]`);
             bible = global_bible_cache[version];
         } else {
-            const localUri = FileSystem.documentDirectory + 'book-' + version + '.json';
-            var info = await FileSystem.getInfoAsync(localUri);
-            if (info && info.exists) {
-                const content = await FileSystem.readAsStringAsync(localUri);
-                bible = JSON.parse(content);
-                console.log('Load bible from ' + localUri + ' ' + content.length);
-                global_bible_cache[version] = bible;
-            } else {
-                // Get from network/cache
-                const content = await loadAsync(Models.Passage, `${passage}?bibleVersion=${version}`, true);
-                if (!content || !content.paragraphs) {
-                    alert('no network or server error');
-                    return result;
-                }
+            switch (version) {
+                case 'niv2011':
+                    bible = require("../assets/bible/niv2011.json");
+                    break;
+                case 'rcuvss':
+                case 'cunpss':
+                    bible = require("../assets/bible/cunpts.json");
+                    break;
+                case 'rcuvts':
+                case 'cunpts':
+                    bible = require("../assets/bible/cunpss.json");
+                    break;
+            }
 
-                for (let i in content.paragraphs) {
-                    const paragraph = content.paragraphs[i];
-                    for (let j in paragraph.verses) {
-                        const verse = paragraph.verses[j];
-                        const strs = verse.verse.split(':');
-                        const id = book * 1000000 + parseInt(strs[0]) * 1000 + parseInt(strs[1]);
-                        bible[id] = verse.text;
+            if (bible) {
+                console.log('Load bible from embedded json');
+            } else {
+                const localUri = FileSystem.documentDirectory + 'book-' + version + '.json';
+                var info = await FileSystem.getInfoAsync(localUri);
+                if (info && info.exists) {
+                    const content = await FileSystem.readAsStringAsync(localUri);
+                    bible = JSON.parse(content);
+                    console.log('Load bible from ' + localUri + ' ' + content.length);
+                    global_bible_cache[version] = bible;
+                } else {
+                    // Get from network/cache
+                    console.log('Load bible from network');
+                    const content = await loadAsync(Models.Passage, `${passage}?bibleVersion=${version}`, true);
+                    if (!content || !content.paragraphs) {
+                        alert('no network or server error');
+                        return result;
+                    }
+
+                    fromNetwork = true;
+
+                    for (let i in content.paragraphs) {
+                        const paragraph = content.paragraphs[i];
+                        for (let j in paragraph.verses) {
+                            const verse = paragraph.verses[j];
+                            const strs = verse.verse.split(':');
+                            const id = book * 1000000 + parseInt(strs[0]) * 1000 + parseInt(strs[1]);
+                            bible[id] = verse.text;
+                        }
                     }
                 }
             }
@@ -475,7 +528,7 @@ async function getPassageAsync(version, passage) {
                 chapter++;
                 verse = 1;
             } else {
-                result.push({ verse: `${chapter}:${verse}`, text });
+                result.push({ verse: `${chapter}:${verse}`, text: fromNetwork ? text : getVerseText(text) });
                 verse++;
             }
         }
