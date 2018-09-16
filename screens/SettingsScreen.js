@@ -25,7 +25,6 @@ import { NavigationActions } from 'react-navigation';
     language: getCurrentUser().getLanguageDisplayName(),
     bibleVersion: getCurrentUser().getBibleVersionDisplayName(),
     fontSize: getCurrentUser().getFontSize(),
-    showMigration: false,
     user: {}
   };
 
@@ -339,16 +338,6 @@ import { NavigationActions } from 'react-navigation';
                   onPress={() => {
                     this.props.navigation.navigate('GlobalChat', { title: getI18nText('聊天室') });
                   }}
-                />
-              }
-              {
-                this.state.showMigration &&
-                <SettingsList.Item
-                  title='Recover missing answers'
-                  hasNavArrow={true}
-                  titleStyle={{ color: 'red', fontSize }}
-                  titleInfoStyle={{ fontSize }}
-                  onPress={() => getCurrentUser().migrateAsync()}
                 />
               }
             </SettingsList>

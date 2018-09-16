@@ -21,8 +21,6 @@ import { getCurrentUser } from '../store/user';
 import { FileSystem } from 'expo';
 import { getI18nText } from '../store/I18n';
 
-const bookid = require('../assets/json/bookid.json');
-
 function onBibleVerse() { }
 function onBibleVerse2() { }
 
@@ -121,7 +119,7 @@ function onBibleVerse2() { }
     let targetVer1 = getCurrentUser().getBibleVersion();
     let targetVer2 = getCurrentUser().getBibleVersion2();
     let changed = false;
-    if (!ver1 && !ver2 && !targetVer2) {
+    if (!ver1 && !ver2 && targetVer2) {
       targetVer2 = null;
       changed = true;
     }
@@ -264,8 +262,9 @@ function onBibleVerse2() { }
 // Build the web service url
 function getId(book, verse) {
   // Parse the book name to id
+  const bookIdList = require('../assets/json/bookid.json');
   let bookId = 1;
-  for (var i in bookid) {
+  for (var i in bookIdList) {
     if (bookid[i].name == book) {
       bookId = bookid[i].id;
       break;
