@@ -3,35 +3,35 @@ import {
   View,
   TouchableOpacity,
   StyleSheet,
-  Text,
   Alert,
   Share,
-  Platform
 } from 'react-native';
-import { Entypo } from '@expo/vector-icons';
+import { Print } from 'expo';
+import { Entypo, FontAwesome, MaterialIcons } from '@expo/vector-icons';
 import { loadAsync } from '../dataStorage/storage';
 import { Models } from '../dataStorage/models';
 import { getI18nText } from '../store/I18n';
+import Colors from '../constants/Colors';
 
 export default class ExportAnswer extends React.Component {
 
-  getAnswer(answers, questionId) {
+  getAnswer(answers, questionId, isHtml) {
     for (var id in answers) {
       if (id == questionId) {
-        return '>>' + answers[id].answerText + '\n';
+        return '>>' + answers[id].answerText + (isHtml ? '<br>' : '\n');
       }
     }
 
     return '';
   }
 
-  getContent(day, answers) {
-    let result = day.title + '\n';
+  getContent(day, answers, isHtml) {
+    let result = day.title + (isHtml ? '<br>' : '\n');
     for (var i in day.questions) {
-      result += (day.questions[i].questionText + '\n');
-      result += (this.getAnswer(answers, day.questions[i].id) + '\n');
+      result += (day.questions[i].questionText + (isHtml ? '<br>' : '\n'));
+      result += (this.getAnswer(answers, day.questions[i].id, isHtml) + (isHtml ? '<br>' : '\n'));
     }
-    result += '\n';
+    result += (isHtml ? '<br><br>' : '\n');
     return result;
   }
 
@@ -70,15 +70,82 @@ export default class ExportAnswer extends React.Component {
     }
   }
 
+  async onPrint() {
+    console.log("Print " + this.props.lessonId);
+    try {
+      const answerContent = await loadAsync(Models.Answer, null, false);
+      console.log(JSON.stringify(answerContent));
+      let answers = '';
+      if (answerContent && answerContent.answers) {
+        answers = answerContent.answers;
+      }
+
+      const lessonContent = await loadAsync(Models.Lesson, this.props.lessonId, false);
+      if (!lessonContent) {
+        Alert.alert("Error", "Network error");
+        return;
+      }
+
+      let content = '<h5>' + lessonContent.id + ' ' + lessonContent.name + '</h5><br><br>' +
+        getI18nText('背诵经文：') + lessonContent.memoryVerse + '<br><br>';
+      content += '<p>' + this.getContent(lessonContent.dayQuestions.one, answers, true);
+      content += '<p>' + this.getContent(lessonContent.dayQuestions.two, answers, true);
+      content += '<p>' + this.getContent(lessonContent.dayQuestions.three, answers, true);
+      content += '<p>' + this.getContent(lessonContent.dayQuestions.four, answers, true);
+      content += '<p>' + this.getContent(lessonContent.dayQuestions.five, answers, true);
+      content += '<p>' + this.getContent(lessonContent.dayQuestions.six, answers, true);
+
+      const html = `<style> p { font-size: 13px; } </style> ${content}`;
+      console.log(html);
+
+      Expo.Print.printAsync({
+        html,
+        width: 612 - 50,
+        height: 792 - 50,
+        orientation: Print.Orientation.portrait
+      });
+
+    } catch (error) {
+      console.log(error);
+      Alert.alert("Error", error);
+      return;
+    }
+  }
+
+  onImportExport() {
+    if (this.props.importExport) {
+      this.props.importExport();
+    }
+  }
+
   render() {
     return (
       <View style={styles.container}>
-        <TouchableOpacity onPress={this.onClick.bind(this)}>
-          <Entypo
-            name='share-alternative'
-            size={28}
-            color='#fff' />
-        </TouchableOpacity>
+        <View style={{ width: 10 }} />
+        <View style={{ width: 40 }}>
+          <TouchableOpacity onPress={this.onImportExport.bind(this)}>
+            <MaterialIcons
+              name='devices'
+              size={28}
+              color='#fff' />
+          </TouchableOpacity>
+        </View>
+        <View style={{ width: 40 }}>
+          <TouchableOpacity onPress={this.onPrint.bind(this)}>
+            <FontAwesome
+              name='print'
+              size={28}
+              color='#fff' />
+          </TouchableOpacity>
+        </View>
+        <View style={{ width: 40 }}>
+          <TouchableOpacity onPress={() => this.onClick()}>
+            <Entypo
+              name='export'
+              size={28}
+              color='#fff' />
+          </TouchableOpacity>
+        </View>
       </View>
     );
   }
@@ -86,6 +153,7 @@ export default class ExportAnswer extends React.Component {
 
 const styles = StyleSheet.create({
   container: {
-    marginRight: 20
+    flexDirection: 'row',
+    backgroundColor: Colors.yellow
   }
 });

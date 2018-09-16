@@ -102,7 +102,6 @@ export default class App extends React.Component {
     const initialstate = {
       answers: bootValues[0] ? bootValues[0] : { answers: {} },
     }
-    console.log("Load answers: " + JSON.stringify(initialstate.answers));
     store = createStore(initialstate);
   };
 

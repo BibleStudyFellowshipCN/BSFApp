@@ -26,7 +26,7 @@ class LessonScreen extends React.Component {
   static navigationOptions = ({ navigation }) => {
     return {
       title: navigation.state.params && navigation.state.params.title ? navigation.state.params.title : '',
-      headerRight: <ExportAnswer lessonId={navigation.state.params.lesson.id} />
+      headerRight: <ExportAnswer lessonId={navigation.state.params.lesson.id} importExport={() => onImportAndExport()} />
     };
   };
 
@@ -44,6 +44,7 @@ class LessonScreen extends React.Component {
     pokeServer(Models.Lesson, this.props.navigation.state.params.lesson.id);
 
     navigateTo = this.navigateTo.bind(this);
+    onImportAndExport = this.onImportAndExport.bind(this);
 
     if (!this.props.lesson) {
       this.props.loadLesson();
@@ -80,6 +81,10 @@ class LessonScreen extends React.Component {
 
   goToPassage(book, verse) {
     this.props.navigation.navigate('Bible', { book, verse, title: getI18nBibleBook(book) + verse });
+  }
+
+  onImportAndExport() {
+    this.props.navigation.navigate('AnswerManage');
   }
 
   render() {
