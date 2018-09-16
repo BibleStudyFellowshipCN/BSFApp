@@ -1,6 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux'
-import { ScrollView, StyleSheet, View, Alert, KeyboardAvoidingView, Platform, AsyncStorage, Linking } from 'react-native';
+import { ScrollView, StyleSheet, View, Alert, KeyboardAvoidingView } from 'react-native';
 import Expo, { FileSystem, Constants } from 'expo';
 import { Models } from '../dataStorage/models';
 import { callWebServiceAsync, showWebServiceCallErrorsAsync } from '../dataStorage/storage';
@@ -12,6 +12,8 @@ import { clearLesson } from '../store/lessons.js'
 import { clearPassage } from '../store/passage.js'
 import { connectActionSheet } from '@expo/react-native-action-sheet';
 import { NavigationActions } from 'react-navigation';
+import { FontAwesome, MaterialIcons, MaterialCommunityIcons } from '@expo/vector-icons';
+import Colors from '../constants/Colors';
 
 @connectActionSheet class SettingsScreen extends React.Component {
   static navigationOptions = ({ navigation }) => {
@@ -251,6 +253,11 @@ import { NavigationActions } from 'react-navigation';
             <SettingsList borderColor='#c8c7cc' defaultItemSize={40}>
               <SettingsList.Header headerText={getI18nText('设置')} headerStyle={{ color: 'black' }} />
               <SettingsList.Item
+                icon={
+                  <View style={{ marginTop: 3, left: 7 }} >
+                    <MaterialIcons color={Colors.yellow} size={28} name='language' />
+                  </View>
+                }
                 title={getI18nText('显示语言')}
                 titleInfo={this.state.language}
                 titleStyle={{ fontSize }}
@@ -258,6 +265,11 @@ import { NavigationActions } from 'react-navigation';
                 onPress={this.onLanguage.bind(this)}
               />
               <SettingsList.Item
+                icon={
+                  <View style={{ marginTop: 3, left: 7 }} >
+                    <MaterialCommunityIcons color={Colors.yellow} size={28} name='book-multiple' />
+                  </View>
+                }
                 title={getI18nText('圣经版本')}
                 titleInfo={this.state.bibleVersion}
                 titleStyle={{ fontSize }}
@@ -265,6 +277,11 @@ import { NavigationActions } from 'react-navigation';
                 onPress={this.onBibleVerse.bind(this)}
               />
               <SettingsList.Item
+                icon={
+                  <View style={{ marginTop: 3, left: 7 }} >
+                    <FontAwesome color={Colors.yellow} size={28} name='font' />
+                  </View>
+                }
                 title={getI18nText('字体大小')}
                 titleInfo={this.getFontText()}
                 titleStyle={{ fontSize }}
@@ -272,6 +289,11 @@ import { NavigationActions } from 'react-navigation';
                 onPress={this.onFontSize.bind(this)}
               />
               <SettingsList.Item
+                icon={
+                  <View style={{ marginTop: 3, left: 7 }} >
+                    <MaterialCommunityIcons color={Colors.yellow} size={28} name='cellphone-iphone' />
+                  </View>
+                }
                 title={getI18nText('手机号码')}
                 titleInfo={getI18nText(phone == '' ? '设置' : '更改')}
                 hasNavArrow={true}
@@ -282,6 +304,11 @@ import { NavigationActions } from 'react-navigation';
               {
                 this.state.user.isGroupLeader &&
                 <SettingsList.Item
+                  icon={
+                    <View style={{ marginTop: 3, left: 7 }} >
+                      <MaterialCommunityIcons color={Colors.yellow} size={28} name='format-list-checks' />
+                    </View>
+                  }
                   title={getI18nText('考勤表')}
                   hasNavArrow={true}
                   titleStyle={{ fontSize }}
@@ -292,6 +319,11 @@ import { NavigationActions } from 'react-navigation';
               {
                 this.state.user.audio &&
                 <SettingsList.Item
+                  icon={
+                    <View style={{ marginTop: 3, left: 7 }} >
+                      <FontAwesome color={Colors.yellow} size={30} name='play-circle-o' />
+                    </View>
+                  }
                   title={getI18nText('讲道录音')}
                   hasNavArrow={true}
                   titleStyle={{ fontSize }}
@@ -300,6 +332,11 @@ import { NavigationActions } from 'react-navigation';
                 />
               }
               <SettingsList.Item
+                icon={
+                  <View style={{ marginTop: 3, left: 7 }} >
+                    <MaterialIcons color={Colors.yellow} size={25} name='devices' />
+                  </View>
+                }
                 title={getI18nText('答案管理')}
                 hasNavArrow={true}
                 titleStyle={{ fontSize }}
@@ -307,6 +344,11 @@ import { NavigationActions } from 'react-navigation';
                 onPress={this.onAnswerManage.bind(this)}
               />
               <SettingsList.Item
+                icon={
+                  <View style={{ marginTop: 3, left: 7 }} >
+                    <FontAwesome color={Colors.yellow} size={28} name='trash' />
+                  </View>
+                }
                 title={getI18nText('清空下载文件')}
                 hasNavArrow={true}
                 titleStyle={{ fontSize }}
@@ -315,6 +357,11 @@ import { NavigationActions } from 'react-navigation';
               />
               <SettingsList.Header headerText='MBSF - Mobile Bible Study Fellowship' headerStyle={{ color: 'black', marginTop: 15 }} />
               <SettingsList.Item
+                icon={
+                  <View style={{ marginTop: 3, left: 7 }} >
+                    <MaterialCommunityIcons color={Colors.yellow} size={28} name='fish' />
+                  </View>
+                }
                 title={getI18nText('版本') + ': ' + manifest.version}
                 titleInfo={getI18nText('检查更新')}
                 titleStyle={{ fontSize }}
@@ -322,6 +369,11 @@ import { NavigationActions } from 'react-navigation';
                 onPress={this.checkAppUpdate.bind(this)}
               />
               <SettingsList.Item
+                icon={
+                  <View style={{ marginTop: 3, left: 7 }} >
+                    <MaterialIcons color={Colors.yellow} size={28} name='feedback' />
+                  </View>
+                }
                 title={getI18nText('反馈意见')}
                 hasNavArrow={true}
                 titleStyle={{ fontSize }}
@@ -331,6 +383,11 @@ import { NavigationActions } from 'react-navigation';
               {
                 this.state.user.chat &&
                 <SettingsList.Item
+                  icon={
+                    <View style={{ marginTop: 3, left: 7 }} >
+                      <FontAwesome color={Colors.yellow} size={24} name='wechat' />
+                    </View>
+                  }
                   title={getI18nText('聊天室')}
                   hasNavArrow={true}
                   titleStyle={{ fontSize }}
