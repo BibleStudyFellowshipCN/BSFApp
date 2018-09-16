@@ -86,22 +86,24 @@ export default class ExportAnswer extends React.Component {
         return;
       }
 
-      let content = '<h5>' + lessonContent.id + ' ' + lessonContent.name + '</h5><br><br>' +
-        getI18nText('背诵经文：') + lessonContent.memoryVerse + '<br><br>';
-      content += '<p>' + this.getContent(lessonContent.dayQuestions.one, answers, true);
-      content += '<p>' + this.getContent(lessonContent.dayQuestions.two, answers, true);
-      content += '<p>' + this.getContent(lessonContent.dayQuestions.three, answers, true);
-      content += '<p>' + this.getContent(lessonContent.dayQuestions.four, answers, true);
-      content += '<p>' + this.getContent(lessonContent.dayQuestions.five, answers, true);
-      content += '<p>' + this.getContent(lessonContent.dayQuestions.six, answers, true);
+      let content = '<p><b>' + lessonContent.id + ' ' + lessonContent.name + '</b></p>' +
+        '<p>' + getI18nText('背诵经文：') + lessonContent.memoryVerse + '</p>';
+      content += '<p>';
+      content += this.getContent(lessonContent.dayQuestions.one, answers, true);
+      content += this.getContent(lessonContent.dayQuestions.two, answers, true);
+      content += this.getContent(lessonContent.dayQuestions.three, answers, true);
+      content += this.getContent(lessonContent.dayQuestions.four, answers, true);
+      content += this.getContent(lessonContent.dayQuestions.five, answers, true);
+      content += this.getContent(lessonContent.dayQuestions.six, answers, true);
+      content += '</p>';
 
-      const html = `<style> p { font-size: 13px; } </style> ${content}`;
+      const html = `<style> p { font-size: 11px; } </style> ${content}`;
       console.log(html);
 
       Expo.Print.printAsync({
         html,
-        width: 612 - 50,
-        height: 792 - 50,
+        width: 612 - 70,
+        height: 792 - 70,
         orientation: Print.Orientation.portrait
       });
 
