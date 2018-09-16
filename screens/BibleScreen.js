@@ -265,8 +265,8 @@ function getId(book, verse) {
   const bookIdList = require('../assets/json/bookid.json');
   let bookId = 1;
   for (var i in bookIdList) {
-    if (bookid[i].name == book) {
-      bookId = bookid[i].id;
+    if (bookIdList[i].name == book) {
+      bookId = bookIdList[i].id;
       break;
     }
   }
