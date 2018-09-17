@@ -1,4 +1,5 @@
 import React from 'react';
+import { connect } from 'react-redux';
 import {
   StyleSheet,
   TextInput,
@@ -6,20 +7,14 @@ import {
   TouchableOpacity,
   Dimensions
 } from 'react-native';
-import { getAnswer, updateAnswer } from '../store/answers';
+import { updateAnswer } from '../store/answers';
 import { getCurrentUser } from '../store/user';
 
-export default class Answer extends React.Component {
-
-  constructor(props) {
-    super(props);
-
-    this.state = {
-      editMode: false,
-      height: 0,
-      answer: getAnswer(props.questionId)
-    };
-  }
+class Answer extends React.Component {
+  state = {
+    editMode: false,
+    height: 0
+  };
 
   contentSize = null;
 
@@ -49,12 +44,14 @@ export default class Answer extends React.Component {
           style={[styles.answerInput, { fontSize: getCurrentUser().getLessonFontSize() }]}
           blurOnSubmit={false}
           multiline
-          value={this.state.answer}
+          value={this.props.answer.answerText}
           onChange={(e) => this.onContentSizeChange(e)}
           onContentSizeChange={(e) => this.onContentSizeChange(e)}
           onChangeText={(text) => {
-            updateAnswer(this.props.questionId, text)
-            this.setState({ answer: text });
+            this.props.updateAnswer(
+              this.props.questionId,
+              text,
+            )
           }}
           onEndEditing={() => {
             this.setState({ editMode: false });
@@ -79,6 +76,22 @@ export default class Answer extends React.Component {
     );
   }
 }
+
+const nullAnswer = {
+  answerText: ''
+}
+
+const mapStateToProps = (state, ownProps) => {
+  return {
+    answer: state.answers.answers[ownProps.questionId] || nullAnswer
+  }
+}
+
+const mapDispatchToProps = {
+  updateAnswer
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(Answer)
 
 const styles = StyleSheet.create({
   answerContainer: {

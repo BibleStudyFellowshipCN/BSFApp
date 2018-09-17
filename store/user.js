@@ -6,19 +6,6 @@ import { getI18nText } from '../store/I18n';
 
 let currentUser;
 
-Expo.Updates.addListener((type, manifest, message) => {
-  console.log("[Update]:" + JSON.stringify({ type, manifest, message }));
-  if (type == Expo.Updates.EventType.DOWNLOAD_FINISHED) {
-    askForUpdate();
-  }
-});
-
-function askForUpdate() {
-  Alert.alert(getI18nText('发现更新'), getI18nText('程序将重新启动'), [
-    { text: 'OK', onPress: () => Expo.Updates.reload() }
-  ]);
-}
-
 function getCurrentUser() {
   if (!currentUser) {
     console.log("new User");
@@ -364,13 +351,7 @@ export default class User {
           { text: 'Reload', onPress: () => { Expo.Updates.reload() } },
         ]);
       }
-    } catch (e) {
-      console.log(JSON.stringify(e));
-      if (!onlyShowUpdateUI) {
-        Alert.alert('Error', JSON.stringify(e));
-      }
     }
-
   }
 
   logUserInfo() {

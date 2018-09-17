@@ -194,15 +194,6 @@ import Colors from '../constants/Colors';
     const phone = getCurrentUser().getCellphone();
     console.log(phone);
 
-    const body = { comment: this.feedback };
-    const result = await callWebServiceAsync(Models.User.restUri, '/' + phone, 'GET');
-    const succeed = await showWebServiceCallErrorsAsync(result);
-    if (succeed && result.status == 200) {
-      this.setState({ user: result.body });
-    }
-    else {
-      this.setState({ user: {} });
-    }
     const user = getCurrentUser().getUserPermissions();
     console.log("UserPermissions: " + JSON.stringify(user));
     this.setState({ user });

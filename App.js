@@ -100,8 +100,8 @@ export default class App extends React.Component {
 
     // create the store with the boot data
     const initialstate = {
+      answers: bootValues[0] ? bootValues[0] : { answers: {} },
     }
-    await loadAnswer();
     store = createStore(initialstate);
   };
 
