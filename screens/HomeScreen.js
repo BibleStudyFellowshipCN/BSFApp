@@ -134,7 +134,9 @@ class HomeScreen extends React.Component {
     if (this.sessionId !== sessionId) {
       this.sessionId = sessionId;
       try {
-        Expo.Updates.fetchUpdateAsync();
+        if (!__DEV__) {
+          Expo.Updates.fetchUpdateAsync();
+        }
       } catch (e) {
         console.log(e);
       };

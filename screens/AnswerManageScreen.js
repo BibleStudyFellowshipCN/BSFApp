@@ -29,7 +29,7 @@ class AnswerManageScreen extends React.Component {
 
   async init() {
     const answerContent = await loadAsync(Models.Answer, null, false);
-    if (answerContent.answers) {
+    if (answerContent && answerContent.answers) {
       let answers = [];
       for (let i in answerContent.answers) {
         const item = answerContent.answers[i];

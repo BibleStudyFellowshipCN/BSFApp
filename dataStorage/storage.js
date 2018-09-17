@@ -428,19 +428,20 @@ async function getPassageAsync(version, passage) {
             console.log(`Load bible from global_bible_cache[${version}]`);
             bible = global_bible_cache[version];
         } else {
+            /*
             switch (version) {
                 case 'niv2011':
                     bible = require("../assets/bible/niv2011.json");
                     break;
                 case 'rcuvss':
                 case 'cunpss':
-                    bible = require("../assets/bible/cunpts.json");
+                    bible = require("../assets/bible/cunpss.json");
                     break;
                 case 'rcuvts':
                 case 'cunpts':
-                    bible = require("../assets/bible/cunpss.json");
+                    bible = require("../assets/bible/cunpts.json");
                     break;
-            }
+            }*/
 
             if (bible) {
                 console.log('Load bible from embedded json');
