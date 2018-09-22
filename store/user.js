@@ -69,7 +69,7 @@ export default class User {
       }
       if (Models.ValidBibleVersionsLanguages.indexOf(existingUser.bibleVersion2) != -1) {
         // we don't use the same version
-        this.bibleVersion2 = existingUser.bibleVersion2 === existingUser.bibleVersion? null: existingUser.bibleVersion2;
+        this.bibleVersion2 = existingUser.bibleVersion2 === existingUser.bibleVersion ? null : existingUser.bibleVersion2;
       }
       if (existingUser.offlineMode) {
         this.offlineMode = true;
@@ -343,16 +343,15 @@ export default class User {
       // TODO: For some reason the partial updated app doesn't have sdkVersion, so we need to reload
       if (clientVersion < serverVersion || manifest.sdkVersion.length < 6) {
         Alert.alert(getI18nText('发现更新') + ': ' + result.body.version, getI18nText('程序将重新启动'), [
-          { text: 'OK', onPress: () => Expo.Util.reload() }
+          { text: 'OK', onPress: () => Expo.Updates.reload() }
         ]);
       } else if (!onlyShowUpdateUI) {
         Alert.alert(getI18nText('您已经在使用最新版本'), getI18nText('版本') + ': ' + manifest.version + ' (SDK' + manifest.sdkVersion + ')', [
+          { text: 'Reload', onPress: () => { Expo.Updates.reload() } },
           { text: 'OK', onPress: () => { } },
-          { text: 'Reload', onPress: () => { Expo.Util.reload() } },
         ]);
       }
     }
-
   }
 
   logUserInfo() {
