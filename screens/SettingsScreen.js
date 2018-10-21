@@ -87,7 +87,7 @@ import Colors from '../constants/Colors';
   }
 
   checkAppUpdate() {
-    getCurrentUser().checkForUpdate(false);
+    getCurrentUser().checkForUpdate();
   }
 
   feedback = '';

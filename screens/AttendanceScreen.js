@@ -34,10 +34,10 @@ export default class AttendanceScreen extends React.Component {
     console.log(JSON.stringify(this.state));
   }
 
-  async onSubmit() {
+  async onSubmit(group) {
     let users = [];
     for (var i in this.state.users) {
-      if (this.state.users[i].checked) {
+      if (this.state.users[i].checked && this.state.users[i].group === group) {
         users.push(this.state.users[i].id);
       }
     }
@@ -103,24 +103,21 @@ export default class AttendanceScreen extends React.Component {
                       onPress={() => { this.onCheck(user) }} />
                   ))
                 }
+
+                <Button
+                  backgroundColor='#397EDC'
+                  borderRadius={5}
+                  style={{ marginTop: 7 }}
+                  containerViewStyle={{ width: Layout.window.width / 2 }}
+                  title={getI18nText('提交') + ' #' + group}
+                  onPress={() => this.onSubmit(group)} />
+
+                <View style={{ height: 40 }} />
               </View>
             ))
           }
           <View style={{ height: 100 }} />
         </ScrollView>
-        <View style={{
-          position: 'absolute',
-          bottom: 5,
-          width: Layout.window.width,
-          alignItems: 'center'
-        }}>
-          <Button
-            backgroundColor='#397EDC'
-            borderRadius={5}
-            containerViewStyle={{ width: 130 }}
-            title={getI18nText('提交')}
-            onPress={this.onSubmit.bind(this)} />
-        </View>
       </View>
     );
   }

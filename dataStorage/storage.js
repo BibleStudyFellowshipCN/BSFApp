@@ -160,7 +160,7 @@ async function pokeServer(model, id) {
     const dayOfToday = (new Date()).getDate();
     console.log('LastCheckForPokeDate: ' + lastPokeDay + ' DayOfToday: ' + dayOfToday);
     if (dayOfToday != lastPokeDay || lastSessionId != Constants['sessionId']) {
-        getCurrentUser().checkForUpdate(true);
+        getCurrentUser().checkForUpdate(false);
         lastPokeDay = dayOfToday;
         lastSessionId = Constants['sessionId'];
     }
