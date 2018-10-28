@@ -38,7 +38,7 @@ export const Models = {
   Attendance: {
     key: "Attendance",
     api: "/attendance",
-    restUri: HostServer + "/attendance"
+    restUri: HostServer + "/attendanceV2"
   },
   User: {
     key: "User",
