@@ -69,7 +69,7 @@ export default class User {
       }
       if (Models.ValidBibleVersionsLanguages.indexOf(existingUser.bibleVersion2) != -1) {
         // we don't use the same version
-        this.bibleVersion2 = existingUser.bibleVersion2 === existingUser.bibleVersion? null: existingUser.bibleVersion2;
+        this.bibleVersion2 = existingUser.bibleVersion2 === existingUser.bibleVersion ? null : existingUser.bibleVersion2;
       }
       if (existingUser.offlineMode) {
         this.offlineMode = true;
@@ -94,9 +94,9 @@ export default class User {
     }
   }
 
-  async loadUserPermissionsAsync(cellphone) {
+  async loadUserPermissionsAsync(cellphone, showUI) {
     const result = await callWebServiceAsync(Models.User.restUri, '/' + cellphone, 'GET');
-    const succeed = await showWebServiceCallErrorsAsync(result);
+    const succeed = await showWebServiceCallErrorsAsync(result, null, showUI);
     if (succeed && result.status == 200) {
       this.permissions = result.body;
     }
@@ -319,22 +319,27 @@ export default class User {
     return value;
   }
 
-  async checkForUpdate(onlyShowUpdateUI) {
+  async checkForUpdate(showUI = true) {
     // Check for user update
-    await this.loadUserPermissionsAsync(this.cellphone);
+    await this.loadUserPermissionsAsync(this.cellphone, showUI);
 
     // Check for app update
     if (!__DEV__) {
-      Expo.Updates.fetchUpdateAsync();
+      const { isAvailable } = await Expo.Updates.checkForUpdateAsync();
+      console.log('checkForUpdateAsync: ' + isAvailable);
+      if (isAvailable) {
+        const { isNew } = await Expo.Updates.fetchUpdateAsyn();
+        console.log('fetchUpdateAsyn: ' + isNew);
+      }
     }
 
     const { manifest } = Constants;
-    const result = await callWebServiceAsync('https://expo.io/@turbozv/CBSFApp/index.exp?sdkVersion=30.0.0,23.0.0', '', 'GET');
+    const result = await callWebServiceAsync('https://expo.io/@turbozv/CBSFApp/index.exp?sdkVersion=30.0.0', '', 'GET');
     let succeed;
-    if (onlyShowUpdateUI) {
-      succeed = result && result.status == 200;
-    } else {
+    if (showUI) {
       succeed = await showWebServiceCallErrorsAsync(result, 200);
+    } else {
+      succeed = result && result.status == 200;
     }
     if (succeed) {
       const clientVersion = this.getVersionNumber(manifest.version);
@@ -343,16 +348,15 @@ export default class User {
       // TODO: For some reason the partial updated app doesn't have sdkVersion, so we need to reload
       if (clientVersion < serverVersion || manifest.sdkVersion.length < 6) {
         Alert.alert(getI18nText('发现更新') + ': ' + result.body.version, getI18nText('程序将重新启动'), [
-          { text: 'OK', onPress: () => Expo.Util.reload() }
+          { text: 'OK', onPress: () => Expo.Updates.reload() }
         ]);
-      } else if (!onlyShowUpdateUI) {
+      } else if (showUI) {
         Alert.alert(getI18nText('您已经在使用最新版本'), getI18nText('版本') + ': ' + manifest.version + ' (SDK' + manifest.sdkVersion + ')', [
+          { text: 'Reload', onPress: () => { Expo.Updates.reload() } },
           { text: 'OK', onPress: () => { } },
-          { text: 'Reload', onPress: () => { Expo.Util.reload() } },
         ]);
       }
     }
-
   }
 
   logUserInfo() {

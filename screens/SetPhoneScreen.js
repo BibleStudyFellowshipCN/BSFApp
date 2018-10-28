@@ -12,13 +12,21 @@ export default class SetPhoneScreen extends React.Component {
   };
 
   state = {
-    cellphone: getCurrentUser().getCellphone()
+    cellphone: getCurrentUser().getCellphone(),
+    busy: false
   }
 
   async onSubmit() {
-    await getCurrentUser().setCellphoneAsync(this.state.cellphone);
-    this.props.navigation.state.params.refresh();
-    this.props.navigation.goBack();
+    try {
+      this.setState({ busy: true });
+
+      await getCurrentUser().setCellphoneAsync(this.state.cellphone);
+      this.props.navigation.state.params.refresh();
+      this.props.navigation.goBack();
+    }
+    finally {
+      this.setState({ busy: false });
+    }
   }
 
   render() {
@@ -39,6 +47,7 @@ export default class SetPhoneScreen extends React.Component {
             />
             <View style={{ alignItems: 'center', marginTop: 40 }}>
               <Button
+                disabled={this.state.busy}
                 backgroundColor='#397EDC'
                 borderRadius={5}
                 containerViewStyle={{ width: 130 }}

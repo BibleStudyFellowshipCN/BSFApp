@@ -1,68 +1,93 @@
 import React from 'react';
-import { ScrollView, StyleSheet, View, Alert, Text } from 'react-native';
+import { ScrollView, StyleSheet, View, Alert, DatePickerAndroid, ActivityIndicator } from 'react-native';
 import { getI18nText } from '../store/I18n';
-import { FontAwesome } from '@expo/vector-icons';
-import { CheckBox, Button, SearchBar, Grid, Col, List, ListItem } from 'react-native-elements';
+import { CheckBox, Button } from 'react-native-elements';
 import Layout from '../constants/Layout';
 import { Models } from '../dataStorage/models';
 import { callWebServiceAsync, showWebServiceCallErrorsAsync } from '../dataStorage/storage';
+import SegmentedControlTab from 'react-native-segmented-control-tab';
+import { getCurrentUser } from '../store/user';
+import Colors from '../constants/Colors';
+import DatePicker from 'react-native-datepicker';
 
 export default class AttendanceScreen extends React.Component {
   static navigationOptions = ({ navigation }) => {
     return {
-      title: navigation.state.params.data.date
+      title: getI18nText('考勤表')
     };
   };
 
-  constructor(props) {
-    super(props);
+  state = {
+    classDate: this.getYYYYMMDD(new Date()),
+    attendance: null,
+    selectedIndex: 0,
+    busy: false
+  };
 
-    const users = this.props.navigation.state.params.data.attendees;
-    let groups = [];
-    for (let i in users) {
-      if (groups.indexOf(users[i].group) === -1) {
-        groups.push(users[i].group);
-      }
-    }
-
-    this.state = {
-      classDate: this.props.navigation.state.params.data.date,
-      groups,
-      users
-    };
-
-    console.log(JSON.stringify(this.state));
+  componentWillMount() {
+    this.loadAsync();
   }
 
-  async onSubmit() {
-    let users = [];
-    for (var i in this.state.users) {
-      if (this.state.users[i].checked) {
-        users.push(this.state.users[i].id);
+  getYYYYMMDD(date) {
+    return date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate();
+  }
+
+  async loadAsync() {
+    try {
+      this.setState({ busy: true });
+      const result = await callWebServiceAsync(Models.Attendance.restUri, '/' + getCurrentUser().getCellphone(), 'GET');
+      const succeed = await showWebServiceCallErrorsAsync(result, 200);
+      if (succeed) {
+        this.setState({ attendance: result.body });
+        console.log('loadAsync: ' + JSON.stringify(this.state));
       }
     }
+    finally {
+      this.setState({ busy: false });
+    }
+  }
 
-    let body = { date: this.state.classDate, users };
-    console.log(JSON.stringify(body));
+  async onSubmit(group) {
+    try {
+      this.setState({ busy: true });
+      let users = [];
+      const currentGroup = this.state.attendance[this.state.selectedIndex];
+      const attendees = currentGroup.attendees;
+      for (var i in attendees) {
+        if (attendees[i].checked) {
+          users.push(attendees[i].id);
+        }
+      }
 
-    const result = await callWebServiceAsync(Models.Attendance.restUri, '?cellphone=' + phone, 'POST', [], body);
-    const succeed = await showWebServiceCallErrorsAsync(result, 201);
-    if (succeed) {
-      Alert.alert(getI18nText('已经提交，谢谢！'));
+      let body = {
+        class: currentGroup.class,
+        group: currentGroup.group,
+        date: currentGroup.date,
+        users
+      };
+
+      const result = await callWebServiceAsync(Models.Attendance.restUri, '?cellphone=' + phone, 'POST', [], body);
+      const succeed = await showWebServiceCallErrorsAsync(result, 201);
+      if (succeed) {
+        Alert.alert(getI18nText('已经提交，谢谢！'));
+      }
+    }
+    finally {
+      this.setState({ busy: false });
     }
   }
 
   onCheck(user) {
-    const newValue = user.checked ? false : true;
-    users = this.state.users
-    for (var i in users) {
-      if (users[i].id == user.id) {
-        users[i].checked = newValue;
+    let attendance = this.state.attendance;
+    const attendees = attendance[this.state.selectedIndex].attendees;
+    for (let i in attendees) {
+      if (attendees[i].id == user.id) {
+        attendees[i].checked = !user.checked;
         break;
       }
     }
 
-    this.setState({ users });
+    this.setState({ attendance });
   }
 
   getTitle(keyIndex, user) {
@@ -73,12 +98,61 @@ export default class AttendanceScreen extends React.Component {
     }
   }
 
-  render() {
-    let keyIndex = 0;
-    let groupIndex = {}
-    for (let i in this.state.groups) {
-      groupIndex[this.state.groups[i]] = 0;
+  onGroupChange(index) {
+    this.setState({ selectedIndex: index });
+  }
+
+  async onDateChange(date) {
+    let attendance = this.state.attendance;
+    const currentGroup = attendance[this.state.selectedIndex];
+    if (currentGroup.date !== date) {
+      currentGroup.date = date;
+      this.setState({ attendance });
+      await this.refresh(currentGroup.group, date);
     }
+  }
+
+  async refresh(group, date) {
+    try {
+      this.setState({ busy: true });
+      const result = await callWebServiceAsync(Models.Attendance.restUri, `/${getCurrentUser().getCellphone()}/${group}/${date}`, 'GET');
+      const succeed = await showWebServiceCallErrorsAsync(result, 200);
+      if (succeed) {
+        let attendance = this.state.attendance;
+        const currentGroup = attendance[this.state.selectedIndex];
+        if (currentGroup.group !== result.body[0].group) {
+          alert('Error!');
+          return;
+        }
+
+        attendance[this.state.selectedIndex] = result.body[0];
+        this.setState({ attendance });
+      }
+    }
+    finally {
+      this.setState({ busy: false });
+    }
+  }
+
+  render() {
+    if (!this.state.attendance) {
+      return (
+        <ActivityIndicator
+          style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}
+          size='large'
+          color={Colors.yellow} />
+      );
+    }
+
+    let keyIndex = 0;
+    let index = 0;
+
+    const groups = this.state.attendance.map(item => '#' + item.group.toString());
+    console.log('groups: ' + JSON.stringify(groups));
+
+    const currentGroup = this.state.attendance[this.state.selectedIndex];
+    console.log('currentGroup: ' + JSON.stringify(currentGroup));
+
     return (
       <View style={{ flex: 1 }}>
         <ScrollView
@@ -86,28 +160,45 @@ export default class AttendanceScreen extends React.Component {
           ref={ref => this.scrollView = ref}>
 
           {
-            this.state.groups.map((group) => (
-              <View style={{ alignItems: 'center', marginTop: 10, marginBottom: 10 }}>
-                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                  <FontAwesome name='group' size={28} color='#fcaf17' />
-                  <Text style={{ fontWeight: 'bold', marginLeft: 10, fontSize: 20 }}>Group#{group}</Text>
-                </View>
-                {
-                  this.state.users.map((user) => (
-                    user.group === group &&
-                    <CheckBox
-                      containerStyle={{ width: Layout.window.width - 20 }}
-                      key={keyIndex++}
-                      title={this.getTitle(++groupIndex[group], user)}
-                      checked={user.checked}
-                      onPress={() => { this.onCheck(user) }} />
-                  ))
-                }
-              </View>
-            ))
+            groups.length > 1 &&
+            <View style={{ marginTop: 10, marginHorizontal: 10 }}>
+              <SegmentedControlTab
+                values={groups}
+                selectedIndex={this.state.selectedIndex}
+                onTabPress={this.onGroupChange.bind(this)}
+              />
+            </View>
           }
-          <View style={{ height: 100 }} />
+
+          <View style={{ alignItems: 'center', marginTop: 5, marginBottom: 5 }}>
+            <DatePicker
+              style={{ width: Layout.window.width - 20 }}
+              date={currentGroup.date}
+              mode="date"
+              placeholder="Select date"
+              format="YYYY-MM-DD"
+              minDate="2018-08-27"
+              maxDate={this.getYYYYMMDD(new Date())}
+              confirmBtnText="Confirm"
+              cancelBtnText="Cancel"
+              onDateChange={this.onDateChange.bind(this)}
+            />
+
+            {
+              currentGroup.attendees.map((user) => (
+                <CheckBox
+                  containerStyle={{ width: Layout.window.width - 20 }}
+                  key={keyIndex++}
+                  title={this.getTitle(++index, user)}
+                  checked={user.checked}
+                  onPress={() => { this.onCheck(user) }} />
+              ))
+            }
+          </View>
+
+          <View style={{ height: 80 }} />
         </ScrollView>
+
         <View style={{
           position: 'absolute',
           bottom: 5,
@@ -115,11 +206,13 @@ export default class AttendanceScreen extends React.Component {
           alignItems: 'center'
         }}>
           <Button
+            disabled={this.state.busy}
             backgroundColor='#397EDC'
             borderRadius={5}
-            containerViewStyle={{ width: 130 }}
+            style={{ marginTop: 7 }}
+            containerViewStyle={{ width: Layout.window.width / 2 }}
             title={getI18nText('提交')}
-            onPress={this.onSubmit.bind(this)} />
+            onPress={() => this.onSubmit(currentGroup)} />
         </View>
       </View>
     );
