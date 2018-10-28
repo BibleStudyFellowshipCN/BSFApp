@@ -87,7 +87,7 @@ import Colors from '../constants/Colors';
   }
 
   checkAppUpdate() {
-    getCurrentUser().checkForUpdate(false);
+    getCurrentUser().checkForUpdate();
   }
 
   feedback = '';
@@ -202,11 +202,7 @@ import Colors from '../constants/Colors';
   }
 
   async onAttendance() {
-    const result = await callWebServiceAsync(Models.Attendance.restUri, '?cellphone=' + phone, 'GET');
-    const succeed = await showWebServiceCallErrorsAsync(result, 200);
-    if (succeed) {
-      this.props.navigation.navigate('Attendance', { data: result.body });
-    }
+    this.props.navigation.navigate('Attendance');
   }
 
   async onAudio() {
