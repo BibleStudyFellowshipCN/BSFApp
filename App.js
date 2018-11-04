@@ -20,7 +20,7 @@ function updateClient(event) {
   console.log('updateClient: ' + JSON.stringify(event));
   if (event === Expo.Updates.EventType.DOWNLOAD_FINISHED) {
     Alert.alert(getI18nText('发现更新'), getI18nText('程序将重新启动'), [
-      { text: 'OK', onPress: () => Expo.Util.reload() },
+      { text: 'OK', onPress: () => Expo.Updates.reload() },
     ]);
   }
 }

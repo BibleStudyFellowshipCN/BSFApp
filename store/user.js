@@ -324,14 +324,14 @@ export default class User {
     await this.loadUserPermissionsAsync(this.cellphone, showUI);
 
     // Check for app update
-    if (!__DEV__) {
+    /*if (!__DEV__) {
       const { isAvailable } = await Expo.Updates.checkForUpdateAsync();
       console.log('checkForUpdateAsync: ' + isAvailable);
       if (isAvailable) {
         const { isNew } = await Expo.Updates.fetchUpdateAsyn();
         console.log('fetchUpdateAsyn: ' + isNew);
       }
-    }
+    }*/
 
     const { manifest } = Constants;
     const result = await callWebServiceAsync('https://expo.io/@turbozv/CBSFApp/index.exp?sdkVersion=30.0.0', '', 'GET');
