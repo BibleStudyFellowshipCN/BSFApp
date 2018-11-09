@@ -19,7 +19,7 @@
     "react-native-gifted-chat": "^0.3.0",
     "react-native-keyboard-aware-scroll-view": "^0.4.1",
     "react-native-keyboard-spacer": "^0.4.1",
-    "react-native-scrollable-tab-view": "^0.8.0",
+    "react-native-scrollable-tab-view": "^0.9.0",
     "react-native-segmented-control-tab": "^3.3.1",
     "react-native-settings-list": "^1.8.0",
     "react-native-storage": "^0.1.5",

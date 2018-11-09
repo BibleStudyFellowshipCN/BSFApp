@@ -9,8 +9,7 @@ import { Provider } from 'react-redux';
 import { ActionSheetProvider } from '@expo/react-native-action-sheet';
 import { getCurrentUser } from './store/user';
 import { getI18nText } from './store/I18n';
-import { DangerZone } from 'expo';
-const { Localization } = DangerZone;
+import { Localization } from 'expo';
 
 let store;
 
