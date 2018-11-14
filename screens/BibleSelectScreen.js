@@ -145,12 +145,12 @@ export default class BibleSelectScreen extends React.Component {
               containerStyle={{ width: Layout.window.width - 10 }}
               key={keyIndex++}
               title='N/A'
-              checked={false}
+              checked={!this.state.selectedBible}
               onPress={() => { this.onRemoval(); }} />
           }
           {
             Object.keys(Models.BibleVersions).map((lang) => (
-              <View key={keyIndex++} style={{ alignItems: "center", fontSize }}>
+              <View key={keyIndex++} style={{ alignItems: "center" }}>
                 <Text key={keyIndex++} style={{ fontSize: fontSize + 2, fontWeight: 'bold' }}>{lang}</Text>
                 {
                   Models.BibleVersions[lang].map((bible) => (
