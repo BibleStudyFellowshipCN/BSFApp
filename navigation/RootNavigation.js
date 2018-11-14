@@ -12,6 +12,7 @@ import HomeTrainingScreen from '../screens/HomeTrainingScreen';
 import HomeDiscussionScreen from '../screens/HomeDiscussionScreen';
 import NotesScreen from '../screens/NotesScreen';
 import AnswerManageScreen from '../screens/AnswerManageScreen';
+import BibleSelectScreen from '../screens/BibleSelectScreen';
 
 const RootStackNavigator = StackNavigator(
   {
@@ -47,6 +48,9 @@ const RootStackNavigator = StackNavigator(
     },
     AnswerManage: {
       screen: AnswerManageScreen
+    },
+    BibleSelect: {
+      screen: BibleSelectScreen
     }
   },
   {

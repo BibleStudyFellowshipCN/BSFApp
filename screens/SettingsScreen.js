@@ -115,27 +115,14 @@ import Colors from '../constants/Colors';
     );
   }
 
+  onBibleSelected(name, version) {
+    console.log('onBibleSelected: ' + name  + ' ' + version);
+    this.onBibleVerseChange(version);
+    this.setState({ bibleVersion: name });
+  }
+
   onBibleVerse() {
-    let options = [];
-    for (var i in Models.BibleVersions) {
-      const text = Models.BibleVersions[i].DisplayName;
-      options.push(text);
-    }
-    options.push('Cancel');
-    let cancelButtonIndex = options.length - 1;
-    let destructiveButtonIndex = cancelButtonIndex;
-    this.props.showActionSheetWithOptions(
-      {
-        options,
-        cancelButtonIndex,
-        destructiveButtonIndex,
-      },
-      buttonIndex => {
-        if (buttonIndex != cancelButtonIndex) {
-          this.onBibleVerseChange(Models.BibleVersions[buttonIndex].Value);
-        }
-      }
-    );
+    this.props.navigation.navigate('BibleSelect', { version: getCurrentUser().getBibleVersion(), onSelected: this.onBibleSelected.bind(this) });
   }
 
   getFontText() {
