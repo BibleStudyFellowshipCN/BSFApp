@@ -68,17 +68,17 @@ export const Models = {
   BibleVersions: {
     "Simplified Chinese":
       [
+        { name: "和合本修订版", id: "rcuvss" },
         { name: "当代译本", id: "ccb" },
         //{ name: "新译本", id: "cnvs" },
         //{ name: "中文标准译本", id: "csbs" },
         //{ name: "新标点和合本", id: "cunpss" },
-        { name: "和合本修订版", id: "rcuvss" },
       ],
     "Traditional Chinese":
       [
+        { name: "和合本修訂版", id: "rcuvts" },
         { name: "新譯本", id: "cnvt" },
         //{ name: "新標點和合本", id: "cunpts" },
-        { name: "和合本修訂版", id: "rcuvts" },
       ],
     "English":
       [
@@ -93,6 +93,7 @@ export const Models = {
         // { name: "Darby Translation", id: "darby" },
         // { name: "Douay-Rheims 1899 American Edition", id: "dra" },
         // { name: "Easy-to-Read Version", id: "erv" },
+        { name: "New International Version 2011", id: "niv2011" },
         { name: "English Standard Version", id: "esv" },
         // { name: "Expanded Bible", id: "exb" },
         // { name: "Good News Translation", id: "gnt" },
@@ -113,7 +114,6 @@ export const Models = {
         // { name: "New Century Version", id: "ncv" },
         // { name: "New English Translation", id: "net" },
         // { name: "New International Reader's Version", id: "nirv" },
-        { name: "New International Version 2011", id: "niv2011" },
         { name: "New International Version 1984", id: "niv1984" },
         // { name: "New International Version - UK", id: "nivuk" },
         // { name: "New King James Version", id: "nkjv" },
