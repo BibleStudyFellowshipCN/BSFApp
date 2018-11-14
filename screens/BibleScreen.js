@@ -60,59 +60,22 @@ function onBibleVerse2() { }
     });
   }
 
+  onBibleSelected(name, version) {
+    console.log('onBibleSelected: ' + name + ' ' + version);
+    this.onBibleVerseChange(version, null);
+  }
+
+  onBibleSelected2(name, version) {
+    console.log('onBibleSelected2: ' + name + ' ' + version);
+    this.onBibleVerseChange(null, version);
+  }
+
   onBibleVerse() {
-    let options = [];
-    const version = getCurrentUser().getBibleVersion();
-    for (var i in Models.BibleVersions) {
-      const text = Models.BibleVersions[i].DisplayName;
-      options.push((version === Models.BibleVersions[i].Value) ? '>' + text : text);
-    }
-    options.push('Cancel');
-    let cancelButtonIndex = options.length - 1;
-    let destructiveButtonIndex = cancelButtonIndex;
-    this.props.showActionSheetWithOptions(
-      {
-        options,
-        cancelButtonIndex,
-        destructiveButtonIndex,
-      },
-      buttonIndex => {
-        if (buttonIndex != cancelButtonIndex) {
-          this.onBibleVerseChange(Models.BibleVersions[buttonIndex].Value, null);
-        }
-      }
-    );
+    this.props.navigation.navigate('BibleSelect', { version: getCurrentUser().getBibleVersion(), onSelected: this.onBibleSelected.bind(this) });
   }
 
   onBibleVerse2() {
-    let options = [];
-    const version = getCurrentUser().getBibleVersion2();
-    let found = false;
-    for (var i in Models.BibleVersions) {
-      const text = Models.BibleVersions[i].DisplayName;
-      if (version === Models.BibleVersions[i].Value) {
-        options.push('>' + text);
-        found = true;
-      } else {
-        options.push(text);
-      }
-    }
-    options.unshift(found ? "N/A" : ">N/A");
-    options.push('Cancel');
-    let cancelButtonIndex = options.length - 1;
-    let destructiveButtonIndex = cancelButtonIndex;
-    this.props.showActionSheetWithOptions(
-      {
-        options,
-        cancelButtonIndex,
-        destructiveButtonIndex,
-      },
-      buttonIndex => {
-        if (buttonIndex != cancelButtonIndex) {
-          this.onBibleVerseChange(null, buttonIndex === 0 ? null : Models.BibleVersions[buttonIndex - 1].Value);
-        }
-      }
-    );
+    this.props.navigation.navigate('BibleSelect', { version: getCurrentUser().getBibleVersion2(), removable: true, onSelected: this.onBibleSelected2.bind(this) });
   }
 
   async onBibleVerseChange(ver1, ver2) {

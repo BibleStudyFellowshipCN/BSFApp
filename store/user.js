@@ -261,9 +261,13 @@ export default class User {
 
   getBibleVersionDisplayName() {
     const verion = this.getBibleVersion();
-    for (var i in Models.BibleVersions) {
-      if (verion == Models.BibleVersions[i].Value) {
-        return Models.BibleVersions[i].DisplayName;
+    for (var lang in Models.BibleVersions) {
+      const data = Models.BibleVersions[lang];
+      for (var i in data) {
+        if (verion == data[i].id) {
+          console.log(data[i].name);
+          return data[i].name;
+        }
       }
     }
     return null;
@@ -271,9 +275,13 @@ export default class User {
 
   getBibleVersion2DisplayName() {
     const verion = this.getBibleVersion2();
-    for (var i in Models.BibleVersions) {
-      if (verion == Models.BibleVersions[i].Value) {
-        return Models.BibleVersions[i].DisplayName;
+    for (var lang in Models.BibleVersions) {
+      const data = Models.BibleVersions[lang];
+      for (var i in data) {
+        if (verion == data[i].id) {
+          console.log(data[i].name);
+          return data[i].name;
+        }
       }
     }
     return null;
