@@ -356,7 +356,8 @@ export default class User {
       // TODO: For some reason the partial updated app doesn't have sdkVersion, so we need to reload
       if (clientVersion < serverVersion || manifest.sdkVersion.length < 6) {
         Alert.alert(getI18nText('发现更新') + ': ' + result.body.version, getI18nText('程序将重新启动'), [
-          { text: 'OK', onPress: () => Expo.Updates.reload() }
+          { text: 'OK', onPress: () => Expo.Updates.reload() },
+          { text: 'Later', onPress: () => { } },
         ]);
       } else if (showUI) {
         Alert.alert(getI18nText('您已经在使用最新版本'), getI18nText('版本') + ': ' + manifest.version + ' (SDK' + manifest.sdkVersion + ')', [
