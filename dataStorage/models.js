@@ -83,7 +83,7 @@ export const Models = {
     "English":
       [
         //{ name: "Authorized King James Version", id: "akjv" },
-        //{ name: "Amplified Bible", id: "amp" },
+        { name: "Amplified Bible", id: "amp" },
         //{ name: "Amplified Bible Classic Edition", id: "ampc" },
         // { name: "American Standard Version", id: "asv" },
         // { name: "Common English Bible", id: "ceb" },
@@ -118,7 +118,7 @@ export const Models = {
         // { name: "New International Version - UK", id: "nivuk" },
         // { name: "New King James Version", id: "nkjv" },
         // { name: "New Living Translation", id: "nlt" },
-        // { name: "New Living Translation 2013", id: "nlt2013" },
+        { name: "New Living Translation 2013", id: "nlt2013" },
         // { name: "New Life Version", id: "nlv" },
         // { name: "Names of God Bible", id: "nog" },
         // { name: "New Revised Standard Version", id: "nrsv" },

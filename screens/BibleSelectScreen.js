@@ -20,7 +20,7 @@ import { CheckBox, Button } from 'react-native-elements';
 export default class BibleSelectScreen extends React.Component {
   static navigationOptions = ({ navigation }) => {
     return {
-      title: getI18nText('选择圣经版本')
+      title: getI18nText('请选择圣经版本')
     };
   };
 
