@@ -68,6 +68,7 @@ const text = {
     "完成",
     "正在下载圣经",
     "下载圣经",
+    "下载失败",
   ],
   cht: [
     "BSF課程",
@@ -135,6 +136,7 @@ const text = {
     "完成",
     "正在下載聖經",
     "下載聖經",
+    "下載失敗",
   ],
   eng: [
     "BSF Lessons",
@@ -202,6 +204,7 @@ const text = {
     "Done",
     "Downloading bible",
     "Download bible",
+    "Failed to download",
   ],
   spa: [
     "BSF Lecciones",
@@ -269,6 +272,7 @@ const text = {
     "Hecho",
     "Descarga de la Biblia",
     "Descargar Biblia",
+    "Error al descargar",
   ]
 };
 
