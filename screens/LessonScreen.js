@@ -17,8 +17,6 @@ import Answer from '../components/Answer'
 import ExportAnswer from '../components/ExportAnswer.js';
 import Colors from '../constants/Colors'
 import { getI18nText, getI18nBibleBook } from '../store/I18n';
-import { Models } from '../dataStorage/models';
-import { pokeServer } from '../dataStorage/storage';
 import { getCurrentUser } from '../store/user';
 import { FontAwesome } from '@expo/vector-icons';
 
@@ -41,8 +39,6 @@ class LessonScreen extends React.Component {
   }
 
   componentWillMount() {
-    pokeServer(Models.Lesson, this.props.navigation.state.params.lesson.id);
-
     navigateTo = this.navigateTo.bind(this);
     onImportAndExport = this.onImportAndExport.bind(this);
 

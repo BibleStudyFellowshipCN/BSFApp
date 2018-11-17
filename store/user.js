@@ -1,6 +1,6 @@
-import { AsyncStorage, Alert, Platform } from 'react-native';
+import { AsyncStorage, Alert } from 'react-native';
 import { Models } from '../dataStorage/models';
-import { callWebServiceAsync, showWebServiceCallErrorsAsync, pokeServer } from '../dataStorage/storage';
+import { callWebServiceAsync, showWebServiceCallErrorsAsync } from '../dataStorage/storage';
 import Expo, { Constants, FileSystem } from 'expo';
 import { getI18nText } from '../store/I18n';
 
@@ -87,7 +87,6 @@ export default class User {
         }
       }
       this.loggedOn = true;
-      console.log("loadExistingUser: " + JSON.stringify(this.getUserInfo()));
 
       await this.loadUserPermissionsAsync(this.cellphone);
       console.log("loadExistingUserPermission: " + JSON.stringify(this.permissions));
