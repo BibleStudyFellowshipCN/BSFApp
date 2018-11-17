@@ -1,6 +1,7 @@
 import React from 'react';
-import { ScrollView, StyleSheet, View, Alert, DatePickerAndroid, ActivityIndicator } from 'react-native';
+import { ScrollView, StyleSheet, View, Alert, Text, ActivityIndicator } from 'react-native';
 import { getI18nText } from '../store/I18n';
+import { FontAwesome } from '@expo/vector-icons';
 import { CheckBox, Button } from 'react-native-elements';
 import Layout from '../constants/Layout';
 import { Models } from '../dataStorage/models';
@@ -147,11 +148,9 @@ export default class AttendanceScreen extends React.Component {
     let keyIndex = 0;
     let index = 0;
 
-    const groups = this.state.attendance.map(item => '#' + item.group.toString());
-    console.log('groups: ' + JSON.stringify(groups));
-
+    const groups = this.state.attendance.map(item => item.group.toString());
     const currentGroup = this.state.attendance[this.state.selectedIndex];
-    console.log('currentGroup: ' + JSON.stringify(currentGroup));
+    const currentGroupTitle = 'Group#' + (currentGroup.name ? currentGroup.group + ' ' + currentGroup.name : currentGroup.group);
 
     return (
       <View style={{ flex: 1 }}>
@@ -170,6 +169,13 @@ export default class AttendanceScreen extends React.Component {
             </View>
           }
 
+          <View style={{ alignItems: 'center', marginTop: 10, marginBottom: 10 }}>
+            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+              <FontAwesome name='group' size={28} color='#fcaf17' />
+              <Text style={{ fontWeight: 'bold', marginLeft: 10, fontSize: 20 }}>{currentGroupTitle}</Text>
+            </View>
+          </View>
+
           <View style={{ alignItems: 'center', marginTop: 5, marginBottom: 5 }}>
             <DatePicker
               style={{ width: Layout.window.width - 20 }}
@@ -177,22 +183,31 @@ export default class AttendanceScreen extends React.Component {
               mode="date"
               placeholder="Select date"
               format="YYYY-MM-DD"
-              minDate="2018-08-27"
-              maxDate={this.getYYYYMMDD(new Date())}
               confirmBtnText="Confirm"
               cancelBtnText="Cancel"
               onDateChange={this.onDateChange.bind(this)}
             />
 
             {
-              currentGroup.attendees.map((user) => (
+              currentGroup.attendees.map((user) => user.checked ? (
                 <CheckBox
                   containerStyle={{ width: Layout.window.width - 20 }}
                   key={keyIndex++}
                   title={this.getTitle(++index, user)}
                   checked={user.checked}
                   onPress={() => { this.onCheck(user) }} />
-              ))
+              ) : null)
+            }
+
+            {
+              currentGroup.attendees.map((user) => !user.checked ? (
+                <CheckBox
+                  containerStyle={{ width: Layout.window.width - 20 }}
+                  key={keyIndex++}
+                  title={this.getTitle(++index, user)}
+                  checked={user.checked}
+                  onPress={() => { this.onCheck(user) }} />
+              ) : null)
             }
           </View>
 

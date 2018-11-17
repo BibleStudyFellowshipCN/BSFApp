@@ -1,6 +1,6 @@
-import { AsyncStorage, Alert, Platform } from 'react-native';
+import { AsyncStorage, Alert } from 'react-native';
 import { Models } from '../dataStorage/models';
-import { callWebServiceAsync, showWebServiceCallErrorsAsync, pokeServer } from '../dataStorage/storage';
+import { callWebServiceAsync, showWebServiceCallErrorsAsync } from '../dataStorage/storage';
 import Expo, { Constants, FileSystem } from 'expo';
 import { getI18nText } from '../store/I18n';
 
@@ -87,7 +87,6 @@ export default class User {
         }
       }
       this.loggedOn = true;
-      console.log("loadExistingUser: " + JSON.stringify(this.getUserInfo()));
 
       await this.loadUserPermissionsAsync(this.cellphone);
       console.log("loadExistingUserPermission: " + JSON.stringify(this.permissions));
@@ -261,9 +260,13 @@ export default class User {
 
   getBibleVersionDisplayName() {
     const verion = this.getBibleVersion();
-    for (var i in Models.BibleVersions) {
-      if (verion == Models.BibleVersions[i].Value) {
-        return Models.BibleVersions[i].DisplayName;
+    for (var lang in Models.BibleVersions) {
+      const data = Models.BibleVersions[lang];
+      for (var i in data) {
+        if (verion == data[i].id) {
+          console.log(data[i].name);
+          return data[i].name;
+        }
       }
     }
     return null;
@@ -271,9 +274,13 @@ export default class User {
 
   getBibleVersion2DisplayName() {
     const verion = this.getBibleVersion2();
-    for (var i in Models.BibleVersions) {
-      if (verion == Models.BibleVersions[i].Value) {
-        return Models.BibleVersions[i].DisplayName;
+    for (var lang in Models.BibleVersions) {
+      const data = Models.BibleVersions[lang];
+      for (var i in data) {
+        if (verion == data[i].id) {
+          console.log(data[i].name);
+          return data[i].name;
+        }
       }
     }
     return null;
@@ -324,14 +331,14 @@ export default class User {
     await this.loadUserPermissionsAsync(this.cellphone, showUI);
 
     // Check for app update
-    if (!__DEV__) {
+    /*if (!__DEV__) {
       const { isAvailable } = await Expo.Updates.checkForUpdateAsync();
       console.log('checkForUpdateAsync: ' + isAvailable);
       if (isAvailable) {
         const { isNew } = await Expo.Updates.fetchUpdateAsyn();
         console.log('fetchUpdateAsyn: ' + isNew);
       }
-    }
+    }*/
 
     const { manifest } = Constants;
     const result = await callWebServiceAsync('https://expo.io/@turbozv/CBSFApp/index.exp?sdkVersion=30.0.0', '', 'GET');
@@ -348,7 +355,8 @@ export default class User {
       // TODO: For some reason the partial updated app doesn't have sdkVersion, so we need to reload
       if (clientVersion < serverVersion || manifest.sdkVersion.length < 6) {
         Alert.alert(getI18nText('发现更新') + ': ' + result.body.version, getI18nText('程序将重新启动'), [
-          { text: 'OK', onPress: () => Expo.Updates.reload() }
+          { text: 'OK', onPress: () => Expo.Updates.reload() },
+          { text: 'Later', onPress: () => { } },
         ]);
       } else if (showUI) {
         Alert.alert(getI18nText('您已经在使用最新版本'), getI18nText('版本') + ': ' + manifest.version + ' (SDK' + manifest.sdkVersion + ')', [
