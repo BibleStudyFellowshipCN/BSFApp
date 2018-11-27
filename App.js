@@ -8,7 +8,7 @@ import { Models } from './dataStorage/models';
 import { Provider } from 'react-redux';
 import { ActionSheetProvider } from '@expo/react-native-action-sheet';
 import { getCurrentUser } from './store/user';
-import { Localization } from 'expo';
+import { Localization } from 'expo-localization';
 
 let store;
 
@@ -44,7 +44,7 @@ export default class App extends React.Component {
     await getCurrentUser().loadExistingUserAsync();
     // TODO: [Wei] Workaround for now
     if (!getCurrentUser().isLoggedOn()) {
-      let locale = await Localization.getCurrentLocaleAsync();
+      let locale = Localization.locale;
       console.log(locale);
       let lang = 'eng';
       let bible = 'niv2011';
