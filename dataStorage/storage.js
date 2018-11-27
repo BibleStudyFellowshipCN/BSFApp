@@ -150,7 +150,7 @@ function getHttpHeaders() {
 let lastPokeDay = 0;
 let lastSessionId = '';
 
-async function pokeServer(model, id) {
+async function pokeServer() {
     // Don't poke from non-device
     /*if (!Expo.Constants.isDevice) {
         return;
@@ -158,9 +158,22 @@ async function pokeServer(model, id) {
 
     // Check is done daily or sessionId is changed
     const dayOfToday = (new Date()).getDate();
-    console.log('LastCheckForPokeDate: ' + lastPokeDay + ' DayOfToday: ' + dayOfToday);
-    if (dayOfToday != lastPokeDay || lastSessionId != Constants['sessionId']) {
-        getCurrentUser().checkForUpdate(false);
+    const sessionId = Constants['sessionId'];
+    console.log(`[Session: ${sessionId}] LastCheckForContentUpdateDate: ${lastPokeDay} DayOfToday: ${dayOfToday}`);
+    if (dayOfToday != lastPokeDay || lastSessionId != sessionId) {
+        try {
+            const update = await Expo.Updates.checkForUpdateAsync();
+            if (update.isAvailable) {
+                await Expo.Updates.fetchUpdateAsync();
+                Alert.alert(getI18nText('发现更新'), getI18nText('程序将重新启动'), [
+                    { text: 'OK', onPress: () => Expo.Updates.reloadFromCache() },
+                    { text: 'Later', onPress: () => { } },
+                ]);
+            }
+        } catch (e) {
+            console.log(e);
+        };
+
         lastPokeDay = dayOfToday;
         lastSessionId = Constants['sessionId'];
     }

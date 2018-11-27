@@ -20,7 +20,7 @@ import { clearPassage } from '../store/passage.js'
 import { getI18nText } from '../store/I18n';
 import { getCurrentUser } from '../store/user';
 import { Models } from '../dataStorage/models';
-import { resetGlobalCache } from '../dataStorage/storage';
+import { resetGlobalCache, pokeServer } from '../dataStorage/storage';
 
 class HomeScreen extends React.Component {
   static navigationOptions = ({ navigation }) => {
@@ -123,25 +123,7 @@ class HomeScreen extends React.Component {
   }
 
   goToLesson(lesson) {
-    // Check for update every day
-    const dayOfToday = (new Date()).getDate();
-    const sessionId = Constants['sessionId'];
-    console.log(`[Session: ${sessionId}] LastCheckForContentUpdateDate: ${this.lastCheckForContentUpdateDate} DayOfToday: ${dayOfToday}`);
-    if (dayOfToday != this.lastCheckForContentUpdateDate) {
-      this.checkForContentUpdate(false);
-    }
-
-    if (this.sessionId !== sessionId) {
-      this.sessionId = sessionId;
-      try {
-        if (!__DEV__) {
-          Expo.Updates.fetchUpdateAsync();
-        }
-      } catch (e) {
-        console.log(e);
-      };
-    }
-
+    pokeServer();
     let parsed = lesson.name.split(' ');
     this.props.navigation.navigate('Lesson', { lesson, title: parsed[1] });
   }

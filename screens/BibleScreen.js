@@ -12,7 +12,7 @@ import {
   ProgressBarAndroid
 } from 'react-native';
 import { loadPassage } from '../store/passage';
-import { pokeServer, downloadBibleAsync } from '../dataStorage/storage';
+import { downloadBibleAsync } from '../dataStorage/storage';
 import { Models } from '../dataStorage/models';
 import { Octicons } from '@expo/vector-icons';
 import { connectActionSheet } from '@expo/react-native-action-sheet';
@@ -52,8 +52,6 @@ function onBibleVerse2() { }
   componentWillMount() {
     onBibleVerse = this.onBibleVerse.bind(this);
     onBibleVerse2 = this.onBibleVerse2.bind(this);
-    const id = getId(this.props.navigation.state.params.book, this.props.navigation.state.params.verse);
-    pokeServer(Models.Passage, id);
     this.ensureBibleIsDownloadedAsync().then(() => {
       this.props.clearPassage();
       this.props.loadPassage();
