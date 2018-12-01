@@ -341,7 +341,7 @@ export default class User {
     }*/
 
     const { manifest } = Constants;
-    const result = await callWebServiceAsync('https://expo.io/@turbozv/CBSFApp/index.exp?sdkVersion=30.0.0', '', 'GET');
+    const result = await callWebServiceAsync('https://expo.io/@turbozv/CBSFApp/index.exp?sdkVersion=' + manifest.sdkVersion, '', 'GET');
     let succeed;
     if (showUI) {
       succeed = await showWebServiceCallErrorsAsync(result, 200);
