@@ -7,7 +7,8 @@ import {
   Picker,
   Dimensions,
   Slider,
-  Alert
+  Alert,
+  ScrollView
 } from 'react-native';
 import { getI18nText, getI18nBibleBookFromLang } from '../store/I18n';
 import { getCurrentUser } from '../store/user';
@@ -220,79 +221,78 @@ export default class AudioBibleScreen extends React.Component {
     const position = this._getMMSSFromMillis(this.state.duration * this.state.progress);
     const duration = this._getMMSSFromMillis(this.state.duration);
     return (
-      <View style={{
-        flex: 1,
-        alignItems: 'center',
-        backgroundColor: 'white'
-      }}>
-        <View style={{ flexDirection: 'row' }}>
-          <View style={{ width: this.state.width / 3 }}>
-            <Picker
-              style={{ alignSelf: 'stretch' }}
-              selectedValue={this.state.currentVersion}
-              onValueChange={this._onVersionSelected.bind(this)}>
-              {
-                Models.AudioBibles.map(s => (
-                  <Picker.Item label={s.DisplayName} value={parseInt(s.Value)} key={s.Value} />
+      <ScrollView
+        style={{ flex: 1, backgroundColor: 'white' }}>
+        <View style={{ alignItems: 'center' }}>
+          <View style={{ flexDirection: 'row' }}>
+            <View style={{ width: this.state.width / 3 }}>
+              <Picker
+                style={{ alignSelf: 'stretch' }}
+                selectedValue={this.state.currentVersion}
+                onValueChange={this._onVersionSelected.bind(this)}>
+                {
+                  Models.AudioBibles.map(s => (
+                    <Picker.Item label={s.DisplayName} value={parseInt(s.Value)} key={s.Value} />
+                  ))}
+              </Picker>
+            </View>
+            <View style={{ width: this.state.width / 3 }}>
+              <Picker
+                style={{ alignSelf: 'stretch' }}
+                selectedValue={this.state.currentBook}
+                onValueChange={this._onBookSelected.bind(this)}>
+                {audioBookId.map(s => (
+                  <Picker.Item label={this.getBookName(s.name)} value={s.id} key={s.id} />
                 ))}
-            </Picker>
+              </Picker>
+            </View>
+            <View style={{ width: this.state.width / 3 }}>
+              <Picker
+                style={{ alignSelf: 'stretch' }}
+                selectedValue={this.state.currentChapter}
+                onValueChange={this._onChapterSelected.bind(this)}>
+                {
+                  Array(this.state.totalChapter).fill(0).map((e, i) => i + 1).map(s => (<Picker.Item label={this.getChapterName(s.toString())} value={s} key={s} />))
+                }
+              </Picker>
+            </View>
           </View>
-          <View style={{ width: this.state.width / 3 }}>
-            <Picker
-              style={{ alignSelf: 'stretch' }}
-              selectedValue={this.state.currentBook}
-              onValueChange={this._onBookSelected.bind(this)}>
-              {audioBookId.map(s => (
-                <Picker.Item label={this.getBookName(s.name)} value={s.id} key={s.id} />
-              ))}
-            </Picker>
-          </View>
-          <View style={{ width: this.state.width / 3 }}>
-            <Picker
-              style={{ alignSelf: 'stretch' }}
-              selectedValue={this.state.currentChapter}
-              onValueChange={this._onChapterSelected.bind(this)}>
-              {
-                Array(this.state.totalChapter).fill(0).map((e, i) => i + 1).map(s => (<Picker.Item label={this.getChapterName(s.toString())} value={s} key={s} />))
-              }
-            </Picker>
+          <Slider
+            style={styles.playbackSlider}
+            value={this.state.progress}
+            onValueChange={this._onSeekSliderValueChange.bind(this)}
+            onSlidingComplete={this._onSeekSliderSlidingComplete.bind(this)}
+            disabled={!this.state.isLoaded}
+          />
+          <Text>{position}/{duration}</Text>
+          <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center' }}>
+            <TouchableHighlight
+              underlayColor={'#FFFFFF'}
+              style={styles.wrapper}
+              onPress={() => {
+                this.state.isPlaying ? this.pause() : this.play();
+              }}>
+              <FontAwesome
+                style={{ marginHorizontal: 30, width: 50 }}
+                name={this.state.isPlaying ? 'pause' : 'play'}
+                size={50}
+              />
+            </TouchableHighlight>
+            <TouchableHighlight
+              underlayColor={'#FFFFFF'}
+              style={styles.wrapper}
+              onPress={() => {
+                this._resetAudio();
+              }}>
+              <FontAwesome
+                style={{ marginHorizontal: 30, width: 50 }}
+                name='stop'
+                size={50}
+              />
+            </TouchableHighlight>
           </View>
         </View>
-        <Slider
-          style={styles.playbackSlider}
-          value={this.state.progress}
-          onValueChange={this._onSeekSliderValueChange.bind(this)}
-          onSlidingComplete={this._onSeekSliderSlidingComplete.bind(this)}
-          disabled={!this.state.isLoaded}
-        />
-        <Text>{position}/{duration}</Text>
-        <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center' }}>
-          <TouchableHighlight
-            underlayColor={'#FFFFFF'}
-            style={styles.wrapper}
-            onPress={() => {
-              this.state.isPlaying ? this.pause() : this.play();
-            }}>
-            <FontAwesome
-              style={{ marginHorizontal: 30, width: 50 }}
-              name={this.state.isPlaying ? 'pause' : 'play'}
-              size={50}
-            />
-          </TouchableHighlight>
-          <TouchableHighlight
-            underlayColor={'#FFFFFF'}
-            style={styles.wrapper}
-            onPress={() => {
-              this._resetAudio();
-            }}>
-            <FontAwesome
-              style={{ marginHorizontal: 30, width: 50 }}
-              name='stop'
-              size={50}
-            />
-          </TouchableHighlight>
-        </View>
-      </View>
+      </ScrollView>
     );
   }
 }
