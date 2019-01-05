@@ -6,14 +6,15 @@ import {
   View,
   Picker,
   Dimensions,
-  Modal,
-  Slider
+  Slider,
+  Alert
 } from 'react-native';
-import { Audio, KeepAwake } from 'expo';
 import { getI18nText, getI18nBibleBookFromLang } from '../store/I18n';
 import { getCurrentUser } from '../store/user';
 import { FontAwesome } from '@expo/vector-icons';
 import { Models } from '../dataStorage/models';
+import Sound from '../store/sound';
+const soundInstance = Sound.instance;
 
 const audioBookId = require('../assets/json/audioBookId.json');
 
@@ -54,8 +55,6 @@ export default class AudioBibleScreen extends React.Component {
       currentChapter,
       totalChapter: book.chapters,
       isPlaying: false,
-      isPaused: false,
-      isLoading: false,
       isLoaded: false,
       duration: 0,
       progress: 0,
@@ -66,45 +65,27 @@ export default class AudioBibleScreen extends React.Component {
   isSeeking = false;
 
   componentDidMount() {
-    Audio.setIsEnabledAsync(true);
-    Audio.setAudioModeAsync({
-      playsInSilentModeIOS: true,
-      allowsRecordingIOS: false,
-      interruptionModeIOS: Audio.INTERRUPTION_MODE_IOS_DUCK_OTHERS,
-      interruptionModeAndroid: Audio.INTERRUPTION_MODE_ANDROID_DUCK_OTHERS,
-      shouldDuckAndroid: true,
-      playThroughEarpieceAndroid: false
-    });
+    soundInstance.enableAsync(this.onPlaybackStatusUpdate.bind(this));
   }
 
   async _resetAudio() {
-    if (this.sound) {
-      if (this.state.isPlaying) {
-        try {
-          await this.sound.stopAsync();
-        } catch (e) {
-          console.log(e);
-        }
-      }
-      if (this.state.isLoaded) {
-        try {
-          await this.sound.unloadAsync();
-        } catch (e) {
-          console.log(e);
-        }
-      }
-    }
-    this.setState({ isLoaded: false, isPlaying: false, isPaused: false, duration: 0, progress: 0 });
+    await soundInstance.resetAsync();
+
+    this.setState({
+      isLoaded: false,
+      isPlaying: false,
+      duration: 0,
+      progress: 0
+    });
     console.log('reset');
   }
 
   async onPlaybackStatusUpdate(status) {
-    console.log(JSON.stringify(status));
+    //console.log(JSON.stringify(status));
     if (status.didJustFinish || status.progress == 1) {
       console.log('didJustFinish ' + this.state.currentChapter);
 
-      await this.sound.unloadAsync();
-      this.setState({ isLoaded: false });
+      await soundInstance.resetAsync();
 
       var newBook = 1;
       var newChapter = 1;
@@ -118,9 +99,12 @@ export default class AudioBibleScreen extends React.Component {
       }
 
       this.setState({ currentBook: newBook, currentChapter: newChapter });
-      await getCurrentUser().setAudioBibleBook(this.state.currentVersion * 1000 * 1000 + newBook * 1000 + newChapter);
-      await this.sound.loadAsync({ uri: this.getAudioUrl() });
-      await this.sound.playAsync();
+      await getCurrentUser().setAudioBibleBook(
+        this.state.currentVersion * 1000 * 1000 + newBook * 1000 + newChapter
+      );
+
+      await soundInstance.loadAsync(this.getAudioUrl());
+      await soundInstance.playAsync();
     } else if (status.isLoaded) {
       this.setState({
         isLoaded: true,
@@ -129,84 +113,43 @@ export default class AudioBibleScreen extends React.Component {
       });
     } else {
       if (status.error) {
-        console.log(`FATAL PLAYER ERROR: ${status.error}`);
+        Alert.alert('Audio error', status.error);
+        await this._resetAudio();
       }
     }
   }
 
   getAudioUrl() {
-    let url = 'http://mycbsf.org/mp3/' + this.state.currentVersion + '/' + this.state.currentBook + '/' + this.state.currentChapter + '.mp3';
-    console.log(url);
-    return url;
+    return `http://mycbsf.org/mp3/${this.state.currentVersion}/${this.state.currentBook}/${this.state.currentChapter}.mp3`;
   }
 
   async play() {
-    if (!this.sound) {
-      try {
-        const { sound, status } = await Audio.Sound.create(
-          { uri: this.getAudioUrl() },
-          { shouldPlay: false },
-          this.onPlaybackStatusUpdate.bind(this),
-          false
-        );
-        this.sound = sound;
-      } catch (error) {
-        alert(error);
-        this.setState({ isLoading: false });
-        return;
-      }
-    }
-    else {
-      if (!this.state.isLoaded) {
-        await this.sound.loadAsync({ uri: this.getAudioUrl() });
-      }
+    if (!this.state.isLoaded) {
+      await soundInstance.loadAsync(this.getAudioUrl());
     }
 
-    this.sound.playFromPositionAsync(this.state.progress * this.state.duration);
-    this.setState({ isPlaying: true, isPaused: false, isLoading: false });
-    console.log('playing');
-    KeepAwake.activate();
+    await soundInstance.playFromPositionAsync(this.state.progress * this.state.duration);
+    this.setState({ isPlaying: true, isLoaded: true });
   }
 
   async pause() {
-    if (this.sound) {
-      await this.sound.pauseAsync();
-    }
-
-    this.setState({ isPlaying: false, isPaused: true, isLoading: false });
-    console.log('paused');
-    KeepAwake.deactivate();
+    await soundInstance.pauseAsync();
+    this.setState({ isPlaying: false, isLoaded: true });
   }
 
-  async _onPlayOrPause() {
-    console.log('_onPlayOrPause');
-    this.setState({ isLoading: true });
-    if (!this.state.isPlaying) {
-      this.play();
-    } else {
-      this.pause();
-    }
-  }
-
-  async _onStop() {
-    this._resetAudio();
-    console.log('stopped');
-    KeepAwake.deactivate();
-  }
-
-  _onBookSelected = async (id) => {
+  async _onBookSelected(id) {
     let book = audioBookId.find((element) => (element.id == id));
     await this._resetAudio();
     this.setState({
       currentBook: id,
       currentChapter: 1,
-      totalChapter: book.chapters,
+      totalChapter: book.chapters
     });
     await getCurrentUser().setAudioBibleBook(this.state.currentVersion * 1000 * 1000 + id * 1000 + 1);
     console.log(JSON.stringify(this.state));
   }
 
-  _onChapterSelected = async (chapter) => {
+  async _onChapterSelected(chapter) {
     console.log('_onChapterSelected:' + chapter);
     await this._resetAudio();
     this.setState({ currentChapter: chapter });
@@ -222,18 +165,16 @@ export default class AudioBibleScreen extends React.Component {
 
   async _onSeekSliderSlidingComplete(value) {
     console.log('SeekComplete: ' + value);
-    if (this.sound != null) {
-      this.isSeeking = false;
-      this.setState({ progress: value });
+    this.isSeeking = false;
+    this.setState({ progress: value });
 
-      if (this.state.isPlaying) {
-        await this.sound.playFromPositionAsync(value * this.state.duration);
-      }
+    if (this.state.isPlaying) {
+      await soundInstance.playFromPositionAsync(value * this.state.duration);
     }
   }
 
   async _onVersionSelected(value) {
-    console.log("Swtich version:" + value);
+    console.log('Swtich version:' + value);
     await this._resetAudio();
     this.setState({ currentVersion: value });
     await getCurrentUser().setAudioBibleBook(value * 1000 * 1000 + this.state.currentBook * 1000 + this.state.currentChapter);
@@ -252,10 +193,6 @@ export default class AudioBibleScreen extends React.Component {
       return string;
     };
     return padWithZero(minutes) + ':' + padWithZero(seconds);
-  }
-
-  onLayout(e) {
-    this.setState({ width: Dimensions.get('window').width });
   }
 
   getBookName(name) {
@@ -279,7 +216,7 @@ export default class AudioBibleScreen extends React.Component {
   }
 
   render() {
-    console.log('State:' + JSON.stringify(this.state));
+    //console.log('State:' + JSON.stringify(this.state));
     const position = this._getMMSSFromMillis(this.state.duration * this.state.progress);
     const duration = this._getMMSSFromMillis(this.state.duration);
     return (
@@ -321,24 +258,20 @@ export default class AudioBibleScreen extends React.Component {
             </Picker>
           </View>
         </View>
-        {/*
         <Slider
           style={styles.playbackSlider}
           value={this.state.progress}
           onValueChange={this._onSeekSliderValueChange.bind(this)}
           onSlidingComplete={this._onSeekSliderSlidingComplete.bind(this)}
-          disabled={!this.state.isPlaying || this.state.isPaused}
+          disabled={!this.state.isLoaded}
         />
-        */}
         <Text>{position}/{duration}</Text>
         <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center' }}>
           <TouchableHighlight
             underlayColor={'#FFFFFF'}
             style={styles.wrapper}
             onPress={() => {
-              if (!this.state.isLoading) {
-                this._onPlayOrPause();
-              }
+              this.state.isPlaying ? this.pause() : this.play();
             }}>
             <FontAwesome
               style={{ marginHorizontal: 30, width: 50 }}
@@ -350,9 +283,7 @@ export default class AudioBibleScreen extends React.Component {
             underlayColor={'#FFFFFF'}
             style={styles.wrapper}
             onPress={() => {
-              if (!this.state.isLoading) {
-                this._onStop();
-              }
+              this._resetAudio();
             }}>
             <FontAwesome
               style={{ marginHorizontal: 30, width: 50 }}
