@@ -13,6 +13,10 @@ import HomeDiscussionScreen from '../screens/HomeDiscussionScreen';
 import NotesScreen from '../screens/NotesScreen';
 import AnswerManageScreen from '../screens/AnswerManageScreen';
 import BibleSelectScreen from '../screens/BibleSelectScreen';
+//////////////
+// added by Frank on Dec 18, 2018
+import MyBSFScreen from '../screens/MyBSFScreen';
+//////////////
 
 const RootStackNavigator = StackNavigator(
   {
@@ -51,6 +55,9 @@ const RootStackNavigator = StackNavigator(
     },
     BibleSelect: {
       screen: BibleSelectScreen
+    },
+    MyBSF: {
+      screen: MyBSFScreen
     }
   },
   {
