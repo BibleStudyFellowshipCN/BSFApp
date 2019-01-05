@@ -148,6 +148,8 @@ export default class Sound {
     console.log(`Sound:playFromPositionAsync:${positionMillis}`);
     try {
       await soundState.soundObject.playFromPositionAsync(positionMillis);
+      soundState.isPlaying = true;
+      KeepAwake.activate();
     } catch (error) {
       Alert.alert('Error', JSON.stringify(error));
     }
