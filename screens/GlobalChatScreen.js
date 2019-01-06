@@ -77,13 +77,21 @@ export default class GlobalChatScreen extends React.Component {
   }
 
   async shareAnswer() {
+    let questionId = this.props.navigation.state.params.id.substr(1);
     const answerContent = await loadAsync(Models.Answer, null, false);
-    if (!answerContent || !answerContent.answers || !answerContent.answers[props.question.id]) {
+    console.log({ questionId, answerContent });
+    if (!answerContent || !answerContent.answers || !answerContent.answers[questionId]) {
       return;
     }
 
-    const message = answerContent.answers[props.question.id].answerText;
-    this.chatServer.sendMessage(message);
+    const message = answerContent.answers[questionId].answerText;
+    this.chatServer.sendMessage([{
+      user: {
+        _id: Platform.OS + ' ' + Constants['deviceId'],
+        name: this.defaultUserName
+      },
+      text: message
+    }]);
   }
 
   render() {
