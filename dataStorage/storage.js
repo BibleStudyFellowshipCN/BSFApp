@@ -165,7 +165,7 @@ async function pokeServer() {
             const update = await Expo.Updates.checkForUpdateAsync();
             if (update.isAvailable) {
                 await Expo.Updates.fetchUpdateAsync();
-                Alert.alert(getI18nText('·¢ÏÖ¸üÐÂ'), getI18nText('³ÌÐò½«ÖØÐÂÆô¶¯'), [
+                Alert.alert(getI18nText('å‘çŽ°æ›´æ–°'), getI18nText('ç¨‹åºå°†é‡æ–°å¯åŠ¨'), [
                     { text: 'OK', onPress: () => Expo.Updates.reloadFromCache() },
                     { text: 'Later', onPress: () => { } },
                 ]);
