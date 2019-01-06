@@ -19,6 +19,8 @@ import Colors from '../constants/Colors'
 import { getI18nText, getI18nBibleBook } from '../store/I18n';
 import { getCurrentUser } from '../store/user';
 import { FontAwesome } from '@expo/vector-icons';
+import { Models } from '../dataStorage/models';
+import { loadAsync } from '../dataStorage/storage';
 
 class LessonScreen extends React.Component {
   static navigationOptions = ({ navigation }) => {
@@ -185,45 +187,62 @@ const DayQuestions = (props) => {
     );
 }
 
-const BSFQuestion = (props) => {
-  lastBibleQuote = null;
-  return (
-    <View style={{ marginVertical: 12, }}>
-      <QuestionText>
-        {props.question.questionText}
-      </QuestionText>
-      <View style={{
-        flexDirection: 'row',
-        flexWrap: 'wrap',
-        maxWidth: Dimensions.get('window').width - 10
-      }}>
-        {props.question.quotes.map(quote => (
-          <BibleQuote key={quote.book + quote.verse} book={quote.book} verse={quote.verse} goToPassage={props.goToPassage} />
-        ))}
-      </View>
-      <View>
-        <Answer questionId={props.question.id} />
-        {
-          getCurrentUser().getUserPermissions().chat &&
-          <View style={{
-            position: 'absolute',
-            top: -26,
-            right: -11
-          }}>
-            <TouchableOpacity onPress={() => {
-              navigateTo('GlobalChat', {
-                id: props.question.id,
-                title: getI18nText('问题讨论') + ' ' + props.question.id,
-                text: props.question.questionText
-              });
+class BSFQuestion extends React.Component {
+
+  async onChat() {
+    const props = this.props;
+
+    if (props.question.id.indexOf('homiletics') !== -1 && getCurrentUser().getUserPermissions().isGroupLeader) {
+      // Group leader has a different chat screen for homiletics question
+      navigateTo('GlobalChat', {
+        id: '~' + props.question.id,
+        title: getI18nText('经文分析练习') + ' ' + props.question.id,
+        text: props.question.questionText,
+        shareAnswer: true
+      });
+    } else {
+      navigateTo('GlobalChat', {
+        id: props.question.id,
+        title: getI18nText('问题讨论') + ' ' + props.question.id,
+        text: props.question.questionText
+      });
+    }
+  }
+
+  render() {
+    const props = this.props;
+    return (
+      <View style={{ marginVertical: 12, }}>
+        <QuestionText>
+          {props.question.questionText}
+        </QuestionText>
+        <View style={{
+          flexDirection: 'row',
+          flexWrap: 'wrap',
+          maxWidth: Dimensions.get('window').width - 10
+        }}>
+          {props.question.quotes.map(quote => (
+            <BibleQuote key={quote.book + quote.verse} book={quote.book} verse={quote.verse} goToPassage={props.goToPassage} />
+          ))}
+        </View>
+        <View>
+          <Answer questionId={props.question.id} />
+          {
+            getCurrentUser().getUserPermissions().chat &&
+            <View style={{
+              position: 'absolute',
+              top: -26,
+              right: -11
             }}>
-              <FontAwesome name='commenting-o' size={28} color='#95a5a6' style={{ backgroundColor: 'transparent' }} />
-            </TouchableOpacity>
-          </View>
-        }
+              <TouchableOpacity onPress={this.onChat.bind(this)}>
+                <FontAwesome name='commenting-o' size={28} color='#95a5a6' style={{ backgroundColor: 'transparent' }} />
+              </TouchableOpacity>
+            </View>
+          }
+        </View>
       </View>
-    </View>
-  );
+    );
+  }
 }
 
 const QuestionText = (props) => (
