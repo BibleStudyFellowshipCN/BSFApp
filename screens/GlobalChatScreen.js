@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, View, Platform, ActivityIndicator } from 'react-native';
+import { StyleSheet, Text, View, Platform, ActivityIndicator } from 'react-native';
 import { getI18nText } from '../store/I18n';
 import { Button } from 'react-native-elements';
 import { Models } from '../dataStorage/models';
@@ -77,7 +77,7 @@ export default class GlobalChatScreen extends React.Component {
   }
 
   async shareAnswer() {
-    let questionId = this.props.navigation.state.params.id.substr(1);
+    let questionId = this.props.navigation.state.params.id;
     const answerContent = await loadAsync(Models.Answer, null, false);
     console.log({ questionId, answerContent });
     if (!answerContent || !answerContent.answers || !answerContent.answers[questionId]) {
@@ -86,11 +86,12 @@ export default class GlobalChatScreen extends React.Component {
 
     const message = answerContent.answers[questionId].answerText;
     this.chatServer.sendMessage([{
+      _id: Math.round(Math.random() * 1000000),
+      text: message,
       user: {
         _id: Platform.OS + ' ' + Constants['deviceId'],
         name: this.defaultUserName
-      },
-      text: message
+      }
     }]);
   }
 

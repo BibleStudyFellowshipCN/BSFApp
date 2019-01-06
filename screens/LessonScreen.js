@@ -192,12 +192,13 @@ class BSFQuestion extends React.Component {
   async onChat() {
     const props = this.props;
 
-    if (props.question.id.indexOf('homiletics') !== -1 && getCurrentUser().getUserPermissions().isGroupLeader) {
+    if (props.question.homiletics && getCurrentUser().getUserPermissions().isGroupLeader) {
       // Group leader has a different chat screen for homiletics question
       navigateTo('GlobalChat', {
-        id: '~' + props.question.id,
+        id: props.question.id,
         title: getI18nText('经文分析练习') + ' ' + props.question.id,
         text: props.question.questionText,
+        homiletics: true,
         shareAnswer: true
       });
     } else {
