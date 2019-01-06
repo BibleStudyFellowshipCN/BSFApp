@@ -1,7 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { FontAwesome, Octicons, Ionicons, Feather } from '@expo/vector-icons';
-import { Constants, FileSystem } from 'expo';
+import { FontAwesome, Octicons, Feather } from '@expo/vector-icons';
+import { FileSystem } from 'expo';
 import {
   ScrollView,
   StyleSheet,
@@ -11,7 +11,8 @@ import {
   Alert,
   Platform,
   ProgressViewIOS,
-  ProgressBarAndroid
+  ProgressBarAndroid,
+  RefreshControl
 } from 'react-native';
 import Accordion from 'react-native-collapsible/Accordion';
 import { requestBooks, clearBooks } from "../store/books.js";
@@ -39,7 +40,8 @@ class HomeScreen extends React.Component {
   state = {
     downloadProgress: '',
     remoteVersion: '',
-    downloading: false
+    downloading: false,
+    refreshing: false
   };
 
   lastCheckForContentUpdateDate = 0;
@@ -147,6 +149,11 @@ class HomeScreen extends React.Component {
     this.props.navigation.navigate('SermonAudio', { id: lesson.id });
   }
 
+  async onRefresh() {
+    await this.checkForContentUpdate(false);
+    await getCurrentUser().checkForUpdate(false);
+  }
+
   render() {
     const progress = (this.state.downloadProgress + this.downloadedFiles) / this.downloadFiles;
     const progressText = getI18nText('下载课程') + ' ' + this.state.remoteVersion + ' (' + parseInt(progress * 100) + '%)';
@@ -168,7 +175,13 @@ class HomeScreen extends React.Component {
         }
         <ScrollView
           style={styles.container}
-          contentContainerStyle={styles.contentContainer}>
+          contentContainerStyle={styles.contentContainer}
+          refreshControl={
+            <RefreshControl
+              refreshing={this.state.refreshing}
+              onRefresh={this.onRefresh.bind(this)}
+            />
+          }>
           <View style={styles.booksContainer}>
             {
               this.props.booklist &&

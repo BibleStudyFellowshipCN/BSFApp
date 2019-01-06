@@ -216,7 +216,7 @@ export default class AttendanceScreen extends React.Component {
 
         <View style={{
           position: 'absolute',
-          bottom: 5,
+          bottom: 0,
           width: Layout.window.width,
           alignItems: 'center',
           backgroundColor: 'white'
@@ -225,7 +225,7 @@ export default class AttendanceScreen extends React.Component {
             disabled={this.state.busy}
             backgroundColor='#397EDC'
             borderRadius={5}
-            style={{ marginTop: 7 }}
+            style={{ margin: 7 }}
             containerViewStyle={{ width: Layout.window.width / 2 }}
             title={getI18nText('提交')}
             onPress={() => this.onSubmit(currentGroup)} />
