@@ -1,7 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux'
 import { ScrollView, StyleSheet, View, Alert, KeyboardAvoidingView } from 'react-native';
-import Expo, { FileSystem, Constants } from 'expo';
+import Expo, { FileSystem, Constants, WebBrowser } from 'expo';
 import { Models } from '../dataStorage/models';
 import { callWebServiceAsync, showWebServiceCallErrorsAsync } from '../dataStorage/storage';
 import { getCurrentUser } from '../store/user';
@@ -116,7 +116,7 @@ import Colors from '../constants/Colors';
   }
 
   onBibleSelected(name, version) {
-    console.log('onBibleSelected: ' + name  + ' ' + version);
+    console.log('onBibleSelected: ' + name + ' ' + version);
     this.onBibleVerseChange(version);
     this.setState({ bibleVersion: name });
   }
@@ -222,6 +222,14 @@ import Colors from '../constants/Colors';
       alert(JSON.stringify(e));
     }
   }
+
+  /////////////////////
+  // added by Frank on Dec 18, 2018
+  //_handlePressButtonAsync = async () => {
+  async onMyBSF() {
+    await WebBrowser.openBrowserAsync('https://www.mybsf.org');
+  }
+  /////////////////////
 
   render() {
     const { manifest } = Constants;
@@ -339,6 +347,17 @@ import Colors from '../constants/Colors';
                 onPress={this.onClearDownloadFiles.bind(this)}
               />
               <SettingsList.Header headerText='MBSF - Mobile Bible Study Fellowship' headerStyle={{ color: 'black', marginTop: 15 }} />
+              <SettingsList.Item
+                icon={
+                  <View style={{ marginTop: 3, left: 7 }} >
+                    <MaterialIcons color={Colors.yellow} size={28} name='library-books' />
+                  </View>
+                }
+                title={getI18nText('MyBSF.org')}
+                titleStyle={{ fontSize }}
+                titleInfoStyle={{ fontSize }}
+                onPress={this.onMyBSF.bind(this)}
+              />
               <SettingsList.Item
                 icon={
                   <View style={{ marginTop: 3, left: 7 }} >

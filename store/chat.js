@@ -9,6 +9,7 @@ export default class Chat {
   socket = null;
   callback = null;
   defaultUserName = 'B';
+  connected = false;
 
   constructor(id, callback, defaultUserName) {
     this.roomId = id;
@@ -18,8 +19,20 @@ export default class Chat {
       this.defaultUserName = defaultUserName;
     }
 
-    this.socket = io(Models.HostServer, {
-      transports: ['websocket'],
+    this.socket = io(Models.HostServer);
+
+    this.socket.on('connect', function () {
+      console.log('connected!');
+      this.connected = true;
+    });
+
+    this.socket.on('disconnect', function () {
+      console.log('disconnect!');
+      this.connected = false;
+    });
+
+    this.socket.on('event', function (data) {
+      console.log(data);
     });
 
     this.socket.on('newMessage', (data) => {

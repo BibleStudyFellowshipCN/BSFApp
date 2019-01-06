@@ -1,9 +1,10 @@
 import React from 'react';
-import { StyleSheet, View, Platform, ActivityIndicator } from 'react-native';
+import { StyleSheet, Text, View, Platform, ActivityIndicator } from 'react-native';
 import { getI18nText } from '../store/I18n';
 import { Button } from 'react-native-elements';
-import { getCurrentUser } from '../store/user';
-import { GiftedChat, Bubble } from 'react-native-gifted-chat';
+import { Models } from '../dataStorage/models';
+import { loadAsync } from '../dataStorage/storage';
+import { GiftedChat } from 'react-native-gifted-chat';
 import Chat from '../store/chat';
 import { Constants } from 'expo';
 import KeyboardSpacer from 'react-native-keyboard-spacer';
@@ -75,6 +76,25 @@ export default class GlobalChatScreen extends React.Component {
     this.chatServer.closeChat();
   }
 
+  async shareAnswer() {
+    let questionId = this.props.navigation.state.params.id;
+    const answerContent = await loadAsync(Models.Answer, null, false);
+    console.log({ questionId, answerContent });
+    if (!answerContent || !answerContent.answers || !answerContent.answers[questionId]) {
+      return;
+    }
+
+    const message = answerContent.answers[questionId].answerText;
+    this.chatServer.sendMessage([{
+      _id: Math.round(Math.random() * 1000000),
+      text: message,
+      user: {
+        _id: Platform.OS + ' ' + Constants['deviceId'],
+        name: this.defaultUserName
+      }
+    }]);
+  }
+
   render() {
     return (
       <View style={styles.container}>
@@ -103,7 +123,21 @@ export default class GlobalChatScreen extends React.Component {
           Platform.OS == 'android' &&
           <KeyboardSpacer />
         }
-      </View >
+        {
+          this.props.navigation.state.params.shareAnswer &&
+          <View style={{
+            position: 'absolute',
+            top: 7,
+            right: 2
+          }}>
+            <Button
+              backgroundColor='#fcaf17'
+              borderRadius={5}
+              title={getI18nText('分享答案')}
+              onPress={this.shareAnswer.bind(this)} />
+          </View>
+        }
+      </View>
     );
   }
 }

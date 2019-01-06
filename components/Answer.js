@@ -35,7 +35,7 @@ class Answer extends React.Component {
   }
 
   render() {
-    const height = Math.max(120, this.state.height);
+    const height = Math.max(this.props.homiletics ? 210 : 120, this.state.height);
     const answerWidth = this.state.width - 32;
     return (
       <View style={[styles.answerContainer, { height }]} onLayout={this.onLayout.bind(this)}>
