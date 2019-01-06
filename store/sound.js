@@ -1,36 +1,22 @@
 import { Alert } from 'react-native';
 import { Audio, KeepAwake } from 'expo';
 
-soundState = {
-  soundObject: null,
-  isLoaded: false,
-  isPlaying: false
-};
-
-const singleton = Symbol();
-const singletonEnforcer = Symbol();
-
 export default class Sound {
-  constructor(enforcer) {
-    if (enforcer != singletonEnforcer) throw 'Cannot construct singleton';
-  }
-
-  static get instance() {
-    if (!this[singleton]) {
-      this[singleton] = new Sound(singletonEnforcer);
-    }
-    return this[singleton];
-  }
-
   get state() {
     return {
       isPlaying: this.isPlaying,
       isLoaded: this.isLoaded
     }
-  }
+  };
+
+  soundState = {
+    soundObject: null,
+    isLoaded: false,
+    isPlaying: false
+  };
 
   async enableAsync(onPlaybackStatusUpdate) {
-    if (soundState.soundObject) {
+    if (this.soundState.soundObject) {
       console.log(`Sound:resetAsync:soundObject is already initialized`);
       return;
     }
@@ -47,39 +33,39 @@ export default class Sound {
         playThroughEarpieceAndroid: false
       });
 
-      soundState.soundObject = new Expo.Audio.Sound();
-      soundState.soundObject.setOnPlaybackStatusUpdate(onPlaybackStatusUpdate);
+      this.soundState.soundObject = new Expo.Audio.Sound();
+      this.soundState.soundObject.setOnPlaybackStatusUpdate(onPlaybackStatusUpdate);
     } catch (error) {
-      Alert.alert('Error', JSON.stringify(error));
+      console.log(JSON.stringify(error));
     }
   }
 
   async resetAsync() {
-    if (!soundState.soundObject) {
+    if (!this.soundState.soundObject) {
       console.log(`Sound:resetAsync:soundObject is null`);
       return;
     }
 
     console.log('Sound:reset');
     try {
-      if (soundState.isPlaying) {
-        await soundState.soundObject.stopAsync();
-        soundState.isPlaying = false;
+      if (this.soundState.isPlaying) {
+        await this.soundState.soundObject.stopAsync();
+        this.soundState.isPlaying = false;
       }
 
-      if (soundState.isLoaded) {
-        await soundState.soundObject.unloadAsync();
-        soundState.isLoaded = false;
+      if (this.soundState.isLoaded) {
+        await this.soundState.soundObject.unloadAsync();
+        this.soundState.isLoaded = false;
       }
 
       KeepAwake.deactivate();
     } catch (error) {
-      Alert.alert('Error', JSON.stringify(error));
+      console.log(JSON.stringify(error));
     }
   }
 
   async loadAsync(uri) {
-    if (!soundState.soundObject) {
+    if (!this.soundState.soundObject) {
       console.log(`Sound:loadAsync:soundObject is null`);
       return;
     }
@@ -89,56 +75,56 @@ export default class Sound {
     this.resetAsync();
 
     try {
-      await soundState.soundObject.loadAsync({ uri });
-      soundState.isLoaded = true;
+      await this.soundState.soundObject.loadAsync({ uri });
+      this.soundState.isLoaded = true;
     } catch (error) {
-      Alert.alert('Error', JSON.stringify(error));
+      console.log(JSON.stringify(error));
     }
   }
 
   async playAsync() {
-    if (!soundState.soundObject) {
+    if (!this.soundState.soundObject) {
       console.log(`Sound:playAsync:soundObject is null`);
       return;
     }
 
-    if (soundState.isPlaying) {
+    if (this.soundState.isPlaying) {
       return;
     }
 
     console.log('Sound:playing');
 
     try {
-      await soundState.soundObject.playAsync();
-      soundState.isPlaying = true;
+      await this.soundState.soundObject.playAsync();
+      this.soundState.isPlaying = true;
       KeepAwake.activate();
     } catch (error) {
-      Alert.alert('Error', JSON.stringify(error));
+      console.log(JSON.stringify(error));
     }
   }
 
   async pauseAsync() {
-    if (!soundState.soundObject) {
+    if (!this.soundState.soundObject) {
       console.log(`Sound:pauseAsync:soundObject is null`);
       return;
     }
 
-    if (!soundState.isPlaying) {
+    if (!this.soundState.isPlaying) {
       return;
     }
 
     console.log('Sound:paused');
     try {
-      await soundState.soundObject.pauseAsync();
-      soundState.isPlaying = false;
+      await this.soundState.soundObject.pauseAsync();
+      this.soundState.isPlaying = false;
       KeepAwake.deactivate();
     } catch (error) {
-      Alert.alert('Error', JSON.stringify(error));
+      console.log(JSON.stringify(error));
     }
   }
 
   async playFromPositionAsync(positionMillis) {
-    if (!soundState.soundObject) {
+    if (!this.soundState.soundObject) {
       console.log(`Sound:playFromPositionAsync:soundObject is null`);
       return;
     }
@@ -147,11 +133,11 @@ export default class Sound {
 
     console.log(`Sound:playFromPositionAsync:${positionMillis}`);
     try {
-      await soundState.soundObject.playFromPositionAsync(positionMillis);
-      soundState.isPlaying = true;
+      await this.soundState.soundObject.playFromPositionAsync(positionMillis);
+      this.soundState.isPlaying = true;
       KeepAwake.activate();
     } catch (error) {
-      Alert.alert('Error', JSON.stringify(error));
+      console.log(JSON.stringify(error));
     }
   }
 }

@@ -15,7 +15,7 @@ import { getCurrentUser } from '../store/user';
 import { FontAwesome } from '@expo/vector-icons';
 import { Models } from '../dataStorage/models';
 import Sound from '../store/sound';
-const soundInstance = Sound.instance;
+import AudioPlayer from '../components/AudioPlayer';
 
 const audioBookId = require('../assets/json/audioBookId.json');
 
@@ -63,137 +63,35 @@ export default class AudioBibleScreen extends React.Component {
     };
   }
 
-  isSeeking = false;
-
-  componentDidMount() {
-    soundInstance.enableAsync(this.onPlaybackStatusUpdate.bind(this));
-  }
-
-  async _resetAudio() {
-    await soundInstance.resetAsync();
-
-    this.setState({
-      isLoaded: false,
-      isPlaying: false,
-      duration: 0,
-      progress: 0
-    });
-    console.log('reset');
-  }
-
-  async onPlaybackStatusUpdate(status) {
-    //console.log(JSON.stringify(status));
-    if (status.didJustFinish || status.progress == 1) {
-      console.log('didJustFinish ' + this.state.currentChapter);
-
-      await soundInstance.resetAsync();
-
-      var newBook = 1;
-      var newChapter = 1;
-      if (this.state.currentChapter < this.state.totalChapter) {
-        // play next chapter
-        newBook = this.state.currentBook;
-        newChapter = this.state.currentChapter + 1;
-      } else if (this.state.currentBook < 66) {
-        // play next book
-        newBook = this.state.currentBook + 1;
-      }
-
-      this.setState({ currentBook: newBook, currentChapter: newChapter });
-      await getCurrentUser().setAudioBibleBook(
-        this.state.currentVersion * 1000 * 1000 + newBook * 1000 + newChapter
-      );
-
-      await soundInstance.loadAsync(this.getAudioUrl());
-      await soundInstance.playAsync();
-    } else if (status.isLoaded) {
-      this.setState({
-        isLoaded: true,
-        progress: status.positionMillis / status.durationMillis,
-        duration: status.durationMillis
-      });
-    } else {
-      if (status.error) {
-        Alert.alert('Audio error', status.error);
-        await this._resetAudio();
-      }
-    }
-  }
-
   getAudioUrl() {
     return `http://mycbsf.org/mp3/${this.state.currentVersion}/${this.state.currentBook}/${this.state.currentChapter}.mp3`;
   }
 
-  async play() {
-    if (!this.state.isLoaded) {
-      await soundInstance.loadAsync(this.getAudioUrl());
+  async updateAudio(play) {
+    await this.audioPlayer.resetAudio();
+    await this.audioPlayer.loadAsync(this.getAudioUrl());
+    if (play) {
+      await this.audioPlayer.playAsync();
     }
-
-    await soundInstance.playFromPositionAsync(this.state.progress * this.state.duration);
-    this.setState({ isPlaying: true, isLoaded: true });
-  }
-
-  async pause() {
-    await soundInstance.pauseAsync();
-    this.setState({ isPlaying: false, isLoaded: true });
   }
 
   async _onBookSelected(id) {
     let book = audioBookId.find((element) => (element.id == id));
-    await this._resetAudio();
-    this.setState({
-      currentBook: id,
-      currentChapter: 1,
-      totalChapter: book.chapters
-    });
+    this.setState({ currentBook: id, currentChapter: 1, totalChapter: book.chapters });
     await getCurrentUser().setAudioBibleBook(this.state.currentVersion * 1000 * 1000 + id * 1000 + 1);
-    console.log(JSON.stringify(this.state));
+    await this.updateAudio();
   }
 
   async _onChapterSelected(chapter) {
-    console.log('_onChapterSelected:' + chapter);
-    await this._resetAudio();
     this.setState({ currentChapter: chapter });
     await getCurrentUser().setAudioBibleBook(this.state.currentVersion * 1000 * 1000 + this.state.currentBook * 1000 + chapter);
-  }
-
-  _onSeekSliderValueChange(value) {
-    console.log('Seeking: ' + value);
-    if (this.sound && this.isPlaying && !this.isSeeking) {
-      this.isSeeking = true;
-    }
-  }
-
-  async _onSeekSliderSlidingComplete(value) {
-    console.log('SeekComplete: ' + value);
-    this.isSeeking = false;
-    this.setState({ progress: value });
-
-    if (this.state.isPlaying) {
-      await soundInstance.playFromPositionAsync(value * this.state.duration);
-    }
+    await this.updateAudio();
   }
 
   async _onVersionSelected(value) {
-    console.log('Swtich version:' + value);
-    await this._resetAudio();
     this.setState({ currentVersion: value });
     await getCurrentUser().setAudioBibleBook(value * 1000 * 1000 + this.state.currentBook * 1000 + this.state.currentChapter);
-  }
-
-  _getMMSSFromMillis(millis) {
-    const totalSeconds = millis / 1000;
-    const seconds = Math.floor(totalSeconds % 60);
-    const minutes = Math.floor(totalSeconds / 60);
-
-    const padWithZero = number => {
-      const string = number.toString();
-      if (number < 10) {
-        return '0' + string;
-      }
-      return string;
-    };
-    return padWithZero(minutes) + ':' + padWithZero(seconds);
+    await this.updateAudio();
   }
 
   getBookName(name) {
@@ -216,10 +114,27 @@ export default class AudioBibleScreen extends React.Component {
     return name;
   }
 
+  async onFinished() {
+    var newBook = 1;
+    var newChapter = 1;
+    if (this.state.currentChapter < this.state.totalChapter) {
+      // play next chapter
+      newBook = this.state.currentBook;
+      newChapter = this.state.currentChapter + 1;
+    } else if (this.state.currentBook < 66) {
+      // play next book
+      newBook = this.state.currentBook + 1;
+    }
+
+    this.setState({ currentBook: newBook, currentChapter: newChapter });
+    await getCurrentUser().setAudioBibleBook(
+      this.state.currentVersion * 1000 * 1000 + newBook * 1000 + newChapter
+    );
+
+    await this.updateAudio(true);
+  }
+
   render() {
-    //console.log('State:' + JSON.stringify(this.state));
-    const position = this._getMMSSFromMillis(this.state.duration * this.state.progress);
-    const duration = this._getMMSSFromMillis(this.state.duration);
     return (
       <ScrollView
         style={{ flex: 1, backgroundColor: 'white' }}>
@@ -257,50 +172,14 @@ export default class AudioBibleScreen extends React.Component {
               </Picker>
             </View>
           </View>
-          <Slider
-            style={styles.playbackSlider}
-            value={this.state.progress}
-            onValueChange={this._onSeekSliderValueChange.bind(this)}
-            onSlidingComplete={this._onSeekSliderSlidingComplete.bind(this)}
-            disabled={!this.state.isLoaded}
+          <AudioPlayer
+            ref={ref => this.audioPlayer = ref}
+            width={this.state.width - 15}
+            uri={this.getAudioUrl()}
+            onFinished={this.onFinished.bind(this)}
           />
-          <Text>{position}/{duration}</Text>
-          <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center' }}>
-            <TouchableHighlight
-              underlayColor={'#FFFFFF'}
-              style={styles.wrapper}
-              onPress={() => {
-                this.state.isPlaying ? this.pause() : this.play();
-              }}>
-              <FontAwesome
-                style={{ marginHorizontal: 30, width: 50 }}
-                name={this.state.isPlaying ? 'pause' : 'play'}
-                size={50}
-              />
-            </TouchableHighlight>
-            <TouchableHighlight
-              underlayColor={'#FFFFFF'}
-              style={styles.wrapper}
-              onPress={() => {
-                this._resetAudio();
-              }}>
-              <FontAwesome
-                style={{ marginHorizontal: 30, width: 50 }}
-                name='stop'
-                size={50}
-              />
-            </TouchableHighlight>
-          </View>
         </View>
       </ScrollView>
     );
   }
 }
-
-const styles = StyleSheet.create({
-  wrapper: {
-  },
-  playbackSlider: {
-    alignSelf: 'stretch',
-  }
-});
