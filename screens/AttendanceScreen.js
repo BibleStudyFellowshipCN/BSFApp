@@ -218,7 +218,8 @@ export default class AttendanceScreen extends React.Component {
           position: 'absolute',
           bottom: 5,
           width: Layout.window.width,
-          alignItems: 'center'
+          alignItems: 'center',
+          backgroundColor: 'white'
         }}>
           <Button
             disabled={this.state.busy}
