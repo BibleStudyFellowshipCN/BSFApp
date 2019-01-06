@@ -1,7 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux'
 import { ScrollView, StyleSheet, View, Alert, KeyboardAvoidingView } from 'react-native';
-import Expo, { FileSystem, Constants } from 'expo';
+import Expo, { FileSystem, Constants, WebBrowser } from 'expo';
 import { Models } from '../dataStorage/models';
 import { callWebServiceAsync, showWebServiceCallErrorsAsync } from '../dataStorage/storage';
 import { getCurrentUser } from '../store/user';
@@ -116,7 +116,7 @@ import Colors from '../constants/Colors';
   }
 
   onBibleSelected(name, version) {
-    console.log('onBibleSelected: ' + name  + ' ' + version);
+    console.log('onBibleSelected: ' + name + ' ' + version);
     this.onBibleVerseChange(version);
     this.setState({ bibleVersion: name });
   }
@@ -223,19 +223,13 @@ import Colors from '../constants/Colors';
     }
   }
 
-/////////////////////
+  /////////////////////
   // added by Frank on Dec 18, 2018
   //_handlePressButtonAsync = async () => {
   async onMyBSF() {
-  //onMyBSF = async () => {
-    //alert("Open WebBrowser7");
-    this.props.navigation.navigate('MyBSF'); 
-    
-    // ??Why doesn't work here?
-    //let result = await WebBrowser.openAuthSessionAsync('https://www.mybsf.org');
-    
+    await WebBrowser.openBrowserAsync('https://www.mybsf.org');
   }
-/////////////////////
+  /////////////////////
 
   render() {
     const { manifest } = Constants;
