@@ -102,13 +102,16 @@ class LessonScreen extends React.Component {
   render() {
     const scrollableStyleProps = {
       tabBarBackgroundColor: Colors.yellow,
-      tabBarActiveTextColor: 'rgba(255, 255, 255, 1)',
-      tabBarInactiveTextColor: 'rgba(0, 0, 0, 0.7)',
+      tabBarActiveTextColor: this.state.keyboard ? Colors.yellow : 'rgba(255, 255, 255, 1)',
+      tabBarInactiveTextColor: this.state.keyboard ? Colors.yellow : 'rgba(0, 0, 0, 0.7)',
       tabBarUnderlineStyle: {
         backgroundColor: 'white',
         height: this.state.keyboard ? 3 : 2
       },
-      tabBarTextStyle: { fontSize: 20, fontWeight: '700' },
+      tabBarTextStyle: {
+        fontSize: 20,
+        fontWeight: '700'
+      },
     }
 
     if (!this.props.lesson) {
@@ -137,7 +140,7 @@ class LessonScreen extends React.Component {
 
     // TODO:[Wei] KeyboardAwareScrollView works on iOS but not Android, KeyboardAvoidingView works on Android, but not iOS :(
     return (Platform.OS === 'ios') ? content : (
-      <KeyboardAvoidingView style={styles.container} behavior='padding' keyboardVerticalOffset={80}>
+      <KeyboardAvoidingView style={styles.container} behavior='padding' keyboardVerticalOffset={30}>
         {content}
       </KeyboardAvoidingView >
     );
@@ -196,7 +199,7 @@ const DayQuestions = (props) => {
   );
 
   return (Platform.OS === 'ios') ? (
-    <KeyboardAwareScrollView style={styles.dayQuestionsContainer} extraScrollHeight={80}>
+    <KeyboardAwareScrollView style={styles.dayQuestionsContainer} extraScrollHeight={30}>
       {content}
     </KeyboardAwareScrollView>
   ) : (
