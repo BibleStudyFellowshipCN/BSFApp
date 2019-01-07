@@ -7,10 +7,11 @@ import {
   Text,
   TouchableOpacity,
   View,
+  Keyboard,
   KeyboardAvoidingView,
   Dimensions
 } from 'react-native';
-import ScrollableTabView from 'react-native-scrollable-tab-view';
+import ScrollableTabView, { DefaultTabBar } from 'react-native-scrollable-tab-view';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { loadLesson } from '../store/lessons.js'
 import Answer from '../components/Answer'
@@ -19,8 +20,6 @@ import Colors from '../constants/Colors'
 import { getI18nText, getI18nBibleBook } from '../store/I18n';
 import { getCurrentUser } from '../store/user';
 import { FontAwesome } from '@expo/vector-icons';
-import { Models } from '../dataStorage/models';
-import { loadAsync } from '../dataStorage/storage';
 
 class LessonScreen extends React.Component {
   static navigationOptions = ({ navigation }) => {
@@ -38,11 +37,23 @@ class LessonScreen extends React.Component {
     // The workaround is set initialPage to -1 and navigate to page 0 when control is initialized
     this.initialPage = Platform.OS === 'ios' ? 0 : -1;
     this.intervalId = null;
+    this.state = {
+      keyboard: false
+    };
   }
 
   componentWillMount() {
     navigateTo = this.navigateTo.bind(this);
     onImportAndExport = this.onImportAndExport.bind(this);
+
+    this.keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', (event) => {
+      console.log('keyboard show');
+      this.setState({ keyboard: true });
+    });
+    this.keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', (event) => {
+      console.log('keyboard hide');
+      this.setState({ keyboard: false })
+    });
 
     if (!this.props.lesson) {
       this.props.loadLesson();
@@ -54,6 +65,9 @@ class LessonScreen extends React.Component {
   }
 
   componentWillUnmount() {
+    this.keyboardDidShowListener.remove();
+    this.keyboardDidHideListener.remove();
+
     if (Platform.OS != 'ios') {
       clearInterval(this.intervalId);
     }
@@ -90,7 +104,10 @@ class LessonScreen extends React.Component {
       tabBarBackgroundColor: Colors.yellow,
       tabBarActiveTextColor: 'rgba(255, 255, 255, 1)',
       tabBarInactiveTextColor: 'rgba(0, 0, 0, 0.7)',
-      tabBarUnderlineStyle: { backgroundColor: 'white', height: 2 },
+      tabBarUnderlineStyle: {
+        backgroundColor: 'white',
+        height: this.state.keyboard ? 3 : 2
+      },
       tabBarTextStyle: { fontSize: 20, fontWeight: '700' },
     }
 
@@ -107,7 +124,9 @@ class LessonScreen extends React.Component {
     const content =
       <ScrollableTabView
         ref={ref => this.tabView = ref}
-        {...scrollableStyleProps} initialPage={this.initialPage}>
+        {...scrollableStyleProps}
+        initialPage={this.initialPage}
+        renderTabBar={() => <DefaultTabBar style={{ height: this.state.keyboard ? 3 : 30 }} />}>
         <DayQuestions tabLabel={getI18nText("一")} goToPassage={this.goToPassage} day={dayQuestions.one} memoryVerse={this.props.lesson.memoryVerse} />
         <DayQuestions tabLabel={getI18nText("二")} goToPassage={this.goToPassage} day={dayQuestions.two} />
         <DayQuestions tabLabel={getI18nText("三")} goToPassage={this.goToPassage} day={dayQuestions.three} />
