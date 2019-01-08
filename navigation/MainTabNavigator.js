@@ -6,18 +6,22 @@ import Colors from '../constants/Colors';
 import HomeScreen from '../screens/HomeScreen';
 import AudioBibleScreen from '../screens/AudioBibleScreen';
 import SettingsScreen from '../screens/SettingsScreen';
+import MyBSFScreen from '../screens/MyBSFScreen';
 
 export default TabNavigator(
   {
     Home: {
-      screen: HomeScreen,
+      screen: HomeScreen
+    },
+    MyBSFScreen: {
+      screen: MyBSFScreen
     },
     AudioBible: {
-      screen: AudioBibleScreen,
+      screen: AudioBibleScreen
     },
     Settings: {
-      screen: SettingsScreen,
-    },
+      screen: SettingsScreen
+    }
   },
   {
     navigationOptions: ({ navigation }) => ({
@@ -27,6 +31,9 @@ export default TabNavigator(
         switch (routeName) {
           case 'Home':
             image = focused ? require('../assets/images/Classes.On.png') : require('../assets/images/Classes.Off.png');
+            break;
+          case 'MyBSFScreen':
+            image = focused ? require('../assets/images/mybsf.On.png') : require('../assets/images/mybsf.Off.png');
             break;
           case 'AudioBible':
             image = focused ? require('../assets/images/AudioBible.On.png') : require('../assets/images/AudioBible.Off.png');
