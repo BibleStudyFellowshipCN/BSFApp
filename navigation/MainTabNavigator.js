@@ -1,12 +1,11 @@
 import React from 'react';
-import { View, Text, Platform } from 'react-native';
+import { Image } from 'react-native';
 import { FontAwesome } from '@expo/vector-icons';
 import { TabNavigator, TabBarBottom } from 'react-navigation';
 import Colors from '../constants/Colors';
 import HomeScreen from '../screens/HomeScreen';
 import AudioBibleScreen from '../screens/AudioBibleScreen';
 import SettingsScreen from '../screens/SettingsScreen';
-import { getI18nText } from '../store/I18n';
 
 export default TabNavigator(
   {
@@ -24,24 +23,22 @@ export default TabNavigator(
     navigationOptions: ({ navigation }) => ({
       tabBarIcon: ({ focused }) => {
         const { routeName } = navigation.state;
-        let iconName;
+        let image;
         switch (routeName) {
           case 'Home':
-            iconName = 'book';
+            image = focused ? require('../assets/images/Classes.On.png') : require('../assets/images/Classes.Off.png');
             break;
           case 'AudioBible':
-            iconName = 'headphones';
+            image = focused ? require('../assets/images/AudioBible.On.png') : require('../assets/images/AudioBible.Off.png');
             break;
           case 'Settings':
-            iconName = 'info-circle';
+            image = focused ? require('../assets/images/MySettings.On.png') : require('../assets/images/MySettings.Off.png');
+            break;
         }
         return (
-          <FontAwesome
-            name={iconName}
-            size={28}
-            color={focused ? Colors.tabIconSelected : Colors.tabIconDefault}
-            style={{ marginBottom: -3 }}
-          />
+          <Image
+            style={{ width: 30, height: 30 }}
+            source={image} />
         );
       },
     }),
@@ -52,7 +49,7 @@ export default TabNavigator(
     tabBarOptions: {
       activeTintColor: 'white',
       labelStyle: {
-        fontSize: 12,
+        fontSize: 11,
       },
       style: {
         backgroundColor: Colors.yellow
