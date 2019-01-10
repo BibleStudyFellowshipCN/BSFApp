@@ -124,7 +124,7 @@ export default class GlobalChatScreen extends React.Component {
           <KeyboardSpacer />
         }
         {
-          this.props.navigation.state.params.shareAnswer &&
+          this.props.navigation.state.params.homiletics &&
           <View style={{
             position: 'absolute',
             top: 7,

@@ -140,7 +140,7 @@ class LessonScreen extends React.Component {
 
     // TODO:[Wei] KeyboardAwareScrollView works on iOS but not Android, KeyboardAvoidingView works on Android, but not iOS :(
     return (Platform.OS === 'ios') ? content : (
-      <KeyboardAvoidingView style={styles.container} behavior='padding' keyboardVerticalOffset={30}>
+      <KeyboardAvoidingView style={styles.container} behavior='padding' keyboardVerticalOffset={80}>
         {content}
       </KeyboardAvoidingView >
     );
@@ -199,7 +199,7 @@ const DayQuestions = (props) => {
   );
 
   return (Platform.OS === 'ios') ? (
-    <KeyboardAwareScrollView style={styles.dayQuestionsContainer} extraScrollHeight={30}>
+    <KeyboardAwareScrollView style={styles.dayQuestionsContainer} extraScrollHeight={80}>
       {content}
     </KeyboardAwareScrollView>
   ) : (
@@ -216,12 +216,11 @@ class BSFQuestion extends React.Component {
 
     if (props.question.homiletics && getCurrentUser().getUserPermissions().isGroupLeader) {
       // Group leader has a different chat screen for homiletics question
-      navigateTo('GlobalChat', {
+      navigateTo('Homiletics', {
         id: props.question.id,
         title: getI18nText('经文分析练习') + ' ' + props.question.id,
         text: props.question.questionText,
-        homiletics: true,
-        shareAnswer: true
+        quotes: props.question.quotes
       });
     } else {
       navigateTo('GlobalChat', {
@@ -234,6 +233,7 @@ class BSFQuestion extends React.Component {
 
   render() {
     const props = this.props;
+    const homiletics = props.question.homiletics;
     return (
       <View style={{ marginVertical: 12, }}>
         <QuestionText>
@@ -249,9 +249,11 @@ class BSFQuestion extends React.Component {
           ))}
         </View>
         <View>
-          <Answer questionId={props.question.id} />
+          <Answer questionId={props.question.id} homiletics={homiletics} />
           {
+            // Show chat icon if user has chat permission and (not homiletics question or group leader)
             getCurrentUser().getUserPermissions().chat &&
+            (!homiletics || getCurrentUser().getUserPermissions().isGroupLeader) &&
             <View style={{
               position: 'absolute',
               top: -26,

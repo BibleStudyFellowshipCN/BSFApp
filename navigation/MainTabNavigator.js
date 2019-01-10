@@ -1,6 +1,5 @@
 import React from 'react';
 import { Image } from 'react-native';
-import { FontAwesome } from '@expo/vector-icons';
 import { TabNavigator, TabBarBottom } from 'react-navigation';
 import Colors from '../constants/Colors';
 import HomeScreen from '../screens/HomeScreen';
