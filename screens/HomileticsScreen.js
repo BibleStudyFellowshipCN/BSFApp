@@ -1,7 +1,6 @@
 import React from 'react';
 import {
-  StyleSheet, Text, View, Platform, ScrollView, TouchableOpacity, Dimensions, TextInput,
-  KeyboardAvoidingView
+  StyleSheet, Text, View, Platform, ActivityIndicator, TouchableOpacity, Dimensions, Alert
 } from 'react-native';
 import { Models } from '../dataStorage/models';
 import { loadAsync } from '../dataStorage/storage';
@@ -9,32 +8,44 @@ import Chat from '../store/chat';
 import { Constants } from 'expo';
 import { getCurrentUser } from '../store/user';
 import Colors from '../constants/Colors';
-import { getI18nText, getI18nBibleBook } from '../store/I18n';
-import { Button } from 'react-native-elements';
+import { getI18nBibleBook } from '../store/I18n';
+import { GiftedChat } from 'react-native-gifted-chat';
+import KeyboardSpacer from 'react-native-keyboard-spacer';
+import { FontAwesome } from '@expo/vector-icons';
+
+function shareAnswer() { }
 
 export default class HomileticsScreen extends React.Component {
   static navigationOptions = ({ navigation }) => {
     return {
-      title: navigation.state.params.title
+      title: navigation.state.params.title,
+      headerRight:
+        <View style={{ marginRight: 7 }}>
+          <TouchableOpacity onPress={() => { shareAnswer(); }}>
+            <FontAwesome color='#fff' size={28} name='send' />
+          </TouchableOpacity>
+        </View>
     };
   };
 
   state = {
     loading: true,
     messages: [],
-    width: Dimensions.get('window').width,
-    height: 0
+    text: ''
   }
 
   contentSize = null;
+  defaultUserName = 'B';
 
   constructor(props) {
     super(props);
 
+    shareAnswer = this.shareAnswer.bind(this);
+
     let id = '';
     if (props.navigation.state.params) {
       if (props.navigation.state.params.id) {
-        id = props.navigation.state.params.id
+        id = 'H' + props.navigation.state.params.id
       }
 
       if (props.navigation.state.params.text) {
@@ -51,9 +62,6 @@ export default class HomileticsScreen extends React.Component {
     this.chatServer = new Chat(id, this.onNewMessage.bind(this), this.defaultUserName);
   }
 
-  componentWillMount() {
-  }
-
   componentDidMount() {
     console.log('loading messages');
     this.chatServer.loadMessages().then(() => {
@@ -62,42 +70,19 @@ export default class HomileticsScreen extends React.Component {
     });
   }
 
-  onContentSizeChange(e) {
-    const contentSize = e.nativeEvent.contentSize;
-
-    // Support earlier versions of React Native on Android.
-    if (!contentSize) return;
-
-    if (!this.contentSize || this.contentSize.height !== contentSize.height) {
-      this.contentSize = contentSize;
-      this.setState({ height: this.contentSize.height + 14 });
-    }
-  }
-
-  onLayout(e) {
-    this.setState({ width: Dimensions.get('window').width });
-  }
-
   onNewMessage(message) {
-    console.log("New message: " + JSON.stringify(message));
-    let messages = this.state.messages;
-    messages.push(message);
-    this.setState({ messages });
+    this.setState((previousState) => {
+      return {
+        messages: GiftedChat.append(previousState.messages, message),
+      };
+    });
   }
 
   componentWillUnmount() {
     this.chatServer.closeChat();
   }
 
-  async shareAnswer() {
-    let questionId = this.props.navigation.state.params.id;
-    const answerContent = await loadAsync(Models.Answer, null, false);
-    console.log({ questionId, answerContent });
-    if (!answerContent || !answerContent.answers || !answerContent.answers[questionId]) {
-      return;
-    }
-
-    const message = answerContent.answers[questionId].answerText;
+  sendMessage(message) {
     this.chatServer.sendMessage([{
       _id: Math.round(Math.random() * 1000000),
       text: message,
@@ -112,21 +97,33 @@ export default class HomileticsScreen extends React.Component {
     this.props.navigation.navigate('Bible', { book, verse, title: getI18nBibleBook(book) + verse });
   }
 
-  onSubmit() {
+  async shareAnswer() {
+    let questionId = this.props.navigation.state.params.id;
+    const answerContent = await loadAsync(Models.Answer, null, false);
+    if (!answerContent || !answerContent.answers || !answerContent.answers[questionId] ||
+      !answerContent.answers[questionId].answerText ||
+      answerContent.answers[questionId].answerText.length < 1) {
+      Alert.alert('Information', 'No answer entered yet');
+      return;
+    }
 
+    let message = answerContent.answers[questionId].answerText;
+    if (this.state.text.length > 0) {
+      message = this.state.text + '\n' + message;
+    }
+
+    this.setState({ text: message });
   }
 
-  isMyMessage(id) {
-    return id === `${Platform.OS} ${Constants['deviceId']}`;
+  async setText(text) {
+    this.text = text;
+    this.setState({ text: text });
   }
 
   render() {
-    const height = Math.min(Math.max(30, this.state.height), Dimensions.get('window').height / 4);
     const windowWidth = Dimensions.get('window').width;
-    let keyIndex = 0;
-    console.log(this.state.messages);
     return (
-      <KeyboardAvoidingView style={styles.container} behavior='padding' keyboardVerticalOffset={80}>
+      <View style={styles.container}>
         <Text style={[styles.dayTitle, { fontSize: getCurrentUser().getLessonFontSize() }]} selectable={true}>{this.questionText}</Text>
         {
           this.quotes &&
@@ -143,72 +140,42 @@ export default class HomileticsScreen extends React.Component {
             }
           </View>
         }
-        <ScrollView style={{ flex: 1, marginVertical: 7 }}>
-          <View style={{ marginHorizontal: 7, backgroundColor: '#FAFAFA' }}>
-            {
-              this.state.messages.map((msg) =>
-                this.isMyMessage(msg.user._id) ? <View key={keyIndex++} style={{
-                  marginLeft: windowWidth / 5,
-                  marginBottom: 7,
-                  padding: 10,
-                  backgroundColor: '#2979FF',
-                  borderRadius: 20
-                }}>
-                  <Text key={keyIndex++} style={{ color: 'white' }}>{msg.text}</Text>
-                  <Text key={keyIndex++} style={{ color: 'white' }}>{msg.createdAt.toLocaleString()}</Text>
-                </View>
-                  :
-                  <View key={keyIndex++} style={{
-                    marginLeft: 7,
-                    marginRight: windowWidth / 5,
-                    marginBottom: 7,
-                    padding: 10,
-                    backgroundColor: '#EEEEEE',
-                    borderRadius: 20
-                  }}>
-                    <Text key={keyIndex++}>{msg.text}</Text>
-                    <Text key={keyIndex++}>{msg.createdAt.toLocaleString()}</Text>
-                  </View>
-              )
-            }
-          </View>
-        </ScrollView>
-
-        <View style={{ flexDirection: 'row', marginVertical: 2 }}>
-          <View style={{ width: 120 }}>
-            <Button
-              style={{ flex: 1 }}
-              disabled={this.state.busy}
-              backgroundColor={Colors.yellow}
-              borderRadius={5}
-              title={getI18nText('分享答案')}
-              onPress={this.onSubmit.bind(this)} />
-          </View>
-          <View style={[styles.answerContainer, { height, width: this.state.width - 190 }]} onLayout={this.onLayout.bind(this)}>
-            <TextInput
-              ref={ref => this.answer = ref}
-              style={[styles.answerInput, { fontSize: getCurrentUser().getLessonFontSize() }]}
-              onChange={(e) => this.onContentSizeChange(e)}
-              onContentSizeChange={(e) => this.onContentSizeChange(e)}
-              onChangeText={(text) => {
-              }}
-            />
-          </View>
-        </View>
-      </KeyboardAvoidingView >
+        {
+          this.state.loading &&
+          <ActivityIndicator
+            style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}
+            size="large"
+            color={Colors.yellow} />
+        }
+        {
+          !this.state.loading &&
+          <GiftedChat
+            messages={this.state.messages}
+            isAnimated={true}
+            onSend={(message) => this.chatServer.sendMessage(message)}
+            text={this.state.text}
+            onInputTextChanged={text => this.setText(text)}
+            user={{
+              _id: Platform.OS + ' ' + Constants['deviceId'],
+              name: this.defaultUserName
+            }}
+          />
+        }
+        {
+          Platform.OS == 'android' &&
+          <KeyboardSpacer />
+        }
+      </View>
     );
   }
 }
 
-let lastBibleQuote;
 const BibleQuote = (props) => {
-  const repeat = lastBibleQuote === props.book;
-  lastBibleQuote = props.book;
   return (
     <View style={{ flexDirection: 'row' }}>
       <TouchableOpacity onPress={() => props.goToPassage(props.book, props.verse)}>
         <View style={styles.bibleQuote}>
-          <Text style={{ color: 'white' }} selectable={true}>{repeat ? '' : getI18nBibleBook(props.book)}{props.verse}</Text>
+          <Text style={{ color: 'white' }} selectable={true}>{getI18nBibleBook(props.book)}{props.verse}</Text>
         </View>
       </TouchableOpacity>
     </View>
@@ -218,13 +185,13 @@ const BibleQuote = (props) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    marginTop: -14,
     backgroundColor: '#FAFAFA'
   },
   dayTitle: {
-    marginTop: -15,
     marginHorizontal: 15,
     color: 'black',
-    fontWeight: 'bold',
+    fontWeight: 'bold'
   },
   bibleQuote: {
     marginVertical: 2,
@@ -234,19 +201,5 @@ const styles = StyleSheet.create({
     height: 22,
     borderRadius: 11,
     backgroundColor: Colors.yellow,
-  },
-  answerContainer: {
-    flex: 1,
-    marginTop: 5,
-    padding: 5,
-    backgroundColor: 'whitesmoke',
-    borderColor: 'black',
-    borderWidth: 1,
-    borderRadius: 5,
-    marginHorizontal: 10
-  },
-  answerInput: {
-    flex: 1,
-    textAlignVertical: 'top'
   }
 });

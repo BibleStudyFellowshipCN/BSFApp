@@ -214,11 +214,14 @@ class BSFQuestion extends React.Component {
   async onChat() {
     const props = this.props;
 
+    const ids = props.question.id.split('_');
+    const title = (ids.length >= 3) ? `: 第${ids[1]}课${ids[1]}题` : '';
+
     if (props.question.homiletics && getCurrentUser().getUserPermissions().isGroupLeader) {
       // Group leader has a different chat screen for homiletics question
       navigateTo('Homiletics', {
         id: props.question.id,
-        title: getI18nText('经文分析练习') + ' ' + props.question.id,
+        title: `${getI18nText('问题讨论')} ${title}`,
         text: props.question.questionText,
         quotes: props.question.quotes
       });
@@ -251,9 +254,7 @@ class BSFQuestion extends React.Component {
         <View>
           <Answer questionId={props.question.id} homiletics={homiletics} />
           {
-            // Show chat icon if user has chat permission and (not homiletics question or group leader)
             getCurrentUser().getUserPermissions().chat &&
-            (!homiletics || getCurrentUser().getUserPermissions().isGroupLeader) &&
             <View style={{
               position: 'absolute',
               top: -26,
