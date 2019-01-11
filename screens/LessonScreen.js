@@ -237,6 +237,7 @@ class BSFQuestion extends React.Component {
   render() {
     const props = this.props;
     const homiletics = props.question.homiletics;
+    const isGroupLeader = getCurrentUser().getUserPermissions().isGroupLeader
     return (
       <View style={{ marginVertical: 12, }}>
         <QuestionText>
@@ -261,7 +262,7 @@ class BSFQuestion extends React.Component {
               right: -11
             }}>
               <TouchableOpacity onPress={this.onChat.bind(this)}>
-                <FontAwesome name='commenting-o' size={28} color='#95a5a6' style={{ backgroundColor: 'transparent' }} />
+                <FontAwesome name={homiletics && isGroupLeader ? 'commenting' : 'commenting-o'} size={28} color='#95a5a6' style={{ backgroundColor: 'transparent' }} />
               </TouchableOpacity>
             </View>
           }
