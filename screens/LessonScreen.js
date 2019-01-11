@@ -37,23 +37,11 @@ class LessonScreen extends React.Component {
     // The workaround is set initialPage to -1 and navigate to page 0 when control is initialized
     this.initialPage = Platform.OS === 'ios' ? 0 : -1;
     this.intervalId = null;
-    this.state = {
-      keyboard: false
-    };
   }
 
   componentWillMount() {
     navigateTo = this.navigateTo.bind(this);
     onImportAndExport = this.onImportAndExport.bind(this);
-
-    this.keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', (event) => {
-      console.log('keyboard show');
-      this.setState({ keyboard: true });
-    });
-    this.keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', (event) => {
-      console.log('keyboard hide');
-      this.setState({ keyboard: false })
-    });
 
     if (!this.props.lesson) {
       this.props.loadLesson();
@@ -65,9 +53,6 @@ class LessonScreen extends React.Component {
   }
 
   componentWillUnmount() {
-    this.keyboardDidShowListener.remove();
-    this.keyboardDidHideListener.remove();
-
     if (Platform.OS != 'ios') {
       clearInterval(this.intervalId);
     }
@@ -102,11 +87,11 @@ class LessonScreen extends React.Component {
   render() {
     const scrollableStyleProps = {
       tabBarBackgroundColor: Colors.yellow,
-      tabBarActiveTextColor: this.state.keyboard ? Colors.yellow : 'rgba(255, 255, 255, 1)',
-      tabBarInactiveTextColor: this.state.keyboard ? Colors.yellow : 'rgba(0, 0, 0, 0.7)',
+      tabBarActiveTextColor: 'rgba(255, 255, 255, 1)',
+      tabBarInactiveTextColor: 'rgba(0, 0, 0, 0.7)',
       tabBarUnderlineStyle: {
         backgroundColor: 'white',
-        height: this.state.keyboard ? 3 : 2
+        height: 2
       },
       tabBarTextStyle: {
         fontSize: 20,
@@ -129,7 +114,7 @@ class LessonScreen extends React.Component {
         ref={ref => this.tabView = ref}
         {...scrollableStyleProps}
         initialPage={this.initialPage}
-        renderTabBar={() => <DefaultTabBar style={{ height: this.state.keyboard ? 3 : 30 }} />}>
+        renderTabBar={() => <DefaultTabBar style={{ height: 30 }} />}>
         <DayQuestions tabLabel={getI18nText("一")} goToPassage={this.goToPassage} day={dayQuestions.one} memoryVerse={this.props.lesson.memoryVerse} />
         <DayQuestions tabLabel={getI18nText("二")} goToPassage={this.goToPassage} day={dayQuestions.two} />
         <DayQuestions tabLabel={getI18nText("三")} goToPassage={this.goToPassage} day={dayQuestions.three} />
