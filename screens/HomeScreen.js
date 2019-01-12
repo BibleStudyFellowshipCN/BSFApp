@@ -23,6 +23,7 @@ import { getI18nText } from '../store/I18n';
 import { getCurrentUser } from '../store/user';
 import { Models } from '../dataStorage/models';
 import { resetGlobalCache, pokeServer } from '../dataStorage/storage';
+import Colors from '../constants/Colors.js';
 
 class HomeScreen extends React.Component {
   static navigationOptions = ({ navigation }) => {
@@ -252,7 +253,7 @@ const Lesson = (props) => {
   return (
     <View style={{ flexDirection: 'row', backgroundColor: 'white' }}>
       <View style={{
-        borderWidth: 2,
+        borderWidth: 1,
         width: Dimensions.get('window').width - 85,
         marginLeft: 20,
         marginVertical: 2,
@@ -272,7 +273,7 @@ const Lesson = (props) => {
       </View>
 
       <View style={{
-        borderWidth: 2,
+        borderWidth: 1,
         width: 50,
         marginLeft: 2,
         marginVertical: 2,
@@ -331,7 +332,9 @@ const styles = StyleSheet.create({
     marginTop: 2,
     marginBottom: 2,
     borderRadius: 10,
-    marginHorizontal: 3
+    marginHorizontal: 3,
+    borderWidth: 1,
+    borderColor: Colors.yellow
   },
   bookHeaderText: {
     marginVertical: 6,
@@ -340,15 +343,6 @@ const styles = StyleSheet.create({
   lessonContainer: {
     paddingLeft: 10,
     backgroundColor: 'transparent',
-  },
-  lessonChevron: {
-    position: 'absolute',
-    flexDirection: 'row',
-    right: 15,
-    top: 25,
-    borderColor: '#cdcdcd',
-    borderWidth: 2,
-    borderRadius: 10
   },
   lessonMetadata: {
     flexDirection: 'row',
