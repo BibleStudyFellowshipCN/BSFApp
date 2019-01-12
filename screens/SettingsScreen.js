@@ -17,7 +17,7 @@ import Colors from '../constants/Colors';
 
 @connectActionSheet class SettingsScreen extends React.Component {
   static navigationOptions = ({ navigation }) => {
-    let title = navigation.state.params && navigation.state.params.title ? navigation.state.params.title : '我';
+    let title = navigation.state.params && navigation.state.params.title ? navigation.state.params.title : getI18nText('我的设置');
     return {
       title: getI18nText(title)
     };

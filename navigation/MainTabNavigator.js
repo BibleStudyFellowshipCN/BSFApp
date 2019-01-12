@@ -1,6 +1,5 @@
 import React from 'react';
 import { Image } from 'react-native';
-import { FontAwesome } from '@expo/vector-icons';
 import { TabNavigator, TabBarBottom } from 'react-navigation';
 import Colors from '../constants/Colors';
 import HomeScreen from '../screens/HomeScreen';
@@ -10,14 +9,14 @@ import SettingsScreen from '../screens/SettingsScreen';
 export default TabNavigator(
   {
     Home: {
-      screen: HomeScreen,
+      screen: HomeScreen
     },
     AudioBible: {
-      screen: AudioBibleScreen,
+      screen: AudioBibleScreen
     },
     Settings: {
-      screen: SettingsScreen,
-    },
+      screen: SettingsScreen
+    }
   },
   {
     navigationOptions: ({ navigation }) => ({
@@ -27,6 +26,9 @@ export default TabNavigator(
         switch (routeName) {
           case 'Home':
             image = focused ? require('../assets/images/Classes.On.png') : require('../assets/images/Classes.Off.png');
+            break;
+          case 'MyBSFScreen':
+            image = focused ? require('../assets/images/mybsf.On.png') : require('../assets/images/mybsf.Off.png');
             break;
           case 'AudioBible':
             image = focused ? require('../assets/images/AudioBible.On.png') : require('../assets/images/AudioBible.Off.png');

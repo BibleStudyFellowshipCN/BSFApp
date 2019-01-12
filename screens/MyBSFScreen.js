@@ -7,6 +7,12 @@ import { Constants, WebBrowser } from 'expo';
 
 //export default class MyBSFScreen extends Component {
 export default class MyBSFScreen extends React.Component {
+  static navigationOptions = ({ navigation }) => {
+    return {
+      title: getI18nText('MyBSF.org')
+    };
+  };
+
   state = {
     result: null,
   };
@@ -18,7 +24,7 @@ export default class MyBSFScreen extends React.Component {
           style={styles.paragraph}
           title="Open MyBSF.org"
           onPress={this._handlePressButtonAsync}
-        />        
+        />
       </View>
     );
   }
@@ -26,7 +32,7 @@ export default class MyBSFScreen extends React.Component {
   _handlePressButtonAsync = async () => {
 
     let result = await WebBrowser.openAuthSessionAsync('https://www.mybsf.org');
-    
+
     this.setState({ result });
   };
 }
