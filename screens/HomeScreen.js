@@ -13,7 +13,8 @@ import {
   ProgressViewIOS,
   ProgressBarAndroid,
   RefreshControl,
-  Dimensions
+  Dimensions,
+  Image
 } from 'react-native';
 import Accordion from 'react-native-collapsible/Accordion';
 import { requestBooks, clearBooks } from "../store/books.js";
@@ -33,7 +34,9 @@ class HomeScreen extends React.Component {
       headerRight: (
         <View style={{ marginRight: 20, flexDirection: 'row' }}>
           <TouchableOpacity onPress={() => { checkForContentUpdate(true); }}>
-            <FontAwesome name='download' size={28} color='#fff' />
+            <Image
+              style={{ width: 34, height: 34 }}
+              source={require('../assets/images/Download.png')} />
           </TouchableOpacity>
         </View>)
     };

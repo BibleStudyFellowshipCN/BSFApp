@@ -22,8 +22,8 @@
       "**/*"
     ],
     "ios": {
-      "icon": "./assets/images/icon-ios.png",
-      "buildNumber": "3",
+      "icon": "./assets/images/icon.png",
+      "buildNumber": "1",
       "bundleIdentifier": "org.CBSF.bsfclass",
       "supportsTablet": true
     },

@@ -7,7 +7,7 @@ import {
   Text,
   TouchableOpacity,
   View,
-  Keyboard,
+  Image,
   KeyboardAvoidingView,
   Dimensions
 } from 'react-native';
@@ -19,7 +19,6 @@ import ExportAnswer from '../components/ExportAnswer.js';
 import Colors from '../constants/Colors'
 import { getI18nText, getI18nBibleBook } from '../store/I18n';
 import { getCurrentUser } from '../store/user';
-import { FontAwesome } from '@expo/vector-icons';
 
 class LessonScreen extends React.Component {
   static navigationOptions = ({ navigation }) => {
@@ -33,7 +32,7 @@ class LessonScreen extends React.Component {
     super();
     this.goToPassage = this.goToPassage.bind(this);
 
-    // [Wei] TextInput cannot take do copy-paste on initialPage, this is a bug on Android
+    // [Wei] TextInput cannot copy-paste on initialPage, this is a bug on Android
     // The workaround is set initialPage to -1 and navigate to page 0 when control is initialized
     this.initialPage = Platform.OS === 'ios' ? 0 : -1;
     this.intervalId = null;
@@ -247,7 +246,9 @@ class BSFQuestion extends React.Component {
               right: -11
             }}>
               <TouchableOpacity onPress={this.onChat.bind(this)}>
-                <FontAwesome name={homiletics && isGroupLeader ? 'commenting' : 'commenting-o'} size={28} color='#95a5a6' style={{ backgroundColor: 'transparent' }} />
+                <Image
+                  style={{ width: 30, height: 30, marginRight: 2, marginBottom: 2 }}
+                  source={require('../assets/images/Chat.png')} />
               </TouchableOpacity>
             </View>
           }
