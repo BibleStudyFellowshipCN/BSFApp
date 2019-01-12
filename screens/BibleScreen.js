@@ -84,11 +84,11 @@ function onBibleVerse2() { }
       targetVer2 = null;
       changed = true;
     }
-    if (ver1 && targetVer1 !== version) {
+    if (ver1 && targetVer1 !== ver1) {
       targetVer1 = ver1;
       changed = true;
     }
-    if (ver2 && targetVer2 !== version) {
+    if (ver2 && targetVer2 !== ver2) {
       targetVer2 = targetVer1 === ver2 ? null : ver2;
       changed = true;
     }
