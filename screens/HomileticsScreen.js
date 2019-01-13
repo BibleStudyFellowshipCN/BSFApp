@@ -23,7 +23,7 @@ export default class HomileticsScreen extends React.Component {
           <TouchableOpacity onPress={() => { shareAnswer(); }}>
             <Image
               style={{ width: 34, height: 34 }}
-              source={require('../assets/images/Share.png')} />
+              source={require('../assets/images/Copy.png')} />
           </TouchableOpacity>
         </View>
     };
