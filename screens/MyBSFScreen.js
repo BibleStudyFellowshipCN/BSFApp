@@ -1,11 +1,9 @@
 import React from 'react';
 import { getI18nText } from '../store/I18n';
-import { getCurrentUser } from '../store/user';
+import { WebView, View, ActivityIndicator, Dimensions } from 'react-native';
+import Colors from '../constants/Colors';
+import { EventRegister } from 'react-native-event-listeners';
 
-import { Button, Text, View, StyleSheet } from 'react-native';
-import { Constants, WebBrowser } from 'expo';
-
-//export default class MyBSFScreen extends Component {
 export default class MyBSFScreen extends React.Component {
   static navigationOptions = ({ navigation }) => {
     return {
@@ -14,35 +12,45 @@ export default class MyBSFScreen extends React.Component {
   };
 
   state = {
-    result: null,
+    loading: true,
+    windowWidth: Dimensions.get('window').width
   };
 
+  componentWillMount() {
+    this.listener = EventRegister.addEventListener('screenDimensionChanged', (window) => {
+      this.setState({ windowWidth: window.width });
+    });
+  }
+
+  componentWillUnmount() {
+    EventRegister.removeEventListener(this.listener);
+  }
+
   render() {
+    const uri = 'https://www.mybsf.org';
     return (
-      <View style={styles.container}>
-        <Button
-          style={styles.paragraph}
-          title="Open MyBSF.org"
-          onPress={this._handlePressButtonAsync}
+      <View style={{ flex: 1 }}>
+        <WebView
+          source={{ uri }}
+          onLoadEnd={() => {
+            this.setState({ loading: false })
+          }}
+          onLoadStart={() => {
+            this.setState({ loading: true })
+          }}
         />
+        {
+          this.state.loading &&
+          <ActivityIndicator
+            style={{
+              position: 'absolute',
+              top: 20,
+              left: this.state.windowWidth / 2 - 20
+            }}
+            size="large"
+            color={Colors.yellow} />
+        }
       </View>
     );
   }
-
-  _handlePressButtonAsync = async () => {
-
-    let result = await WebBrowser.openAuthSessionAsync('https://www.mybsf.org');
-
-    this.setState({ result });
-  };
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingTop: Constants.statusBarHeight,
-    backgroundColor: '#ecf0f1',
-  },
-});

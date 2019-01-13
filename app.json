@@ -23,7 +23,7 @@
     ],
     "ios": {
       "icon": "./assets/images/icon.png",
-      "buildNumber": "2",
+      "buildNumber": "3",
       "bundleIdentifier": "org.CBSF.bsfclass",
       "supportsTablet": true
     },
@@ -33,7 +33,7 @@
       "permissions": [
         "WAKE_LOCK"
       ],
-      "versionCode": 26
+      "versionCode": 27
     }
   }
 }

@@ -1,11 +1,12 @@
 import React from 'react';
-import { StyleSheet, Text, View, Platform, ActivityIndicator } from 'react-native';
+import { StyleSheet, View, Platform, ActivityIndicator, Dimensions } from 'react-native';
 import { getI18nText } from '../store/I18n';
 import { GiftedChat } from 'react-native-gifted-chat';
 import Chat from '../store/chat';
 import { Constants } from 'expo';
 import KeyboardSpacer from 'react-native-keyboard-spacer';
 import Colors from '../constants/Colors';
+import { EventRegister } from 'react-native-event-listeners';
 
 export default class GlobalChatScreen extends React.Component {
   static navigationOptions = ({ navigation }) => {
@@ -18,6 +19,7 @@ export default class GlobalChatScreen extends React.Component {
   state = {
     loading: true,
     messages: [],
+    windowWidth: Dimensions.get('window').width
   }
 
   constructor(props) {
@@ -50,6 +52,9 @@ export default class GlobalChatScreen extends React.Component {
   }
 
   componentWillMount() {
+    this.listener = EventRegister.addEventListener('screenDimensionChanged', (window) => {
+      this.setState({ windowWidth: window.width });
+    });
   }
 
   componentDidMount() {
@@ -70,6 +75,7 @@ export default class GlobalChatScreen extends React.Component {
   }
 
   componentWillUnmount() {
+    EventRegister.removeEventListener(this.listener);
     this.chatServer.closeChat();
   }
 
@@ -86,6 +92,7 @@ export default class GlobalChatScreen extends React.Component {
         {
           !this.state.loading &&
           <GiftedChat
+            style={{ flex: 1 }}
             messages={this.state.messages}
             isAnimated={true}
             onSend={(message) => {

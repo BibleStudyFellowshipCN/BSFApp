@@ -1,21 +1,15 @@
 import React from 'react';
 import {
-  StyleSheet,
-  Text,
-  TouchableHighlight,
   View,
   Picker,
   Dimensions,
-  Slider,
-  Alert,
   ScrollView
 } from 'react-native';
 import { getI18nText, getI18nBibleBookFromLang } from '../store/I18n';
 import { getCurrentUser } from '../store/user';
-import { FontAwesome } from '@expo/vector-icons';
 import { Models } from '../dataStorage/models';
-import Sound from '../store/sound';
 import AudioPlayer from '../components/AudioPlayer';
+import { EventRegister } from 'react-native-event-listeners';
 
 const audioBookId = require('../assets/json/audioBookId.json');
 
@@ -61,6 +55,16 @@ export default class AudioBibleScreen extends React.Component {
       progress: 0,
       width: Dimensions.get('window').width
     };
+  }
+
+  componentWillMount() {
+    this.listener = EventRegister.addEventListener('screenDimensionChanged', (window) => {
+      this.setState({ windowWidth: window.width, windowHeight: window.height });
+    });
+  }
+
+  componentWillUnmount() {
+    EventRegister.removeEventListener(this.listener)
   }
 
   getAudioUrl() {

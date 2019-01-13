@@ -1,10 +1,10 @@
 import React from 'react';
-import { ScrollView, StyleSheet, View, ActivityIndicator, WebView } from 'react-native';
+import { View, ActivityIndicator, WebView, Dimensions } from 'react-native';
 import { getI18nText } from '../store/I18n';
 import { getCurrentUser } from '../store/user';
 import { KeepAwake } from 'expo';
-import Layout from '../constants/Layout';
 import Colors from '../constants/Colors';
+import { EventRegister } from 'react-native-event-listeners';
 
 export default class SermonAudioScreen extends React.Component {
   static navigationOptions = ({ navigation }) => {
@@ -14,14 +14,21 @@ export default class SermonAudioScreen extends React.Component {
   };
 
   state = {
-    loading: true
+    loading: true,
+    windowWidth: Dimensions.get('window').width
   };
 
   componentWillMount() {
+    this.listener = EventRegister.addEventListener('screenDimensionChanged', (window) => {
+      this.setState({ windowWidth: window.width });
+    });
+
     KeepAwake.activate();
   }
 
   componentWillUnmount() {
+    EventRegister.removeEventListener(this.listener);
+
     KeepAwake.deactivate();
   }
 
@@ -47,7 +54,7 @@ export default class SermonAudioScreen extends React.Component {
             style={{
               position: 'absolute',
               top: 20,
-              left: Layout.window.width / 2 - 20
+              left: this.state.windowWidth / 2 - 20
             }}
             size="large"
             color={Colors.yellow} />

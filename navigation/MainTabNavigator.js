@@ -5,11 +5,15 @@ import Colors from '../constants/Colors';
 import HomeScreen from '../screens/HomeScreen';
 import AudioBibleScreen from '../screens/AudioBibleScreen';
 import SettingsScreen from '../screens/SettingsScreen';
+import MyBSFScreen from '../screens/MyBSFScreen';
 
 export default TabNavigator(
   {
     Home: {
       screen: HomeScreen
+    },
+    MyBSFScreen: {
+      screen: MyBSFScreen
     },
     AudioBible: {
       screen: AudioBibleScreen

@@ -7,15 +7,16 @@ import {
   Text,
   View,
   ProgressViewIOS,
-  ProgressBarAndroid
+  ProgressBarAndroid,
+  Dimensions
 } from 'react-native';
 import { FileSystem } from 'expo';
 import { getI18nText } from '../store/I18n';
 import { Models } from '../dataStorage/models';
 import { getCurrentUser } from '../store/user';
-import Layout from '../constants/Layout';
 import { downloadBibleAsync } from '../dataStorage/storage';
-import { CheckBox, Button } from 'react-native-elements';
+import { CheckBox } from 'react-native-elements';
+import { EventRegister } from 'react-native-event-listeners';
 
 export default class BibleSelectScreen extends React.Component {
   static navigationOptions = ({ navigation }) => {
@@ -30,14 +31,19 @@ export default class BibleSelectScreen extends React.Component {
     downloading: false,
     downloadProgress: 0,
     downloadBible: '',
+    windowWidth: Dimensions.get('window').width
   };
 
   removable = this.props.navigation.state.params.removable;
 
   componentWillMount() {
+    this.listener = EventRegister.addEventListener('screenDimensionChanged', (window) => {
+      this.setState({ windowWidth: window.width });
+    });
   }
 
   componentWillUnmount() {
+    EventRegister.removeEventListener(this.listener)
   }
 
   async isBibleExistAsync(bible) {
@@ -142,7 +148,7 @@ export default class BibleSelectScreen extends React.Component {
             this.removable &&
             <CheckBox
               textStyle={{ color: 'red' }}
-              containerStyle={{ width: Layout.window.width - 10 }}
+              containerStyle={{ width: this.state.windowWidth - 10 }}
               key={keyIndex++}
               title='N/A'
               checked={!this.state.selectedBible}
@@ -155,7 +161,7 @@ export default class BibleSelectScreen extends React.Component {
                 {
                   Models.BibleVersions[lang].map((bible) => (
                     <CheckBox
-                      containerStyle={{ width: Layout.window.width - 10 }}
+                      containerStyle={{ width: this.state.windowWidth - 10 }}
                       key={keyIndex++}
                       title={/*'#' + (bibleIndex++) + ' ' + */bible.name}
                       checked={bible.id === this.state.selectedBible}
