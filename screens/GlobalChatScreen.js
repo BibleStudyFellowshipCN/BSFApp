@@ -1,14 +1,12 @@
 import React from 'react';
-import { StyleSheet, Text, View, Platform, ActivityIndicator } from 'react-native';
+import { StyleSheet, View, Platform, ActivityIndicator, Dimensions } from 'react-native';
 import { getI18nText } from '../store/I18n';
-import { Button } from 'react-native-elements';
-import { Models } from '../dataStorage/models';
-import { loadAsync } from '../dataStorage/storage';
 import { GiftedChat } from 'react-native-gifted-chat';
 import Chat from '../store/chat';
 import { Constants } from 'expo';
 import KeyboardSpacer from 'react-native-keyboard-spacer';
 import Colors from '../constants/Colors';
+import { EventRegister } from 'react-native-event-listeners';
 
 export default class GlobalChatScreen extends React.Component {
   static navigationOptions = ({ navigation }) => {
@@ -21,6 +19,7 @@ export default class GlobalChatScreen extends React.Component {
   state = {
     loading: true,
     messages: [],
+    windowWidth: Dimensions.get('window').width
   }
 
   constructor(props) {
@@ -53,6 +52,9 @@ export default class GlobalChatScreen extends React.Component {
   }
 
   componentWillMount() {
+    this.listener = EventRegister.addEventListener('screenDimensionChanged', (window) => {
+      this.setState({ windowWidth: window.width });
+    });
   }
 
   componentDidMount() {
@@ -73,26 +75,8 @@ export default class GlobalChatScreen extends React.Component {
   }
 
   componentWillUnmount() {
+    EventRegister.removeEventListener(this.listener);
     this.chatServer.closeChat();
-  }
-
-  async shareAnswer() {
-    let questionId = this.props.navigation.state.params.id;
-    const answerContent = await loadAsync(Models.Answer, null, false);
-    console.log({ questionId, answerContent });
-    if (!answerContent || !answerContent.answers || !answerContent.answers[questionId]) {
-      return;
-    }
-
-    const message = answerContent.answers[questionId].answerText;
-    this.chatServer.sendMessage([{
-      _id: Math.round(Math.random() * 1000000),
-      text: message,
-      user: {
-        _id: Platform.OS + ' ' + Constants['deviceId'],
-        name: this.defaultUserName
-      }
-    }]);
   }
 
   render() {
@@ -108,6 +92,7 @@ export default class GlobalChatScreen extends React.Component {
         {
           !this.state.loading &&
           <GiftedChat
+            style={{ flex: 1 }}
             messages={this.state.messages}
             isAnimated={true}
             onSend={(message) => {
@@ -122,20 +107,6 @@ export default class GlobalChatScreen extends React.Component {
         {
           Platform.OS == 'android' &&
           <KeyboardSpacer />
-        }
-        {
-          this.props.navigation.state.params.shareAnswer &&
-          <View style={{
-            position: 'absolute',
-            top: 7,
-            right: 2
-          }}>
-            <Button
-              backgroundColor='#fcaf17'
-              borderRadius={5}
-              title={getI18nText('分享答案')}
-              onPress={this.shareAnswer.bind(this)} />
-          </View>
         }
       </View>
     );

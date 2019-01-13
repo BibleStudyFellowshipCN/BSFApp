@@ -1,6 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { TouchableOpacity, StyleSheet, View, Alert, TextInput, KeyboardAvoidingView, Text, Share, Dimensions, ScrollView } from 'react-native';
+import { TouchableOpacity, StyleSheet, View, Alert, TextInput, KeyboardAvoidingView, Text, Share, ScrollView, Dimensions } from 'react-native';
 import { Entypo } from '@expo/vector-icons';
 import { updateAnswer } from '../store/answers';
 import { loadAsync } from '../dataStorage/storage';
@@ -9,6 +9,7 @@ import { Button } from 'react-native-elements';
 import { Models } from '../dataStorage/models';
 import { getCurrentUser } from '../store/user';
 import SegmentedControlTab from 'react-native-segmented-control-tab';
+import { EventRegister } from 'react-native-event-listeners';
 
 class AnswerManageScreen extends React.Component {
   static navigationOptions = ({ navigation }) => {
@@ -20,11 +21,20 @@ class AnswerManageScreen extends React.Component {
   state = {
     answers: '',
     importAnswers: '',
-    selectedIndex: 0
+    selectedIndex: 0,
+    windowWidth: Dimensions.get('window').width
   };
 
   componentWillMount() {
+    this.listener = EventRegister.addEventListener('screenDimensionChanged', (window) => {
+      this.setState({ windowWidth: window.width });
+    });
+
     this.init();
+  }
+
+  componentWillUnmount() {
+    EventRegister.removeEventListener(this.listener)
   }
 
   async init() {
@@ -108,7 +118,7 @@ class AnswerManageScreen extends React.Component {
                 selectable={true}
                 style={[styles.answersExport, {
                   fontSize: getCurrentUser().getLessonFontSize(),
-                  width: Dimensions.get('window').width - 20
+                  width: this.state.windowWidth - 20
                 }]}>{this.state.answers}</Text>
             </ScrollView>
           </View>
@@ -121,7 +131,7 @@ class AnswerManageScreen extends React.Component {
             <TextInput
               style={[styles.answersImport, {
                 fontSize: getCurrentUser().getLessonFontSize(),
-                width: Dimensions.get('window').width - 20
+                width: this.state.windowWidth - 20
               }]}
               blurOnSubmit={false}
               multiline

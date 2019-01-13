@@ -1,15 +1,15 @@
 import React from 'react';
-import { ScrollView, StyleSheet, View, Alert, Text, ActivityIndicator } from 'react-native';
+import { ScrollView, View, Alert, Text, ActivityIndicator, Dimensions } from 'react-native';
 import { getI18nText } from '../store/I18n';
 import { FontAwesome } from '@expo/vector-icons';
 import { CheckBox, Button } from 'react-native-elements';
-import Layout from '../constants/Layout';
 import { Models } from '../dataStorage/models';
 import { callWebServiceAsync, showWebServiceCallErrorsAsync } from '../dataStorage/storage';
 import SegmentedControlTab from 'react-native-segmented-control-tab';
 import { getCurrentUser } from '../store/user';
 import Colors from '../constants/Colors';
 import DatePicker from 'react-native-datepicker';
+import { EventRegister } from 'react-native-event-listeners';
 
 export default class AttendanceScreen extends React.Component {
   static navigationOptions = ({ navigation }) => {
@@ -22,11 +22,20 @@ export default class AttendanceScreen extends React.Component {
     classDate: this.getYYYYMMDD(new Date()),
     attendance: null,
     selectedIndex: 0,
-    busy: false
+    busy: false,
+    windowWidth: Dimensions.get('window').width
   };
 
   componentWillMount() {
+    this.listener = EventRegister.addEventListener('screenDimensionChanged', (window) => {
+      this.setState({ windowWidth: window.width });
+    });
+
     this.loadAsync();
+  }
+
+  componentWillUnmount() {
+    EventRegister.removeEventListener(this.listener)
   }
 
   getYYYYMMDD(date) {
@@ -178,7 +187,7 @@ export default class AttendanceScreen extends React.Component {
 
           <View style={{ alignItems: 'center', marginTop: 5, marginBottom: 5 }}>
             <DatePicker
-              style={{ width: Layout.window.width - 20 }}
+              style={{ width: this.state.windowWidth - 20 }}
               date={currentGroup.date}
               mode="date"
               placeholder="Select date"
@@ -191,7 +200,7 @@ export default class AttendanceScreen extends React.Component {
             {
               currentGroup.attendees.map((user) => user.checked ? (
                 <CheckBox
-                  containerStyle={{ width: Layout.window.width - 20 }}
+                  containerStyle={{ width: this.state.windowWidth - 20 }}
                   key={keyIndex++}
                   title={this.getTitle(++index, user)}
                   checked={user.checked}
@@ -202,7 +211,7 @@ export default class AttendanceScreen extends React.Component {
             {
               currentGroup.attendees.map((user) => !user.checked ? (
                 <CheckBox
-                  containerStyle={{ width: Layout.window.width - 20 }}
+                  containerStyle={{ width: this.state.windowWidth - 20 }}
                   key={keyIndex++}
                   title={this.getTitle(++index, user)}
                   checked={user.checked}
@@ -216,8 +225,8 @@ export default class AttendanceScreen extends React.Component {
 
         <View style={{
           position: 'absolute',
-          bottom: 5,
-          width: Layout.window.width,
+          bottom: 0,
+          width: this.state.windowWidth,
           alignItems: 'center',
           backgroundColor: 'white'
         }}>
@@ -225,8 +234,8 @@ export default class AttendanceScreen extends React.Component {
             disabled={this.state.busy}
             backgroundColor='#397EDC'
             borderRadius={5}
-            style={{ marginTop: 7 }}
-            containerViewStyle={{ width: Layout.window.width / 2 }}
+            style={{ margin: 7 }}
+            containerViewStyle={{ width: this.state.windowWidth / 2 }}
             title={getI18nText('提交')}
             onPress={() => this.onSubmit(currentGroup)} />
         </View>
@@ -234,9 +243,3 @@ export default class AttendanceScreen extends React.Component {
     );
   }
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  }
-});

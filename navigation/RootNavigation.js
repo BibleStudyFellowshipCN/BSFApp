@@ -13,6 +13,7 @@ import HomeDiscussionScreen from '../screens/HomeDiscussionScreen';
 import NotesScreen from '../screens/NotesScreen';
 import AnswerManageScreen from '../screens/AnswerManageScreen';
 import BibleSelectScreen from '../screens/BibleSelectScreen';
+import HomileticsScreen from '../screens/HomileticsScreen';
 //////////////
 // added by Frank on Dec 18, 2018
 import MyBSFScreen from '../screens/MyBSFScreen';
@@ -58,6 +59,9 @@ const RootStackNavigator = StackNavigator(
     },
     MyBSF: {
       screen: MyBSFScreen
+    },
+    Homiletics: {
+      screen: HomileticsScreen
     }
   },
   {

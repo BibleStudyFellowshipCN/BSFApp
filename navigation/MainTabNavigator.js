@@ -1,47 +1,50 @@
 import React from 'react';
-import { View, Text, Platform } from 'react-native';
-import { FontAwesome } from '@expo/vector-icons';
+import { Image } from 'react-native';
 import { TabNavigator, TabBarBottom } from 'react-navigation';
 import Colors from '../constants/Colors';
 import HomeScreen from '../screens/HomeScreen';
 import AudioBibleScreen from '../screens/AudioBibleScreen';
 import SettingsScreen from '../screens/SettingsScreen';
-import { getI18nText } from '../store/I18n';
+import MyBSFScreen from '../screens/MyBSFScreen';
 
 export default TabNavigator(
   {
     Home: {
-      screen: HomeScreen,
+      screen: HomeScreen
+    },
+    MyBSFScreen: {
+      screen: MyBSFScreen
     },
     AudioBible: {
-      screen: AudioBibleScreen,
+      screen: AudioBibleScreen
     },
     Settings: {
-      screen: SettingsScreen,
-    },
+      screen: SettingsScreen
+    }
   },
   {
     navigationOptions: ({ navigation }) => ({
       tabBarIcon: ({ focused }) => {
         const { routeName } = navigation.state;
-        let iconName;
+        let image;
         switch (routeName) {
           case 'Home':
-            iconName = 'book';
+            image = focused ? require('../assets/images/Classes.On.png') : require('../assets/images/Classes.Off.png');
+            break;
+          case 'MyBSFScreen':
+            image = focused ? require('../assets/images/mybsf.On.png') : require('../assets/images/mybsf.Off.png');
             break;
           case 'AudioBible':
-            iconName = 'headphones';
+            image = focused ? require('../assets/images/AudioBible.On.png') : require('../assets/images/AudioBible.Off.png');
             break;
           case 'Settings':
-            iconName = 'info-circle';
+            image = focused ? require('../assets/images/MySettings.On.png') : require('../assets/images/MySettings.Off.png');
+            break;
         }
         return (
-          <FontAwesome
-            name={iconName}
-            size={28}
-            color={focused ? Colors.tabIconSelected : Colors.tabIconDefault}
-            style={{ marginBottom: -3 }}
-          />
+          <Image
+            style={{ width: 30, height: 30 }}
+            source={image} />
         );
       },
     }),
@@ -52,7 +55,7 @@ export default TabNavigator(
     tabBarOptions: {
       activeTintColor: 'white',
       labelStyle: {
-        fontSize: 12,
+        fontSize: 11,
       },
       style: {
         backgroundColor: Colors.yellow

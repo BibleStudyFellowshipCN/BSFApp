@@ -5,9 +5,9 @@ import {
   StyleSheet,
   Alert,
   Share,
+  Image
 } from 'react-native';
 import { Print } from 'expo';
-import { Entypo, FontAwesome, MaterialIcons } from '@expo/vector-icons';
 import { loadAsync } from '../dataStorage/storage';
 import { Models } from '../dataStorage/models';
 import { getI18nText } from '../store/I18n';
@@ -129,27 +129,17 @@ export default class ExportAnswer extends React.Component {
       <View style={styles.container}>
         <View style={{ width: 10 }} />
         <View style={{ width: 40 }}>
-          <TouchableOpacity onPress={this.onImportExport.bind(this)}>
-            <MaterialIcons
-              name='devices'
-              size={28}
-              color='#fff' />
-          </TouchableOpacity>
-        </View>
-        <View style={{ width: 40 }}>
           <TouchableOpacity onPress={this.onPrint.bind(this)}>
-            <FontAwesome
-              name='print'
-              size={28}
-              color='#fff' />
+          <Image
+              style={{ width: 34, height: 34 }}
+              source={require('../assets/images/Print.png')} />
           </TouchableOpacity>
         </View>
         <View style={{ width: 40 }}>
           <TouchableOpacity onPress={() => this.onClick()}>
-            <Entypo
-              name='export'
-              size={28}
-              color='#fff' />
+          <Image
+              style={{ width: 34, height: 34 }}
+              source={require('../assets/images/Share.png')} />
           </TouchableOpacity>
         </View>
       </View>

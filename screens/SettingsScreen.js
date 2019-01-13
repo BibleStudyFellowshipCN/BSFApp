@@ -17,7 +17,7 @@ import Colors from '../constants/Colors';
 
 @connectActionSheet class SettingsScreen extends React.Component {
   static navigationOptions = ({ navigation }) => {
-    let title = navigation.state.params && navigation.state.params.title ? navigation.state.params.title : '我';
+    let title = navigation.state.params && navigation.state.params.title ? navigation.state.params.title : getI18nText('我的设置');
     return {
       title: getI18nText(title)
     };
@@ -223,14 +223,6 @@ import Colors from '../constants/Colors';
     }
   }
 
-  /////////////////////
-  // added by Frank on Dec 18, 2018
-  //_handlePressButtonAsync = async () => {
-  async onMyBSF() {
-    await WebBrowser.openBrowserAsync('https://www.mybsf.org');
-  }
-  /////////////////////
-
   render() {
     const { manifest } = Constants;
     phone = getCurrentUser().getCellphone();
@@ -347,17 +339,6 @@ import Colors from '../constants/Colors';
                 onPress={this.onClearDownloadFiles.bind(this)}
               />
               <SettingsList.Header headerText='MBSF - Mobile Bible Study Fellowship' headerStyle={{ color: 'black', marginTop: 15 }} />
-              <SettingsList.Item
-                icon={
-                  <View style={{ marginTop: 3, left: 7 }} >
-                    <MaterialIcons color={Colors.yellow} size={28} name='library-books' />
-                  </View>
-                }
-                title={getI18nText('MyBSF.org')}
-                titleStyle={{ fontSize }}
-                titleInfoStyle={{ fontSize }}
-                onPress={this.onMyBSF.bind(this)}
-              />
               <SettingsList.Item
                 icon={
                   <View style={{ marginTop: 3, left: 7 }} >

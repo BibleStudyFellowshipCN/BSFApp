@@ -7,10 +7,11 @@ import {
   Text,
   TouchableOpacity,
   View,
+  Image,
   KeyboardAvoidingView,
   Dimensions
 } from 'react-native';
-import ScrollableTabView from 'react-native-scrollable-tab-view';
+import ScrollableTabView, { DefaultTabBar } from 'react-native-scrollable-tab-view';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { loadLesson } from '../store/lessons.js'
 import Answer from '../components/Answer'
@@ -18,9 +19,6 @@ import ExportAnswer from '../components/ExportAnswer.js';
 import Colors from '../constants/Colors'
 import { getI18nText, getI18nBibleBook } from '../store/I18n';
 import { getCurrentUser } from '../store/user';
-import { FontAwesome } from '@expo/vector-icons';
-import { Models } from '../dataStorage/models';
-import { loadAsync } from '../dataStorage/storage';
 
 class LessonScreen extends React.Component {
   static navigationOptions = ({ navigation }) => {
@@ -34,7 +32,7 @@ class LessonScreen extends React.Component {
     super();
     this.goToPassage = this.goToPassage.bind(this);
 
-    // [Wei] TextInput cannot take do copy-paste on initialPage, this is a bug on Android
+    // [Wei] TextInput cannot copy-paste on initialPage, this is a bug on Android
     // The workaround is set initialPage to -1 and navigate to page 0 when control is initialized
     this.initialPage = Platform.OS === 'ios' ? 0 : -1;
     this.intervalId = null;
@@ -90,8 +88,14 @@ class LessonScreen extends React.Component {
       tabBarBackgroundColor: Colors.yellow,
       tabBarActiveTextColor: 'rgba(255, 255, 255, 1)',
       tabBarInactiveTextColor: 'rgba(0, 0, 0, 0.7)',
-      tabBarUnderlineStyle: { backgroundColor: 'white', height: 2 },
-      tabBarTextStyle: { fontSize: 20, fontWeight: '700' },
+      tabBarUnderlineStyle: {
+        backgroundColor: 'white',
+        height: 2
+      },
+      tabBarTextStyle: {
+        fontSize: 20,
+        fontWeight: '700'
+      },
     }
 
     if (!this.props.lesson) {
@@ -107,7 +111,9 @@ class LessonScreen extends React.Component {
     const content =
       <ScrollableTabView
         ref={ref => this.tabView = ref}
-        {...scrollableStyleProps} initialPage={this.initialPage}>
+        {...scrollableStyleProps}
+        initialPage={this.initialPage}
+        renderTabBar={() => <DefaultTabBar style={{ height: 30 }} />}>
         <DayQuestions tabLabel={getI18nText("一")} goToPassage={this.goToPassage} day={dayQuestions.one} memoryVerse={this.props.lesson.memoryVerse} />
         <DayQuestions tabLabel={getI18nText("二")} goToPassage={this.goToPassage} day={dayQuestions.two} />
         <DayQuestions tabLabel={getI18nText("三")} goToPassage={this.goToPassage} day={dayQuestions.three} />
@@ -192,14 +198,16 @@ class BSFQuestion extends React.Component {
   async onChat() {
     const props = this.props;
 
+    const ids = props.question.id.split('_');
+    const title = (ids.length >= 3) ? `: 第${ids[1]}课${ids[1]}题` : '';
+
     if (props.question.homiletics && getCurrentUser().getUserPermissions().isGroupLeader) {
       // Group leader has a different chat screen for homiletics question
-      navigateTo('GlobalChat', {
+      navigateTo('Homiletics', {
         id: props.question.id,
-        title: getI18nText('经文分析练习') + ' ' + props.question.id,
+        title: `${getI18nText('问题讨论')} ${title}`,
         text: props.question.questionText,
-        homiletics: true,
-        shareAnswer: true
+        quotes: props.question.quotes
       });
     } else {
       navigateTo('GlobalChat', {
@@ -212,6 +220,8 @@ class BSFQuestion extends React.Component {
 
   render() {
     const props = this.props;
+    const homiletics = props.question.homiletics;
+    const isGroupLeader = getCurrentUser().getUserPermissions().isGroupLeader
     return (
       <View style={{ marginVertical: 12, }}>
         <QuestionText>
@@ -227,7 +237,7 @@ class BSFQuestion extends React.Component {
           ))}
         </View>
         <View>
-          <Answer questionId={props.question.id} />
+          <Answer questionId={props.question.id} homiletics={homiletics} />
           {
             getCurrentUser().getUserPermissions().chat &&
             <View style={{
@@ -236,7 +246,9 @@ class BSFQuestion extends React.Component {
               right: -11
             }}>
               <TouchableOpacity onPress={this.onChat.bind(this)}>
-                <FontAwesome name='commenting-o' size={28} color='#95a5a6' style={{ backgroundColor: 'transparent' }} />
+                <Image
+                  style={{ width: 30, height: 30, marginRight: 2, marginBottom: 2 }}
+                  source={require('../assets/images/Chat.png')} />
               </TouchableOpacity>
             </View>
           }

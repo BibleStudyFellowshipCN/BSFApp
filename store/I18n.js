@@ -5,7 +5,7 @@ const text = {
   chs: [
     "BSF课程",
     "课",
-    "我",
+    "我的设置",
     "有声圣经",
     "设置",
     "显示语言",
@@ -73,7 +73,7 @@ const text = {
   cht: [
     "BSF課程",
     "課",
-    "我",
+    "我的設置",
     "有聲聖經",
     "設置",
     "顯示語言",
@@ -141,7 +141,7 @@ const text = {
   eng: [
     "BSF Lessons",
     "Lessons",
-    "Me",
+    "My Settings",
     "AudioBible",
     "Settings",
     "Display Language",
@@ -209,7 +209,7 @@ const text = {
   spa: [
     "BSF Lecciones",
     "Lecciones",
-    "Yo",
+    "Mis ajustes",
     "Audio biblia",
     "Las configuraciónes",
     "idioma de la pantalla",

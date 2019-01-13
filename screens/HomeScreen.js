@@ -1,7 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { FontAwesome, Octicons, Ionicons, Feather } from '@expo/vector-icons';
-import { Constants, FileSystem } from 'expo';
+import { FontAwesome } from '@expo/vector-icons';
+import { FileSystem } from 'expo';
 import {
   ScrollView,
   StyleSheet,
@@ -11,7 +11,10 @@ import {
   Alert,
   Platform,
   ProgressViewIOS,
-  ProgressBarAndroid
+  ProgressBarAndroid,
+  RefreshControl,
+  Dimensions,
+  Image
 } from 'react-native';
 import Accordion from 'react-native-collapsible/Accordion';
 import { requestBooks, clearBooks } from "../store/books.js";
@@ -21,6 +24,8 @@ import { getI18nText } from '../store/I18n';
 import { getCurrentUser } from '../store/user';
 import { Models } from '../dataStorage/models';
 import { resetGlobalCache, pokeServer } from '../dataStorage/storage';
+import Colors from '../constants/Colors.js';
+import { EventRegister } from 'react-native-event-listeners';
 
 class HomeScreen extends React.Component {
   static navigationOptions = ({ navigation }) => {
@@ -30,7 +35,9 @@ class HomeScreen extends React.Component {
       headerRight: (
         <View style={{ marginRight: 20, flexDirection: 'row' }}>
           <TouchableOpacity onPress={() => { checkForContentUpdate(true); }}>
-            <FontAwesome name='download' size={28} color='#fff' />
+            <Image
+              style={{ width: 34, height: 34 }}
+              source={require('../assets/images/Download.png')} />
           </TouchableOpacity>
         </View>)
     };
@@ -39,7 +46,9 @@ class HomeScreen extends React.Component {
   state = {
     downloadProgress: '',
     remoteVersion: '',
-    downloading: false
+    downloading: false,
+    refreshing: false,
+    windowWidth: Dimensions.get('window').width
   };
 
   lastCheckForContentUpdateDate = 0;
@@ -52,7 +61,15 @@ class HomeScreen extends React.Component {
       this.props.requestBooks();
     }
 
+    this.listener = EventRegister.addEventListener('screenDimensionChanged', (window) => {
+      this.setState({ windowWidth: window.width, windowHeight: window.height });
+    });
+
     checkForContentUpdate = this.checkForContentUpdate.bind(this);
+  }
+
+  componentWillUnmount() {
+    EventRegister.removeEventListener(this.listener)
   }
 
   downloadCallback(downloadProgress) {
@@ -147,6 +164,11 @@ class HomeScreen extends React.Component {
     this.props.navigation.navigate('SermonAudio', { id: lesson.id });
   }
 
+  async onRefresh() {
+    await this.checkForContentUpdate(false);
+    await getCurrentUser().checkForUpdate(false);
+  }
+
   render() {
     const progress = (this.state.downloadProgress + this.downloadedFiles) / this.downloadFiles;
     const progressText = getI18nText('下载课程') + ' ' + this.state.remoteVersion + ' (' + parseInt(progress * 100) + '%)';
@@ -168,7 +190,13 @@ class HomeScreen extends React.Component {
         }
         <ScrollView
           style={styles.container}
-          contentContainerStyle={styles.contentContainer}>
+          contentContainerStyle={styles.contentContainer}
+          refreshControl={
+            <RefreshControl
+              refreshing={this.state.refreshing}
+              onRefresh={this.onRefresh.bind(this)}
+            />
+          }>
           <View style={styles.booksContainer}>
             {
               this.props.booklist &&
@@ -231,9 +259,16 @@ const Lesson = (props) => {
   const permissions = getCurrentUser().getUserPermissions();
   const hasAudio = permissions.audios && (permissions.audios.indexOf(props.lesson.id) != -1)
   return (
-    <View>
-      <TouchableOpacity style={styles.lessonContainer} onPress={() => props.goToLesson()}>
-        <View>
+    <View style={{ flexDirection: 'row', backgroundColor: 'white' }}>
+      <View style={{
+        borderWidth: 1,
+        width: Dimensions.get('window').width - 85,
+        marginLeft: 20,
+        marginVertical: 2,
+        borderRadius: 10,
+        borderColor: '#cdcdcd'
+      }}>
+        <TouchableOpacity style={styles.lessonContainer} onPress={() => props.goToLesson()}>
           <View style={styles.lessonMetadata}>
             <Text style={styles.lessonMetadataText}>
               {date} {lessonNumber}
@@ -242,56 +277,34 @@ const Lesson = (props) => {
           <Text style={{ marginVertical: 4, fontSize: getCurrentUser().getHomeFontSize() }}>
             {name}
           </Text>
-        </View>
-        <View style={styles.lessonChevron}>
-          {
-            props.lesson.homeDiscussion &&
-            <TouchableOpacity onPress={() => props.goToHomeDiscussion()}>
-              <Octicons
-                style={{ marginRight: 24 }}
-                name={'comment-discussion'}
-                size={26}
-              />
-            </TouchableOpacity>
-          }
-          {
-            props.lesson.homeTraining &&
-            <TouchableOpacity onPress={() => props.goToHomeTraining()}>
-              <Feather
-                style={{ marginRight: 20 }}
-                name={'users'}
-                size={24}
-              />
-            </TouchableOpacity>
-          }
-          {
-            getCurrentUser().getUserPermissions().isGroupLeader && props.lesson.notesUri &&
-            <TouchableOpacity onPress={() => props.goToNotes()}>
-              <Feather
-                style={{ marginRight: 20 }}
-                name={'file-text'}
-                size={24}
-              />
-            </TouchableOpacity>
-          }
-          {
-            hasAudio &&
-            <TouchableOpacity onPress={() => props.goToAudio()}>
-              <Feather
-                style={{ marginRight: 20 }}
-                name={'volume-2'}
-                size={24}
-              />
-            </TouchableOpacity>
-          }
-          <FontAwesome
-            style={{ top: 4 }}
-            name='chevron-right'
-            color='grey'
-            size={16}
-          />
-        </View>
-      </TouchableOpacity>
+        </TouchableOpacity>
+      </View>
+
+      <View style={{
+        borderWidth: 1,
+        width: 50,
+        marginLeft: 2,
+        marginVertical: 2,
+        borderRadius: 10,
+        borderColor: '#cdcdcd',
+        alignItems: 'center',
+        justifyContent: 'center'
+      }}>
+        {
+          hasAudio &&
+          <TouchableOpacity onPress={() => props.goToAudio()}>
+            <Image
+              style={{ width: 34, height: 34 }}
+              source={require('../assets/images/Materials.On.png')} />
+          </TouchableOpacity>
+        }
+        {
+          !hasAudio &&
+          <Image
+            style={{ width: 34, height: 34 }}
+            source={require('../assets/images/Materials.Off.png')} />
+        }
+      </View>
     </View>
   )
 }
@@ -321,6 +334,7 @@ const styles = StyleSheet.create({
   contentContainer: {
   },
   booksContainer: {
+    backgroundColor: 'white'
   },
   bookHeader: {
     flexDirection: 'row',
@@ -329,22 +343,19 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingLeft: 15,
     marginTop: 2,
-    marginBottom: 2
+    marginBottom: 2,
+    borderRadius: 10,
+    marginHorizontal: 3,
+    borderWidth: 1,
+    borderColor: Colors.yellow
   },
   bookHeaderText: {
     marginVertical: 6,
     fontWeight: '400',
   },
   lessonContainer: {
-    paddingLeft: 25,
-    paddingVertical: 5,
-    backgroundColor: 'white',
-  },
-  lessonChevron: {
-    position: 'absolute',
-    flexDirection: 'row',
-    right: 15,
-    top: 25,
+    paddingLeft: 10,
+    backgroundColor: 'transparent',
   },
   lessonMetadata: {
     flexDirection: 'row',

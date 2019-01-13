@@ -29,12 +29,12 @@ function onBibleVerse2() { }
     return {
       title: navigation.state.params && navigation.state.params.title ? navigation.state.params.title : 'Bible',
       headerRight: (
-        <View style={{ marginRight: 20, flexDirection: 'row', backgroundColor: '#fcaf17', alignItems: 'baseline' }}>
+        <View style={{ marginRight: 2, flexDirection: 'row', backgroundColor: '#fcaf17', alignItems: 'baseline' }}>
           <TouchableOpacity onPress={() => onBibleVerse()}>
             <Octicons name='book' size={28} color='#fff' />
           </TouchableOpacity>
           <Text style={{ marginLeft: 3, fontSize: 12, color: 'white' }}>1</Text>
-          <View style={{ width: 7 }} />
+          <View style={{ width: 5 }} />
           <TouchableOpacity onPress={() => onBibleVerse2()}>
             <Octicons name='book' size={28} color='#fff' />
           </TouchableOpacity>
@@ -60,12 +60,12 @@ function onBibleVerse2() { }
 
   onBibleSelected(name, version) {
     console.log('onBibleSelected: ' + name + ' ' + version);
-    this.onBibleVerseChange(version, null);
+    this.onBibleVerseChange(version, getCurrentUser().getBibleVersion2());
   }
 
   onBibleSelected2(name, version) {
     console.log('onBibleSelected2: ' + name + ' ' + version);
-    this.onBibleVerseChange(null, version);
+    this.onBibleVerseChange(getCurrentUser().getBibleVersion(), version);
   }
 
   onBibleVerse() {
@@ -77,33 +77,15 @@ function onBibleVerse2() { }
   }
 
   async onBibleVerseChange(ver1, ver2) {
-    let targetVer1 = getCurrentUser().getBibleVersion();
-    let targetVer2 = getCurrentUser().getBibleVersion2();
-    let changed = false;
-    if (!ver1 && !ver2 && targetVer2) {
-      targetVer2 = null;
-      changed = true;
-    }
-    if (ver1 && targetVer1 !== version) {
-      targetVer1 = ver1;
-      changed = true;
-    }
-    if (ver2 && targetVer2 !== version) {
-      targetVer2 = targetVer1 === ver2 ? null : ver2;
-      changed = true;
-    }
-    if (targetVer1 === targetVer2) {
-      targetVer2 = null;
-      changed = true;
+    // if two versions are the same, we only use one version
+    if (ver1 === ver2) {
+      ver2 = null;
     }
 
-    console.log(`onBibleVerseChange: ${ver1}-${ver2} => ${targetVer1}-${targetVer2} [changed=${changed}]`);
-    if (!changed) {
-      return;
-    }
+    console.log(`onBibleVerseChange: ${getCurrentUser().getBibleVersion()}-${getCurrentUser().getBibleVersion2()} => ${ver1}-${ver2}`);
 
-    await getCurrentUser().setBibleVersionAsync(targetVer1);
-    await getCurrentUser().setBibleVersion2Async(targetVer2);
+    await getCurrentUser().setBibleVersionAsync(ver1);
+    await getCurrentUser().setBibleVersion2Async(ver2);
     await this.ensureBibleIsDownloadedAsync();
     this.props.clearPassage();
     this.props.loadPassage();

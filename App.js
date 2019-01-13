@@ -1,5 +1,5 @@
 import React from 'react';
-import { Platform, StatusBar, StyleSheet, View } from 'react-native';
+import { Platform, StatusBar, StyleSheet, View, Dimensions } from 'react-native';
 import { AppLoading } from 'expo';
 import RootNavigation from './navigation/RootNavigation';
 import createStore from './store/createStore'
@@ -9,6 +9,8 @@ import { Provider } from 'react-redux';
 import { ActionSheetProvider } from '@expo/react-native-action-sheet';
 import { getCurrentUser } from './store/user';
 import { Localization } from 'expo-localization';
+import Layout from './constants/Layout';
+import { EventRegister } from 'react-native-event-listeners';
 
 let store;
 
@@ -16,6 +18,12 @@ export default class App extends React.Component {
   state = {
     isLoadingComplete: false,
   };
+
+  onLayout(e) {
+    const window = Dimensions.get('window');
+    Layout.window.set(window.width, window.height);
+    EventRegister.emit('screenDimensionChanged', window);
+  }
 
   render() {
     if (!this.state.isLoadingComplete && !this.props.skipLoadingScreen) {
@@ -30,7 +38,7 @@ export default class App extends React.Component {
       return (
         <ActionSheetProvider>
           <Provider store={store}>
-            <View style={{ flex: 1 }}>
+            <View style={{ flex: 1 }} onLayout={this.onLayout.bind(this)}>
               {Platform.OS !== 'ios' && <StatusBar barStyle="default" />}
               <RootNavigation />
             </View>
