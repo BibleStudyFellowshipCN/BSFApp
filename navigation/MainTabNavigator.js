@@ -12,9 +12,9 @@ export default TabNavigator(
     Home: {
       screen: HomeScreen
     },
-    MyBSFScreen: {
+    /*MyBSFScreen: {
       screen: MyBSFScreen
-    },
+    },*/
     AudioBible: {
       screen: AudioBibleScreen
     },
