@@ -1,20 +1,42 @@
 import React from 'react';
 import { getI18nText } from '../store/I18n';
-import { WebView, View, ActivityIndicator, Dimensions } from 'react-native';
+import { WebView, View, ActivityIndicator, Dimensions, TouchableOpacity, Image } from 'react-native';
 import Colors from '../constants/Colors';
 import { EventRegister } from 'react-native-event-listeners';
+import { NavigationActions } from 'react-navigation';
+
+function goback() { }
 
 export default class MyBSFScreen extends React.Component {
   static navigationOptions = ({ navigation }) => {
+    const canGoBack = navigation.state.params && navigation.state.params.canGoBack;
     return {
-      title: getI18nText('MyBSF.org')
+      title: getI18nText('MyBSF.org'),
+      headerLeft: (
+        <View style={{ marginHorizontal: 20, flexDirection: 'row' }}>
+          {
+            canGoBack &&
+            <TouchableOpacity onPress={() => { goback(); }}>
+              <Image
+                style={{ width: 34, height: 34 }}
+                source={require('../assets/images/GoBack.png')} />
+            </TouchableOpacity>
+          }
+        </View>)
     };
   };
 
   state = {
     loading: true,
-    windowWidth: Dimensions.get('window').width
+    canGoBack: false,
+    windowWidth: Dimensions.get('window').width,
   };
+
+  constructor(props) {
+    super(props);
+
+    goback = this.goback.bind(this);
+  }
 
   componentWillMount() {
     this.listener = EventRegister.addEventListener('screenDimensionChanged', (window) => {
@@ -26,17 +48,33 @@ export default class MyBSFScreen extends React.Component {
     EventRegister.removeEventListener(this.listener);
   }
 
+  goback() {
+    if (this.state.canGoBack) {
+      this.browser.goBack();
+    }
+  }
+
   render() {
-    const uri = 'https://www.mybsf.org';
     return (
       <View style={{ flex: 1 }}>
         <WebView
-          source={{ uri }}
+          ref={ref => this.browser = ref}
+          source={{ uri: 'https://www.mybsf.org' }}
           onLoadEnd={() => {
             this.setState({ loading: false })
           }}
           onLoadStart={() => {
             this.setState({ loading: true })
+          }}
+          onNavigationStateChange={(navState) => {
+            console.log(navState);
+            const canGoBack = navState.canGoBack && !navState.loading;
+            this.setState({ canGoBack });
+            const setParamsAction = NavigationActions.setParams({
+              params: { canGoBack },
+              key: 'MyBSFScreen',
+            })
+            this.props.navigation.dispatch(setParamsAction);
           }}
         />
         {
