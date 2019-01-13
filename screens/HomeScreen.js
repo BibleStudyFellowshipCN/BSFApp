@@ -290,15 +290,20 @@ const Lesson = (props) => {
         alignItems: 'center',
         justifyContent: 'center'
       }}>
-        <TouchableOpacity onPress={() => {
-          if (hasAudio) {
-            props.goToAudio();
-          }
-        }}>
+        {
+          hasAudio &&
+          <TouchableOpacity onPress={() => props.goToAudio()}>
+            <Image
+              style={{ width: 34, height: 34 }}
+              source={require('../assets/images/Materials.On.png')} />
+          </TouchableOpacity>
+        }
+        {
+          !hasAudio &&
           <Image
             style={{ width: 34, height: 34 }}
-            source={hasAudio ? require('../assets/images/Materials.On.png') : require('../assets/images/Materials.Off.png')} />
-        </TouchableOpacity>
+            source={require('../assets/images/Materials.Off.png')} />
+        }
       </View>
     </View>
   )

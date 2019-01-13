@@ -29,12 +29,12 @@ function onBibleVerse2() { }
     return {
       title: navigation.state.params && navigation.state.params.title ? navigation.state.params.title : 'Bible',
       headerRight: (
-        <View style={{ marginRight: 20, flexDirection: 'row', backgroundColor: '#fcaf17', alignItems: 'baseline' }}>
+        <View style={{ marginRight: 2, flexDirection: 'row', backgroundColor: '#fcaf17', alignItems: 'baseline' }}>
           <TouchableOpacity onPress={() => onBibleVerse()}>
             <Octicons name='book' size={28} color='#fff' />
           </TouchableOpacity>
           <Text style={{ marginLeft: 3, fontSize: 12, color: 'white' }}>1</Text>
-          <View style={{ width: 7 }} />
+          <View style={{ width: 5 }} />
           <TouchableOpacity onPress={() => onBibleVerse2()}>
             <Octicons name='book' size={28} color='#fff' />
           </TouchableOpacity>
