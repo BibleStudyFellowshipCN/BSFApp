@@ -60,12 +60,12 @@ function onBibleVerse2() { }
 
   onBibleSelected(name, version) {
     console.log('onBibleSelected: ' + name + ' ' + version);
-    this.onBibleVerseChange(version, null);
+    this.onBibleVerseChange(version, getCurrentUser().getBibleVersion2());
   }
 
   onBibleSelected2(name, version) {
     console.log('onBibleSelected2: ' + name + ' ' + version);
-    this.onBibleVerseChange(null, version);
+    this.onBibleVerseChange(getCurrentUser().getBibleVersion(), version);
   }
 
   onBibleVerse() {
@@ -77,33 +77,15 @@ function onBibleVerse2() { }
   }
 
   async onBibleVerseChange(ver1, ver2) {
-    let targetVer1 = getCurrentUser().getBibleVersion();
-    let targetVer2 = getCurrentUser().getBibleVersion2();
-    let changed = false;
-    if (!ver1 && !ver2 && targetVer2) {
-      targetVer2 = null;
-      changed = true;
-    }
-    if (ver1 && targetVer1 !== ver1) {
-      targetVer1 = ver1;
-      changed = true;
-    }
-    if (ver2 && targetVer2 !== ver2) {
-      targetVer2 = targetVer1 === ver2 ? null : ver2;
-      changed = true;
-    }
-    if (targetVer1 === targetVer2) {
-      targetVer2 = null;
-      changed = true;
+    // if two versions are the same, we only use one version
+    if (ver1 === ver2) {
+      ver2 = null;
     }
 
-    console.log(`onBibleVerseChange: ${ver1}-${ver2} => ${targetVer1}-${targetVer2} [changed=${changed}]`);
-    if (!changed) {
-      return;
-    }
+    console.log(`onBibleVerseChange: ${getCurrentUser().getBibleVersion()}-${getCurrentUser().getBibleVersion2()} => ${ver1}-${ver2}`);
 
-    await getCurrentUser().setBibleVersionAsync(targetVer1);
-    await getCurrentUser().setBibleVersion2Async(targetVer2);
+    await getCurrentUser().setBibleVersionAsync(ver1);
+    await getCurrentUser().setBibleVersion2Async(ver2);
     await this.ensureBibleIsDownloadedAsync();
     this.props.clearPassage();
     this.props.loadPassage();

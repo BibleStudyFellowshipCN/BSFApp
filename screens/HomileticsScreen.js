@@ -1,6 +1,6 @@
 import React from 'react';
 import {
-  StyleSheet, Text, View, Platform, ActivityIndicator, TouchableOpacity, Dimensions, Alert
+  StyleSheet, Text, View, Platform, ActivityIndicator, TouchableOpacity, Dimensions, Alert, Image
 } from 'react-native';
 import { Models } from '../dataStorage/models';
 import { loadAsync } from '../dataStorage/storage';
@@ -11,7 +11,6 @@ import Colors from '../constants/Colors';
 import { getI18nBibleBook } from '../store/I18n';
 import { GiftedChat } from 'react-native-gifted-chat';
 import KeyboardSpacer from 'react-native-keyboard-spacer';
-import { FontAwesome } from '@expo/vector-icons';
 
 function shareAnswer() { }
 
@@ -22,7 +21,9 @@ export default class HomileticsScreen extends React.Component {
       headerRight:
         <View style={{ marginRight: 7 }}>
           <TouchableOpacity onPress={() => { shareAnswer(); }}>
-            <FontAwesome color='#fff' size={28} name='send' />
+            <Image
+              style={{ width: 34, height: 34 }}
+              source={require('../assets/images/Share.png')} />
           </TouchableOpacity>
         </View>
     };
