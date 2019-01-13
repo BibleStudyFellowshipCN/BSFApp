@@ -5,7 +5,7 @@
     "slug": "CBSFApp",
     "privacy": "public",
     "sdkVersion": "32.0.0",
-    "version": "2019.1.10",
+    "version": "2019.1.12",
     "primaryColor": "#cccccc",
     "icon": "./assets/images/icon.png",
     "splash": {
@@ -22,7 +22,7 @@
       "**/*"
     ],
     "ios": {
-      "icon": "./assets/images/icon-ios.png",
+      "icon": "./assets/images/icon.png",
       "buildNumber": "3",
       "bundleIdentifier": "org.CBSF.bsfclass",
       "supportsTablet": true
@@ -33,7 +33,7 @@
       "permissions": [
         "WAKE_LOCK"
       ],
-      "versionCode": 25
+      "versionCode": 27
     }
   }
 }

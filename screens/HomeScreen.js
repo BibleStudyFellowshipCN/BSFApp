@@ -1,6 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { FontAwesome, Octicons, Feather } from '@expo/vector-icons';
+import { FontAwesome } from '@expo/vector-icons';
 import { FileSystem } from 'expo';
 import {
   ScrollView,
@@ -13,7 +13,8 @@ import {
   ProgressViewIOS,
   ProgressBarAndroid,
   RefreshControl,
-  Dimensions
+  Dimensions,
+  Image
 } from 'react-native';
 import Accordion from 'react-native-collapsible/Accordion';
 import { requestBooks, clearBooks } from "../store/books.js";
@@ -24,6 +25,7 @@ import { getCurrentUser } from '../store/user';
 import { Models } from '../dataStorage/models';
 import { resetGlobalCache, pokeServer } from '../dataStorage/storage';
 import Colors from '../constants/Colors.js';
+import { EventRegister } from 'react-native-event-listeners';
 
 class HomeScreen extends React.Component {
   static navigationOptions = ({ navigation }) => {
@@ -33,7 +35,9 @@ class HomeScreen extends React.Component {
       headerRight: (
         <View style={{ marginRight: 20, flexDirection: 'row' }}>
           <TouchableOpacity onPress={() => { checkForContentUpdate(true); }}>
-            <FontAwesome name='download' size={28} color='#fff' />
+            <Image
+              style={{ width: 34, height: 34 }}
+              source={require('../assets/images/Download.png')} />
           </TouchableOpacity>
         </View>)
     };
@@ -57,7 +61,15 @@ class HomeScreen extends React.Component {
       this.props.requestBooks();
     }
 
+    this.listener = EventRegister.addEventListener('screenDimensionChanged', (window) => {
+      this.setState({ windowWidth: window.width, windowHeight: window.height });
+    });
+
     checkForContentUpdate = this.checkForContentUpdate.bind(this);
+  }
+
+  componentWillUnmount() {
+    EventRegister.removeEventListener(this.listener)
   }
 
   downloadCallback(downloadProgress) {
@@ -157,15 +169,11 @@ class HomeScreen extends React.Component {
     await getCurrentUser().checkForUpdate(false);
   }
 
-  onLayout(e) {
-    this.setState({ windowWidth: Dimensions.get('window').width });
-  }
-
   render() {
     const progress = (this.state.downloadProgress + this.downloadedFiles) / this.downloadFiles;
     const progressText = getI18nText('下载课程') + ' ' + this.state.remoteVersion + ' (' + parseInt(progress * 100) + '%)';
     return (
-      <View style={styles.container} onLayout={this.onLayout.bind(this)}>
+      <View style={styles.container}>
         {
           this.state.downloading && Platform.OS === 'ios' &&
           <View>
@@ -285,11 +293,16 @@ const Lesson = (props) => {
         {
           hasAudio &&
           <TouchableOpacity onPress={() => props.goToAudio()}>
-            <Feather
-              name={'volume-2'}
-              size={28}
-            />
+            <Image
+              style={{ width: 34, height: 34 }}
+              source={require('../assets/images/Materials.On.png')} />
           </TouchableOpacity>
+        }
+        {
+          !hasAudio &&
+          <Image
+            style={{ width: 34, height: 34 }}
+            source={require('../assets/images/Materials.Off.png')} />
         }
       </View>
     </View>

@@ -1,6 +1,6 @@
 import React from 'react';
 import {
-  StyleSheet, Text, View, Platform, ActivityIndicator, TouchableOpacity, Dimensions, Alert
+  StyleSheet, Text, View, Platform, ActivityIndicator, TouchableOpacity, Dimensions, Alert, Image, Clipboard
 } from 'react-native';
 import { Models } from '../dataStorage/models';
 import { loadAsync } from '../dataStorage/storage';
@@ -11,7 +11,6 @@ import Colors from '../constants/Colors';
 import { getI18nBibleBook } from '../store/I18n';
 import { GiftedChat } from 'react-native-gifted-chat';
 import KeyboardSpacer from 'react-native-keyboard-spacer';
-import { FontAwesome } from '@expo/vector-icons';
 
 function shareAnswer() { }
 
@@ -22,7 +21,9 @@ export default class HomileticsScreen extends React.Component {
       headerRight:
         <View style={{ marginRight: 7 }}>
           <TouchableOpacity onPress={() => { shareAnswer(); }}>
-            <FontAwesome color='#fff' size={28} name='send' />
+            <Image
+              style={{ width: 34, height: 34 }}
+              source={require('../assets/images/Copy.png')} />
           </TouchableOpacity>
         </View>
     };
@@ -87,7 +88,7 @@ export default class HomileticsScreen extends React.Component {
       _id: Math.round(Math.random() * 1000000),
       text: message,
       user: {
-        _id: Platform.OS + ' ' + Constants['deviceId'],
+        _id: `${Platform.OS} ${Constants['deviceId']}`,
         name: this.defaultUserName
       }
     }]);
@@ -118,6 +119,31 @@ export default class HomileticsScreen extends React.Component {
   async setText(text) {
     this.text = text;
     this.setState({ text: text });
+  }
+
+  isMyMessage(id) {
+    return `${Platform.OS} ${Constants['deviceId']}` === id;
+  }
+
+  onLongPress(context, message) {
+    if (message.text) {
+      const options = this.isMyMessage(message.user._id) ? ['Delete', 'Copy Text', 'Cancel',] : ['Copy Text', 'Cancel'];
+      const cancelButtonIndex = options.length - 1;
+      context.actionSheet().showActionSheetWithOptions({
+        options,
+        cancelButtonIndex,
+      },
+        (buttonIndex) => {
+          switch (buttonIndex) {
+            case 0:
+              Alert.alert('TODO', 'Call server API to remove message ' + message.createdAt);
+              break;
+            case 1:
+              Clipboard.setString(message.text);
+              break;
+          }
+        });
+    }
   }
 
   render() {
@@ -155,6 +181,7 @@ export default class HomileticsScreen extends React.Component {
             onSend={(message) => this.chatServer.sendMessage(message)}
             text={this.state.text}
             onInputTextChanged={text => this.setText(text)}
+            onLongPress={this.onLongPress.bind(this)}
             user={{
               _id: Platform.OS + ' ' + Constants['deviceId'],
               name: this.defaultUserName
