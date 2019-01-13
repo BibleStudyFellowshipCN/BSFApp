@@ -127,8 +127,8 @@ export default class HomileticsScreen extends React.Component {
 
   onLongPress(context, message) {
     if (message.text) {
-      const options = this.isMyMessage(message.user._id) ? ['Delete', 'Copy Text', 'Cancel',] : ['Copy Text', 'Cancel'];
-      const cancelButtonIndex = options.length - 1;
+      const options = this.isMyMessage(message.user._id) ? ['Copy Text', 'Cancel'/*, 'Delete'*/] : ['Copy Text', 'Cancel'];
+      const cancelButtonIndex = 1;
       context.actionSheet().showActionSheetWithOptions({
         options,
         cancelButtonIndex,
@@ -136,11 +136,11 @@ export default class HomileticsScreen extends React.Component {
         (buttonIndex) => {
           switch (buttonIndex) {
             case 0:
-              Alert.alert('TODO', 'Call server API to remove message ' + message.createdAt);
-              break;
-            case 1:
               Clipboard.setString(message.text);
               break;
+            /*case 2:
+              Alert.alert('TODO', 'Call server API to remove message ' + message.createdAt);
+              break;*/
           }
         });
     }
