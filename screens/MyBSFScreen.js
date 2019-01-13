@@ -67,8 +67,8 @@ export default class MyBSFScreen extends React.Component {
             this.setState({ loading: true })
           }}
           onNavigationStateChange={(navState) => {
-            console.log(navState);
             const canGoBack = navState.canGoBack && !navState.loading;
+            console.log({ navState, canGoBack });
             this.setState({ canGoBack });
             const setParamsAction = NavigationActions.setParams({
               params: { canGoBack },
