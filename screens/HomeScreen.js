@@ -357,7 +357,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingLeft: 15,
     marginTop: 2,
-    marginBottom: 2
+    marginBottom: 2,
+    borderRadius: 10,
+    marginHorizontal: 3,
+    borderWidth: 1,
+    borderColor: Colors.yellow
   },
   bookHeaderText: {
     marginVertical: 6,

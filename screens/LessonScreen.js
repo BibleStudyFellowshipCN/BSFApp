@@ -264,7 +264,7 @@ const QuestionText = (props) => (
 
 let lastBibleQuote = '';
 const BibleQuote = (props) => {
-  const repeat = lastBibleQuote === props.book ? true : false;
+  const repeat = lastBibleQuote === props.book;
   lastBibleQuote = props.book;
   return (
     <View style={{ flexDirection: 'row' }}>
@@ -306,10 +306,10 @@ const styles = StyleSheet.create({
   },
   bibleQuote: {
     marginVertical: 2,
-    paddingHorizontal: 15,
+    marginRight: 2,
+    paddingHorizontal: 5,
     justifyContent: 'center',
     alignItems: 'center',
-    height: 22,
     borderRadius: 11,
     backgroundColor: Colors.yellow,
   },
