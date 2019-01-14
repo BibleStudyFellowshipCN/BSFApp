@@ -9,7 +9,7 @@ import { Constants } from 'expo';
 import { getCurrentUser } from '../store/user';
 import Colors from '../constants/Colors';
 import { getI18nBibleBook } from '../store/I18n';
-import { GiftedChat } from 'react-native-gifted-chat';
+import { GiftedChat, Bubble } from 'react-native-gifted-chat';
 import KeyboardSpacer from 'react-native-keyboard-spacer';
 
 function shareAnswer() { }
@@ -173,11 +173,14 @@ export default class HomileticsScreen extends React.Component {
             size="large"
             color={Colors.yellow} />
         }
+        <View style={{ backgroundColor: '#101010', height: 1 }} />
         {
           !this.state.loading &&
           <GiftedChat
             messages={this.state.messages}
-            isAnimated={true}
+            isAnimated
+            showAvatarForEveryMessage={true}
+            showUserAvatar={true}
             onSend={(message) => this.chatServer.sendMessage(message)}
             text={this.state.text}
             onInputTextChanged={text => this.setText(text)}
@@ -185,6 +188,44 @@ export default class HomileticsScreen extends React.Component {
             user={{
               _id: Platform.OS + ' ' + Constants['deviceId'],
               name: this.defaultUserName
+            }}
+            renderBubble={props => {
+              return (
+                <Bubble
+                  {...props}
+                  textStyle={{
+                    right: {
+                      color: '#202020'
+                    }
+                  }}
+                  wrapperStyle={{
+                    left: {
+                      backgroundColor: '#eeeeee',
+                    },
+                    right: {
+                      backgroundColor: '#FFECB3',
+                    },
+                  }}
+                />
+              );
+            }}
+            /*renderMessageText={(e) => {
+              console.log(e.currentMessage._id);
+              return (<Text>{e.currentMessage._id}</Text>);
+            }}*/
+            //renderAvatar={(e) => <View />}
+            /*renderAvatar={(e) => {
+              console.log(e.currentMessage._id);
+              return (<Text>{e.currentMessage._id}</Text>);
+            }}*/
+            renderActions={() => {
+              return (
+                <TouchableOpacity onPress={() => { shareAnswer(); }}>
+                  <Image
+                    style={{ width: 40, height: 40 }}
+                    source={require('../assets/images/MySettings.On.png')} />
+                </TouchableOpacity>
+              );
             }}
           />
         }

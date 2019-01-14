@@ -1,9 +1,8 @@
 import React from 'react';
 import { connect } from 'react-redux'
 import { ScrollView, StyleSheet, View, Alert, KeyboardAvoidingView } from 'react-native';
-import Expo, { FileSystem, Constants, WebBrowser } from 'expo';
+import { FileSystem, Constants, WebBrowser } from 'expo';
 import { Models } from '../dataStorage/models';
-import { callWebServiceAsync, showWebServiceCallErrorsAsync } from '../dataStorage/storage';
 import { getCurrentUser } from '../store/user';
 import { requestBooks, clearBooks } from "../store/books.js";
 import SettingsList from 'react-native-settings-list';
@@ -203,18 +202,18 @@ import Colors from '../constants/Colors';
   async onClearDownloadFiles() {
     try {
       let freeSize = 0;
-      const files = await Expo.FileSystem.readDirectoryAsync(FileSystem.documentDirectory);
+      const files = await FileSystem.readDirectoryAsync(FileSystem.documentDirectory);
       for (let i in files) {
         const file = files[i];
         console.log(file);
         if (file.toLocaleLowerCase().indexOf('book-') !== -1 && file.toLocaleLowerCase().endsWith('.json')) {
           const fileUri = FileSystem.documentDirectory + file;
           console.log(fileUri);
-          const info = await Expo.FileSystem.getInfoAsync(fileUri);
+          const info = await FileSystem.getInfoAsync(fileUri);
           console.log(JSON.stringify(info));
           freeSize += info.size;
           console.log(freeSize);
-          await Expo.FileSystem.deleteAsync(fileUri, { idempotent: true });
+          await FileSystem.deleteAsync(fileUri, { idempotent: true });
         }
       }
       Alert.alert(getI18nText('完成'));
