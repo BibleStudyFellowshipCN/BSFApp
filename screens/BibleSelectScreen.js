@@ -99,11 +99,11 @@ export default class BibleSelectScreen extends React.Component {
     try {
       console.log('Select: ' + version);
 
-      // const result = await this.ensureBibleIsDownloadedAsync(name, version);
-      // if (!result) {
-      //   Alert.alert(getI18nText('错误'), getI18nText('下载失败'));
-      //   return;
-      // }
+      const result = await this.ensureBibleIsDownloadedAsync(name, version);
+      if (!result) {
+        Alert.alert(getI18nText('错误'), getI18nText('下载失败'));
+        return;
+      }
 
       const selectedBibles = this.state.selectedBibles;
       console.log(`Before: ${JSON.stringify(selectedBibles)}`);
