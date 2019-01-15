@@ -201,21 +201,12 @@ class BSFQuestion extends React.Component {
     const ids = props.question.id.split('_');
     const title = (ids.length >= 3) ? `: 第${ids[1]}课${ids[1]}题` : '';
 
-    if (props.question.homiletics && getCurrentUser().getUserPermissions().isGroupLeader) {
-      // Group leader has a different chat screen for homiletics question
-      navigateTo('Homiletics', {
-        id: props.question.id,
-        title: `${getI18nText('问题讨论')} ${title}`,
-        text: props.question.questionText,
-        quotes: props.question.quotes
-      });
-    } else {
-      navigateTo('GlobalChat', {
-        id: props.question.id,
-        title: getI18nText('问题讨论') + ' ' + props.question.id,
-        text: props.question.questionText
-      });
-    }
+    navigateTo('Homiletics', {
+      id: props.question.id,
+      title: `${getI18nText('问题讨论')} ${title}`,
+      text: props.question.questionText,
+      quotes: props.question.quotes
+    });
   }
 
   render() {

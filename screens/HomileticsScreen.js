@@ -8,7 +8,7 @@ import Chat from '../store/chat';
 import { Constants } from 'expo';
 import { getCurrentUser } from '../store/user';
 import Colors from '../constants/Colors';
-import { getI18nBibleBook } from '../store/I18n';
+import { getI18nBibleBook, getI18nText } from '../store/I18n';
 import { GiftedChat, Bubble } from 'react-native-gifted-chat';
 import KeyboardSpacer from 'react-native-keyboard-spacer';
 
@@ -17,15 +17,7 @@ function shareAnswer() { }
 export default class HomileticsScreen extends React.Component {
   static navigationOptions = ({ navigation }) => {
     return {
-      title: navigation.state.params.title,
-      headerRight:
-        <View style={{ marginRight: 7 }}>
-          <TouchableOpacity onPress={() => { shareAnswer(); }}>
-            <Image
-              style={{ width: 34, height: 34 }}
-              source={require('../assets/images/Copy.png')} />
-          </TouchableOpacity>
-        </View>
+      title: navigation.state.params.title
     };
   };
 
@@ -104,7 +96,7 @@ export default class HomileticsScreen extends React.Component {
     if (!answerContent || !answerContent.answers || !answerContent.answers[questionId] ||
       !answerContent.answers[questionId].answerText ||
       answerContent.answers[questionId].answerText.length < 1) {
-      Alert.alert('Information', 'No answer entered yet');
+      Alert.alert(getI18nText('提示'), getI18nText('您没有答这道题目'));
       return;
     }
 
@@ -127,7 +119,14 @@ export default class HomileticsScreen extends React.Component {
 
   onLongPress(context, message) {
     if (message.text) {
-      const options = this.isMyMessage(message.user._id) ? ['Copy Text', 'Cancel'/*, 'Delete'*/] : ['Copy Text', 'Cancel'];
+      let options = [getI18nText('拷贝'), getI18nText('取消')];
+      let copyIndex = 0;
+      let deleteIndex = -1;
+      if (this.isMyMessage(message.user._id)) {
+        options.unshift(getI18nText('删除'));
+        deleteIndex = 0;
+        copyIndex = 1;
+      }
       const cancelButtonIndex = 1;
       context.actionSheet().showActionSheetWithOptions({
         options,
@@ -135,12 +134,12 @@ export default class HomileticsScreen extends React.Component {
       },
         (buttonIndex) => {
           switch (buttonIndex) {
-            case 0:
+            case copyIndex:
               Clipboard.setString(message.text);
               break;
-            /*case 2:
+            case deleteIndex:
               Alert.alert('TODO', 'Call server API to remove message ' + message.createdAt);
-              break;*/
+              break;
           }
         });
     }
@@ -173,7 +172,7 @@ export default class HomileticsScreen extends React.Component {
             size="large"
             color={Colors.yellow} />
         }
-        <View style={{ backgroundColor: '#101010', height: 1 }} />
+        <View style={{ backgroundColor: '#bdc3c7', height: 1 }} />
         {
           !this.state.loading &&
           <GiftedChat
@@ -214,16 +213,17 @@ export default class HomileticsScreen extends React.Component {
               return (<Text>{e.currentMessage._id}</Text>);
             }}*/
             //renderAvatar={(e) => <View />}
-            /*renderAvatar={(e) => {
-              console.log(e.currentMessage._id);
-              return (<Text>{e.currentMessage._id}</Text>);
-            }}*/
+            renderAvatar={(e) => {
+              const id = e.currentMessage._id;
+              console.log(JSON.stringify(id));
+              return (<Text>{id}</Text>);
+            }}
             renderActions={() => {
               return (
                 <TouchableOpacity onPress={() => { shareAnswer(); }}>
                   <Image
-                    style={{ width: 40, height: 40 }}
-                    source={require('../assets/images/MySettings.On.png')} />
+                    style={{ width: 34, height: 34, margin: 5 }}
+                    source={require('../assets/images/Copy.png')} />
                 </TouchableOpacity>
               );
             }}
@@ -253,7 +253,6 @@ const BibleQuote = (props) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    marginTop: -14,
     backgroundColor: '#FAFAFA'
   },
   dayTitle: {
