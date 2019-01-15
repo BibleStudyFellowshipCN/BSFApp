@@ -1,6 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { FontAwesome } from '@expo/vector-icons';
+import { FontAwesome, Octicons, Feather } from '@expo/vector-icons';
 import { FileSystem } from 'expo';
 import {
   ScrollView,
@@ -259,16 +259,9 @@ const Lesson = (props) => {
   const permissions = getCurrentUser().getUserPermissions();
   const hasAudio = permissions.audios && (permissions.audios.indexOf(props.lesson.id) != -1)
   return (
-    <View style={{ flexDirection: 'row', backgroundColor: 'white' }}>
-      <View style={{
-        borderWidth: 1,
-        width: Dimensions.get('window').width - 85,
-        marginLeft: 20,
-        marginVertical: 2,
-        borderRadius: 10,
-        borderColor: '#cdcdcd'
-      }}>
-        <TouchableOpacity style={styles.lessonContainer} onPress={() => props.goToLesson()}>
+    <View>
+      <TouchableOpacity style={styles.lessonContainer} onPress={() => props.goToLesson()}>
+        <View>
           <View style={styles.lessonMetadata}>
             <Text style={styles.lessonMetadataText}>
               {date} {lessonNumber}
@@ -277,34 +270,56 @@ const Lesson = (props) => {
           <Text style={{ marginVertical: 4, fontSize: getCurrentUser().getHomeFontSize() }}>
             {name}
           </Text>
-        </TouchableOpacity>
-      </View>
-
-      <View style={{
-        borderWidth: 1,
-        width: 50,
-        marginLeft: 2,
-        marginVertical: 2,
-        borderRadius: 10,
-        borderColor: '#cdcdcd',
-        alignItems: 'center',
-        justifyContent: 'center'
-      }}>
-        {
-          hasAudio &&
-          <TouchableOpacity onPress={() => props.goToAudio()}>
-            <Image
-              style={{ width: 34, height: 34 }}
-              source={require('../assets/images/Materials.On.png')} />
-          </TouchableOpacity>
-        }
-        {
-          !hasAudio &&
-          <Image
-            style={{ width: 34, height: 34 }}
-            source={require('../assets/images/Materials.Off.png')} />
-        }
-      </View>
+        </View>
+        <View style={styles.lessonChevron}>
+          {
+            props.lesson.homeDiscussion &&
+            <TouchableOpacity onPress={() => props.goToHomeDiscussion()}>
+              <Octicons
+                style={{ marginRight: 24 }}
+                name={'comment-discussion'}
+                size={26}
+              />
+            </TouchableOpacity>
+          }
+          {
+            props.lesson.homeTraining &&
+            <TouchableOpacity onPress={() => props.goToHomeTraining()}>
+              <Feather
+                style={{ marginRight: 20 }}
+                name={'users'}
+                size={24}
+              />
+            </TouchableOpacity>
+          }
+          {
+            getCurrentUser().getUserPermissions().isGroupLeader && props.lesson.notesUri &&
+            <TouchableOpacity onPress={() => props.goToNotes()}>
+              <Feather
+                style={{ marginRight: 20 }}
+                name={'file-text'}
+                size={24}
+              />
+            </TouchableOpacity>
+          }
+          {
+            hasAudio &&
+            <TouchableOpacity onPress={() => props.goToAudio()}>
+              <Feather
+                style={{ marginRight: 20 }}
+                name={'volume-2'}
+                size={24}
+              />
+            </TouchableOpacity>
+          }
+          <FontAwesome
+            style={{ top: 4 }}
+            name='chevron-right'
+            color='grey'
+            size={16}
+          />
+        </View>
+      </TouchableOpacity>
     </View>
   )
 }
@@ -334,7 +349,6 @@ const styles = StyleSheet.create({
   contentContainer: {
   },
   booksContainer: {
-    backgroundColor: 'white'
   },
   bookHeader: {
     flexDirection: 'row',
@@ -354,8 +368,15 @@ const styles = StyleSheet.create({
     fontWeight: '400',
   },
   lessonContainer: {
-    paddingLeft: 10,
-    backgroundColor: 'transparent',
+    paddingLeft: 25,
+    paddingVertical: 5,
+    backgroundColor: 'white',
+  },
+  lessonChevron: {
+    position: 'absolute',
+    flexDirection: 'row',
+    right: 15,
+    top: 25,
   },
   lessonMetadata: {
     flexDirection: 'row',
