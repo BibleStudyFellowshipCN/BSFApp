@@ -1,5 +1,5 @@
 import React from 'react';
-import { ScrollView, StyleSheet, View, Alert, TextInput, KeyboardAvoidingView, Keyboard } from 'react-native';
+import { ScrollView, StyleSheet, View, Alert, TextInput, KeyboardAvoidingView, Keyboard, Image, TouchableOpacity } from 'react-native';
 import { getI18nText } from '../store/I18n';
 import { Button } from 'react-native-elements';
 import { getCurrentUser } from '../store/user';
@@ -7,13 +7,25 @@ import { getCurrentUser } from '../store/user';
 export default class SetPhoneScreen extends React.Component {
   static navigationOptions = ({ navigation }) => {
     return {
-      title: getI18nText('设置手机号码')
+      title: getI18nText('设置手机号码'),
+      headerLeft: (
+        <View style={{ marginLeft: 10 }}>
+          <TouchableOpacity onPress={() => navigateBack()}>
+            <Image
+              style={{ width: 34, height: 34 }}
+              source={require('../assets/images/GoBack.png')} />
+          </TouchableOpacity>
+        </View>)
     };
   };
 
   state = {
     cellphone: getCurrentUser().getCellphone(),
     busy: false
+  }
+
+  componentWillMount() {
+    navigateBack = () => this.props.navigation.pop();
   }
 
   async onSubmit() {
@@ -44,6 +56,7 @@ export default class SetPhoneScreen extends React.Component {
               blurOnSubmit={false}
               placeholder={getI18nText('手机号码')}
               onChangeText={(text) => { this.setState({ cellphone: text }); }}
+              onSubmitEditing={this.onSubmit.bind(this)}
             />
             <View style={{ alignItems: 'center', marginTop: 40 }}>
               <Button

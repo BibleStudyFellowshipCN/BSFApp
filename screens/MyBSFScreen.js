@@ -14,7 +14,7 @@ export default class MyBSFScreen extends React.Component {
     return {
       title: getI18nText('MyBSF.org'),
       headerLeft: (
-        <View style={{ marginLeft: 20, flexDirection: 'row' }}>
+        <View style={{ marginLeft: 10, flexDirection: 'row' }}>
           {
             canGoBack &&
             <TouchableOpacity onPress={() => { goback(); }}>
@@ -25,7 +25,7 @@ export default class MyBSFScreen extends React.Component {
           }
         </View>),
       headerRight: (
-        <View style={{ marginRight: 20, flexDirection: 'row' }}>
+        <View style={{ marginRight: 10, flexDirection: 'row' }}>
           <TouchableOpacity onPress={() => { refreshWebView(); }}>
             <Image
               style={{ width: 34, height: 34 }}
@@ -76,6 +76,7 @@ export default class MyBSFScreen extends React.Component {
     return (
       <View style={{ flex: 1 }}>
         <WebView
+          style={{ flex: 1 }}
           key={this.state.key}
           ref={ref => this.browser = ref}
           source={{ uri: this.webUrl }}

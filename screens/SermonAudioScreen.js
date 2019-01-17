@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, ActivityIndicator, WebView, Dimensions } from 'react-native';
+import { View, ActivityIndicator, WebView, Dimensions, Image, TouchableOpacity } from 'react-native';
 import { getI18nText } from '../store/I18n';
 import { getCurrentUser } from '../store/user';
 import { KeepAwake } from 'expo';
@@ -9,7 +9,15 @@ import { EventRegister } from 'react-native-event-listeners';
 export default class SermonAudioScreen extends React.Component {
   static navigationOptions = ({ navigation }) => {
     return {
-      title: getI18nText('讲道录音')
+      title: getI18nText('课程资料'),
+      headerLeft: (
+        <View style={{ marginLeft: 10 }}>
+          <TouchableOpacity onPress={() => navigateBack()}>
+            <Image
+              style={{ width: 34, height: 34 }}
+              source={require('../assets/images/GoBack.png')} />
+          </TouchableOpacity>
+        </View>)
     };
   };
 
@@ -19,6 +27,7 @@ export default class SermonAudioScreen extends React.Component {
   };
 
   componentWillMount() {
+    navigateBack = () => this.props.navigation.pop();
     this.listener = EventRegister.addEventListener('screenDimensionChanged', (window) => {
       this.setState({ windowWidth: window.width });
     });

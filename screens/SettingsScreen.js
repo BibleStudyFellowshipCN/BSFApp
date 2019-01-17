@@ -306,7 +306,7 @@ import Colors from '../constants/Colors';
                       <FontAwesome color={Colors.yellow} size={30} name='play-circle-o' />
                     </View>
                   }
-                  title={getI18nText('讲道录音')}
+                  title={getI18nText('课程资料')}
                   hasNavArrow={true}
                   titleStyle={{ fontSize }}
                   titleInfoStyle={{ fontSize }}

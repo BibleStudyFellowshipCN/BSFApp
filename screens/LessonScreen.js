@@ -24,7 +24,17 @@ class LessonScreen extends React.Component {
   static navigationOptions = ({ navigation }) => {
     return {
       title: navigation.state.params && navigation.state.params.title ? navigation.state.params.title : '',
-      headerRight: <ExportAnswer lessonId={navigation.state.params.lesson.id} importExport={() => onImportAndExport()} />
+      headerLeft: (
+        <View style={{ marginLeft: 10 }}>
+          <TouchableOpacity onPress={() => navigateBack()}>
+            <Image
+              style={{ width: 34, height: 34 }}
+              source={require('../assets/images/GoBack.png')} />
+          </TouchableOpacity>
+        </View>),
+      headerRight: (
+        <ExportAnswer lessonId={navigation.state.params.lesson.id} importExport={() => onImportAndExport()} />
+      )
     };
   };
 
@@ -40,6 +50,7 @@ class LessonScreen extends React.Component {
 
   componentWillMount() {
     navigateTo = this.navigateTo.bind(this);
+    navigateBack = () => this.props.navigation.pop();
     onImportAndExport = this.onImportAndExport.bind(this);
 
     if (!this.props.lesson) {

@@ -8,7 +8,9 @@ import {
   View,
   ProgressViewIOS,
   ProgressBarAndroid,
-  Dimensions
+  Dimensions,
+  TouchableOpacity,
+  Image
 } from 'react-native';
 import { FileSystem } from 'expo';
 import { getI18nText } from '../store/I18n';
@@ -21,7 +23,15 @@ import { EventRegister } from 'react-native-event-listeners';
 export default class BibleSelectScreen extends React.Component {
   static navigationOptions = ({ navigation }) => {
     return {
-      title: getI18nText('请选择圣经版本')
+      title: getI18nText('请选择圣经版本'),
+      headerLeft: (
+        <View style={{ marginLeft: 10 }}>
+          <TouchableOpacity onPress={() => navigateBack()}>
+            <Image
+              style={{ width: 34, height: 34 }}
+              source={require('../assets/images/GoBack.png')} />
+          </TouchableOpacity>
+        </View>)
     };
   };
 
@@ -44,6 +54,7 @@ export default class BibleSelectScreen extends React.Component {
   }
 
   componentWillMount() {
+    navigateBack = () => this.props.navigation.pop();
     this.listener = EventRegister.addEventListener('screenDimensionChanged', (window) => {
       this.setState({ windowWidth: window.width });
     });

@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, View, Platform, ActivityIndicator, Dimensions } from 'react-native';
+import { StyleSheet, View, Platform, ActivityIndicator, Dimensions, Image, TouchableOpacity } from 'react-native';
 import { getI18nText } from '../store/I18n';
 import { GiftedChat } from 'react-native-gifted-chat';
 import Chat from '../store/chat';
@@ -12,7 +12,15 @@ export default class GlobalChatScreen extends React.Component {
   static navigationOptions = ({ navigation }) => {
     const title = navigation.state.params && navigation.state.params.title ? navigation.state.params.title : getI18nText('聊天室');
     return {
-      title
+      title,
+      headerLeft: (
+        <View style={{ marginLeft: 10 }}>
+          <TouchableOpacity onPress={() => navigateBack()}>
+            <Image
+              style={{ width: 34, height: 34 }}
+              source={require('../assets/images/GoBack.png')} />
+          </TouchableOpacity>
+        </View>)
     };
   };
 
@@ -52,6 +60,7 @@ export default class GlobalChatScreen extends React.Component {
   }
 
   componentWillMount() {
+    navigateBack = () => this.props.navigation.pop();
     this.listener = EventRegister.addEventListener('screenDimensionChanged', (window) => {
       this.setState({ windowWidth: window.width });
     });

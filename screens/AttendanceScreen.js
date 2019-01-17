@@ -1,5 +1,5 @@
 import React from 'react';
-import { ScrollView, View, Alert, Text, ActivityIndicator, Dimensions } from 'react-native';
+import { ScrollView, View, Alert, Text, ActivityIndicator, Dimensions, Image, TouchableOpacity } from 'react-native';
 import { getI18nText } from '../store/I18n';
 import { FontAwesome } from '@expo/vector-icons';
 import { CheckBox, Button } from 'react-native-elements';
@@ -14,7 +14,15 @@ import { EventRegister } from 'react-native-event-listeners';
 export default class AttendanceScreen extends React.Component {
   static navigationOptions = ({ navigation }) => {
     return {
-      title: getI18nText('考勤表')
+      title: getI18nText('考勤表'),
+      headerLeft: (
+        <View style={{ marginLeft: 10 }}>
+          <TouchableOpacity onPress={() => navigateBack()}>
+            <Image
+              style={{ width: 34, height: 34 }}
+              source={require('../assets/images/GoBack.png')} />
+          </TouchableOpacity>
+        </View>)
     };
   };
 
@@ -27,6 +35,7 @@ export default class AttendanceScreen extends React.Component {
   };
 
   componentWillMount() {
+    navigateBack = () => this.props.navigation.pop();
     this.listener = EventRegister.addEventListener('screenDimensionChanged', (window) => {
       this.setState({ windowWidth: window.width });
     });

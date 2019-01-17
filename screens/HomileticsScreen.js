@@ -17,7 +17,15 @@ function shareAnswer() { }
 export default class HomileticsScreen extends React.Component {
   static navigationOptions = ({ navigation }) => {
     return {
-      title: navigation.state.params.title
+      title: navigation.state.params.title,
+      headerLeft: (
+        <View style={{ marginLeft: 10 }}>
+          <TouchableOpacity onPress={() => navigateBack()}>
+            <Image
+              style={{ width: 34, height: 34 }}
+              source={require('../assets/images/GoBack.png')} />
+          </TouchableOpacity>
+        </View>)
     };
   };
 
@@ -56,6 +64,10 @@ export default class HomileticsScreen extends React.Component {
   }
 
   componentDidMount() {
+    navigateBack = () => {
+      this.props.navigation.pop();
+    }
+
     console.log('loading messages');
     this.chatServer.loadMessages().then(() => {
       this.setState({ loading: false });
@@ -122,11 +134,11 @@ export default class HomileticsScreen extends React.Component {
       let options = [getI18nText('拷贝'), getI18nText('取消')];
       let copyIndex = 0;
       let deleteIndex = -1;
-      if (this.isMyMessage(message.user._id)) {
-        options.unshift(getI18nText('删除'));
-        deleteIndex = 0;
-        copyIndex = 1;
-      }
+      // if (this.isMyMessage(message.user._id)) {
+      //   options.unshift(getI18nText('删除'));
+      //   deleteIndex = 0;
+      //   copyIndex = 1;
+      // }
       const cancelButtonIndex = 1;
       context.actionSheet().showActionSheetWithOptions({
         options,
@@ -137,9 +149,9 @@ export default class HomileticsScreen extends React.Component {
             case copyIndex:
               Clipboard.setString(message.text);
               break;
-            case deleteIndex:
-              Alert.alert('TODO', 'Call server API to remove message ' + message.createdAt);
-              break;
+            // case deleteIndex:
+            //   Alert.alert('TODO', 'Call server API to remove message ' + message.createdAt);
+            //   break;
           }
         });
     }
@@ -216,7 +228,7 @@ export default class HomileticsScreen extends React.Component {
             renderAvatar={(e) => {
               const id = e.currentMessage._id;
               console.log(JSON.stringify(id));
-              return (<Text>{id}</Text>);
+              return (<Text>#{id}</Text>);
             }}
             renderActions={() => {
               return (

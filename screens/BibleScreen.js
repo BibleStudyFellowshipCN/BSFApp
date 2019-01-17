@@ -7,6 +7,7 @@ import {
   StyleSheet,
   Text,
   View,
+  Image,
   TouchableOpacity,
   ProgressViewIOS,
   ProgressBarAndroid
@@ -28,8 +29,16 @@ function onBibleVerse2() { }
   static navigationOptions = ({ navigation }) => {
     return {
       title: navigation.state.params && navigation.state.params.title ? navigation.state.params.title : 'Bible',
+      headerLeft: (
+        <View style={{ marginLeft: 10 }}>
+          <TouchableOpacity onPress={() => navigateBack()}>
+            <Image
+              style={{ width: 34, height: 34 }}
+              source={require('../assets/images/GoBack.png')} />
+          </TouchableOpacity>
+        </View>),
       headerRight: (
-        <View style={{ marginRight: 20, flexDirection: 'row' }}>
+        <View style={{ marginRight: 10, flexDirection: 'row' }}>
           <TouchableOpacity onPress={() => { onBibleVerse(true); }}>
             <Image
               style={{ width: 34, height: 34 }}
@@ -46,6 +55,7 @@ function onBibleVerse2() { }
   }
 
   componentWillMount() {
+    navigateBack = () => this.props.navigation.pop();
     onBibleVerse = this.onBibleVerse.bind(this);
     onBibleVerse2 = this.onBibleVerse2.bind(this);
     this.ensureBibleIsDownloadedAsync().then(() => {

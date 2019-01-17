@@ -33,7 +33,7 @@ class HomeScreen extends React.Component {
     return {
       title: getI18nText(title),
       headerRight: (
-        <View style={{ marginRight: 20, flexDirection: 'row' }}>
+        <View style={{ marginRight: 10, flexDirection: 'row' }}>
           <TouchableOpacity onPress={() => { checkForContentUpdate(true); }}>
             <Image
               style={{ width: 34, height: 34 }}
