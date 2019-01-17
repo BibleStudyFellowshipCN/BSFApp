@@ -10,10 +10,10 @@ export default class SetPhoneScreen extends React.Component {
       title: getI18nText('设置手机号码'),
       headerLeft: (
         <View style={{ marginLeft: 10 }}>
-          <TouchableOpacity onPress={() => navigateBack()}>
+          <TouchableOpacity onPress={() => onSubmit()}>
             <Image
               style={{ width: 34, height: 34 }}
-              source={require('../assets/images/GoBack.png')} />
+              source={require('../assets/images/Ok.png')} />
           </TouchableOpacity>
         </View>)
     };
@@ -25,7 +25,7 @@ export default class SetPhoneScreen extends React.Component {
   }
 
   componentWillMount() {
-    navigateBack = () => this.props.navigation.pop();
+    onSubmit = () => this.onSubmit();
   }
 
   async onSubmit() {
@@ -44,31 +44,18 @@ export default class SetPhoneScreen extends React.Component {
   render() {
     return (
       <KeyboardAvoidingView style={styles.container} behavior='padding' keyboardVerticalOffset={0}>
-        <ScrollView
-          style={{ backgroundColor: 'white' }}
-          ref={ref => this.scrollView = ref}>
-          <View style={{ backgroundColor: 'white' }}>
-            <TextInput
-              style={styles.cellphoneInput}
-              ref={(input) => this.cellphoneInput = input}
-              keyboardType='phone-pad'
-              defaultValue={this.state.cellphone}
-              blurOnSubmit={false}
-              placeholder={getI18nText('手机号码')}
-              onChangeText={(text) => { this.setState({ cellphone: text }); }}
-              onSubmitEditing={this.onSubmit.bind(this)}
-            />
-            <View style={{ alignItems: 'center', marginTop: 40 }}>
-              <Button
-                disabled={this.state.busy}
-                backgroundColor='#397EDC'
-                borderRadius={5}
-                containerViewStyle={{ width: 130 }}
-                title={getI18nText('提交')}
-                onPress={this.onSubmit.bind(this)} />
-            </View>
-          </View>
-        </ScrollView>
+        <View style={{ flex: 1, backgroundColor: 'white' }}>
+          <TextInput
+            style={styles.cellphoneInput}
+            ref={(input) => this.cellphoneInput = input}
+            keyboardType='phone-pad'
+            defaultValue={this.state.cellphone}
+            blurOnSubmit={false}
+            placeholder={getI18nText('手机号码')}
+            onChangeText={(text) => { this.setState({ cellphone: text }); }}
+            onSubmitEditing={this.onSubmit.bind(this)}
+          />
+        </View>
       </KeyboardAvoidingView>
     );
   }

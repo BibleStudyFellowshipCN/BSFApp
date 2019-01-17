@@ -29,7 +29,7 @@ export default class BibleSelectScreen extends React.Component {
           <TouchableOpacity onPress={() => navigateBack()}>
             <Image
               style={{ width: 34, height: 34 }}
-              source={require('../assets/images/GoBack.png')} />
+              source={require('../assets/images/Ok.png')} />
           </TouchableOpacity>
         </View>)
     };

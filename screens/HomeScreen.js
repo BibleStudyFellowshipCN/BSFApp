@@ -167,6 +167,7 @@ class HomeScreen extends React.Component {
   async onRefresh() {
     await this.checkForContentUpdate(false);
     await getCurrentUser().checkForUpdate(false);
+    this.setState({ onRefresh: !this.state.onRefresh });
   }
 
   render() {

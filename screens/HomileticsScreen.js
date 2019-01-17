@@ -268,6 +268,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#FAFAFA'
   },
   dayTitle: {
+    top: -10,
     marginHorizontal: 15,
     color: 'black',
     fontWeight: 'bold'

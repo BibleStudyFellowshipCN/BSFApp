@@ -124,7 +124,7 @@ class LessonScreen extends React.Component {
         ref={ref => this.tabView = ref}
         {...scrollableStyleProps}
         initialPage={this.initialPage}
-        renderTabBar={() => <DefaultTabBar style={{ height: 30 }} />}>
+        /*renderTabBar={() => <DefaultTabBar style={{ height: 30 }} />}*/>
         <DayQuestions tabLabel={getI18nText("一")} goToPassage={this.goToPassage} day={dayQuestions.one} memoryVerse={this.props.lesson.memoryVerse} />
         <DayQuestions tabLabel={getI18nText("二")} goToPassage={this.goToPassage} day={dayQuestions.two} />
         <DayQuestions tabLabel={getI18nText("三")} goToPassage={this.goToPassage} day={dayQuestions.three} />
