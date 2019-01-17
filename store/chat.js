@@ -97,7 +97,7 @@ export default class Chat {
   }
 
   onNewMessage(data) {
-    console.log("receiveMessage: " + JSON.stringify(data));ga
+    console.log("receiveMessage: " + JSON.stringify(data));
 
     if (data.room == this.getRoom()) {
       this.callback({
