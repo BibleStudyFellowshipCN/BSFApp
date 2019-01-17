@@ -37,6 +37,7 @@ export default class HomileticsScreen extends React.Component {
 
   contentSize = null;
   defaultUserName = 'B';
+  messageId = 1;
 
   constructor(props) {
     super(props);
@@ -76,6 +77,15 @@ export default class HomileticsScreen extends React.Component {
   }
 
   onNewMessage(message) {
+    if (typeof message._id === 'number') {
+      const id = parseInt(message._id);
+      if (id > this.messageId) {
+        this.messageId = id;
+      }
+    } else {
+      message._id = ++this.messageId;
+    }
+    console.log(`onNewMessage: ${JSON.stringify(message)}`);
     this.setState((previousState) => {
       return {
         messages: GiftedChat.append(previousState.messages, message),
@@ -226,9 +236,15 @@ export default class HomileticsScreen extends React.Component {
             }}*/
             //renderAvatar={(e) => <View />}
             renderAvatar={(e) => {
-              const id = e.currentMessage._id;
-              console.log(JSON.stringify(id));
-              return (<Text>#{id}</Text>);
+              const id = parseInt(e.currentMessage._id) + 1;
+              return (
+                <View style={{
+                  width: 35, height: 35, borderRadius: 35, backgroundColor: '#cdcdcd',
+                  alignItems: 'center', justifyContent: 'center'
+                }}>
+                  <Text style={{ fontWeight: 'bold', fontSize: 18 }}>{id}</Text>
+                </View>
+              );
             }}
             renderActions={() => {
               return (
