@@ -168,6 +168,14 @@ export default class HomileticsScreen extends React.Component {
   }
 
   render() {
+    if (this.state.loading) {
+      return (
+        <ActivityIndicator
+          style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}
+          size="large"
+          color={Colors.yellow} />);
+    }
+
     const windowWidth = Dimensions.get('window').width;
     return (
       <View style={styles.container}>
@@ -186,13 +194,6 @@ export default class HomileticsScreen extends React.Component {
               ))
             }
           </View>
-        }
-        {
-          this.state.loading &&
-          <ActivityIndicator
-            style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}
-            size="large"
-            color={Colors.yellow} />
         }
         <View style={{ backgroundColor: '#bdc3c7', height: 1 }} />
         {
@@ -284,7 +285,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#FAFAFA'
   },
   dayTitle: {
-    top: -10,
     marginHorizontal: 15,
     color: 'black',
     fontWeight: 'bold'
@@ -294,7 +294,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 6,
     justifyContent: 'center',
     alignItems: 'center',
-    height: 22,
     borderRadius: 11,
     backgroundColor: Colors.yellow,
   }

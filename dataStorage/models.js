@@ -49,10 +49,10 @@ export const Models = {
     key: "ANSWER",
     cachePolicy: CachePolicy.AsyncStorage,
   },
-  Recover: {
-    key: "RECOVER",
-    api: "/recover",
-    restUri: HostServer + "/recover",
+  AudioInfo: {
+    key: "AudioInfo",
+    api: "/audioInfo",
+    restUri: HostServer + "/audioInfo",
   },
   DefaultLanguage: "eng",
   ValidLanguages: ["chs", "cht", "eng", "spa"],

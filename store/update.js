@@ -73,4 +73,4 @@ async function checkAppUpdateInBackground() {
     }
 }
 
-export default { checkForAppUpdate, checkAppUpdateInBackground };
+export { checkForAppUpdate, checkAppUpdateInBackground };

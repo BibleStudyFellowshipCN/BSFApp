@@ -1,6 +1,6 @@
-import { AsyncStorage, Alert } from 'react-native';
+import { AsyncStorage } from 'react-native';
 import { Models } from '../dataStorage/models';
-import { callWebServiceAsync, showWebServiceCallErrorsAsync } from '../dataStorage/storage';
+import { setUserInternal, callWebServiceAsync, showWebServiceCallErrorsAsync } from '../dataStorage/storage';
 import { FileSystem } from 'expo';
 
 let currentUser;
@@ -9,6 +9,7 @@ function getCurrentUser() {
   if (!currentUser) {
     console.log("new User");
     currentUser = new User();
+    setUserInternal(currentUser);
   }
 
   return currentUser;

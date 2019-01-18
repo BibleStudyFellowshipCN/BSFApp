@@ -2,10 +2,10 @@
   "expo": {
     "name": "CBSF",
     "description": "Chinese Bible Study Fellowship",
-    "slug": "cbsfapp2",
+    "slug": "CBSFApp",
     "privacy": "public",
     "sdkVersion": "32.0.0",
-    "version": "2019.1.16",
+    "version": "2019.1.17",
     "primaryColor": "#cccccc",
     "icon": "./assets/images/icon.png",
     "splash": {
@@ -33,7 +33,7 @@
       "permissions": [
         "WAKE_LOCK"
       ],
-      "versionCode": 29
+      "versionCode": 30
     }
   }
 }
