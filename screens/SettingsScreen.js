@@ -132,6 +132,8 @@ import Colors from '../constants/Colors';
         return getI18nText('中');
       case 3:
         return getI18nText('大');
+      case 4:
+        return getI18nText("特大");
     }
   }
 
@@ -146,6 +148,7 @@ import Colors from '../constants/Colors';
       getI18nText('小'),
       getI18nText('中'),
       getI18nText('大'),
+      getI18nText("特大")
     ];
     options.push('Cancel');
     let cancelButtonIndex = options.length - 1;
