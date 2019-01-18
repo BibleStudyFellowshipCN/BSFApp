@@ -23,9 +23,10 @@ import { clearPassage } from '../store/passage.js'
 import { getI18nText } from '../store/I18n';
 import { getCurrentUser } from '../store/user';
 import { Models } from '../dataStorage/models';
-import { resetGlobalCache, pokeServer } from '../dataStorage/storage';
+import { resetGlobalCache } from '../dataStorage/storage';
 import Colors from '../constants/Colors.js';
 import { EventRegister } from 'react-native-event-listeners';
+import { checkForAppUpdate, checkAppUpdateInBackground } from '../store/update';
 
 class HomeScreen extends React.Component {
   static navigationOptions = ({ navigation }) => {
@@ -140,7 +141,7 @@ class HomeScreen extends React.Component {
   }
 
   goToLesson(lesson) {
-    pokeServer();
+    checkAppUpdateInBackground();
     let parsed = lesson.name.split(' ');
     this.props.navigation.navigate('Lesson', { lesson, title: parsed[1] });
   }
@@ -165,8 +166,9 @@ class HomeScreen extends React.Component {
   }
 
   async onRefresh() {
+    await checkForAppUpdate(false);
+    await getCurrentUser().reloadPermissionAsync();
     await this.checkForContentUpdate(false);
-    await getCurrentUser().checkForUpdate(false);
     this.setState({ onRefresh: !this.state.onRefresh });
   }
 

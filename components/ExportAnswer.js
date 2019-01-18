@@ -102,14 +102,14 @@ export default class ExportAnswer extends React.Component {
 
       // Android has a bug that cannot parse width/height
       if (Platform.OS === 'ios') {
-        Expo.Print.printAsync({
+        Print.printAsync({
           html,
           width: 612 - 70,
           height: 792 - 70,
           orientation: Print.Orientation.portrait
         });
       } else {
-        Expo.Print.printAsync({ html });
+        Print.printAsync({ html });
       }
     } catch (error) {
       console.log(error);

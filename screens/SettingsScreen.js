@@ -13,6 +13,7 @@ import { connectActionSheet } from '@expo/react-native-action-sheet';
 import { NavigationActions } from 'react-navigation';
 import { FontAwesome, MaterialIcons, MaterialCommunityIcons } from '@expo/vector-icons';
 import Colors from '../constants/Colors';
+import { checkForAppUpdate } from '../store/update';
 
 @connectActionSheet class SettingsScreen extends React.Component {
   static navigationOptions = ({ navigation }) => {
@@ -83,10 +84,6 @@ import Colors from '../constants/Colors';
       this.setState({ bibleVersion: getCurrentUser().getBibleVersionDisplayName() });
       this.reload();
     }
-  }
-
-  checkAppUpdate() {
-    getCurrentUser().checkForUpdate();
   }
 
   feedback = '';
@@ -351,7 +348,7 @@ import Colors from '../constants/Colors';
                 titleInfo={getI18nText('检查更新')}
                 titleStyle={{ fontSize }}
                 titleInfoStyle={{ fontSize }}
-                onPress={this.checkAppUpdate.bind(this)}
+                onPress={() => checkForAppUpdate()}
               />
               <SettingsList.Item
                 icon={

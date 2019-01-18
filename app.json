@@ -2,7 +2,7 @@
   "expo": {
     "name": "CBSF",
     "description": "Chinese Bible Study Fellowship",
-    "slug": "CBSFApp",
+    "slug": "cbsfapp2",
     "privacy": "public",
     "sdkVersion": "32.0.0",
     "version": "2019.1.16",
