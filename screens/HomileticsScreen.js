@@ -187,6 +187,17 @@ export default class HomileticsScreen extends React.Component {
     }
   }
 
+  getIndex(message) {
+    const length = this.state.messages.length;
+    for (let i = 0; i < length; i++) {
+      if (message._id === this.state.messages[i]._id) {
+        return length - i;
+      }
+    }
+
+    return '#';
+  }
+
   render() {
     if (this.state.loading) {
       return (
@@ -251,13 +262,8 @@ export default class HomileticsScreen extends React.Component {
                 />
               );
             }}
-            /*renderMessageText={(e) => {
-              console.log(e.currentMessage._id);
-              return (<Text>{e.currentMessage._id}</Text>);
-            }}*/
-            //renderAvatar={(e) => <View />}
             renderAvatar={(e) => {
-              const id = parseInt(e.currentMessage._id) + 1;
+              const id = this.getIndex(e.currentMessage);
               return (
                 <View style={{
                   width: 35, height: 35, borderRadius: 35, backgroundColor: '#cdcdcd',
