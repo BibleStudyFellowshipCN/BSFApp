@@ -11,7 +11,7 @@ import {
   KeyboardAvoidingView,
   Dimensions
 } from 'react-native';
-import ScrollableTabView, { DefaultTabBar } from 'react-native-scrollable-tab-view';
+import ScrollableTabView from 'react-native-scrollable-tab-view';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { loadLesson } from '../store/lessons.js'
 import Answer from '../components/Answer'

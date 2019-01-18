@@ -11,6 +11,9 @@ import Colors from '../constants/Colors';
 import { getI18nBibleBook, getI18nText } from '../store/I18n';
 import { GiftedChat, Bubble } from 'react-native-gifted-chat';
 import KeyboardSpacer from 'react-native-keyboard-spacer';
+import { callWebServiceAsync, showWebServiceCallErrorsAsync } from '../dataStorage/storage';
+
+let MD5 = require("react-native-crypto-js").MD5;
 
 function shareAnswer() { }
 
@@ -139,16 +142,33 @@ export default class HomileticsScreen extends React.Component {
     return `${Platform.OS} ${Constants['deviceId']}` === id;
   }
 
+  async deleteMessage(message) {
+    try {
+      this.setState({ busy: true });
+      const token = MD5(`${Platform.OS} ${Constants['deviceId']}${message.text}`).toString();
+      const result = await callWebServiceAsync(Models.DeleteMessage.restUri, `/${token}`, 'DELETE');
+      const succeed = await showWebServiceCallErrorsAsync(result, 200);
+      if (succeed) {
+        // Remove the message
+        const newMessages = this.state.messages.filter(item => item._id !== message._id);
+        this.setState({ messages: newMessages });
+      }
+    }
+    finally {
+      this.setState({ busy: false });
+    }
+  }
+
   onLongPress(context, message) {
     if (message.text) {
       let options = [getI18nText('拷贝'), getI18nText('取消')];
       let copyIndex = 0;
       let deleteIndex = -1;
-      // if (this.isMyMessage(message.user._id)) {
-      //   options.unshift(getI18nText('删除'));
-      //   deleteIndex = 0;
-      //   copyIndex = 1;
-      // }
+      if (this.isMyMessage(message.user._id)) {
+        options.unshift(getI18nText('删除'));
+        deleteIndex = 0;
+        copyIndex = 1;
+      }
       const cancelButtonIndex = 1;
       context.actionSheet().showActionSheetWithOptions({
         options,
@@ -159,9 +179,9 @@ export default class HomileticsScreen extends React.Component {
             case copyIndex:
               Clipboard.setString(message.text);
               break;
-            // case deleteIndex:
-            //   Alert.alert('TODO', 'Call server API to remove message ' + message.createdAt);
-            //   break;
+            case deleteIndex:
+              this.deleteMessage(message);
+              break;
           }
         });
     }

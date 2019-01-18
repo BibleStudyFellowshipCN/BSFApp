@@ -54,6 +54,11 @@ export const Models = {
     api: "/audioInfo",
     restUri: HostServer + "/audioInfo",
   },
+  DeleteMessage: {
+    key: "DeleteMessage",
+    api: "/deleteMessage",
+    restUri: HostServer + "/deleteMessage",
+  },
   DefaultLanguage: "eng",
   ValidLanguages: ["chs", "cht", "eng", "spa"],
   Languages: [
