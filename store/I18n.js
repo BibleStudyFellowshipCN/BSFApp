@@ -74,6 +74,9 @@ const text = {
     "取消",
     "删除",
     "您没有答这道题目",
+    "讲道录音",
+    "经文释义",
+    "专题讲座",
   ],
   cht: [
     "BSF課程",
@@ -147,6 +150,9 @@ const text = {
     "取消",
     "刪除",
     "您沒有答這道題目",
+    "講道錄音",
+    "經文釋義",
+    "專題講座",
   ],
   eng: [
     "BSF Lessons",
@@ -220,6 +226,9 @@ const text = {
     "Cancel",
     "Delete",
     "You haven't answered this question yet",
+    "Sermon",
+    "Notes",
+    "Seminar",
   ],
   spa: [
     "BSF Lecciones",
@@ -293,6 +302,9 @@ const text = {
     "Cancelar",
     "Borrar",
     "Aún no has respondido a esta pregunta",
+    "Sermón",
+    "Notas",
+    "Seminario",
   ]
 };
 

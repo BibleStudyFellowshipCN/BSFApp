@@ -1,13 +1,13 @@
 import React from 'react';
 import {
-  Alert,
   View,
-  Slider,
   TouchableHighlight,
   Text
 } from 'react-native';
 import { FontAwesome } from '@expo/vector-icons';
 import Sound from '../store/sound';
+import { Slider } from 'react-native-elements'
+import Colors from '../constants/Colors';
 
 export default class AudioPlayer extends React.Component {
   state = {
@@ -146,10 +146,11 @@ export default class AudioPlayer extends React.Component {
     const duration = this.getMMSSFromMillis(this.state.duration);
     const width = Math.max(this.props.width || 330, 330);
     const height = Math.max(this.props.height || 40, 40);
+    const color = this.props.color ? this.props.color : Colors.yellow;
     return (
       <View style={{
         flexDirection: 'row',
-        backgroundColor: '#EEEEEE',
+        backgroundColor: this.props.backgroundColor ? this.props.backgroundColor : '#202020',
         borderRadius: 40,
         alignItems: 'center',
         width,
@@ -166,16 +167,20 @@ export default class AudioPlayer extends React.Component {
             this.onPlayOrPauseOrReload();
           }}>
           <FontAwesome
+            color={color}
             name={this.state.error ? 'refresh' : this.state.isLoaded ? (this.state.isPlaying ? 'pause' : 'play') : 'hand-stop-o'}
             size={28}
           />
         </TouchableHighlight>
-        <Text style={{ width: 90 }}>{position}/{duration}</Text>
+        <Text style={{ width: 90, color }}>{position}/{duration}</Text>
         <Slider
           style={{
             alignSelf: 'stretch',
             width: width - 150
           }}
+          thumbTintColor={Colors.yellow}
+          minimumTrackTintColor={'#FFB900'}
+          maximumTrackTintColor={'#525E54'}
           value={this.state.progress}
           onValueChange={this.onSeekSliderValueChange.bind(this)}
           onSlidingComplete={this.onSeekSliderSlidingComplete.bind(this)}
