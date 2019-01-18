@@ -222,6 +222,10 @@ import { checkForAppUpdate } from '../store/update';
     }
   }
 
+  checkForUpdate() {
+    checkForAppUpdate();
+  }
+
   render() {
     const { manifest } = Constants;
     phone = getCurrentUser().getCellphone();
@@ -348,7 +352,7 @@ import { checkForAppUpdate } from '../store/update';
                 titleInfo={getI18nText('检查更新')}
                 titleStyle={{ fontSize }}
                 titleInfoStyle={{ fontSize }}
-                onPress={() => checkForAppUpdate()}
+                onPress={this.checkForUpdate.bind(this)}
               />
               <SettingsList.Item
                 icon={

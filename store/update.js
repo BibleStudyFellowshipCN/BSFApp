@@ -1,5 +1,24 @@
+import { Alert } from 'react-native';
 import { getI18nText } from "../store/I18n";
 import { Updates, Constants } from "expo";
+import { callWebServiceAsync, showWebServiceCallErrorsAsync } from '../dataStorage/storage';
+
+function getVersionNumber(version) {
+    if (!version) {
+        return 0;
+    }
+
+    // version is "a.b.c" or "a.b.c.d"
+    let versionNumbers = version.split(".");
+    let value = 0;
+    for (let i in versionNumbers) {
+        value = value * 1000 + parseInt(versionNumbers[i]);
+    }
+    if (versionNumbers.length === 3) {
+        value = value * 1000;
+    }
+    return value;
+}
 
 async function checkForAppUpdate(showUI = true) {
     // Check for app update
@@ -22,8 +41,8 @@ async function checkForAppUpdate(showUI = true) {
     }
 
     if (succeed) {
-        const clientVersion = this.getVersionNumber(manifest.version);
-        const serverVersion = this.getVersionNumber(result.body.version);
+        const clientVersion = getVersionNumber(manifest.version);
+        const serverVersion = getVersionNumber(result.body.version);
         console.log('checkForAppUpdate:' + clientVersion + '-' + serverVersion);
         // TODO: For some reason the partial updated app doesn't have sdkVersion, so we need to reload
         if (clientVersion < serverVersion || manifest.sdkVersion.length < 6) {

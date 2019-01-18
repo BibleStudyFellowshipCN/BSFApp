@@ -164,11 +164,11 @@ export default class HomileticsScreen extends React.Component {
       let options = [getI18nText('拷贝'), getI18nText('取消')];
       let copyIndex = 0;
       let deleteIndex = -1;
-      if (this.isMyMessage(message.user._id)) {
+      /*if (this.isMyMessage(message.user._id)) {
         options.unshift(getI18nText('删除'));
         deleteIndex = 0;
         copyIndex = 1;
-      }
+      }*/
       const cancelButtonIndex = 1;
       context.actionSheet().showActionSheetWithOptions({
         options,
