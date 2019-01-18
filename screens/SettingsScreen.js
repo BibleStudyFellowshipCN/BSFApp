@@ -253,7 +253,7 @@ import { checkForAppUpdate } from '../store/update';
                   </View>
                 }
                 title={getI18nText('圣经版本')}
-                titleInfo={this.state.bibleVersion}
+                titleInfo={this.state.bibleVersion.length > 23 ? this.state.bibleVersion.substr(0, 23) + '...' : this.state.bibleVersion}
                 titleStyle={{ fontSize }}
                 titleInfoStyle={{ fontSize }}
                 onPress={this.onBibleVerse.bind(this)}

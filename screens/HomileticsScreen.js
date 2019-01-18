@@ -298,7 +298,7 @@ const BibleQuote = (props) => {
     <View style={{ flexDirection: 'row' }}>
       <TouchableOpacity onPress={() => props.goToPassage(props.book, props.verse)}>
         <View style={styles.bibleQuote}>
-          <Text style={{ color: 'white' }} selectable={true}>{getI18nBibleBook(props.book)}{props.verse}</Text>
+          <Text style={{ color: 'white', fontSize: getCurrentUser().getLessonFontSize() - 2 }} selectable={true}>{getI18nBibleBook(props.book)}{props.verse}</Text>
         </View>
       </TouchableOpacity>
     </View>
