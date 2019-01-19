@@ -210,20 +210,27 @@ class BSFQuestion extends React.Component {
     const props = this.props;
 
     const ids = props.question.id.split('_');
-    const title = (ids.length >= 3) ? `: 第${ids[1]}课${ids[1]}题` : '';
-
-    navigateTo('Homiletics', {
-      id: props.question.id,
-      title: `${getI18nText('问题讨论')} ${title}`,
-      text: props.question.questionText,
-      quotes: props.question.quotes
-    });
+    const title = (ids.length >= 3) ? `:${ids[1]}课${ids[2]}题` : '';
+    if (props.question.homiletics && getCurrentUser().getUserPermissions().isGroupLeader) {
+      // Group leader has a different chat screen for homiletics question
+      navigateTo('Homiletics', {
+        id: props.question.id,
+        title: `${getI18nText('问题讨论')} ${title}`,
+        text: props.question.questionText,
+        quotes: props.question.quotes
+      });
+    } else {
+      navigateTo('GlobalChat', {
+        id: props.question.id,
+        title: getI18nText('问题讨论'),
+        text: props.question.questionText
+      });
+    }
   }
 
   render() {
     const props = this.props;
     const homiletics = props.question.homiletics;
-    const isGroupLeader = getCurrentUser().getUserPermissions().isGroupLeader
     return (
       <View style={{ marginVertical: 12, }}>
         <QuestionText>
