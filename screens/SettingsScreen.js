@@ -13,7 +13,7 @@ import { connectActionSheet } from '@expo/react-native-action-sheet';
 import { NavigationActions } from 'react-navigation';
 import { FontAwesome, MaterialIcons, MaterialCommunityIcons } from '@expo/vector-icons';
 import Colors from '../constants/Colors';
-import { checkForAppUpdate } from '../store/update';
+import { checkAppUpdateInBackground } from '../store/update';
 
 @connectActionSheet class SettingsScreen extends React.Component {
   static navigationOptions = ({ navigation }) => {
@@ -222,8 +222,18 @@ import { checkForAppUpdate } from '../store/update';
     }
   }
 
-  checkForUpdate() {
-    checkForAppUpdate();
+  async onVersion() {
+    const { manifest } = Constants;
+    let message = `${manifest.version} (SDK${manifest.sdkVersion})`;
+    if (manifest.publishedTime) {
+      message += `\n\n*PublishedTime: ${manifest.publishedTime}`;
+    }
+    if (manifest.bundleUrl) {
+      const data = manifest.bundleUrl.split('/');
+      message += `\n\n*BundleUrl: ${data[data.length - 1]}`;
+    }
+    Alert.alert(getI18nText('版本'), message);
+    checkAppUpdateInBackground(true);
   }
 
   render() {
@@ -349,10 +359,10 @@ import { checkForAppUpdate } from '../store/update';
                   </View>
                 }
                 title={getI18nText('版本') + ': ' + manifest.version}
-                titleInfo={getI18nText('检查更新')}
                 titleStyle={{ fontSize }}
                 titleInfoStyle={{ fontSize }}
-                onPress={this.checkForUpdate.bind(this)}
+                hasNavArrow={true}
+                onPress={this.onVersion.bind(this)}
               />
               <SettingsList.Item
                 icon={

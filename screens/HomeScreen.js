@@ -26,7 +26,7 @@ import { Models } from '../dataStorage/models';
 import { resetGlobalCache } from '../dataStorage/storage';
 import Colors from '../constants/Colors.js';
 import { EventRegister } from 'react-native-event-listeners';
-import { checkForAppUpdate, checkAppUpdateInBackground } from '../store/update';
+import { checkAppUpdateInBackground } from '../store/update';
 
 class HomeScreen extends React.Component {
   static navigationOptions = ({ navigation }) => {
@@ -166,7 +166,6 @@ class HomeScreen extends React.Component {
   }
 
   async onRefresh() {
-    await checkForAppUpdate(false);
     await getCurrentUser().reloadPermissionAsync();
     await this.checkForContentUpdate(false);
     this.setState({ onRefresh: !this.state.onRefresh });
