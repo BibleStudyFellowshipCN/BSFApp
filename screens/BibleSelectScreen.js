@@ -13,9 +13,9 @@ import {
   Image
 } from 'react-native';
 import { FileSystem } from 'expo';
-import { getI18nText } from '../store/I18n';
+import { getI18nText } from '../utils/I18n';
 import { Models } from '../dataStorage/models';
-import { getCurrentUser } from '../store/user';
+import { getCurrentUser } from '../utils/user';
 import { downloadBibleAsync } from '../dataStorage/storage';
 import { CheckBox } from 'react-native-elements';
 import { EventRegister } from 'react-native-event-listeners';

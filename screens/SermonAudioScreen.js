@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, ActivityIndicator, Text, Dimensions, Image, TouchableOpacity } from 'react-native';
-import { getI18nText } from '../store/I18n';
-import { getCurrentUser } from '../store/user';
+import { getI18nText } from '../utils/I18n';
+import { getCurrentUser } from '../utils/user';
 import { Models } from '../dataStorage/models';
 import { callWebServiceAsync, showWebServiceCallErrorsAsync } from '../dataStorage/storage';
 import Colors from '../constants/Colors';
@@ -118,7 +118,7 @@ class SermonAudioSection extends React.Component {
         marginHorizontal: 10,
         borderColor: '#FFE8A1',
         backgroundColor: '#FFF2CC',
-        borderWidth: 3,
+        borderWidth: 1,
         borderRadius: 10,
         alignItems: 'center'
       }}>

@@ -5,7 +5,7 @@ import {
   Text
 } from 'react-native';
 import { FontAwesome } from '@expo/vector-icons';
-import Sound from '../store/sound';
+import Sound from '../utils/sound';
 import { Slider } from 'react-native-elements'
 import Colors from '../constants/Colors';
 

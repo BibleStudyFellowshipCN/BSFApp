@@ -15,15 +15,11 @@ import {
 import { loadPassage } from '../store/passage';
 import { downloadBibleAsync } from '../dataStorage/storage';
 import { Models } from '../dataStorage/models';
-import { Octicons } from '@expo/vector-icons';
 import { connectActionSheet } from '@expo/react-native-action-sheet';
 import { clearPassage } from '../store/passage.js'
-import { getCurrentUser } from '../store/user';
+import { getCurrentUser } from '../utils/user';
 import { FileSystem } from 'expo';
-import { getI18nText } from '../store/I18n';
-
-function onBibleVerse() { }
-function onBibleVerse2() { }
+import { getI18nText } from '../utils/I18n';
 
 @connectActionSheet class BibleScreen extends React.Component {
   static navigationOptions = ({ navigation }) => {
@@ -39,7 +35,7 @@ function onBibleVerse2() { }
         </View>),
       headerRight: (
         <View style={{ marginRight: 10, flexDirection: 'row' }}>
-          <TouchableOpacity onPress={() => { onBibleVerse(true); }}>
+          <TouchableOpacity onPress={() => { Z(true); }}>
             <Image
               style={{ width: 34, height: 34 }}
               source={require('../assets/images/Bible.png')} />
@@ -57,7 +53,6 @@ function onBibleVerse2() { }
   componentWillMount() {
     navigateBack = () => this.props.navigation.pop();
     onBibleVerse = this.onBibleVerse.bind(this);
-    onBibleVerse2 = this.onBibleVerse2.bind(this);
     this.ensureBibleIsDownloadedAsync().then(() => {
       this.props.clearPassage();
       this.props.loadPassage();
@@ -69,17 +64,8 @@ function onBibleVerse2() { }
     this.onBibleVerseChange(version, getCurrentUser().getBibleVersion2());
   }
 
-  onBibleSelected2(name, version) {
-    console.log('onBibleSelected2: ' + name + ' ' + version);
-    this.onBibleVerseChange(getCurrentUser().getBibleVersion(), version);
-  }
-
   onBibleVerse() {
     this.props.navigation.navigate('BibleSelect', { version: getCurrentUser().getBibleVersion(), onSelected: this.onBibleSelected.bind(this) });
-  }
-
-  onBibleVerse2() {
-    this.props.navigation.navigate('BibleSelect', { version: getCurrentUser().getBibleVersion2(), removable: true, onSelected: this.onBibleSelected2.bind(this) });
   }
 
   async onBibleVerseChange(ver1, ver2) {

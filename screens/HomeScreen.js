@@ -20,13 +20,13 @@ import Accordion from 'react-native-collapsible/Accordion';
 import { requestBooks, clearBooks } from "../store/books.js";
 import { clearLesson } from '../store/lessons.js'
 import { clearPassage } from '../store/passage.js'
-import { getI18nText } from '../store/I18n';
-import { getCurrentUser } from '../store/user';
+import { getI18nText } from '../utils/I18n';
+import { getCurrentUser } from '../utils/user';
 import { Models } from '../dataStorage/models';
 import { resetGlobalCache } from '../dataStorage/storage';
 import Colors from '../constants/Colors.js';
 import { EventRegister } from 'react-native-event-listeners';
-import { checkAppUpdateInBackground } from '../store/update';
+import { checkAppUpdateInBackground } from '../utils/update';
 
 class HomeScreen extends React.Component {
   static navigationOptions = ({ navigation }) => {

@@ -4,14 +4,15 @@ import {
 } from 'react-native';
 import { Models } from '../dataStorage/models';
 import { loadAsync } from '../dataStorage/storage';
-import Chat from '../store/chat';
+import Chat from '../utils/chat';
 import { Constants } from 'expo';
-import { getCurrentUser } from '../store/user';
+import { getCurrentUser } from '../utils/user';
 import Colors from '../constants/Colors';
-import { getI18nBibleBook, getI18nText } from '../store/I18n';
+import { getI18nBibleBook, getI18nText } from '../utils/I18n';
 import { GiftedChat, Bubble } from 'react-native-gifted-chat';
 import KeyboardSpacer from 'react-native-keyboard-spacer';
 import { callWebServiceAsync, showWebServiceCallErrorsAsync } from '../dataStorage/storage';
+import { isAudioEnabled } from 'expo/build/av/Audio/AudioAvailability';
 
 let MD5 = require("react-native-crypto-js").MD5;
 
@@ -50,11 +51,14 @@ export default class HomileticsScreen extends React.Component {
     let id = '';
     if (props.navigation.state.params) {
       if (props.navigation.state.params.id) {
-        id = 'H' + props.navigation.state.params.id
+        id = props.navigation.state.params.id;
+        if (props.navigation.state.params.isGroupLeader) {
+          id = 'H' + id;
+        }
       }
 
       if (props.navigation.state.params.text) {
-        this.questionText = props.navigation.state.params.text;
+        this.questionText = props.navigation.state.params.text.trim();
       }
 
       if (props.navigation.state.params.quotes) {

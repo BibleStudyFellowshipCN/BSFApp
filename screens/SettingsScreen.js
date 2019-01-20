@@ -1,19 +1,19 @@
 import React from 'react';
 import { connect } from 'react-redux'
 import { ScrollView, StyleSheet, View, Alert, KeyboardAvoidingView } from 'react-native';
-import { FileSystem, Constants, WebBrowser } from 'expo';
+import { Constants, StoreReview } from 'expo';
 import { Models } from '../dataStorage/models';
-import { getCurrentUser } from '../store/user';
+import { getCurrentUser } from '../utils/user';
 import { requestBooks, clearBooks } from "../store/books.js";
 import SettingsList from 'react-native-settings-list';
-import { getI18nText } from '../store/I18n';
+import { getI18nText } from '../utils/I18n';
 import { clearLesson } from '../store/lessons.js'
 import { clearPassage } from '../store/passage.js'
 import { connectActionSheet } from '@expo/react-native-action-sheet';
 import { NavigationActions } from 'react-navigation';
 import { FontAwesome, MaterialIcons, MaterialCommunityIcons } from '@expo/vector-icons';
 import Colors from '../constants/Colors';
-import { checkAppUpdateInBackground } from '../store/update';
+import { checkAppUpdateInBackground } from '../utils/update';
 
 @connectActionSheet class SettingsScreen extends React.Component {
   static navigationOptions = ({ navigation }) => {
@@ -216,23 +216,29 @@ import { checkAppUpdateInBackground } from '../store/update';
           await FileSystem.deleteAsync(fileUri, { idempotent: true });
         }
       }
-      Alert.alert(getI18nText('完成'));
+      Alert.alert('Completed', `Removed ${freeSize} bytes`);
     } catch (e) {
-      alert(JSON.stringify(e));
+      Alert.alert('Error', JSON.stringify(e));
     }
   }
 
   async onVersion() {
-    const { manifest } = Constants;
+    const { manifest, platform } = Constants;
     let message = `${manifest.version} (SDK${manifest.sdkVersion})`;
     if (manifest.publishedTime) {
       message += `\n\n*PublishedTime: ${manifest.publishedTime}`;
     }
+    if (platform.ios) {
+      message += `\n\n*Model: ${platform.ios.model} (iOS: ${platform.ios.systemVersion})`;
+    }
     if (manifest.bundleUrl) {
-      const data = manifest.bundleUrl.split('/');
+      const data = manifest.bundleUrl.split(/\%2F|\//);
       message += `\n\n*BundleUrl: ${data[data.length - 1]}`;
     }
-    Alert.alert(getI18nText('版本'), message);
+    Alert.alert(getI18nText('版本'), message, [
+      { text: 'Review', onPress: () => StoreReview.requestReview() },
+      { text: 'Ok', onPress: () => { } }
+    ]);
     checkAppUpdateInBackground(true);
   }
 
@@ -240,8 +246,9 @@ import { checkAppUpdateInBackground } from '../store/update';
     const { manifest } = Constants;
     phone = getCurrentUser().getCellphone();
     const fontSize = getCurrentUser().getSettingFontSize();
+    const version = `${manifest.version} (SDK${manifest.sdkVersion})`;
     return (
-      <KeyboardAvoidingView style={styles.container} behavior='padding' keyboardVerticalOffset={0}>
+      <KeyboardAvoidingView style={styles.container} behavior='padding' keyboardVerticalOffset={0} >
         <ScrollView
           style={{ backgroundColor: 'white' }}
           ref={ref => this.scrollView = ref}>
@@ -358,7 +365,7 @@ import { checkAppUpdateInBackground } from '../store/update';
                     <MaterialCommunityIcons color={Colors.yellow} size={28} name='fish' />
                   </View>
                 }
-                title={getI18nText('版本') + ': ' + manifest.version}
+                title={getI18nText('版本') + ': ' + version}
                 titleStyle={{ fontSize }}
                 titleInfoStyle={{ fontSize }}
                 hasNavArrow={true}

@@ -10,7 +10,7 @@ import {
 import { Print } from 'expo';
 import { loadAsync } from '../dataStorage/storage';
 import { Models } from '../dataStorage/models';
-import { getI18nText } from '../store/I18n';
+import { getI18nText } from '../utils/I18n';
 import Colors from '../constants/Colors';
 
 export default class ExportAnswer extends React.Component {

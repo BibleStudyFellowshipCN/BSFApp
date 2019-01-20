@@ -1,8 +1,8 @@
 import React from 'react';
-import { StyleSheet, View, Platform, ActivityIndicator, Dimensions, Image, TouchableOpacity } from 'react-native';
-import { getI18nText } from '../store/I18n';
-import { GiftedChat } from 'react-native-gifted-chat';
-import Chat from '../store/chat';
+import { StyleSheet, View, Text, Platform, ActivityIndicator, Dimensions, Image, TouchableOpacity } from 'react-native';
+import { getI18nText } from '../utils/I18n';
+import { GiftedChat, Bubble } from 'react-native-gifted-chat';
+import Chat from '../utils/chat';
 import { Constants } from 'expo';
 import KeyboardSpacer from 'react-native-keyboard-spacer';
 import Colors from '../constants/Colors';
@@ -89,30 +89,62 @@ export default class GlobalChatScreen extends React.Component {
   }
 
   render() {
+    if (this.state.loading) {
+      return (
+        <ActivityIndicator
+          style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}
+          size="large"
+          color={Colors.yellow} />);
+    }
+
     return (
       <View style={styles.container}>
-        {
-          this.state.loading &&
-          <ActivityIndicator
-            style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}
-            size="large"
-            color={Colors.yellow} />
-        }
-        {
-          !this.state.loading &&
-          <GiftedChat
-            style={{ flex: 1 }}
-            messages={this.state.messages}
-            isAnimated={true}
-            onSend={(message) => {
-              this.chatServer.sendMessage(message);
-            }}
-            user={{
-              _id: Platform.OS + ' ' + Constants['deviceId'],
-              name: this.defaultUserName
-            }}
-          />
-        }
+        <GiftedChat
+          style={{ flex: 1, background: 'white' }}
+          messages={this.state.messages}
+          isAnimated={true}
+          showAvatarForEveryMessage={true}
+          showUserAvatar={true}
+          onSend={(message) => {
+            this.chatServer.sendMessage(message);
+          }}
+          user={{
+            _id: Platform.OS + ' ' + Constants['deviceId'],
+            name: this.defaultUserName
+          }}
+          renderBubble={props => {
+            return (
+              <Bubble
+                {...props}
+                textStyle={{
+                  right: {
+                    color: '#202020'
+                  }
+                }}
+                wrapperStyle={{
+                  left: {
+                    backgroundColor: '#eeeeee',
+                  },
+                  right: {
+                    backgroundColor: '#FFECB3',
+                  },
+                }}
+              />
+            );
+          }}
+          renderAvatar={(e) => {
+            const isSystem = e.currentMessage.user._id === 'System';
+            return (
+              <View style={{
+                width: 40, height: 40, borderRadius: 40,
+                backgroundColor: isSystem ? '#95a5a6' : Colors.yellow,
+                alignItems: 'center', justifyContent: 'center'
+              }}>
+                <Text style={{ fontWeight: 'bold', fontSize: 10, color: 'white' }}>{isSystem ? 'Admin' : 'BSFer'}</Text>
+              </View>
+            );
+          }}
+        />
         {
           Platform.OS == 'android' &&
           <KeyboardSpacer />
@@ -125,5 +157,6 @@ export default class GlobalChatScreen extends React.Component {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: '#FAFAFA'
   }
 });

@@ -5,8 +5,8 @@ import {
   Dimensions,
   ScrollView
 } from 'react-native';
-import { getI18nText, getI18nBibleBookFromLang } from '../store/I18n';
-import { getCurrentUser } from '../store/user';
+import { getI18nText, getI18nBibleBookFromLang } from '../utils/I18n';
+import { getCurrentUser } from '../utils/user';
 import { Models } from '../dataStorage/models';
 import AudioPlayer from '../components/AudioPlayer';
 import { EventRegister } from 'react-native-event-listeners';

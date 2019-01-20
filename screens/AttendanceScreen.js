@@ -1,12 +1,12 @@
 import React from 'react';
 import { ScrollView, View, Alert, Text, ActivityIndicator, Dimensions, Image, TouchableOpacity } from 'react-native';
-import { getI18nText } from '../store/I18n';
+import { getI18nText } from '../utils/I18n';
 import { FontAwesome } from '@expo/vector-icons';
 import { CheckBox, Button } from 'react-native-elements';
 import { Models } from '../dataStorage/models';
 import { callWebServiceAsync, showWebServiceCallErrorsAsync } from '../dataStorage/storage';
 import SegmentedControlTab from 'react-native-segmented-control-tab';
-import { getCurrentUser } from '../store/user';
+import { getCurrentUser } from '../utils/user';
 import Colors from '../constants/Colors';
 import DatePicker from 'react-native-datepicker';
 import { EventRegister } from 'react-native-event-listeners';

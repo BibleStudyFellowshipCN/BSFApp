@@ -1,5 +1,5 @@
 import { Models } from '../dataStorage/models';
-import { getCurrentUser } from '../store/user';
+import { getCurrentUser } from '../utils/user';
 
 const text = {
   chs: [

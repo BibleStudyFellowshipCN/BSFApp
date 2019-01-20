@@ -1,8 +1,7 @@
 import React from 'react';
-import { ScrollView, StyleSheet, View, Alert, TextInput, KeyboardAvoidingView, Keyboard, Image, TouchableOpacity } from 'react-native';
-import { getI18nText } from '../store/I18n';
-import { Button } from 'react-native-elements';
-import { getCurrentUser } from '../store/user';
+import { StyleSheet, View, Alert, TextInput, KeyboardAvoidingView, Keyboard, Image, TouchableOpacity } from 'react-native';
+import { getI18nText } from '../utils/I18n';
+import { getCurrentUser } from '../utils/user';
 
 export default class SetPhoneScreen extends React.Component {
   static navigationOptions = ({ navigation }) => {
@@ -26,6 +25,10 @@ export default class SetPhoneScreen extends React.Component {
 
   componentWillMount() {
     onSubmit = () => this.onSubmit();
+  }
+
+  componentDidMount() {
+    this.cellphoneInput.focus();
   }
 
   async onSubmit() {

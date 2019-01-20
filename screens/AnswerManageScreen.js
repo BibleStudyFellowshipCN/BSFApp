@@ -4,10 +4,10 @@ import { TouchableOpacity, StyleSheet, View, Alert, TextInput, KeyboardAvoidingV
 import { Entypo } from '@expo/vector-icons';
 import { updateAnswer } from '../store/answers';
 import { loadAsync } from '../dataStorage/storage';
-import { getI18nText } from '../store/I18n';
+import { getI18nText } from '../utils/I18n';
 import { Button } from 'react-native-elements';
 import { Models } from '../dataStorage/models';
-import { getCurrentUser } from '../store/user';
+import { getCurrentUser } from '../utils/user';
 import SegmentedControlTab from 'react-native-segmented-control-tab';
 import { EventRegister } from 'react-native-event-listeners';
 

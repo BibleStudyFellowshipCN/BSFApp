@@ -17,8 +17,8 @@ import { loadLesson } from '../store/lessons.js'
 import Answer from '../components/Answer'
 import ExportAnswer from '../components/ExportAnswer.js';
 import Colors from '../constants/Colors'
-import { getI18nText, getI18nBibleBook } from '../store/I18n';
-import { getCurrentUser } from '../store/user';
+import { getI18nText, getI18nBibleBook } from '../utils/I18n';
+import { getCurrentUser } from '../utils/user';
 
 class LessonScreen extends React.Component {
   static navigationOptions = ({ navigation }) => {
@@ -211,21 +211,15 @@ class BSFQuestion extends React.Component {
 
     const ids = props.question.id.split('_');
     const title = (ids.length >= 3) ? `:${ids[1]}课${ids[2]}题` : '';
-    if (props.question.homiletics && getCurrentUser().getUserPermissions().isGroupLeader) {
-      // Group leader has a different chat screen for homiletics question
-      navigateTo('Homiletics', {
-        id: props.question.id,
-        title: `${getI18nText('问题讨论')} ${title}`,
-        text: props.question.questionText,
-        quotes: props.question.quotes
-      });
-    } else {
-      navigateTo('GlobalChat', {
-        id: props.question.id,
-        title: getI18nText('问题讨论'),
-        text: props.question.questionText
-      });
-    }
+    const isGroupLeader = props.question.homiletics && getCurrentUser().getUserPermissions().isGroupLeader;
+    // Group leader has a different chat screen for homiletics question
+    navigateTo('Homiletics', {
+      id: props.question.id,
+      isGroupLeader: isGroupLeader,
+      title: isGroupLeader ? `${getI18nText('问题讨论')} ${title}` : getI18nText('问题讨论'),
+      text: props.question.questionText,
+      quotes: props.question.quotes
+    });
   }
 
   render() {

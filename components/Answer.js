@@ -8,7 +8,7 @@ import {
   Dimensions
 } from 'react-native';
 import { updateAnswer } from '../store/answers';
-import { getCurrentUser } from '../store/user';
+import { getCurrentUser } from '../utils/user';
 
 class Answer extends React.Component {
   state = {

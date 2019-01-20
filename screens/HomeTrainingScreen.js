@@ -1,8 +1,8 @@
 import React from 'react';
 import { ScrollView, StyleSheet, View, ActivityIndicator, Text } from 'react-native';
-import { getI18nText } from '../store/I18n';
+import { getI18nText } from '../utils/I18n';
 import { Button } from 'react-native-elements';
-import { getCurrentUser } from '../store/user';
+import { getCurrentUser } from '../utils/user';
 import { loadFromCacheAsync } from '../dataStorage/storage';
 import Colors from '../constants/Colors'
 
