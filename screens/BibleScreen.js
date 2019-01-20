@@ -35,7 +35,7 @@ import { getI18nText } from '../utils/I18n';
         </View>),
       headerRight: (
         <View style={{ marginRight: 10, flexDirection: 'row' }}>
-          <TouchableOpacity onPress={() => { Z(true); }}>
+          <TouchableOpacity onPress={() => { onBibleVerse(true); }}>
             <Image
               style={{ width: 34, height: 34 }}
               source={require('../assets/images/Bible.png')} />

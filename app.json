@@ -5,7 +5,7 @@
     "slug": "CBSFApp",
     "privacy": "public",
     "sdkVersion": "32.0.0",
-    "version": "2019.1.19",
+    "version": "2019.1.20",
     "primaryColor": "#cccccc",
     "icon": "./assets/images/icon.png",
     "splash": {
@@ -15,15 +15,15 @@
     },
     "updates": {
       "enabled": true,
-      "checkAutomatically": "ON_ERROR_RECOVERY",
-      "fallbackToCacheTimeout": 0
+      "checkAutomatically": "ON_LOAD",
+      "fallbackToCacheTimeout": 10000
     },
     "assetBundlePatterns": [
       "**/*"
     ],
     "ios": {
       "icon": "./assets/images/icon.png",
-      "appStoreUrl": "https://itunes.apple.com/us/app/cbsf/id1229869018",
+      "appStoreUrl": "https://itunes.apple.com/us/app/cbsf/id1229869018?mt=8",
       "buildNumber": "2",
       "bundleIdentifier": "org.CBSF.bsfclass",
       "supportsTablet": true
