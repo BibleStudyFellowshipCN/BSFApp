@@ -315,6 +315,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#FAFAFA'
   },
   dayTitle: {
+    marginTop: 3,
     marginHorizontal: 15,
     color: 'black',
     fontWeight: 'bold'
