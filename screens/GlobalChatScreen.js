@@ -97,6 +97,8 @@ export default class GlobalChatScreen extends React.Component {
           color={Colors.yellow} />);
     }
 
+    const iPhoneModel = Constants.platform.ios && Constants.platform.ios.model ? Constants.platform.ios.model : '';
+    const isIPhoneX = iPhoneModel.indexOf('X') !== -1 || iPhoneModel.indexOf('Simulator`') !== -1;
     return (
       <View style={styles.container}>
         <GiftedChat
@@ -145,6 +147,11 @@ export default class GlobalChatScreen extends React.Component {
             );
           }}
         />
+        {
+          // When keyboard is not shown on iPhoneX+, we show some space
+          isIPhoneX &&
+          <View style={{ height: 30 }} />
+        }
         {
           Platform.OS == 'android' &&
           <KeyboardSpacer />

@@ -12,7 +12,6 @@ import { getI18nBibleBook, getI18nText } from '../utils/I18n';
 import { GiftedChat, Bubble } from 'react-native-gifted-chat';
 import KeyboardSpacer from 'react-native-keyboard-spacer';
 import { callWebServiceAsync, showWebServiceCallErrorsAsync } from '../dataStorage/storage';
-import { isAudioEnabled } from 'expo/build/av/Audio/AudioAvailability';
 
 let MD5 = require("react-native-crypto-js").MD5;
 
@@ -72,9 +71,7 @@ export default class HomileticsScreen extends React.Component {
   }
 
   componentDidMount() {
-    navigateBack = () => {
-      this.props.navigation.pop();
-    }
+    navigateBack = () => this.props.navigation.pop();
 
     console.log('loading messages');
     this.chatServer.loadMessages().then(() => {
@@ -212,6 +209,8 @@ export default class HomileticsScreen extends React.Component {
     }
 
     const windowWidth = Dimensions.get('window').width;
+    const iPhoneModel = Constants.platform.ios && Constants.platform.ios.model ? Constants.platform.ios.model : '';
+    const isIPhoneX = iPhoneModel.indexOf('X') !== -1 || iPhoneModel.indexOf('Simulator`') !== -1;
     return (
       <View style={styles.container}>
         <Text style={[styles.dayTitle, { fontSize: getCurrentUser().getLessonFontSize() }]} selectable={true}>{this.questionText}</Text>
@@ -287,6 +286,11 @@ export default class HomileticsScreen extends React.Component {
               );
             }}
           />
+        }
+        {
+          // When keyboard is not shown on iPhoneX+, we show some space
+          isIPhoneX &&
+          <View style={{ height: 30 }} />
         }
         {
           Platform.OS == 'android' &&
