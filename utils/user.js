@@ -56,6 +56,21 @@ export default class User {
   audioBook = 1 * 1000 + 1;
   fontSize = Models.DefaultFontSize;
   permissions = {};
+  validBibles = null;
+
+  isBibleVersionValid(version) {
+    if (!this.validBibles) {
+      this.validBibles = [];
+      for (let lang in Models.BibleVersions) {
+        const items = Models.BibleVersions[lang];
+        for (let i in items) {
+          this.validBibles.push(items[i].id);
+        }
+      }
+    }
+
+    return this.validBibles.indexOf(version) !== -1;
+  }
 
   async loadExistingUserAsync() {
     let existingUser = await loadUser();
@@ -64,10 +79,10 @@ export default class User {
       if (Models.ValidLanguages.indexOf(existingUser.language) != -1) {
         this.language = existingUser.language;
       }
-      if (Models.ValidBibleVersionsLanguages.indexOf(existingUser.bibleVersion) != -1) {
+      if (this.isBibleVersionValid(existingUser.bibleVersion)) {
         this.bibleVersion = existingUser.bibleVersion;
       }
-      if (Models.ValidBibleVersionsLanguages.indexOf(existingUser.bibleVersion2) != -1) {
+      if (this.isBibleVersionValid(existingUser.bibleVersion2)) {
         // we don't use the same version
         this.bibleVersion2 = existingUser.bibleVersion2 === existingUser.bibleVersion ? null : existingUser.bibleVersion2;
       }

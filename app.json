@@ -23,12 +23,14 @@
     ],
     "ios": {
       "icon": "./assets/images/icon.png",
+      "appStoreUrl": "https://itunes.apple.com/us/app/cbsf/id1229869018",
       "buildNumber": "2",
       "bundleIdentifier": "org.CBSF.bsfclass",
       "supportsTablet": true
     },
     "android": {
       "icon": "./assets/images/icon-android.png",
+      "playStoreUrl": "https://play.google.com/store/apps/details?id=org.cbsfappv1.bsfclass",
       "package": "org.cbsfappv1.bsfclass",
       "permissions": [
         "WAKE_LOCK"
