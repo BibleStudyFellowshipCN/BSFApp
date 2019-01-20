@@ -210,7 +210,7 @@ export default class HomileticsScreen extends React.Component {
 
     const windowWidth = Dimensions.get('window').width;
     const iPhoneModel = Constants.platform.ios && Constants.platform.ios.model ? Constants.platform.ios.model : '';
-    const isIPhoneX = iPhoneModel.indexOf('X') !== -1 || iPhoneModel.indexOf('Simulator`') !== -1;
+    const isIPhoneX = iPhoneModel.indexOf('X') !== -1 || iPhoneModel.indexOf('Simulator') !== -1;
     return (
       <View style={styles.container}>
         <Text style={[styles.dayTitle, { fontSize: getCurrentUser().getLessonFontSize() }]} selectable={true}>{this.questionText}</Text>

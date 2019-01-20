@@ -98,7 +98,7 @@ export default class GlobalChatScreen extends React.Component {
     }
 
     const iPhoneModel = Constants.platform.ios && Constants.platform.ios.model ? Constants.platform.ios.model : '';
-    const isIPhoneX = iPhoneModel.indexOf('X') !== -1 || iPhoneModel.indexOf('Simulator`') !== -1;
+    const isIPhoneX = iPhoneModel.indexOf('X') !== -1 || iPhoneModel.indexOf('Simulator') !== -1;
     return (
       <View style={styles.container}>
         <GiftedChat
