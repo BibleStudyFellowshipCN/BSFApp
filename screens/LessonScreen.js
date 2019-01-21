@@ -8,6 +8,7 @@ import {
   TouchableOpacity,
   View,
   Image,
+  TouchableHighlight,
   KeyboardAvoidingView,
   Dimensions
 } from 'react-native';
@@ -94,6 +95,21 @@ class LessonScreen extends React.Component {
     this.props.navigation.navigate('AnswerManage');
   }
 
+  renderTab(name, page, isTabActive, onPressHandler, onLayoutHandler) {
+    return (
+      <View style={{ height: 20 }}>
+        <TouchableHighlight
+          key={`${name}_${page}`}
+          onPress={() => onPressHandler(page)}
+          onLayout={onLayoutHandler}
+          style={{ flex: 1, width: 100, }}
+          underlayColor="#aaaaaa">
+          <Text>{name}</Text>
+        </TouchableHighlight>
+      </View>
+    );
+  };
+
   render() {
     const scrollableStyleProps = {
       tabBarBackgroundColor: Colors.yellow,
@@ -124,13 +140,13 @@ class LessonScreen extends React.Component {
         ref={ref => this.tabView = ref}
         {...scrollableStyleProps}
         initialPage={this.initialPage}
-        /*renderTabBar={() => <DefaultTabBar style={{ height: 30 }} />}*/>
-        <DayQuestions tabLabel={getI18nText("一")} goToPassage={this.goToPassage} day={dayQuestions.one} memoryVerse={this.props.lesson.memoryVerse} />
-        <DayQuestions tabLabel={getI18nText("二")} goToPassage={this.goToPassage} day={dayQuestions.two} />
-        <DayQuestions tabLabel={getI18nText("三")} goToPassage={this.goToPassage} day={dayQuestions.three} />
-        <DayQuestions tabLabel={getI18nText("四")} goToPassage={this.goToPassage} day={dayQuestions.four} />
-        <DayQuestions tabLabel={getI18nText("五")} goToPassage={this.goToPassage} day={dayQuestions.five} />
-        <DayQuestions tabLabel={getI18nText("六")} goToPassage={this.goToPassage} day={dayQuestions.six} />
+        renderTabBar={() => <LessonTab />}>
+        <DayQuestions tabLabel='1' goToPassage={this.goToPassage} day={dayQuestions.one} memoryVerse={this.props.lesson.memoryVerse} />
+        <DayQuestions tabLabel='2' goToPassage={this.goToPassage} day={dayQuestions.two} />
+        <DayQuestions tabLabel='3' goToPassage={this.goToPassage} day={dayQuestions.three} />
+        <DayQuestions tabLabel='4' goToPassage={this.goToPassage} day={dayQuestions.four} />
+        <DayQuestions tabLabel='5' goToPassage={this.goToPassage} day={dayQuestions.five} />
+        <DayQuestions tabLabel='6' goToPassage={this.goToPassage} day={dayQuestions.six} />
       </ScrollableTabView>
 
     // TODO:[Wei] KeyboardAwareScrollView works on iOS but not Android, KeyboardAvoidingView works on Android, but not iOS :(
@@ -138,6 +154,51 @@ class LessonScreen extends React.Component {
       <KeyboardAvoidingView style={styles.container} behavior='padding' keyboardVerticalOffset={80}>
         {content}
       </KeyboardAvoidingView >
+    );
+  }
+}
+
+class LessonTab extends React.Component {
+  render() {
+    const containerWidth = Dimensions.get('window').width;
+    const numberOfTabs = this.props.tabs.length;
+    return (
+      <View style={{
+        flexDirection: 'row',
+        backgroundColor: this.props.backgroundColor
+      }}>
+        {
+          this.props.tabs.map((name, page) => {
+            const isTabActive = this.props.activeTab === page;
+            return (
+              <TouchableOpacity key={name} onPress={() => this.props.goToPage(page)}>
+                <View style={{
+                  marginHorizontal: 0.5,
+                  width: (containerWidth / numberOfTabs) - 1,
+                  borderTopColor: 'whitesmoke',
+                  borderLeftColor: 'whitesmoke',
+                  borderRightColor: 'whitesmoke',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  borderTopWidth: 1,
+                  borderLeftWidth: 1,
+                  borderRightWidth: 1,
+                  borderTopLeftRadius: 10,
+                  borderTopRightRadius: 10,
+                  backgroundColor: isTabActive ? 'whitesmoke' : this.props.backgroundColor
+                }}>
+                  <Text style={{
+                    margin: 3,
+                    fontSize: getCurrentUser().getLessonFontSize() + 4,
+                    color: isTabActive ? Colors.yellow : 'whitesmoke',
+                    fontWeight: '900'
+                  }}>{name}</Text>
+                </View>
+              </TouchableOpacity>
+            );
+          })
+        }
+      </View>
     );
   }
 }

@@ -224,16 +224,12 @@ import { checkAppUpdateInBackground } from '../utils/update';
 
   async onVersion() {
     const { manifest, platform } = Constants;
-    let message = `${manifest.version} (SDK${manifest.sdkVersion})`;
+    let message = `*Base: ${manifest.version} (SDK${manifest.sdkVersion})`;
     if (manifest.publishedTime) {
       message += `\n\n*PublishedTime: ${manifest.publishedTime}`;
     }
     if (platform.ios) {
       message += `\n\n*Model: ${platform.ios.model} (iOS: ${platform.ios.systemVersion})`;
-    }
-    if (manifest.bundleUrl) {
-      const data = manifest.bundleUrl.split(/\%2F|\//);
-      message += `\n\n*BundleUrl: ${data[data.length - 1]}`;
     }
     Alert.alert(getI18nText('版本'), message, [
       { text: 'Review', onPress: () => StoreReview.requestReview() },
@@ -246,7 +242,8 @@ import { checkAppUpdateInBackground } from '../utils/update';
     const { manifest } = Constants;
     phone = getCurrentUser().getCellphone();
     const fontSize = getCurrentUser().getSettingFontSize();
-    const version = `${manifest.version} (SDK${manifest.sdkVersion})`;
+    const version = manifest.publishedTime ? `${manifest.publishedTime.split('T')[0].replace(/-/g, '.')} (SDK${manifest.sdkVersion})` :
+      `${manifest.version} (SDK${manifest.sdkVersion})`;
     return (
       <KeyboardAvoidingView style={styles.container} behavior='padding' keyboardVerticalOffset={0} >
         <ScrollView
