@@ -65,7 +65,7 @@ export default class DiscussionScreen extends React.Component {
       }
     }
 
-    this.chatServer = new Chat(id, this.onNewMessage.bind(this), this.defaultUserName);
+    this.chatServer = new Chat(id, this.onNewMessage.bind(this), this.onDeleteMessage.bind(this), this.defaultUserName);
   }
 
   componentDidMount() {
@@ -93,6 +93,12 @@ export default class DiscussionScreen extends React.Component {
         messages: GiftedChat.append(previousState.messages, message),
       };
     });
+  }
+
+  onDeleteMessage(message) {
+    // Remove the message
+    const newMessages = this.state.messages.filter(item => item.createdAt.getTime() !== parseInt(message.createdAt) || item.user._id !== message.user);
+    this.setState({ messages: newMessages });
   }
 
   componentWillUnmount() {
@@ -144,13 +150,8 @@ export default class DiscussionScreen extends React.Component {
   async deleteMessage(message) {
     try {
       this.setState({ busy: true });
-      const result = await callWebServiceAsync(Models.DeleteMessage.restUri, `/${message.token}`, 'DELETE');
-      const succeed = await showWebServiceCallErrorsAsync(result, 200);
-      if (succeed) {
-        // Remove the message
-        const newMessages = this.state.messages.filter(item => item._id !== message._id);
-        this.setState({ messages: newMessages });
-      }
+      const result = await callWebServiceAsync(Models.DeleteMessage.restUri, `/${message.createdAt.getTime()}`, 'DELETE');
+      await showWebServiceCallErrorsAsync(result, 200);
     }
     finally {
       this.setState({ busy: false });
@@ -162,11 +163,11 @@ export default class DiscussionScreen extends React.Component {
       let options = [getI18nText('拷贝'), getI18nText('取消')];
       let copyIndex = 0;
       let deleteIndex = -1;
-      /*if (this.isMyMessage(message.user._id)) {
+      if (this.isMyMessage(message.user._id)) {
         options.unshift(getI18nText('删除'));
         deleteIndex = 0;
         copyIndex = 1;
-      }*/
+      }
       const cancelButtonIndex = 1;
       context.actionSheet().showActionSheetWithOptions({
         options,

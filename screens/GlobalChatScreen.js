@@ -56,7 +56,7 @@ export default class GlobalChatScreen extends React.Component {
         ];
       }
     }
-    this.chatServer = new Chat(id, this.onNewMessage.bind(this), this.defaultUserName);
+    this.chatServer = new Chat(id, this.onNewMessage.bind(this), this.onDeleteMessage.bind(this), this.defaultUserName);
   }
 
   componentWillMount() {
@@ -81,6 +81,9 @@ export default class GlobalChatScreen extends React.Component {
         messages: GiftedChat.append(previousState.messages, message),
       };
     });
+  }
+
+  onDeleteMessage(message) {
   }
 
   componentWillUnmount() {

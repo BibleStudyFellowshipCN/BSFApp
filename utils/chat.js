@@ -7,13 +7,15 @@ export default class Chat {
   uid = '';
   roomId = null;
   socket = null;
-  callback = null;
+  newMessageCallback = null;
+  deleteMessageCallback = null;
   defaultUserName = 'B';
   connected = false;
 
-  constructor(id, callback, defaultUserName) {
+  constructor(id, newMessageCallback, deleteMessageCallback, defaultUserName) {
     this.roomId = id;
-    this.callback = callback;
+    this.newMessageCallback = newMessageCallback;
+    this.deleteMessageCallback = deleteMessageCallback;
 
     if (defaultUserName) {
       this.defaultUserName = defaultUserName;
@@ -39,6 +41,11 @@ export default class Chat {
       console.log('newMessage: ' + JSON.stringify(data))
       this.onNewMessage(data);
     });
+
+    this.socket.on('deleteMessage', (data) => {
+      console.log('deleteMessage: ' + JSON.stringify(data))
+      this.onDeleteMessage(data);
+    });
   }
 
   setUid(value) {
@@ -63,7 +70,7 @@ export default class Chat {
     if (succeed) {
       for (var i in result.body) {
         const data = result.body[i];
-        this.callback({
+        this.newMessageCallback({
           _id: i,
           text: data.message,
           createdAt: new Date(data.createdAt),
@@ -74,7 +81,7 @@ export default class Chat {
         });
       }
     } else {
-      this.callback({
+      this.newMessageCallback({
         _id: 0,
         text: 'Failed to load messages, please try again later',
         createdAt: new Date(),
@@ -97,10 +104,8 @@ export default class Chat {
   }
 
   onNewMessage(data) {
-    console.log("receiveMessage: " + JSON.stringify(data));
-
     if (data.room == this.getRoom()) {
-      this.callback({
+      this.newMessageCallback({
         _id: this.uuid(),
         text: data.message,
         createdAt: new Date(data.createdAt),
@@ -112,16 +117,21 @@ export default class Chat {
     }
   }
 
+  onDeleteMessage(data) {
+    if (this.deleteMessageCallback) {
+      this.deleteMessageCallback(data);
+    }
+  }
+
   sendMessage(message) {
     for (i = 0; i < message.length; i++) {
       console.log("sendMessage: " + JSON.stringify(message[i]));
 
-      this.callback(message[i]);
-
       this.socket.emit('newMessage', {
         room: this.getRoom(),
         user: message[i].user._id,
-        message: message[i].text
+        message: message[i].text,
+        token: message[i].token
       });
     }
   }
