@@ -165,7 +165,7 @@ export default class DiscussionScreen extends React.Component {
       let cancelButtonIndex = 1;
       let deleteIndex = -1;
       if (this.isMyMessage(message.user._id)) {
-        options.unshift(getI18nText('删除'));
+        options.splice(1, 0, getI18nText('删除'));
         copyIndex = 0;
         deleteIndex = 1;
         cancelButtonIndex = 2;
