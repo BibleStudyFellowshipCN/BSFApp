@@ -274,7 +274,7 @@ class BSFQuestion extends React.Component {
     const title = (ids.length >= 3) ? `:${ids[1]}课${ids[2]}题` : '';
     const isGroupLeader = props.question.homiletics && getCurrentUser().getUserPermissions().isGroupLeader;
     // Group leader has a different chat screen for homiletics question
-    navigateTo('Homiletics', {
+    navigateTo('Discussion', {
       id: props.question.id,
       isGroupLeader: isGroupLeader,
       title: isGroupLeader ? `${getI18nText('问题讨论')} ${title}` : getI18nText('问题讨论'),

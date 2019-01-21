@@ -192,7 +192,7 @@ import { checkAppUpdateInBackground } from '../utils/update';
   }
 
   async onAudio() {
-    this.props.navigation.navigate('SermonAudio', { user: this.state.user });
+    this.props.navigation.navigate('LectureMaterial', { user: this.state.user });
   }
 
   async onAnswerManage() {

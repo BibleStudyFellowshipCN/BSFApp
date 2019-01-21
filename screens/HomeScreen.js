@@ -162,7 +162,7 @@ class HomeScreen extends React.Component {
   }
 
   goToAudio(lesson) {
-    this.props.navigation.navigate('SermonAudio', { id: lesson.id });
+    this.props.navigation.navigate('LectureMaterial', { id: lesson.id });
   }
 
   async onRefresh() {

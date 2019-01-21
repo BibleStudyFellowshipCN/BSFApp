@@ -13,11 +13,9 @@ import { GiftedChat, Bubble } from 'react-native-gifted-chat';
 import KeyboardSpacer from 'react-native-keyboard-spacer';
 import { callWebServiceAsync, showWebServiceCallErrorsAsync } from '../dataStorage/storage';
 
-let MD5 = require("react-native-crypto-js").MD5;
-
 function shareAnswer() { }
 
-export default class HomileticsScreen extends React.Component {
+export default class DiscussionScreen extends React.Component {
   static navigationOptions = ({ navigation }) => {
     return {
       title: navigation.state.params.title,
@@ -146,8 +144,7 @@ export default class HomileticsScreen extends React.Component {
   async deleteMessage(message) {
     try {
       this.setState({ busy: true });
-      const token = MD5(`${Platform.OS} ${Constants['deviceId']}${message.text}`).toString();
-      const result = await callWebServiceAsync(Models.DeleteMessage.restUri, `/${token}`, 'DELETE');
+      const result = await callWebServiceAsync(Models.DeleteMessage.restUri, `/${message.token}`, 'DELETE');
       const succeed = await showWebServiceCallErrorsAsync(result, 200);
       if (succeed) {
         // Remove the message

@@ -9,7 +9,7 @@ import { EventRegister } from 'react-native-event-listeners';
 import AudioPlayer from '../components/AudioPlayer';
 import { ScrollView } from 'react-native-gesture-handler';
 
-export default class SermonAudioScreen extends React.Component {
+export default class LectureMaterialScreen extends React.Component {
   static navigationOptions = ({ navigation }) => {
     return {
       title: getI18nText('课程资料'),

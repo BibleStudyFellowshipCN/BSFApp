@@ -6,14 +6,14 @@ import LessonScreen from '../screens/LessonScreen';
 import BibleScreen from '../screens/BibleScreen';
 import SetPhoneScreen from '../screens/SetPhoneScreen';
 import AttendanceScreen from '../screens/AttendanceScreen';
-import SermonAudioScreen from '../screens/SermonAudioScreen';
+import LectureMaterialScreen from '../screens/LectureMaterialScreen';
 import GlobalChatScreen from '../screens/GlobalChatScreen';
 import HomeTrainingScreen from '../screens/HomeTrainingScreen';
 import HomeDiscussionScreen from '../screens/HomeDiscussionScreen';
 import NotesScreen from '../screens/NotesScreen';
 import AnswerManageScreen from '../screens/AnswerManageScreen';
 import BibleSelectScreen from '../screens/BibleSelectScreen';
-import HomileticsScreen from '../screens/HomileticsScreen';
+import DiscussionScreen from '../screens/DiscussionScreen';
 //////////////
 // added by Frank on Dec 18, 2018
 import MyBSFScreen from '../screens/MyBSFScreen';
@@ -36,8 +36,8 @@ const RootStackNavigator = StackNavigator(
     Attendance: {
       screen: AttendanceScreen
     },
-    SermonAudio: {
-      screen: SermonAudioScreen
+    LectureMaterial: {
+      screen: LectureMaterialScreen
     },
     GlobalChat: {
       screen: GlobalChatScreen
@@ -60,8 +60,8 @@ const RootStackNavigator = StackNavigator(
     MyBSF: {
       screen: MyBSFScreen
     },
-    Homiletics: {
-      screen: HomileticsScreen
+    Discussion: {
+      screen: DiscussionScreen
     }
   },
   {
