@@ -1,7 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux'
 import { ScrollView, StyleSheet, View, Alert, KeyboardAvoidingView } from 'react-native';
-import { Constants, StoreReview } from 'expo';
+import { Constants, StoreReview, Updates } from 'expo';
 import { Models } from '../dataStorage/models';
 import { getCurrentUser } from '../utils/user';
 import { requestBooks, clearBooks } from "../store/books.js";
@@ -231,10 +231,24 @@ import { checkAppUpdateInBackground } from '../utils/update';
     if (platform.ios) {
       message += `\n\n*Model: ${platform.ios.model} (iOS: ${platform.ios.systemVersion})`;
     }
-    Alert.alert(getI18nText('版本'), message, [
-      { text: 'Review', onPress: () => StoreReview.requestReview() },
-      { text: 'Ok', onPress: () => { } }
-    ]);
+
+    console.log({
+      isSupported: StoreReview.isSupported(),
+      hasAction: StoreReview.hasAction(),
+      url: StoreReview.storeUrl()
+    });
+    if (StoreReview.isSupported() && !StoreReview.hasAction()) {
+      Alert.alert(getI18nText('版本'), message, [
+        { text: 'Review', onPress: () => { StoreReview.requestReview() } },
+        { text: 'Ok', onPress: () => { } }
+      ]);
+    } else {
+      Alert.alert(getI18nText('版本'), message, [
+        { text: 'Reload', onPress: () => { Updates.reload() } },
+        { text: 'Ok', onPress: () => { } }
+      ]);
+    }
+
     checkAppUpdateInBackground(true);
   }
 
