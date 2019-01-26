@@ -8,12 +8,14 @@ import {
   View,
   ProgressViewIOS,
   ProgressBarAndroid,
-  Dimensions
+  Dimensions,
+  TouchableOpacity,
+  Image
 } from 'react-native';
 import { FileSystem } from 'expo';
-import { getI18nText } from '../store/I18n';
+import { getI18nText } from '../utils/I18n';
 import { Models } from '../dataStorage/models';
-import { getCurrentUser } from '../store/user';
+import { getCurrentUser } from '../utils/user';
 import { downloadBibleAsync } from '../dataStorage/storage';
 import { CheckBox } from 'react-native-elements';
 import { EventRegister } from 'react-native-event-listeners';
@@ -21,22 +23,38 @@ import { EventRegister } from 'react-native-event-listeners';
 export default class BibleSelectScreen extends React.Component {
   static navigationOptions = ({ navigation }) => {
     return {
-      title: getI18nText('请选择圣经版本')
+      title: getI18nText('请选择圣经版本'),
+      headerLeft: (
+        <View style={{ marginLeft: 10 }}>
+          <TouchableOpacity onPress={() => navigateBack()}>
+            <Image
+              style={{ width: 34, height: 34 }}
+              source={require('../assets/images/Ok.png')} />
+          </TouchableOpacity>
+        </View>)
     };
   };
 
   state = {
     busy: false,
-    selectedBible: this.props.navigation.state.params.version,
     downloading: false,
     downloadProgress: 0,
     downloadBible: '',
     windowWidth: Dimensions.get('window').width
   };
 
-  removable = this.props.navigation.state.params.removable;
+  constructor(props) {
+    super(props);
+    let selectedBibles = [getCurrentUser().getBibleVersion()];
+    const bibleVersion2 = getCurrentUser().getBibleVersion2();
+    if (bibleVersion2) {
+      selectedBibles.push(bibleVersion2);
+    }
+    this.state.selectedBibles = selectedBibles;
+  }
 
   componentWillMount() {
+    navigateBack = () => this.props.navigation.pop();
     this.listener = EventRegister.addEventListener('screenDimensionChanged', (window) => {
       this.setState({ windowWidth: window.width });
     });
@@ -92,41 +110,50 @@ export default class BibleSelectScreen extends React.Component {
     try {
       console.log('Select: ' + version);
 
-      const oldVersion = this.state.selectedBible;
-      this.setState({ selectedBible: version });
-
       const result = await this.ensureBibleIsDownloadedAsync(name, version);
       if (!result) {
         Alert.alert(getI18nText('错误'), getI18nText('下载失败'));
-        this.setState({ selectedBible: oldVersion });
         return;
       }
 
+      const selectedBibles = this.state.selectedBibles;
+      console.log(`Before: ${JSON.stringify(selectedBibles)}`);
+      const existing = selectedBibles.indexOf(version);
+      if (existing !== -1) {
+        if (selectedBibles.length > 1) {
+          selectedBibles.splice(existing, 1);
+        }
+      } else {
+        if (selectedBibles.length <= 1) {
+          selectedBibles.push(version);
+        } else {
+          selectedBibles[0] = selectedBibles[1];
+          selectedBibles[1] = version;
+        }
+      }
+      console.log(`After: ${JSON.stringify(selectedBibles)}`);
+      this.setState({ selectedBibles });
+
+      // Save
+      await getCurrentUser().setBibleVersionAsync(selectedBibles[0]);
+      await getCurrentUser().setBibleVersion2Async(selectedBibles.length > 1 ? selectedBibles[1] : null);
+
+      // Notify selection change
       const onSelected = this.props.navigation.state.params.onSelected;
       if (typeof onSelected === 'function') {
-        onSelected(name, version);
-        this.props.navigation.goBack();
+        onSelected(getCurrentUser().getBibleVersionDisplayName(), getCurrentUser().getBibleVersion());
       }
     } finally {
       this.setState({ busy: false });
     }
   }
 
-  onRemoval() {
-    const onSelected = this.props.navigation.state.params.onSelected;
-    if (typeof onSelected === 'function') {
-      onSelected('N/A', null);
-      this.props.navigation.goBack();
-    }
-  }
-
   render() {
     let keyIndex = 1;
-    let bibleIndex = 1;
     const progress = this.state.downloadProgress;
     const progressText = getI18nText('正在下载圣经') + ' ' + this.state.downloadBible + ' (' + parseInt(progress * 100) + '%)';
     const fontSize = getCurrentUser().getBibleFontSize();
-    console.log('Current bible: ' + this.state.selectedBible);
+    console.log(`Selected bibles: ${JSON.stringify(this.state.selectedBibles)}`);
     return (
       <View style={{ flex: 1, backgroundColor: 'white' }}>
         {
@@ -145,16 +172,6 @@ export default class BibleSelectScreen extends React.Component {
         }
         <ScrollView>
           {
-            this.removable &&
-            <CheckBox
-              textStyle={{ color: 'red' }}
-              containerStyle={{ width: this.state.windowWidth - 10 }}
-              key={keyIndex++}
-              title='N/A'
-              checked={!this.state.selectedBible}
-              onPress={() => { this.onRemoval(); }} />
-          }
-          {
             Object.keys(Models.BibleVersions).map((lang) => (
               <View key={keyIndex++} style={{ alignItems: "center" }}>
                 <Text key={keyIndex++} style={{ fontSize: fontSize + 2, fontWeight: 'bold' }}>{lang}</Text>
@@ -163,8 +180,8 @@ export default class BibleSelectScreen extends React.Component {
                     <CheckBox
                       containerStyle={{ width: this.state.windowWidth - 10 }}
                       key={keyIndex++}
-                      title={/*'#' + (bibleIndex++) + ' ' + */bible.name}
-                      checked={bible.id === this.state.selectedBible}
+                      title={bible.name}
+                      checked={this.state.selectedBibles.indexOf(bible.id) !== -1}
                       onPress={() => { this.onSelect(bible.name, bible.id); }} />
                   ))
                 }

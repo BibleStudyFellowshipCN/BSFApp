@@ -7,7 +7,7 @@ import { loadAsync } from './dataStorage/storage';
 import { Models } from './dataStorage/models';
 import { Provider } from 'react-redux';
 import { ActionSheetProvider } from '@expo/react-native-action-sheet';
-import { getCurrentUser } from './store/user';
+import { getCurrentUser } from './utils/user';
 import { Localization } from 'expo-localization';
 import Layout from './constants/Layout';
 import { EventRegister } from 'react-native-event-listeners';

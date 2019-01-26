@@ -8,23 +8,34 @@ import {
   TouchableOpacity,
   View,
   Image,
+  TouchableHighlight,
   KeyboardAvoidingView,
   Dimensions
 } from 'react-native';
-import ScrollableTabView, { DefaultTabBar } from 'react-native-scrollable-tab-view';
+import ScrollableTabView from 'react-native-scrollable-tab-view';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { loadLesson } from '../store/lessons.js'
 import Answer from '../components/Answer'
 import ExportAnswer from '../components/ExportAnswer.js';
 import Colors from '../constants/Colors'
-import { getI18nText, getI18nBibleBook } from '../store/I18n';
-import { getCurrentUser } from '../store/user';
+import { getI18nText, getI18nBibleBook } from '../utils/I18n';
+import { getCurrentUser } from '../utils/user';
 
 class LessonScreen extends React.Component {
   static navigationOptions = ({ navigation }) => {
     return {
       title: navigation.state.params && navigation.state.params.title ? navigation.state.params.title : '',
-      headerRight: <ExportAnswer lessonId={navigation.state.params.lesson.id} importExport={() => onImportAndExport()} />
+      headerLeft: (
+        <View style={{ marginLeft: 10 }}>
+          <TouchableOpacity onPress={() => navigateBack()}>
+            <Image
+              style={{ width: 34, height: 34 }}
+              source={require('../assets/images/GoBack.png')} />
+          </TouchableOpacity>
+        </View>),
+      headerRight: (
+        <ExportAnswer lessonId={navigation.state.params.lesson.id} importExport={() => onImportAndExport()} />
+      )
     };
   };
 
@@ -40,6 +51,7 @@ class LessonScreen extends React.Component {
 
   componentWillMount() {
     navigateTo = this.navigateTo.bind(this);
+    navigateBack = () => this.props.navigation.pop();
     onImportAndExport = this.onImportAndExport.bind(this);
 
     if (!this.props.lesson) {
@@ -83,6 +95,21 @@ class LessonScreen extends React.Component {
     this.props.navigation.navigate('AnswerManage');
   }
 
+  renderTab(name, page, isTabActive, onPressHandler, onLayoutHandler) {
+    return (
+      <View style={{ height: 20 }}>
+        <TouchableHighlight
+          key={`${name}_${page}`}
+          onPress={() => onPressHandler(page)}
+          onLayout={onLayoutHandler}
+          style={{ flex: 1, width: 100, }}
+          underlayColor="#aaaaaa">
+          <Text>{name}</Text>
+        </TouchableHighlight>
+      </View>
+    );
+  };
+
   render() {
     const scrollableStyleProps = {
       tabBarBackgroundColor: Colors.yellow,
@@ -113,13 +140,13 @@ class LessonScreen extends React.Component {
         ref={ref => this.tabView = ref}
         {...scrollableStyleProps}
         initialPage={this.initialPage}
-        renderTabBar={() => <DefaultTabBar style={{ height: 30 }} />}>
-        <DayQuestions tabLabel={getI18nText("一")} goToPassage={this.goToPassage} day={dayQuestions.one} memoryVerse={this.props.lesson.memoryVerse} />
-        <DayQuestions tabLabel={getI18nText("二")} goToPassage={this.goToPassage} day={dayQuestions.two} />
-        <DayQuestions tabLabel={getI18nText("三")} goToPassage={this.goToPassage} day={dayQuestions.three} />
-        <DayQuestions tabLabel={getI18nText("四")} goToPassage={this.goToPassage} day={dayQuestions.four} />
-        <DayQuestions tabLabel={getI18nText("五")} goToPassage={this.goToPassage} day={dayQuestions.five} />
-        <DayQuestions tabLabel={getI18nText("六")} goToPassage={this.goToPassage} day={dayQuestions.six} />
+        renderTabBar={() => <LessonTab />}>
+        <DayQuestions tabLabel='1' goToPassage={this.goToPassage} day={dayQuestions.one} memoryVerse={this.props.lesson.memoryVerse} />
+        <DayQuestions tabLabel='2' goToPassage={this.goToPassage} day={dayQuestions.two} />
+        <DayQuestions tabLabel='3' goToPassage={this.goToPassage} day={dayQuestions.three} />
+        <DayQuestions tabLabel='4' goToPassage={this.goToPassage} day={dayQuestions.four} />
+        <DayQuestions tabLabel='5' goToPassage={this.goToPassage} day={dayQuestions.five} />
+        <DayQuestions tabLabel='6' goToPassage={this.goToPassage} day={dayQuestions.six} />
       </ScrollableTabView>
 
     // TODO:[Wei] KeyboardAwareScrollView works on iOS but not Android, KeyboardAvoidingView works on Android, but not iOS :(
@@ -127,6 +154,51 @@ class LessonScreen extends React.Component {
       <KeyboardAvoidingView style={styles.container} behavior='padding' keyboardVerticalOffset={80}>
         {content}
       </KeyboardAvoidingView >
+    );
+  }
+}
+
+class LessonTab extends React.Component {
+  render() {
+    const containerWidth = Dimensions.get('window').width;
+    const numberOfTabs = this.props.tabs.length;
+    return (
+      <View style={{
+        flexDirection: 'row',
+        backgroundColor: this.props.backgroundColor
+      }}>
+        {
+          this.props.tabs.map((name, page) => {
+            const isTabActive = this.props.activeTab === page;
+            return (
+              <TouchableOpacity key={name} onPress={() => this.props.goToPage(page)}>
+                <View style={{
+                  marginHorizontal: 0.5,
+                  width: (containerWidth / numberOfTabs) - 1,
+                  borderTopColor: 'whitesmoke',
+                  borderLeftColor: 'whitesmoke',
+                  borderRightColor: 'whitesmoke',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  borderTopWidth: 1,
+                  borderLeftWidth: 1,
+                  borderRightWidth: 1,
+                  borderTopLeftRadius: 10,
+                  borderTopRightRadius: 10,
+                  backgroundColor: isTabActive ? 'whitesmoke' : this.props.backgroundColor
+                }}>
+                  <Text style={{
+                    margin: 3,
+                    fontSize: getCurrentUser().getLessonFontSize() + 4,
+                    color: isTabActive ? Colors.yellow : 'whitesmoke',
+                    fontWeight: '900'
+                  }}>{name}</Text>
+                </View>
+              </TouchableOpacity>
+            );
+          })
+        }
+      </View>
     );
   }
 }
@@ -199,29 +271,21 @@ class BSFQuestion extends React.Component {
     const props = this.props;
 
     const ids = props.question.id.split('_');
-    const title = (ids.length >= 3) ? `: 第${ids[1]}课${ids[1]}题` : '';
-
-    if (props.question.homiletics && getCurrentUser().getUserPermissions().isGroupLeader) {
-      // Group leader has a different chat screen for homiletics question
-      navigateTo('Homiletics', {
-        id: props.question.id,
-        title: `${getI18nText('问题讨论')} ${title}`,
-        text: props.question.questionText,
-        quotes: props.question.quotes
-      });
-    } else {
-      navigateTo('GlobalChat', {
-        id: props.question.id,
-        title: getI18nText('问题讨论') + ' ' + props.question.id,
-        text: props.question.questionText
-      });
-    }
+    const title = (ids.length >= 3) ? `:${ids[1]}课${ids[2]}题` : '';
+    const isGroupLeader = props.question.homiletics && getCurrentUser().getUserPermissions().isGroupLeader;
+    // Group leader has a different chat screen for homiletics question
+    navigateTo('Discussion', {
+      id: props.question.id,
+      isGroupLeader: isGroupLeader,
+      title: isGroupLeader ? `${getI18nText('问题讨论')} ${title}` : getI18nText('问题讨论'),
+      text: props.question.questionText,
+      quotes: props.question.quotes
+    });
   }
 
   render() {
     const props = this.props;
     const homiletics = props.question.homiletics;
-    const isGroupLeader = getCurrentUser().getUserPermissions().isGroupLeader
     return (
       <View style={{ marginVertical: 12, }}>
         <QuestionText>
@@ -264,13 +328,13 @@ const QuestionText = (props) => (
 
 let lastBibleQuote = '';
 const BibleQuote = (props) => {
-  const repeat = lastBibleQuote === props.book ? true : false;
+  const repeat = lastBibleQuote === props.book;
   lastBibleQuote = props.book;
   return (
     <View style={{ flexDirection: 'row' }}>
       <TouchableOpacity onPress={() => props.goToPassage(props.book, props.verse)}>
         <View style={styles.bibleQuote}>
-          <Text style={{ color: 'white' }} selectable={true}>{repeat ? '' : getI18nBibleBook(props.book)}{props.verse}</Text>
+          <Text style={{ color: 'white', fontSize: getCurrentUser().getLessonFontSize() - 2 }} selectable={true}>{repeat ? '' : getI18nBibleBook(props.book)}{props.verse}</Text>
         </View>
       </TouchableOpacity>
     </View>
@@ -306,10 +370,10 @@ const styles = StyleSheet.create({
   },
   bibleQuote: {
     marginVertical: 2,
-    paddingHorizontal: 15,
+    marginRight: 2,
+    paddingHorizontal: 5,
     justifyContent: 'center',
     alignItems: 'center',
-    height: 22,
     borderRadius: 11,
     backgroundColor: Colors.yellow,
   },

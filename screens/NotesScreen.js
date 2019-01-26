@@ -1,5 +1,5 @@
 import React from 'react';
-import { getI18nText } from '../store/I18n';
+import { getI18nText } from '../utils/I18n';
 import { WebView, View, ActivityIndicator } from 'react-native';
 import Layout from '../constants/Layout';
 import Colors from '../constants/Colors';

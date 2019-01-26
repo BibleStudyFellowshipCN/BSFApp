@@ -3,7 +3,6 @@ import { debounce } from 'lodash';
 import Storage from 'react-native-storage';
 import { Constants, FileSystem } from 'expo';
 import { Models, CachePolicy } from './models';
-import { getCurrentUser } from '../store/user';
 
 if (!global.storage) {
     global.storage = new Storage({
@@ -28,7 +27,7 @@ if (!global.deviceInfo) {
 }
 
 function getLanguage() {
-    let lang = getCurrentUser().getLanguage();
+    let lang = currentUser.getLanguage();
     if (!lang) {
         lang = Models.DefaultLanguage;
     }
@@ -78,12 +77,6 @@ async function getCacheData(name, key) {
         case 'books':
             cache = require("../assets/json/books.json");
             break;
-        case 'homeDiscussion':
-            cache = require("../assets/json/homeDiscussion.json");
-            break;
-        case 'homeTraining':
-            cache = require("../assets/json/homeTraining.json");
-            break;
     }
     if (cache) {
         const data = cache[key];
@@ -99,7 +92,7 @@ async function getCacheData(name, key) {
 async function getFromCache(key, keyString) {
     // Load from book cache
     if (key == Models.Book.key) {
-        const data = await getCacheData('books', getCurrentUser().getLanguage());
+        const data = await getCacheData('books', currentUser.getLanguage());
         if (data) {
             return data;
         }
@@ -107,7 +100,7 @@ async function getFromCache(key, keyString) {
 
     // Load from lesson cache
     if (key == Models.Lesson.key) {
-        const data = await getCacheData(getCurrentUser().getLanguage(), keyString);
+        const data = await getCacheData(currentUser.getLanguage(), keyString);
         if (data) {
             return data;
         }
@@ -119,7 +112,7 @@ async function getFromCache(key, keyString) {
         if (index !== -1) {
             version = keyString.substring(index + '?bibleVersion='.length);
         } else {
-            version = getCurrentUser().getBibleVersion();
+            version = currentUser.getBibleVersion();
         }
 
         const data = await getCacheData(version, keyString);
@@ -140,43 +133,11 @@ function getHttpHeaders() {
         'deviceYearClass': global.deviceInfo.deviceYearClass,
         'platformOS': global.deviceInfo.platformOS,
         'version': global.deviceInfo.version + ' ' + global.deviceInfo.sdkVersion,
-        'lang': getCurrentUser().getLanguage(),
-        'bibleVersion': getCurrentUser().getBibleVersion(),
+        'lang': currentUser.getLanguage(),
+        'bibleVersion': currentUser.getBibleVersion(),
         'Accept': 'application/json',
         'Content-Type': 'application/json',
     };
-}
-
-let lastPokeDay = 0;
-let lastSessionId = '';
-
-async function pokeServer() {
-    // Don't poke from non-device
-    /*if (!Expo.Constants.isDevice) {
-        return;
-    }*/
-
-    // Check is done daily or sessionId is changed
-    const dayOfToday = (new Date()).getDate();
-    const sessionId = Constants['sessionId'];
-    console.log(`[Session: ${sessionId}] LastCheckForContentUpdateDate: ${lastPokeDay} DayOfToday: ${dayOfToday}`);
-    if (dayOfToday != lastPokeDay || lastSessionId != sessionId) {
-        try {
-            const update = await Expo.Updates.checkForUpdateAsync();
-            if (update.isAvailable) {
-                await Expo.Updates.fetchUpdateAsync();
-                Alert.alert(getI18nText('发现更新'), getI18nText('程序将重新启动'), [
-                    { text: 'OK', onPress: () => Expo.Updates.reloadFromCache() },
-                    { text: 'Later', onPress: () => { } },
-                ]);
-            }
-        } catch (e) {
-            console.log(e);
-        };
-
-        lastPokeDay = dayOfToday;
-        lastSessionId = Constants['sessionId'];
-    }
 }
 
 async function loadAsync(model, id, update) {
@@ -565,13 +526,26 @@ async function downloadBibleAsync(bible, downloadCallback) {
 
         const finalUri = FileSystem.documentDirectory + 'book-' + bible + '.json';
         console.log(`Move ${localUri} to ${finalUri}...`);
-        await Expo.FileSystem.moveAsync({ from: localUri, to: finalUri });
+        await FileSystem.moveAsync({ from: localUri, to: finalUri });
     } catch (e) {
         console.log(e);
     }
 }
 
+let currentUser = {
+    getLanguage() {
+        return "eng";
+    },
+    getBibleVersion() {
+        return "niv2011";
+    }
+};
+
+function setUserInternal(user) {
+    currentUser = user;
+}
+
 export {
-    loadAsync, saveAsync, clearStorageAsync, callWebServiceAsync, showWebServiceCallErrorsAsync, pokeServer, resetGlobalCache, reloadGlobalCache, loadFromCacheAsync, getPassageAsync,
-    downloadBibleAsync
+    loadAsync, saveAsync, clearStorageAsync, callWebServiceAsync, showWebServiceCallErrorsAsync, resetGlobalCache, reloadGlobalCache, loadFromCacheAsync, getPassageAsync,
+    downloadBibleAsync, setUserInternal
 };

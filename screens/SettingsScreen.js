@@ -1,19 +1,19 @@
 import React from 'react';
 import { connect } from 'react-redux'
 import { ScrollView, StyleSheet, View, Alert, KeyboardAvoidingView } from 'react-native';
-import Expo, { FileSystem, Constants, WebBrowser } from 'expo';
+import { Constants, StoreReview, Updates, FileSystem } from 'expo';
 import { Models } from '../dataStorage/models';
-import { callWebServiceAsync, showWebServiceCallErrorsAsync } from '../dataStorage/storage';
-import { getCurrentUser } from '../store/user';
+import { getCurrentUser } from '../utils/user';
 import { requestBooks, clearBooks } from "../store/books.js";
 import SettingsList from 'react-native-settings-list';
-import { getI18nText } from '../store/I18n';
+import { getI18nText } from '../utils/I18n';
 import { clearLesson } from '../store/lessons.js'
 import { clearPassage } from '../store/passage.js'
 import { connectActionSheet } from '@expo/react-native-action-sheet';
 import { NavigationActions } from 'react-navigation';
 import { FontAwesome, MaterialIcons, MaterialCommunityIcons } from '@expo/vector-icons';
 import Colors from '../constants/Colors';
+import { checkAppUpdateInBackground } from '../utils/update';
 
 @connectActionSheet class SettingsScreen extends React.Component {
   static navigationOptions = ({ navigation }) => {
@@ -86,10 +86,6 @@ import Colors from '../constants/Colors';
     }
   }
 
-  checkAppUpdate() {
-    getCurrentUser().checkForUpdate();
-  }
-
   feedback = '';
 
   onLanguage() {
@@ -133,6 +129,8 @@ import Colors from '../constants/Colors';
         return getI18nText('中');
       case 3:
         return getI18nText('大');
+      case 4:
+        return getI18nText("特大");
     }
   }
 
@@ -147,6 +145,7 @@ import Colors from '../constants/Colors';
       getI18nText('小'),
       getI18nText('中'),
       getI18nText('大'),
+      getI18nText("特大")
     ];
     options.push('Cancel');
     let cancelButtonIndex = options.length - 1;
@@ -193,7 +192,7 @@ import Colors from '../constants/Colors';
   }
 
   async onAudio() {
-    this.props.navigation.navigate('SermonAudio', { user: this.state.user });
+    this.props.navigation.navigate('LectureMaterial', { user: this.state.user });
   }
 
   async onAnswerManage() {
@@ -203,32 +202,64 @@ import Colors from '../constants/Colors';
   async onClearDownloadFiles() {
     try {
       let freeSize = 0;
-      const files = await Expo.FileSystem.readDirectoryAsync(FileSystem.documentDirectory);
+      const files = await FileSystem.readDirectoryAsync(FileSystem.documentDirectory);
       for (let i in files) {
         const file = files[i];
         console.log(file);
         if (file.toLocaleLowerCase().indexOf('book-') !== -1 && file.toLocaleLowerCase().endsWith('.json')) {
           const fileUri = FileSystem.documentDirectory + file;
           console.log(fileUri);
-          const info = await Expo.FileSystem.getInfoAsync(fileUri);
+          const info = await FileSystem.getInfoAsync(fileUri);
           console.log(JSON.stringify(info));
           freeSize += info.size;
           console.log(freeSize);
-          await Expo.FileSystem.deleteAsync(fileUri, { idempotent: true });
+          await FileSystem.deleteAsync(fileUri, { idempotent: true });
         }
       }
-      Alert.alert(getI18nText('完成'));
+      Alert.alert('Completed', `Removed ${freeSize} bytes`);
     } catch (e) {
-      alert(JSON.stringify(e));
+      Alert.alert('Error', JSON.stringify(e));
     }
+  }
+
+  async onVersion() {
+    const { manifest, platform } = Constants;
+    let message = `*Base: ${manifest.version} (SDK${manifest.sdkVersion})`;
+    if (manifest.publishedTime) {
+      message += `\n\n*PublishedTime: ${manifest.publishedTime}`;
+    }
+    if (platform.ios) {
+      message += `\n\n*Model: ${platform.ios.model} (iOS: ${platform.ios.systemVersion})`;
+    }
+
+    console.log({
+      isSupported: StoreReview.isSupported(),
+      hasAction: StoreReview.hasAction(),
+      url: StoreReview.storeUrl()
+    });
+    if (StoreReview.isSupported() && !StoreReview.hasAction()) {
+      Alert.alert(getI18nText('版本'), message, [
+        { text: 'Review', onPress: () => { StoreReview.requestReview() } },
+        { text: 'Ok', onPress: () => { } }
+      ]);
+    } else {
+      Alert.alert(getI18nText('版本'), message, [
+        { text: 'Reload', onPress: () => { Updates.reload() } },
+        { text: 'Ok', onPress: () => { } }
+      ]);
+    }
+
+    checkAppUpdateInBackground(true);
   }
 
   render() {
     const { manifest } = Constants;
     phone = getCurrentUser().getCellphone();
     const fontSize = getCurrentUser().getSettingFontSize();
+    const version = manifest.publishedTime ? `${manifest.publishedTime.split('T')[0].replace(/-/g, '.')} (SDK${manifest.sdkVersion})` :
+      `${manifest.version} (SDK${manifest.sdkVersion})`;
     return (
-      <KeyboardAvoidingView style={styles.container} behavior='padding' keyboardVerticalOffset={0}>
+      <KeyboardAvoidingView style={styles.container} behavior='padding' keyboardVerticalOffset={0} >
         <ScrollView
           style={{ backgroundColor: 'white' }}
           ref={ref => this.scrollView = ref}>
@@ -254,7 +285,7 @@ import Colors from '../constants/Colors';
                   </View>
                 }
                 title={getI18nText('圣经版本')}
-                titleInfo={this.state.bibleVersion}
+                titleInfo={this.state.bibleVersion.length > 23 ? this.state.bibleVersion.substr(0, 23) + '...' : this.state.bibleVersion}
                 titleStyle={{ fontSize }}
                 titleInfoStyle={{ fontSize }}
                 onPress={this.onBibleVerse.bind(this)}
@@ -307,7 +338,7 @@ import Colors from '../constants/Colors';
                       <FontAwesome color={Colors.yellow} size={30} name='play-circle-o' />
                     </View>
                   }
-                  title={getI18nText('讲道录音')}
+                  title={getI18nText('课程资料')}
                   hasNavArrow={true}
                   titleStyle={{ fontSize }}
                   titleInfoStyle={{ fontSize }}
@@ -345,11 +376,11 @@ import Colors from '../constants/Colors';
                     <MaterialCommunityIcons color={Colors.yellow} size={28} name='fish' />
                   </View>
                 }
-                title={getI18nText('版本') + ': ' + manifest.version}
-                titleInfo={getI18nText('检查更新')}
+                title={getI18nText('版本') + ': ' + version}
                 titleStyle={{ fontSize }}
                 titleInfoStyle={{ fontSize }}
-                onPress={this.checkAppUpdate.bind(this)}
+                hasNavArrow={true}
+                onPress={this.onVersion.bind(this)}
               />
               <SettingsList.Item
                 icon={

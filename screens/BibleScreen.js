@@ -7,6 +7,7 @@ import {
   StyleSheet,
   Text,
   View,
+  Image,
   TouchableOpacity,
   ProgressViewIOS,
   ProgressBarAndroid
@@ -14,31 +15,31 @@ import {
 import { loadPassage } from '../store/passage';
 import { downloadBibleAsync } from '../dataStorage/storage';
 import { Models } from '../dataStorage/models';
-import { Octicons } from '@expo/vector-icons';
 import { connectActionSheet } from '@expo/react-native-action-sheet';
 import { clearPassage } from '../store/passage.js'
-import { getCurrentUser } from '../store/user';
+import { getCurrentUser } from '../utils/user';
 import { FileSystem } from 'expo';
-import { getI18nText } from '../store/I18n';
-
-function onBibleVerse() { }
-function onBibleVerse2() { }
+import { getI18nText } from '../utils/I18n';
 
 @connectActionSheet class BibleScreen extends React.Component {
   static navigationOptions = ({ navigation }) => {
     return {
       title: navigation.state.params && navigation.state.params.title ? navigation.state.params.title : 'Bible',
+      headerLeft: (
+        <View style={{ marginLeft: 10 }}>
+          <TouchableOpacity onPress={() => navigateBack()}>
+            <Image
+              style={{ width: 34, height: 34 }}
+              source={require('../assets/images/GoBack.png')} />
+          </TouchableOpacity>
+        </View>),
       headerRight: (
-        <View style={{ marginRight: 2, flexDirection: 'row', backgroundColor: '#fcaf17', alignItems: 'baseline' }}>
-          <TouchableOpacity onPress={() => onBibleVerse()}>
-            <Octicons name='book' size={28} color='#fff' />
+        <View style={{ marginRight: 10, flexDirection: 'row' }}>
+          <TouchableOpacity onPress={() => { onBibleVerse(true); }}>
+            <Image
+              style={{ width: 34, height: 34 }}
+              source={require('../assets/images/Bible.png')} />
           </TouchableOpacity>
-          <Text style={{ marginLeft: 3, fontSize: 12, color: 'white' }}>1</Text>
-          <View style={{ width: 5 }} />
-          <TouchableOpacity onPress={() => onBibleVerse2()}>
-            <Octicons name='book' size={28} color='#fff' />
-          </TouchableOpacity>
-          <Text style={{ marginLeft: 3, fontSize: 12, color: 'white' }}>2</Text>
         </View>)
     };
   };
@@ -50,8 +51,8 @@ function onBibleVerse2() { }
   }
 
   componentWillMount() {
+    navigateBack = () => this.props.navigation.pop();
     onBibleVerse = this.onBibleVerse.bind(this);
-    onBibleVerse2 = this.onBibleVerse2.bind(this);
     this.ensureBibleIsDownloadedAsync().then(() => {
       this.props.clearPassage();
       this.props.loadPassage();
@@ -63,17 +64,8 @@ function onBibleVerse2() { }
     this.onBibleVerseChange(version, getCurrentUser().getBibleVersion2());
   }
 
-  onBibleSelected2(name, version) {
-    console.log('onBibleSelected2: ' + name + ' ' + version);
-    this.onBibleVerseChange(getCurrentUser().getBibleVersion(), version);
-  }
-
   onBibleVerse() {
     this.props.navigation.navigate('BibleSelect', { version: getCurrentUser().getBibleVersion(), onSelected: this.onBibleSelected.bind(this) });
-  }
-
-  onBibleVerse2() {
-    this.props.navigation.navigate('BibleSelect', { version: getCurrentUser().getBibleVersion2(), removable: true, onSelected: this.onBibleSelected2.bind(this) });
   }
 
   async onBibleVerseChange(ver1, ver2) {
@@ -137,15 +129,11 @@ function onBibleVerse2() { }
   }
 
   render() {
-    const bible = getCurrentUser().getBibleVersion();
-    const bible2 = getCurrentUser().getBibleVersion2();
     const fontSize = getCurrentUser().getBibleFontSize();
     const verses = this.props.passage;
     let contentUI;
-    // Using text (some Android device cannot show CJK in WebView)
-    if (Platform.OS == 'android' &&
-      (bible == 'rcuvss' || bible == 'ccb' || bible == 'rcuvts' || bible == 'cnvt' ||
-        bible2 == 'rcuvss' || bible2 == 'ccb' || bible2 == 'rcuvts' || bible2 == 'cnvt')) {
+    // Using text (some Android device cannot show CJK or even UTF8 in WebView)
+    if (Platform.OS == 'android') {
       let line = '';
       for (var i in verses) {
         const verse = verses[i];
@@ -163,8 +151,7 @@ function onBibleVerse2() { }
           </ScrollView>
         </View>
       );
-    }
-    else {
+    } else {
       // For some reason, Android cannot show html with 'tr:nth-child(even)' css...
       const moreStyle = Platform.OS === 'ios' ? 'tr:nth-child(even) { background: #EEEEEE }' : '';
       // Using html

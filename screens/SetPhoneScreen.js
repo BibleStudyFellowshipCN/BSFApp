@@ -1,19 +1,34 @@
 import React from 'react';
-import { ScrollView, StyleSheet, View, Alert, TextInput, KeyboardAvoidingView, Keyboard } from 'react-native';
-import { getI18nText } from '../store/I18n';
-import { Button } from 'react-native-elements';
-import { getCurrentUser } from '../store/user';
+import { StyleSheet, View, Alert, TextInput, KeyboardAvoidingView, Keyboard, Image, TouchableOpacity } from 'react-native';
+import { getI18nText } from '../utils/I18n';
+import { getCurrentUser } from '../utils/user';
 
 export default class SetPhoneScreen extends React.Component {
   static navigationOptions = ({ navigation }) => {
     return {
-      title: getI18nText('设置手机号码')
+      title: getI18nText('设置手机号码'),
+      headerLeft: (
+        <View style={{ marginLeft: 10 }}>
+          <TouchableOpacity onPress={() => onSubmit()}>
+            <Image
+              style={{ width: 34, height: 34 }}
+              source={require('../assets/images/Ok.png')} />
+          </TouchableOpacity>
+        </View>)
     };
   };
 
   state = {
     cellphone: getCurrentUser().getCellphone(),
     busy: false
+  }
+
+  componentWillMount() {
+    onSubmit = () => this.onSubmit();
+  }
+
+  componentDidMount() {
+    this.cellphoneInput.focus();
   }
 
   async onSubmit() {
@@ -32,30 +47,18 @@ export default class SetPhoneScreen extends React.Component {
   render() {
     return (
       <KeyboardAvoidingView style={styles.container} behavior='padding' keyboardVerticalOffset={0}>
-        <ScrollView
-          style={{ backgroundColor: 'white' }}
-          ref={ref => this.scrollView = ref}>
-          <View style={{ backgroundColor: 'white' }}>
-            <TextInput
-              style={styles.cellphoneInput}
-              ref={(input) => this.cellphoneInput = input}
-              keyboardType='phone-pad'
-              defaultValue={this.state.cellphone}
-              blurOnSubmit={false}
-              placeholder={getI18nText('手机号码')}
-              onChangeText={(text) => { this.setState({ cellphone: text }); }}
-            />
-            <View style={{ alignItems: 'center', marginTop: 40 }}>
-              <Button
-                disabled={this.state.busy}
-                backgroundColor='#397EDC'
-                borderRadius={5}
-                containerViewStyle={{ width: 130 }}
-                title={getI18nText('提交')}
-                onPress={this.onSubmit.bind(this)} />
-            </View>
-          </View>
-        </ScrollView>
+        <View style={{ flex: 1, backgroundColor: 'white' }}>
+          <TextInput
+            style={styles.cellphoneInput}
+            ref={(input) => this.cellphoneInput = input}
+            keyboardType='phone-pad'
+            defaultValue={this.state.cellphone}
+            blurOnSubmit={false}
+            placeholder={getI18nText('手机号码')}
+            onChangeText={(text) => { this.setState({ cellphone: text }); }}
+            onSubmitEditing={this.onSubmit.bind(this)}
+          />
+        </View>
       </KeyboardAvoidingView>
     );
   }

@@ -5,8 +5,8 @@ import {
   Dimensions,
   ScrollView
 } from 'react-native';
-import { getI18nText, getI18nBibleBookFromLang } from '../store/I18n';
-import { getCurrentUser } from '../store/user';
+import { getI18nText, getI18nBibleBookFromLang } from '../utils/I18n';
+import { getCurrentUser } from '../utils/user';
 import { Models } from '../dataStorage/models';
 import AudioPlayer from '../components/AudioPlayer';
 import { EventRegister } from 'react-native-event-listeners';
@@ -53,7 +53,7 @@ export default class AudioBibleScreen extends React.Component {
       isLoaded: false,
       duration: 0,
       progress: 0,
-      width: Dimensions.get('window').width
+      windowWidth: Dimensions.get('window').width
     };
   }
 
@@ -144,7 +144,7 @@ export default class AudioBibleScreen extends React.Component {
         style={{ flex: 1, backgroundColor: 'white' }}>
         <View style={{ alignItems: 'center' }}>
           <View style={{ flexDirection: 'row' }}>
-            <View style={{ width: this.state.width / 3 }}>
+            <View style={{ width: this.state.windowWidth / 3 }}>
               <Picker
                 style={{ alignSelf: 'stretch' }}
                 selectedValue={this.state.currentVersion}
@@ -155,7 +155,7 @@ export default class AudioBibleScreen extends React.Component {
                   ))}
               </Picker>
             </View>
-            <View style={{ width: this.state.width / 3 }}>
+            <View style={{ width: this.state.windowWidth / 3 }}>
               <Picker
                 style={{ alignSelf: 'stretch' }}
                 selectedValue={this.state.currentBook}
@@ -165,7 +165,7 @@ export default class AudioBibleScreen extends React.Component {
                 ))}
               </Picker>
             </View>
-            <View style={{ width: this.state.width / 3 }}>
+            <View style={{ width: this.state.windowWidth / 3 }}>
               <Picker
                 style={{ alignSelf: 'stretch' }}
                 selectedValue={this.state.currentChapter}
@@ -178,7 +178,7 @@ export default class AudioBibleScreen extends React.Component {
           </View>
           <AudioPlayer
             ref={ref => this.audioPlayer = ref}
-            width={this.state.width - 15}
+            width={this.state.windowWidth - 15}
             uri={this.getAudioUrl()}
             onFinished={this.onFinished.bind(this)}
           />

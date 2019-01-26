@@ -33,7 +33,7 @@ export default class Sound {
         playThroughEarpieceAndroid: false
       });
 
-      this.soundState.soundObject = new Expo.Audio.Sound();
+      this.soundState.soundObject = new Audio.Sound();
       this.soundState.soundObject.setOnPlaybackStatusUpdate(onPlaybackStatusUpdate);
     } catch (error) {
       console.log(JSON.stringify(error));

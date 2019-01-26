@@ -11,9 +11,9 @@ import {
   KeyboardAvoidingView,
   Dimensions
 } from 'react-native';
-import { getI18nText, getI18nBibleBook } from '../store/I18n';
+import { getI18nText, getI18nBibleBook } from '../utils/I18n';
 import { Button } from 'react-native-elements';
-import { getCurrentUser } from '../store/user';
+import { getCurrentUser } from '../utils/user';
 import { loadFromCacheAsync } from '../dataStorage/storage';
 import ScrollableTabView from 'react-native-scrollable-tab-view';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';

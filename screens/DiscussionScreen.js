@@ -4,28 +4,29 @@ import {
 } from 'react-native';
 import { Models } from '../dataStorage/models';
 import { loadAsync } from '../dataStorage/storage';
-import Chat from '../store/chat';
+import Chat from '../utils/chat';
 import { Constants } from 'expo';
-import { getCurrentUser } from '../store/user';
+import { getCurrentUser } from '../utils/user';
 import Colors from '../constants/Colors';
-import { getI18nBibleBook } from '../store/I18n';
-import { GiftedChat } from 'react-native-gifted-chat';
+import { getI18nBibleBook, getI18nText } from '../utils/I18n';
+import { GiftedChat, Bubble } from 'react-native-gifted-chat';
 import KeyboardSpacer from 'react-native-keyboard-spacer';
+import { callWebServiceAsync, showWebServiceCallErrorsAsync } from '../dataStorage/storage';
 
 function shareAnswer() { }
 
-export default class HomileticsScreen extends React.Component {
+export default class DiscussionScreen extends React.Component {
   static navigationOptions = ({ navigation }) => {
     return {
       title: navigation.state.params.title,
-      headerRight:
-        <View style={{ marginRight: 7 }}>
-          <TouchableOpacity onPress={() => { shareAnswer(); }}>
+      headerLeft: (
+        <View style={{ marginLeft: 10 }}>
+          <TouchableOpacity onPress={() => navigateBack()}>
             <Image
               style={{ width: 34, height: 34 }}
-              source={require('../assets/images/Copy.png')} />
+              source={require('../assets/images/GoBack.png')} />
           </TouchableOpacity>
-        </View>
+        </View>)
     };
   };
 
@@ -37,6 +38,7 @@ export default class HomileticsScreen extends React.Component {
 
   contentSize = null;
   defaultUserName = 'B';
+  messageId = 1;
 
   constructor(props) {
     super(props);
@@ -46,11 +48,14 @@ export default class HomileticsScreen extends React.Component {
     let id = '';
     if (props.navigation.state.params) {
       if (props.navigation.state.params.id) {
-        id = 'H' + props.navigation.state.params.id
+        id = props.navigation.state.params.id;
+        if (props.navigation.state.params.isGroupLeader) {
+          id = 'H' + id;
+        }
       }
 
       if (props.navigation.state.params.text) {
-        this.questionText = props.navigation.state.params.text;
+        this.questionText = props.navigation.state.params.text.trim();
       }
 
       if (props.navigation.state.params.quotes) {
@@ -60,10 +65,12 @@ export default class HomileticsScreen extends React.Component {
       }
     }
 
-    this.chatServer = new Chat(id, this.onNewMessage.bind(this), this.defaultUserName);
+    this.chatServer = new Chat(id, this.onNewMessage.bind(this), this.onDeleteMessage.bind(this), this.defaultUserName);
   }
 
   componentDidMount() {
+    navigateBack = () => this.props.navigation.pop();
+
     console.log('loading messages');
     this.chatServer.loadMessages().then(() => {
       this.setState({ loading: false });
@@ -72,11 +79,26 @@ export default class HomileticsScreen extends React.Component {
   }
 
   onNewMessage(message) {
+    if (typeof message._id === 'number') {
+      const id = parseInt(message._id);
+      if (id > this.messageId) {
+        this.messageId = id;
+      }
+    } else {
+      message._id = ++this.messageId;
+    }
+    console.log(`onNewMessage: ${JSON.stringify(message)}`);
     this.setState((previousState) => {
       return {
         messages: GiftedChat.append(previousState.messages, message),
       };
     });
+  }
+
+  onDeleteMessage(message) {
+    // Remove the message
+    const newMessages = this.state.messages.filter(item => item.createdAt.getTime() !== parseInt(message.createdAt) || item.user._id !== message.user);
+    this.setState({ messages: newMessages });
   }
 
   componentWillUnmount() {
@@ -104,7 +126,7 @@ export default class HomileticsScreen extends React.Component {
     if (!answerContent || !answerContent.answers || !answerContent.answers[questionId] ||
       !answerContent.answers[questionId].answerText ||
       answerContent.answers[questionId].answerText.length < 1) {
-      Alert.alert('Information', 'No answer entered yet');
+      Alert.alert(getI18nText('提示'), getI18nText('您没有答这道题目'));
       return;
     }
 
@@ -125,29 +147,69 @@ export default class HomileticsScreen extends React.Component {
     return `${Platform.OS} ${Constants['deviceId']}` === id;
   }
 
+  async deleteMessage(message) {
+    try {
+      this.setState({ busy: true });
+      const result = await callWebServiceAsync(Models.DeleteMessage.restUri, `/${message.createdAt.getTime()}`, 'DELETE');
+      await showWebServiceCallErrorsAsync(result, 200);
+    }
+    finally {
+      this.setState({ busy: false });
+    }
+  }
+
   onLongPress(context, message) {
     if (message.text) {
-      const options = this.isMyMessage(message.user._id) ? ['Delete', 'Copy Text', 'Cancel',] : ['Copy Text', 'Cancel'];
-      const cancelButtonIndex = options.length - 1;
+      let options = [getI18nText('拷贝'), getI18nText('取消')];
+      let copyIndex = 0;
+      let cancelButtonIndex = 1;
+      let deleteIndex = -1;
+      if (this.isMyMessage(message.user._id)) {
+        options.splice(1, 0, getI18nText('删除'));
+        copyIndex = 0;
+        deleteIndex = 1;
+        cancelButtonIndex = 2;
+      }
       context.actionSheet().showActionSheetWithOptions({
         options,
         cancelButtonIndex,
       },
         (buttonIndex) => {
           switch (buttonIndex) {
-            case 0:
-              Alert.alert('TODO', 'Call server API to remove message ' + message.createdAt);
-              break;
-            case 1:
+            case copyIndex:
               Clipboard.setString(message.text);
+              break;
+            case deleteIndex:
+              this.deleteMessage(message);
               break;
           }
         });
     }
   }
 
+  getIndex(message) {
+    const length = this.state.messages.length;
+    for (let i = 0; i < length; i++) {
+      if (message._id === this.state.messages[i]._id) {
+        return length - i;
+      }
+    }
+
+    return '#';
+  }
+
   render() {
+    if (this.state.loading) {
+      return (
+        <ActivityIndicator
+          style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}
+          size="large"
+          color={Colors.yellow} />);
+    }
+
     const windowWidth = Dimensions.get('window').width;
+    const iPhoneModel = Constants.platform.ios && Constants.platform.ios.model ? Constants.platform.ios.model : '';
+    const isIPhoneX = iPhoneModel.indexOf('X') !== -1 || iPhoneModel.indexOf('Simulator') !== -1;
     return (
       <View style={styles.container}>
         <Text style={[styles.dayTitle, { fontSize: getCurrentUser().getLessonFontSize() }]} selectable={true}>{this.questionText}</Text>
@@ -166,18 +228,14 @@ export default class HomileticsScreen extends React.Component {
             }
           </View>
         }
-        {
-          this.state.loading &&
-          <ActivityIndicator
-            style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}
-            size="large"
-            color={Colors.yellow} />
-        }
+        <View style={{ backgroundColor: '#bdc3c7', height: 1 }} />
         {
           !this.state.loading &&
           <GiftedChat
             messages={this.state.messages}
-            isAnimated={true}
+            isAnimated
+            showAvatarForEveryMessage={true}
+            showUserAvatar={true}
             onSend={(message) => this.chatServer.sendMessage(message)}
             text={this.state.text}
             onInputTextChanged={text => this.setText(text)}
@@ -186,7 +244,52 @@ export default class HomileticsScreen extends React.Component {
               _id: Platform.OS + ' ' + Constants['deviceId'],
               name: this.defaultUserName
             }}
+            renderBubble={props => {
+              return (
+                <Bubble
+                  {...props}
+                  textStyle={{
+                    right: {
+                      color: '#202020'
+                    }
+                  }}
+                  wrapperStyle={{
+                    left: {
+                      backgroundColor: '#eeeeee',
+                    },
+                    right: {
+                      backgroundColor: '#FFECB3',
+                    },
+                  }}
+                />
+              );
+            }}
+            renderAvatar={(e) => {
+              const id = this.getIndex(e.currentMessage);
+              return (
+                <View style={{
+                  width: 35, height: 35, borderRadius: 35, backgroundColor: '#cdcdcd',
+                  alignItems: 'center', justifyContent: 'center'
+                }}>
+                  <Text style={{ fontWeight: 'bold', fontSize: 18 }}>{id}</Text>
+                </View>
+              );
+            }}
+            renderActions={() => {
+              return (
+                <TouchableOpacity onPress={() => { shareAnswer(); }}>
+                  <Image
+                    style={{ width: 34, height: 34, margin: 5 }}
+                    source={require('../assets/images/Copy.png')} />
+                </TouchableOpacity>
+              );
+            }}
           />
+        }
+        {
+          // When keyboard is not shown on iPhoneX+, we show some space
+          isIPhoneX &&
+          <View style={{ height: 30 }} />
         }
         {
           Platform.OS == 'android' &&
@@ -202,7 +305,7 @@ const BibleQuote = (props) => {
     <View style={{ flexDirection: 'row' }}>
       <TouchableOpacity onPress={() => props.goToPassage(props.book, props.verse)}>
         <View style={styles.bibleQuote}>
-          <Text style={{ color: 'white' }} selectable={true}>{getI18nBibleBook(props.book)}{props.verse}</Text>
+          <Text style={{ color: 'white', fontSize: getCurrentUser().getLessonFontSize() - 2 }} selectable={true}>{getI18nBibleBook(props.book)}{props.verse}</Text>
         </View>
       </TouchableOpacity>
     </View>
@@ -212,10 +315,10 @@ const BibleQuote = (props) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    marginTop: -14,
     backgroundColor: '#FAFAFA'
   },
   dayTitle: {
+    marginTop: 3,
     marginHorizontal: 15,
     color: 'black',
     fontWeight: 'bold'
@@ -225,7 +328,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 6,
     justifyContent: 'center',
     alignItems: 'center',
-    height: 22,
     borderRadius: 11,
     backgroundColor: Colors.yellow,
   }

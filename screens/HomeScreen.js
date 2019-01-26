@@ -20,12 +20,13 @@ import Accordion from 'react-native-collapsible/Accordion';
 import { requestBooks, clearBooks } from "../store/books.js";
 import { clearLesson } from '../store/lessons.js'
 import { clearPassage } from '../store/passage.js'
-import { getI18nText } from '../store/I18n';
-import { getCurrentUser } from '../store/user';
+import { getI18nText } from '../utils/I18n';
+import { getCurrentUser } from '../utils/user';
 import { Models } from '../dataStorage/models';
-import { resetGlobalCache, pokeServer } from '../dataStorage/storage';
+import { resetGlobalCache } from '../dataStorage/storage';
 import Colors from '../constants/Colors.js';
 import { EventRegister } from 'react-native-event-listeners';
+import { checkAppUpdateInBackground } from '../utils/update';
 
 class HomeScreen extends React.Component {
   static navigationOptions = ({ navigation }) => {
@@ -33,7 +34,7 @@ class HomeScreen extends React.Component {
     return {
       title: getI18nText(title),
       headerRight: (
-        <View style={{ marginRight: 20, flexDirection: 'row' }}>
+        <View style={{ marginRight: 10, flexDirection: 'row' }}>
           <TouchableOpacity onPress={() => { checkForContentUpdate(true); }}>
             <Image
               style={{ width: 34, height: 34 }}
@@ -140,7 +141,7 @@ class HomeScreen extends React.Component {
   }
 
   goToLesson(lesson) {
-    pokeServer();
+    checkAppUpdateInBackground();
     let parsed = lesson.name.split(' ');
     this.props.navigation.navigate('Lesson', { lesson, title: parsed[1] });
   }
@@ -161,12 +162,13 @@ class HomeScreen extends React.Component {
   }
 
   goToAudio(lesson) {
-    this.props.navigation.navigate('SermonAudio', { id: lesson.id });
+    this.props.navigation.navigate('LectureMaterial', { id: lesson.id });
   }
 
   async onRefresh() {
+    await getCurrentUser().reloadPermissionAsync();
     await this.checkForContentUpdate(false);
-    await getCurrentUser().checkForUpdate(false);
+    this.setState({ onRefresh: !this.state.onRefresh });
   }
 
   render() {

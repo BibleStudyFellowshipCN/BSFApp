@@ -1,8 +1,7 @@
-import { AsyncStorage, Alert } from 'react-native';
+import { AsyncStorage } from 'react-native';
 import { Models } from '../dataStorage/models';
-import { callWebServiceAsync, showWebServiceCallErrorsAsync } from '../dataStorage/storage';
-import Expo, { Constants, FileSystem } from 'expo';
-import { getI18nText } from '../store/I18n';
+import { setUserInternal, callWebServiceAsync, showWebServiceCallErrorsAsync } from '../dataStorage/storage';
+import { FileSystem } from 'expo';
 
 let currentUser;
 
@@ -10,6 +9,7 @@ function getCurrentUser() {
   if (!currentUser) {
     console.log("new User");
     currentUser = new User();
+    setUserInternal(currentUser);
   }
 
   return currentUser;
@@ -56,6 +56,21 @@ export default class User {
   audioBook = 1 * 1000 + 1;
   fontSize = Models.DefaultFontSize;
   permissions = {};
+  validBibles = null;
+
+  isBibleVersionValid(version) {
+    if (!this.validBibles) {
+      this.validBibles = [];
+      for (let lang in Models.BibleVersions) {
+        const items = Models.BibleVersions[lang];
+        for (let i in items) {
+          this.validBibles.push(items[i].id);
+        }
+      }
+    }
+
+    return this.validBibles.indexOf(version) !== -1;
+  }
 
   async loadExistingUserAsync() {
     let existingUser = await loadUser();
@@ -64,10 +79,10 @@ export default class User {
       if (Models.ValidLanguages.indexOf(existingUser.language) != -1) {
         this.language = existingUser.language;
       }
-      if (Models.ValidBibleVersionsLanguages.indexOf(existingUser.bibleVersion) != -1) {
+      if (this.isBibleVersionValid(existingUser.bibleVersion)) {
         this.bibleVersion = existingUser.bibleVersion;
       }
-      if (Models.ValidBibleVersionsLanguages.indexOf(existingUser.bibleVersion2) != -1) {
+      if (this.isBibleVersionValid(existingUser.bibleVersion2)) {
         // we don't use the same version
         this.bibleVersion2 = existingUser.bibleVersion2 === existingUser.bibleVersion ? null : existingUser.bibleVersion2;
       }
@@ -102,6 +117,10 @@ export default class User {
     else {
       this.permissions = {};
     }
+  }
+
+  async reloadPermissionAsync() {
+    await this.loadUserPermissionsAsync(this.cellphone, showUI);
   }
 
   isLoggedOn() {
@@ -324,47 +343,6 @@ export default class User {
       value = value * 1000;
     }
     return value;
-  }
-
-  async checkForUpdate(showUI = true) {
-    // Check for user update
-    await this.loadUserPermissionsAsync(this.cellphone, showUI);
-
-    // Check for app update
-    /*if (!__DEV__) {
-      const { isAvailable } = await Expo.Updates.checkForUpdateAsync();
-      console.log('checkForUpdateAsync: ' + isAvailable);
-      if (isAvailable) {
-        const { isNew } = await Expo.Updates.fetchUpdateAsyn();
-        console.log('fetchUpdateAsyn: ' + isNew);
-      }
-    }*/
-
-    const { manifest } = Constants;
-    const result = await callWebServiceAsync('https://expo.io/@turbozv/CBSFApp/index.exp?sdkVersion=' + manifest.sdkVersion, '', 'GET');
-    let succeed;
-    if (showUI) {
-      succeed = await showWebServiceCallErrorsAsync(result, 200);
-    } else {
-      succeed = result && result.status == 200;
-    }
-    if (succeed) {
-      const clientVersion = this.getVersionNumber(manifest.version);
-      const serverVersion = this.getVersionNumber(result.body.version);
-      console.log('checkForUpdate:' + clientVersion + '-' + serverVersion);
-      // TODO: For some reason the partial updated app doesn't have sdkVersion, so we need to reload
-      if (clientVersion < serverVersion || manifest.sdkVersion.length < 6) {
-        Alert.alert(getI18nText('发现更新') + ': ' + result.body.version, getI18nText('程序将重新启动'), [
-          { text: 'OK', onPress: () => Expo.Updates.reload() },
-          { text: 'Later', onPress: () => { } },
-        ]);
-      } else if (showUI) {
-        Alert.alert(getI18nText('您已经在使用最新版本'), getI18nText('版本') + ': ' + manifest.version + ' (SDK' + manifest.sdkVersion + ')', [
-          { text: 'Reload', onPress: () => { Expo.Updates.reload() } },
-          { text: 'OK', onPress: () => { } },
-        ]);
-      }
-    }
   }
 
   logUserInfo() {

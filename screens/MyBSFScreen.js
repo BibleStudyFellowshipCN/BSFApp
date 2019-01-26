@@ -1,11 +1,12 @@
 import React from 'react';
-import { getI18nText } from '../store/I18n';
+import { getI18nText } from '../utils/I18n';
 import { WebView, View, ActivityIndicator, Dimensions, TouchableOpacity, Image } from 'react-native';
 import Colors from '../constants/Colors';
 import { EventRegister } from 'react-native-event-listeners';
 import { NavigationActions } from 'react-navigation';
 
 function goback() { }
+function refreshWebView() { }
 
 export default class MyBSFScreen extends React.Component {
   static navigationOptions = ({ navigation }) => {
@@ -13,7 +14,7 @@ export default class MyBSFScreen extends React.Component {
     return {
       title: getI18nText('MyBSF.org'),
       headerLeft: (
-        <View style={{ marginHorizontal: 20, flexDirection: 'row' }}>
+        <View style={{ marginLeft: 10, flexDirection: 'row' }}>
           {
             canGoBack &&
             <TouchableOpacity onPress={() => { goback(); }}>
@@ -22,6 +23,14 @@ export default class MyBSFScreen extends React.Component {
                 source={require('../assets/images/GoBack.png')} />
             </TouchableOpacity>
           }
+        </View>),
+      headerRight: (
+        <View style={{ marginRight: 10, flexDirection: 'row' }}>
+          <TouchableOpacity onPress={() => { refreshWebView(); }}>
+            <Image
+              style={{ width: 34, height: 34 }}
+              source={require('../assets/images/BsfHome.png')} />
+          </TouchableOpacity>
         </View>)
     };
   };
@@ -30,12 +39,17 @@ export default class MyBSFScreen extends React.Component {
     loading: true,
     canGoBack: false,
     windowWidth: Dimensions.get('window').width,
+    key: 1,
+    isWebViewUrlChanged: false
   };
 
   constructor(props) {
     super(props);
 
+    this.webUrl = 'https://www.mybsf.org';
+
     goback = this.goback.bind(this);
+    refreshWebView = this.refreshWebView.bind(this);
   }
 
   componentWillMount() {
@@ -54,12 +68,18 @@ export default class MyBSFScreen extends React.Component {
     }
   }
 
+  refreshWebView() {
+    this.setState({ key: this.state.key + 1 });
+  }
+
   render() {
     return (
       <View style={{ flex: 1 }}>
         <WebView
+          style={{ flex: 1 }}
+          key={this.state.key}
           ref={ref => this.browser = ref}
-          source={{ uri: 'https://www.mybsf.org' }}
+          source={{ uri: this.webUrl }}
           onLoadEnd={() => {
             this.setState({ loading: false })
           }}
@@ -68,8 +88,8 @@ export default class MyBSFScreen extends React.Component {
           }}
           onNavigationStateChange={(navState) => {
             const canGoBack = navState.canGoBack && !navState.loading;
-            console.log({ navState, canGoBack });
-            this.setState({ canGoBack });
+            const isWebViewUrlChanged = (navState.url !== this.webUrl);
+            this.setState({ canGoBack, isWebViewUrlChanged });
             const setParamsAction = NavigationActions.setParams({
               params: { canGoBack },
               key: 'MyBSFScreen',

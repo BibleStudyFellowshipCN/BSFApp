@@ -5,7 +5,7 @@
     "slug": "CBSFApp",
     "privacy": "public",
     "sdkVersion": "32.0.0",
-    "version": "2019.1.12",
+    "version": "2019.1.23",
     "primaryColor": "#cccccc",
     "icon": "./assets/images/icon.png",
     "splash": {
@@ -15,25 +15,27 @@
     },
     "updates": {
       "enabled": true,
-      "checkAutomatically": "ON_ERROR_RECOVERY",
-      "fallbackToCacheTimeout": 0
+      "checkAutomatically": "ON_LOAD",
+      "fallbackToCacheTimeout": 20000
     },
     "assetBundlePatterns": [
       "**/*"
     ],
     "ios": {
       "icon": "./assets/images/icon.png",
-      "buildNumber": "3",
+      "appStoreUrl": "https://itunes.apple.com/us/app/cbsf/id1229869018?mt=8",
+      "buildNumber": "2",
       "bundleIdentifier": "org.CBSF.bsfclass",
       "supportsTablet": true
     },
     "android": {
       "icon": "./assets/images/icon-android.png",
+      "playStoreUrl": "https://play.google.com/store/apps/details?id=org.cbsfappv1.bsfclass",
       "package": "org.cbsfappv1.bsfclass",
       "permissions": [
         "WAKE_LOCK"
       ],
-      "versionCode": 27
+      "versionCode": 30
     }
   }
 }

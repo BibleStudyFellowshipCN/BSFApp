@@ -1,6 +1,6 @@
 import { Models } from '../dataStorage/models';
 import { getPassageAsync } from '../dataStorage/storage';
-import { getCurrentUser } from '../store/user';
+import { getCurrentUser } from '../utils/user';
 
 // ------------------------------------
 // Constants
