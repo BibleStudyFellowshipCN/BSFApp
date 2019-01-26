@@ -1,7 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux'
 import { ScrollView, StyleSheet, View, Alert, KeyboardAvoidingView } from 'react-native';
-import { Constants, StoreReview, Updates } from 'expo';
+import { Constants, StoreReview, Updates, FileSystem } from 'expo';
 import { Models } from '../dataStorage/models';
 import { getCurrentUser } from '../utils/user';
 import { requestBooks, clearBooks } from "../store/books.js";

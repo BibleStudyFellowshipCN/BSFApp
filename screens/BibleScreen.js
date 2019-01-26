@@ -129,15 +129,11 @@ import { getI18nText } from '../utils/I18n';
   }
 
   render() {
-    const bible = getCurrentUser().getBibleVersion();
-    const bible2 = getCurrentUser().getBibleVersion2();
     const fontSize = getCurrentUser().getBibleFontSize();
     const verses = this.props.passage;
     let contentUI;
-    // Using text (some Android device cannot show CJK in WebView)
-    if (Platform.OS == 'android' &&
-      (bible == 'rcuvss' || bible == 'ccb' || bible == 'rcuvts' || bible == 'cnvt' ||
-        bible2 == 'rcuvss' || bible2 == 'ccb' || bible2 == 'rcuvts' || bible2 == 'cnvt')) {
+    // Using text (some Android device cannot show CJK or even UTF8 in WebView)
+    if (Platform.OS == 'android') {
       let line = '';
       for (var i in verses) {
         const verse = verses[i];
@@ -155,8 +151,7 @@ import { getI18nText } from '../utils/I18n';
           </ScrollView>
         </View>
       );
-    }
-    else {
+    } else {
       // For some reason, Android cannot show html with 'tr:nth-child(even)' css...
       const moreStyle = Platform.OS === 'ios' ? 'tr:nth-child(even) { background: #EEEEEE }' : '';
       // Using html
