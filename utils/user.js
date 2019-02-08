@@ -120,7 +120,7 @@ export default class User {
   }
 
   async reloadPermissionAsync() {
-    await this.loadUserPermissionsAsync(this.cellphone, showUI);
+    await this.loadUserPermissionsAsync(this.cellphone);
   }
 
   isLoggedOn() {
