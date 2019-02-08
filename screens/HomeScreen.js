@@ -26,7 +26,6 @@ import { Models } from '../dataStorage/models';
 import { resetGlobalCache } from '../dataStorage/storage';
 import Colors from '../constants/Colors.js';
 import { EventRegister } from 'react-native-event-listeners';
-import { checkAppUpdateInBackground } from '../utils/update';
 
 class HomeScreen extends React.Component {
   static navigationOptions = ({ navigation }) => {
@@ -87,6 +86,9 @@ class HomeScreen extends React.Component {
       return;
     }
 
+    await getCurrentUser().reloadPermissionAsync();
+    this.setState({ onRefresh: !this.state.onRefresh });
+
     this.lastCheckForContentUpdateDate = (new Date()).getDate();
     try {
       const { localVersion, remoteVersion, localVersionString, remoteVersionString } = await getCurrentUser().getContentVersions(showUI);
@@ -141,7 +143,6 @@ class HomeScreen extends React.Component {
   }
 
   goToLesson(lesson) {
-    checkAppUpdateInBackground();
     let parsed = lesson.name.split(' ');
     this.props.navigation.navigate('Lesson', { lesson, title: parsed[1] });
   }
@@ -166,9 +167,7 @@ class HomeScreen extends React.Component {
   }
 
   async onRefresh() {
-    await getCurrentUser().reloadPermissionAsync();
     await this.checkForContentUpdate(false);
-    this.setState({ onRefresh: !this.state.onRefresh });
   }
 
   render() {

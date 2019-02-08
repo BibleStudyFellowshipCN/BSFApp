@@ -13,7 +13,6 @@ import { connectActionSheet } from '@expo/react-native-action-sheet';
 import { NavigationActions } from 'react-navigation';
 import { FontAwesome, MaterialIcons, MaterialCommunityIcons } from '@expo/vector-icons';
 import Colors from '../constants/Colors';
-import { checkAppUpdateInBackground } from '../utils/update';
 
 @connectActionSheet class SettingsScreen extends React.Component {
   static navigationOptions = ({ navigation }) => {
@@ -248,8 +247,6 @@ import { checkAppUpdateInBackground } from '../utils/update';
         { text: 'Ok', onPress: () => { } }
       ]);
     }
-
-    checkAppUpdateInBackground(true);
   }
 
   render() {
