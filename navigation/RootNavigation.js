@@ -18,6 +18,7 @@ import NotesScreen from '../screens/NotesScreen';
 import AnswerManageScreen from '../screens/AnswerManageScreen';
 import BibleSelectScreen from '../screens/BibleSelectScreen';
 import DiscussionScreen from '../screens/DiscussionScreen';
+import AboutScreen from '../screens/AboutScreen';
 //////////////
 // added by Frank on Dec 18, 2018
 import MyBSFScreen from '../screens/MyBSFScreen';
@@ -78,6 +79,9 @@ const RootStackNavigator = StackNavigator(
     },
     Discussion: {
       screen: DiscussionScreen
+    },
+    About: {
+      screen: AboutScreen
     }
   },
   {

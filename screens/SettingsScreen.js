@@ -1,7 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux'
 import { ScrollView, StyleSheet, View, Alert, KeyboardAvoidingView } from 'react-native';
-import { Constants, StoreReview, Updates, FileSystem } from 'expo';
+import { Constants, StoreReview, FileSystem } from 'expo';
 import { Models } from '../dataStorage/models';
 import { getCurrentUser } from '../utils/user';
 import { requestBooks, clearBooks } from "../store/books.js";
@@ -194,10 +194,6 @@ import Colors from '../constants/Colors';
     this.props.navigation.navigate('AttendanceHome');
   }
 
-  async onAudio() {
-    this.props.navigation.navigate('LectureMaterial', { user: this.state.user });
-  }
-
   async onAnswerManage() {
     this.props.navigation.navigate('AnswerManage');
   }
@@ -225,40 +221,10 @@ import Colors from '../constants/Colors';
     }
   }
 
-  async onVersion() {
-    const { manifest, platform } = Constants;
-    let message = `*Base: ${manifest.version} (SDK${manifest.sdkVersion})`;
-    if (manifest.publishedTime) {
-      message += `\n\n*PublishedTime: ${manifest.publishedTime}`;
-    }
-    if (platform.ios) {
-      message += `\n\n*Model: ${platform.ios.model} (iOS: ${platform.ios.systemVersion})`;
-    }
-
-    console.log({
-      isSupported: StoreReview.isSupported(),
-      hasAction: StoreReview.hasAction(),
-      url: StoreReview.storeUrl()
-    });
-    if (StoreReview.isSupported() && !StoreReview.hasAction()) {
-      Alert.alert(getI18nText('版本'), message, [
-        { text: 'Review', onPress: () => { StoreReview.requestReview() } },
-        { text: 'Ok', onPress: () => { } }
-      ]);
-    } else {
-      Alert.alert(getI18nText('版本'), message, [
-        { text: 'Reload', onPress: () => { Updates.reload() } },
-        { text: 'Ok', onPress: () => { } }
-      ]);
-    }
-  }
-
   render() {
-    const { manifest } = Constants;
     phone = getCurrentUser().getCellphone();
     const fontSize = getCurrentUser().getSettingFontSize();
-    const version = manifest.publishedTime ? `${manifest.publishedTime.split('T')[0].replace(/-/g, '.')} (SDK${manifest.sdkVersion})` :
-      `${manifest.version} (SDK${manifest.sdkVersion})`;
+    const showReview = StoreReview.isSupported() && !StoreReview.hasAction();
     return (
       <KeyboardAvoidingView style={styles.container} behavior='padding' keyboardVerticalOffset={0} >
         <ScrollView
@@ -346,21 +312,6 @@ import Colors from '../constants/Colors';
                   onPress={this.onAttendanceHome.bind(this)}
                 />
               }
-              {
-                this.state.user.audio &&
-                <SettingsList.Item
-                  icon={
-                    <View style={{ marginTop: 3, left: 7 }} >
-                      <FontAwesome color={Colors.yellow} size={30} name='play-circle-o' />
-                    </View>
-                  }
-                  title={getI18nText('课程资料')}
-                  hasNavArrow={true}
-                  titleStyle={{ fontSize }}
-                  titleInfoStyle={{ fontSize }}
-                  onPress={this.onAudio.bind(this)}
-                />
-              }
               <SettingsList.Item
                 icon={
                   <View style={{ marginTop: 3, left: 7 }} >
@@ -384,19 +335,6 @@ import Colors from '../constants/Colors';
                 titleStyle={{ fontSize }}
                 titleInfoStyle={{ fontSize }}
                 onPress={this.onClearDownloadFiles.bind(this)}
-              />
-              <SettingsList.Header headerText='MBSF - Mobile Bible Study Fellowship' headerStyle={{ color: 'black', marginTop: 15 }} />
-              <SettingsList.Item
-                icon={
-                  <View style={{ marginTop: 3, left: 7 }} >
-                    <MaterialCommunityIcons color={Colors.yellow} size={28} name='fish' />
-                  </View>
-                }
-                title={getI18nText('版本') + ': ' + version}
-                titleStyle={{ fontSize }}
-                titleInfoStyle={{ fontSize }}
-                hasNavArrow={true}
-                onPress={this.onVersion.bind(this)}
               />
               <SettingsList.Item
                 icon={
@@ -427,6 +365,32 @@ import Colors from '../constants/Colors';
                   }}
                 />
               }
+              {showReview &&
+                <SettingsList.Item
+                  icon={
+                    <View style={{ marginTop: 3, left: 7 }} >
+                      <MaterialIcons color={Colors.yellow} size={28} name='rate-review' />
+                    </View>
+                  }
+                  title={getI18nText('评论')}
+                  titleStyle={{ fontSize }}
+                  titleInfoStyle={{ fontSize }}
+                  hasNavArrow={true}
+                  onPress={() => StoreReview.requestReview()}
+                />
+              }
+              <SettingsList.Item
+                icon={
+                  <View style={{ marginTop: 3, left: 7 }} >
+                    <MaterialCommunityIcons color={Colors.yellow} size={28} name='fish' />
+                  </View>
+                }
+                title={getI18nText('关于CBSF')}
+                titleStyle={{ fontSize }}
+                titleInfoStyle={{ fontSize }}
+                hasNavArrow={true}
+                onPress={() => this.props.navigation.navigate('About')}
+              />
             </SettingsList>
           </View>
         </ScrollView>
