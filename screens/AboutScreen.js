@@ -62,7 +62,8 @@ export default class AboutScreen extends React.Component {
           borderRadius: 10,
           alignItems: 'center'
         }}>
-          <Text style={{ fontSize: 18, marginHorizontal: 20, marginVertical: 10, fontWeight: 'bold' }}>{`${getI18nText('版本')}: ${version}`}</Text>
+          <Text style={{ fontSize: 18, marginHorizontal: 20, marginTop: 10, fontWeight: 'bold' }}>{getI18nText('版本')}</Text>
+          <Text style={{ fontSize: 18, marginHorizontal: 20, fontWeight: 'bold' }}>{version}</Text>
           <Button
             icon={{ name: "refresh", size: 20, color: "white" }}
             title="Reload"
