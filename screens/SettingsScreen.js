@@ -1,6 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux'
-import { ScrollView, StyleSheet, View, Alert, KeyboardAvoidingView } from 'react-native';
+import { ScrollView, StyleSheet, View, Alert, Image } from 'react-native';
 import { Constants, StoreReview, FileSystem } from 'expo';
 import { Models } from '../dataStorage/models';
 import { getCurrentUser } from '../utils/user';
@@ -226,175 +226,176 @@ import Colors from '../constants/Colors';
     const fontSize = getCurrentUser().getSettingFontSize();
     const showReview = StoreReview.isSupported() && !StoreReview.hasAction();
     return (
-      <KeyboardAvoidingView style={styles.container} behavior='padding' keyboardVerticalOffset={0} >
-        <ScrollView
-          style={{ backgroundColor: 'white' }}
-          ref={ref => this.scrollView = ref}>
-          <View style={{ backgroundColor: 'white' }}>
-            <SettingsList borderColor='#c8c7cc' defaultItemSize={40}>
-              <SettingsList.Header headerText={getI18nText('设置')} headerStyle={{ color: 'black' }} />
-              <SettingsList.Item
-                icon={
-                  <View style={{ marginTop: 3, left: 7 }} >
-                    <MaterialIcons color={Colors.yellow} size={28} name='language' />
-                  </View>
-                }
-                title={getI18nText('显示语言')}
-                titleInfo={this.state.language}
-                titleStyle={{ fontSize }}
-                titleInfoStyle={{ fontSize }}
-                onPress={this.onLanguage.bind(this)}
-              />
-              <SettingsList.Item
-                icon={
-                  <View style={{ marginTop: 3, left: 7 }} >
-                    <MaterialCommunityIcons color={Colors.yellow} size={28} name='book-multiple' />
-                  </View>
-                }
-                title={getI18nText('圣经版本')}
-                titleInfo={this.state.bibleVersion.length > 23 ? this.state.bibleVersion.substr(0, 23) + '...' : this.state.bibleVersion}
-                titleStyle={{ fontSize }}
-                titleInfoStyle={{ fontSize }}
-                onPress={this.onBibleVerse.bind(this)}
-              />
-              <SettingsList.Item
-                icon={
-                  <View style={{ marginTop: 3, left: 7 }} >
-                    <FontAwesome color={Colors.yellow} size={28} name='font' />
-                  </View>
-                }
-                title={getI18nText('字体大小')}
-                titleInfo={this.getFontText()}
-                titleStyle={{ fontSize }}
-                titleInfoStyle={{ fontSize }}
-                onPress={this.onFontSize.bind(this)}
-              />
-              <SettingsList.Item
-                icon={
-                  <View style={{ marginTop: 3, left: 7 }} >
-                    <MaterialCommunityIcons color={Colors.yellow} size={28} name='cellphone-iphone' />
-                  </View>
-                }
-                title={getI18nText('手机号码')}
-                titleInfo={getI18nText(phone == '' ? '设置' : '更改')}
-                hasNavArrow={true}
-                titleStyle={{ fontSize }}
-                titleInfoStyle={{ fontSize }}
-                onPress={this.onSetPhoneNumber.bind(this)}
-              />
-              {
-                this.state.user.isGroupLeader &&
-                <SettingsList.Item
-                  icon={
-                    <View style={{ marginTop: 3, left: 7 }} >
-                      <MaterialCommunityIcons color={Colors.yellow} size={28} name='format-list-checks' />
-                    </View>
-                  }
-                  title={getI18nText('考勤表')}
-                  hasNavArrow={true}
-                  titleStyle={{ fontSize }}
-                  titleInfoStyle={{ fontSize }}
-                  onPress={this.onAttendance.bind(this)}
-                />
+      <ScrollView
+        style={{ backgroundColor: 'white' }}
+        ref={ref => this.scrollView = ref}>
+        <View style={{ backgroundColor: 'white' }}>
+          <SettingsList borderColor='#c8c7cc' defaultItemSize={40}>
+            <SettingsList.Header headerText={getI18nText('设置')} headerStyle={{ color: 'black' }} />
+            <SettingsList.Item
+              icon={
+                <View style={{ marginTop: 3, left: 7 }} >
+                  <MaterialIcons color={Colors.yellow} size={28} name='language' />
+                </View>
               }
-              {
-                this.state.user.isGroupLeader &&
-                <SettingsList.Item
-                  icon={
-                    <View style={{ marginTop: 3, left: 7 }} >
-                      <MaterialCommunityIcons color={Colors.yellow} size={28} name='format-list-checks' />
-                    </View>
-                  }
-                  title={getI18nText('考勤表') + '(Test)'}
-                  hasNavArrow={true}
-                  titleStyle={{ fontSize }}
-                  titleInfoStyle={{ fontSize }}
-                  onPress={this.onAttendanceHome.bind(this)}
-                />
+              title={getI18nText('显示语言')}
+              titleInfo={this.state.language}
+              titleStyle={{ fontSize }}
+              titleInfoStyle={{ fontSize }}
+              onPress={this.onLanguage.bind(this)}
+            />
+            <SettingsList.Item
+              icon={
+                <View style={{ marginTop: 3, left: 7 }} >
+                  <MaterialCommunityIcons color={Colors.yellow} size={28} name='book-multiple' />
+                </View>
               }
-              <SettingsList.Item
-                icon={
-                  <View style={{ marginTop: 3, left: 7 }} >
-                    <MaterialIcons color={Colors.yellow} size={25} name='devices' />
-                  </View>
-                }
-                title={getI18nText('答案管理')}
-                hasNavArrow={true}
-                titleStyle={{ fontSize }}
-                titleInfoStyle={{ fontSize }}
-                onPress={this.onAnswerManage.bind(this)}
-              />
-              <SettingsList.Item
-                icon={
-                  <View style={{ marginTop: 3, left: 7 }} >
-                    <FontAwesome color={Colors.yellow} size={28} name='trash' />
-                  </View>
-                }
-                title={getI18nText('清空下载文件')}
-                hasNavArrow={true}
-                titleStyle={{ fontSize }}
-                titleInfoStyle={{ fontSize }}
-                onPress={this.onClearDownloadFiles.bind(this)}
-              />
-              <SettingsList.Item
-                icon={
-                  <View style={{ marginTop: 3, left: 7 }} >
-                    <MaterialIcons color={Colors.yellow} size={28} name='feedback' />
-                  </View>
-                }
-                title={getI18nText('反馈意见')}
-                hasNavArrow={true}
-                titleStyle={{ fontSize }}
-                titleInfoStyle={{ fontSize }}
-                onPress={this.onFeedback.bind(this)}
-              />
-              {
-                this.state.user.chat &&
-                <SettingsList.Item
-                  icon={
-                    <View style={{ marginTop: 3, left: 7 }} >
-                      <FontAwesome color={Colors.yellow} size={24} name='wechat' />
-                    </View>
-                  }
-                  title={getI18nText('聊天室')}
-                  hasNavArrow={true}
-                  titleStyle={{ fontSize }}
-                  titleInfoStyle={{ fontSize }}
-                  onPress={() => {
-                    this.props.navigation.navigate('GlobalChat', { title: getI18nText('聊天室') });
-                  }}
-                />
+              title={getI18nText('圣经版本')}
+              titleInfo={this.state.bibleVersion.length > 23 ? this.state.bibleVersion.substr(0, 23) + '...' : this.state.bibleVersion}
+              titleStyle={{ fontSize }}
+              titleInfoStyle={{ fontSize }}
+              onPress={this.onBibleVerse.bind(this)}
+            />
+            <SettingsList.Item
+              icon={
+                <View style={{ marginTop: 3, left: 7 }} >
+                  <FontAwesome color={Colors.yellow} size={28} name='font' />
+                </View>
               }
-              {showReview &&
-                <SettingsList.Item
-                  icon={
-                    <View style={{ marginTop: 3, left: 7 }} >
-                      <MaterialIcons color={Colors.yellow} size={28} name='rate-review' />
-                    </View>
-                  }
-                  title={getI18nText('评论')}
-                  titleStyle={{ fontSize }}
-                  titleInfoStyle={{ fontSize }}
-                  hasNavArrow={true}
-                  onPress={() => StoreReview.requestReview()}
-                />
+              title={getI18nText('字体大小')}
+              titleInfo={this.getFontText()}
+              titleStyle={{ fontSize }}
+              titleInfoStyle={{ fontSize }}
+              onPress={this.onFontSize.bind(this)}
+            />
+            <SettingsList.Item
+              icon={
+                <View style={{ marginTop: 3, left: 7 }} >
+                  <MaterialCommunityIcons color={Colors.yellow} size={28} name='cellphone-iphone' />
+                </View>
               }
+              title={getI18nText('手机号码')}
+              titleInfo={getI18nText(phone == '' ? '设置' : '更改')}
+              hasNavArrow={true}
+              titleStyle={{ fontSize }}
+              titleInfoStyle={{ fontSize }}
+              onPress={this.onSetPhoneNumber.bind(this)}
+            />
+            {
+              this.state.user.isGroupLeader &&
               <SettingsList.Item
                 icon={
                   <View style={{ marginTop: 3, left: 7 }} >
-                    <MaterialCommunityIcons color={Colors.yellow} size={28} name='fish' />
+                    <MaterialCommunityIcons color={Colors.yellow} size={28} name='format-list-checks' />
                   </View>
                 }
-                title={getI18nText('关于CBSF')}
+                title={getI18nText('考勤表')}
+                hasNavArrow={true}
+                titleStyle={{ fontSize }}
+                titleInfoStyle={{ fontSize }}
+                onPress={this.onAttendance.bind(this)}
+              />
+            }
+            {
+              this.state.user.isGroupLeader &&
+              <SettingsList.Item
+                icon={
+                  <View style={{ marginTop: 3, left: 7 }} >
+                    <MaterialCommunityIcons color={Colors.yellow} size={28} name='format-list-checks' />
+                  </View>
+                }
+                title={getI18nText('考勤表') + '(Test)'}
+                hasNavArrow={true}
+                titleStyle={{ fontSize }}
+                titleInfoStyle={{ fontSize }}
+                onPress={this.onAttendanceHome.bind(this)}
+              />
+            }
+            <SettingsList.Item
+              icon={
+                <View style={{ marginTop: 3, left: 7 }} >
+                  <MaterialIcons color={Colors.yellow} size={25} name='devices' />
+                </View>
+              }
+              title={getI18nText('答案管理')}
+              hasNavArrow={true}
+              titleStyle={{ fontSize }}
+              titleInfoStyle={{ fontSize }}
+              onPress={this.onAnswerManage.bind(this)}
+            />
+            <SettingsList.Item
+              icon={
+                <View style={{ marginTop: 3, left: 7 }} >
+                  <FontAwesome color={Colors.yellow} size={28} name='trash' />
+                </View>
+              }
+              title={getI18nText('清空下载文件')}
+              hasNavArrow={true}
+              titleStyle={{ fontSize }}
+              titleInfoStyle={{ fontSize }}
+              onPress={this.onClearDownloadFiles.bind(this)}
+            />
+            <SettingsList.Item
+              icon={
+                <View style={{ marginTop: 3, left: 7 }} >
+                  <MaterialIcons color={Colors.yellow} size={28} name='feedback' />
+                </View>
+              }
+              title={getI18nText('反馈意见')}
+              hasNavArrow={true}
+              titleStyle={{ fontSize }}
+              titleInfoStyle={{ fontSize }}
+              onPress={this.onFeedback.bind(this)}
+            />
+            {
+              this.state.user.chat &&
+              <SettingsList.Item
+                icon={
+                  <View style={{ marginTop: 3, left: 7 }} >
+                    <FontAwesome color={Colors.yellow} size={24} name='wechat' />
+                  </View>
+                }
+                title={getI18nText('聊天室')}
+                hasNavArrow={true}
+                titleStyle={{ fontSize }}
+                titleInfoStyle={{ fontSize }}
+                onPress={() => {
+                  this.props.navigation.navigate('GlobalChat', { title: getI18nText('聊天室') });
+                }}
+              />
+            }
+            {
+              showReview &&
+              <SettingsList.Item
+                icon={
+                  <View style={{ marginTop: 3, left: 7 }} >
+                    <MaterialIcons color={Colors.yellow} size={28} name='rate-review' />
+                  </View>
+                }
+                title={getI18nText('评论')}
                 titleStyle={{ fontSize }}
                 titleInfoStyle={{ fontSize }}
                 hasNavArrow={true}
-                onPress={() => this.props.navigation.navigate('About')}
+                onPress={() => StoreReview.requestReview()}
               />
-            </SettingsList>
-          </View>
-        </ScrollView>
-      </KeyboardAvoidingView>
+            }
+            <SettingsList.Item
+              icon={
+                <View style={{ marginTop: 3, left: 7 }} >
+                  <Image
+                    style={{ width: 30, height: 30 }}
+                    source={require('../assets/images/icon-android.png')} />
+                </View>
+              }
+              title={getI18nText('关于CBSF')}
+              titleStyle={{ fontSize }}
+              titleInfoStyle={{ fontSize }}
+              hasNavArrow={true}
+              onPress={() => this.props.navigation.navigate('About')}
+            />
+          </SettingsList>
+        </View>
+      </ScrollView>
     );
   }
 }
