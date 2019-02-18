@@ -67,7 +67,7 @@ export default class AboutScreen extends React.Component {
           <Button
             icon={{ name: "refresh", size: 20, color: "white" }}
             title="Reload"
-            buttonStyle={{ backgroundColor: Colors.yellow, margin: 10 }}
+            buttonStyle={{ backgroundColor: Colors.yellow, margin: 10, borderRadius: 30, paddingLeft: 10, paddingRight: 20 }}
             onPress={() => Updates.reload()}
           />
         </View>
