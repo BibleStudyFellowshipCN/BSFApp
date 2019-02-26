@@ -186,10 +186,6 @@ import Colors from '../constants/Colors';
     this.reload();
   }
 
-  onAttendance() {
-    this.props.navigation.navigate('Attendance');
-  }
-
   onAttendanceHome() {
     this.props.navigation.navigate('AttendanceHome');
   }
@@ -290,21 +286,6 @@ import Colors from '../constants/Colors';
                   </View>
                 }
                 title={getI18nText('考勤表')}
-                hasNavArrow={true}
-                titleStyle={{ fontSize }}
-                titleInfoStyle={{ fontSize }}
-                onPress={this.onAttendance.bind(this)}
-              />
-            }
-            {
-              this.state.user.isGroupLeader &&
-              <SettingsList.Item
-                icon={
-                  <View style={{ marginTop: 3, left: 7 }} >
-                    <MaterialCommunityIcons color={Colors.yellow} size={28} name='format-list-checks' />
-                  </View>
-                }
-                title={getI18nText('考勤表') + '(Test)'}
                 hasNavArrow={true}
                 titleStyle={{ fontSize }}
                 titleInfoStyle={{ fontSize }}

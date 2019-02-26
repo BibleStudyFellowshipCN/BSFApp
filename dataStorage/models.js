@@ -30,11 +30,6 @@ export const Models = {
     restUri: HostServer + "/logon",
     userKey: '@BsfApp:user'
   },
-  Attendance: {
-    key: "Attendance",
-    api: "/attendance",
-    restUri: HostServer + "/attendanceV2"
-  },
   User: {
     key: "User",
     api: "/user",

@@ -5,7 +5,6 @@ import MainTabNavigator from './MainTabNavigator';
 import LessonScreen from '../screens/LessonScreen';
 import BibleScreen from '../screens/BibleScreen';
 import SetPhoneScreen from '../screens/SetPhoneScreen';
-import AttendanceScreen from '../screens/AttendanceScreen';
 import AttendanceHomeScreen from '../screens/AttendanceHomeScreen';
 import AttendanceGroupScreen from '../screens/AttendanceGroupScreen';
 import AttendanceLessonScreen from '../screens/AttendanceLessonScreen';
@@ -37,9 +36,6 @@ const RootStackNavigator = StackNavigator(
     },
     SetPhone: {
       screen: SetPhoneScreen
-    },
-    Attendance: {
-      screen: AttendanceScreen
     },
     AttendanceHome: {
       screen: AttendanceHomeScreen
