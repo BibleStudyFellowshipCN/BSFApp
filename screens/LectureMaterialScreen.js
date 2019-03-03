@@ -115,7 +115,7 @@ class SermonAudioSection extends React.Component {
     const result = await callWebServiceAsync(`${Models.HostServer}/downloadToken/${getCurrentUser().getCellphone()}/${this.props.lesson}/${this.props.type}`, '', 'GET');
     const succeed = await showWebServiceCallErrorsAsync(result, 200);
     if (succeed && result.body.token) {
-      Linking.openURL(`http://mycbsf.org:3000/download/${result.body.token}`);
+      Linking.openURL(`${Models.HostServer}/download/${result.body.token}`);
     }
   }
 
@@ -126,13 +126,13 @@ class SermonAudioSection extends React.Component {
     let audioUrl;
     switch (this.props.type) {
       case '1':
-        audioUrl = `http://mycbsf.org:3000/audio/${cellphone}?lesson=${this.props.lesson}&playNotes=1`;
+        audioUrl = `${Models.HostServer}/audio/${cellphone}?lesson=${this.props.lesson}&playNotes=1`;
         break;
       case '2':
-        audioUrl = `http://mycbsf.org:3000/audio/${cellphone}?lesson=${this.props.lesson}&playSeminar=1`;
+        audioUrl = `${Models.HostServer}/audio/${cellphone}?lesson=${this.props.lesson}&playSeminar=1`;
         break;
       default:
-        audioUrl = `http://mycbsf.org:3000/audio/${cellphone}?lesson=${this.props.lesson}&play=1`;
+        audioUrl = `${Models.HostServer}/audio/${cellphone}?lesson=${this.props.lesson}&play=1`;
         break;
     }
     return (
