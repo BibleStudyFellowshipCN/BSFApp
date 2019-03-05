@@ -17,14 +17,14 @@ import {
   Image
 } from 'react-native';
 import Accordion from 'react-native-collapsible/Accordion';
-import { requestBooks, clearBooks } from "../store/books.js";
-import { clearLesson } from '../store/lessons.js'
-import { clearPassage } from '../store/passage.js'
+import { requestBooks, clearBooks } from "../store/books";
+import { clearLesson } from '../store/lessons';
+import { clearPassage } from '../store/passage';
 import { getI18nText } from '../utils/I18n';
 import { getCurrentUser } from '../utils/user';
 import { Models } from '../dataStorage/models';
 import { resetGlobalCache } from '../dataStorage/storage';
-import Colors from '../constants/Colors.js';
+import Colors from '../constants/Colors';
 import { EventRegister } from 'react-native-event-listeners';
 
 class HomeScreen extends React.Component {
@@ -34,7 +34,7 @@ class HomeScreen extends React.Component {
       title: getI18nText(title),
       headerRight: (
         <View style={{ marginRight: 10, flexDirection: 'row' }}>
-          <TouchableOpacity onPress={() => { checkForContentUpdate(true); }}>
+          <TouchableOpacity onPress={() => { checkForContentUpdate() }}>
             <Image
               style={{ width: 34, height: 34 }}
               source={require('../assets/images/Download.png')} />
@@ -65,11 +65,11 @@ class HomeScreen extends React.Component {
       this.setState({ windowWidth: window.width, windowHeight: window.height });
     });
 
-    checkForContentUpdate = this.checkForContentUpdate.bind(this);
+    checkForContentUpdate = () => this.checkForContentUpdate(true);
   }
 
   componentWillUnmount() {
-    EventRegister.removeEventListener(this.listener)
+    EventRegister.removeEventListener(this.listener);
   }
 
   downloadCallback(downloadProgress) {

@@ -196,6 +196,8 @@ import Colors from '../constants/Colors';
 
   async onClearDownloadFiles() {
     try {
+      await getCurrentUser().resetDiscussionReadAsync();
+
       let freeSize = 0;
       const files = await FileSystem.readDirectoryAsync(FileSystem.documentDirectory);
       for (let i in files) {

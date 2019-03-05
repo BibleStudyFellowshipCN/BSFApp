@@ -20,6 +20,7 @@ import ExportAnswer from '../components/ExportAnswer.js';
 import Colors from '../constants/Colors'
 import { getI18nText, getI18nBibleBook } from '../utils/I18n';
 import { getCurrentUser } from '../utils/user';
+import { EventRegister } from 'react-native-event-listeners';
 
 class LessonScreen extends React.Component {
   static navigationOptions = ({ navigation }) => {
@@ -55,7 +56,7 @@ class LessonScreen extends React.Component {
     onImportAndExport = this.onImportAndExport.bind(this);
 
     if (!this.props.lesson) {
-      this.props.loadLesson();
+      this.props.loadLesson(this.props.navigation.state.params.lesson.id);
     }
 
     if (Platform.OS != 'ios') {
@@ -140,7 +141,13 @@ class LessonScreen extends React.Component {
         ref={ref => this.tabView = ref}
         {...scrollableStyleProps}
         initialPage={this.initialPage}
-        renderTabBar={() => <LessonTab />}>
+        renderTabBar={() => <LessonTab dayQuestions={[
+          dayQuestions.one.questions,
+          dayQuestions.two.questions,
+          dayQuestions.three.questions,
+          dayQuestions.four.questions,
+          dayQuestions.five.questions,
+          dayQuestions.six.questions]} />}>
         <DayQuestions tabLabel='1' goToPassage={this.goToPassage} day={dayQuestions.one} memoryVerse={this.props.lesson.memoryVerse} />
         <DayQuestions tabLabel='2' goToPassage={this.goToPassage} day={dayQuestions.two} />
         <DayQuestions tabLabel='3' goToPassage={this.goToPassage} day={dayQuestions.three} />
@@ -159,6 +166,14 @@ class LessonScreen extends React.Component {
 }
 
 class LessonTab extends React.Component {
+  componentWillMount() {
+    this.listener = EventRegister.addEventListener('userReadDiscussionChanged', () => this.forceUpdate());
+  }
+
+  componentWillUnmount() {
+    EventRegister.removeEventListener(this.listener);
+  }
+
   render() {
     const containerWidth = Dimensions.get('window').width;
     const numberOfTabs = this.props.tabs.length;
@@ -169,6 +184,7 @@ class LessonTab extends React.Component {
       }}>
         {
           this.props.tabs.map((name, page) => {
+            const hasUnread = getCurrentUser().getDiscussionHasUnreadByDay(this.props.dayQuestions[page]);
             const isTabActive = this.props.activeTab === page;
             return (
               <TouchableOpacity key={name} onPress={() => this.props.goToPage(page)}>
@@ -193,6 +209,19 @@ class LessonTab extends React.Component {
                     color: isTabActive ? Colors.yellow : 'whitesmoke',
                     fontWeight: '900'
                   }}>{name}</Text>
+                  {
+                    hasUnread && <View
+                      style={{
+                        position: 'absolute',
+                        backgroundColor: 'red',
+                        height: 9,
+                        width: 9,
+                        borderRadius: 9,
+                        right: 2,
+                        top: 3
+                      }}
+                    />
+                  }
                 </View>
               </TouchableOpacity>
             );
@@ -266,16 +295,28 @@ const DayQuestions = (props) => {
 }
 
 class BSFQuestion extends React.Component {
+  componentWillMount() {
+    this.listener = EventRegister.addEventListener('userReadDiscussionChanged', () => this.forceUpdate());
+  }
+
+  componentWillUnmount() {
+    EventRegister.removeEventListener(this.listener);
+  }
 
   async onChat() {
     const props = this.props;
 
-    const ids = props.question.id.split('_');
+    const id = props.question.id;
+    await getCurrentUser().setDiscussionReadAsync(props.question);
+    this.setState({ hasUnread: getCurrentUser().getDiscussionHasUnread(props.question) });
+
+    const ids = id.split('_');
     const title = (ids.length >= 3) ? `:${ids[1]}课${ids[2]}题` : '';
     const isGroupLeader = props.question.homiletics && getCurrentUser().getUserPermissions().isGroupLeader;
+
     // Group leader has a different chat screen for homiletics question
     navigateTo('Discussion', {
-      id: props.question.id,
+      id: id,
       isGroupLeader: isGroupLeader,
       title: isGroupLeader ? `${getI18nText('问题讨论')} ${title}` : getI18nText('问题讨论'),
       text: props.question.questionText,
@@ -286,6 +327,7 @@ class BSFQuestion extends React.Component {
   render() {
     const props = this.props;
     const homiletics = props.question.homiletics;
+    const hasUnread = getCurrentUser().getDiscussionHasUnread(props.question);
     return (
       <View style={{ marginVertical: 12, }}>
         <QuestionText>
@@ -314,6 +356,17 @@ class BSFQuestion extends React.Component {
                   style={{ width: 30, height: 30, marginRight: 2, marginBottom: 2 }}
                   source={require('../assets/images/Chat.png')} />
               </TouchableOpacity>
+              {
+                hasUnread &&
+                <View style={{
+                  position: 'absolute',
+                  backgroundColor: 'red',
+                  height: 9,
+                  width: 9,
+                  borderRadius: 9,
+                  right: 2
+                }} />
+              }
             </View>
           }
         </View>
@@ -349,8 +402,8 @@ const mapStateToProps = (state, ownProps) => {
 
 const mapDispatchToProps = (dispatch, ownProps) => {
   return {
-    loadLesson: () => dispatch(loadLesson(ownProps.navigation.state.params.lesson.id)),
-  }
+    loadLesson: (id) => dispatch(loadLesson(id)),
+  };
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(LessonScreen)

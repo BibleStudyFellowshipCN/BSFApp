@@ -2,6 +2,7 @@ import { AsyncStorage } from 'react-native';
 import { Models } from '../dataStorage/models';
 import { setUserInternal, callWebServiceAsync, showWebServiceCallErrorsAsync } from '../dataStorage/storage';
 import { FileSystem } from 'expo';
+import { EventRegister } from 'react-native-event-listeners';
 
 let currentUser;
 
@@ -57,6 +58,7 @@ export default class User {
   fontSize = Models.DefaultFontSize;
   permissions = {};
   validBibles = null;
+  readDiscussions = {};
 
   isBibleVersionValid(version) {
     if (!this.validBibles) {
@@ -101,6 +103,9 @@ export default class User {
           this.fontSize = 2;
         }
       }
+      if (existingUser.readDiscussions) {
+        this.readDiscussions = existingUser.readDiscussions;
+      }
       this.loggedOn = true;
 
       await this.loadUserPermissionsAsync(this.cellphone);
@@ -111,7 +116,7 @@ export default class User {
   async loadUserPermissionsAsync(cellphone, showUI) {
     const result = await callWebServiceAsync(Models.User.restUri, '/' + cellphone, 'GET');
     const succeed = await showWebServiceCallErrorsAsync(result, null, showUI);
-    if (succeed && result.status == 200) {
+    if (succeed && result.status === 200) {
       this.permissions = result.body;
     }
     else {
@@ -357,7 +362,8 @@ export default class User {
       offlineMode: this.offlineMode,
       audioBook: this.audioBook,
       fontSize: this.fontSize,
-      bibleVersion2: this.bibleVersion2
+      bibleVersion2: this.bibleVersion2,
+      readDiscussions: this.readDiscussions
     };
   }
 
@@ -378,7 +384,7 @@ export default class User {
     try {
       const result = await callWebServiceAsync(Models.DownloadUrl + 'version.json', '', 'GET');
       const succeed = await showWebServiceCallErrorsAsync(result, 200, showUI);
-      if (succeed) {
+      if (succeed && result && result.body && result.body.version) {
         console.log('RemoteVersion: ' + result.body.version);
         return result.body.version;
       }
@@ -406,6 +412,87 @@ export default class User {
     }
 
     return this.permissions;
+  }
+
+  getReadDiscussions() {
+    if (!this.isLoggedOn()) {
+      return {};
+    }
+
+    return this.readDiscussions;
+  }
+
+  async setDiscussionReadAsync(question) {
+    if (!this.isLoggedOn() || !this.permissions.chat) {
+      return;
+    }
+
+    const id = question.homiletics && this.permissions.isGroupLeader ? 'H' + question.id : question.id;
+    const count = this.permissions.discussions[id];
+    if (!count) {
+      return;
+    }
+
+    this.readDiscussions[id] = count;
+    EventRegister.emit('userReadDiscussionChanged');
+    console.log({ readCount: this.readDiscussions[id], id })
+    await saveUserAsync(this.getUserInfo());
+    this.logUserInfo();
+  }
+
+  async resetDiscussionReadAsync() {
+    if (!this.isLoggedOn() || !this.permissions.chat) {
+      return;
+    }
+
+    this.readDiscussions = {};
+    await saveUserAsync(this.getUserInfo());
+    this.logUserInfo();
+  }
+
+  getQuestionId(question) {
+    if (question.homiletics && this.permissions.isGroupLeader) {
+      return 'H' + question.id;
+    }
+
+    return question.id;
+  }
+
+  getDiscussionHasUnread(question) {
+    if (!this.isLoggedOn() || !this.permissions.chat) {
+      return 0;
+    }
+
+    const id = this.getQuestionId(question);
+    console.log('getDiscussionHasUnread: ' + JSON.stringify({ id, localTimestamp: this.readDiscussions[id], serverTimestamp: this.permissions.discussions[id] }));
+
+    const serverTimestamp = this.permissions.discussions[id];
+    if (!serverTimestamp) {
+      if (this.readDiscussions[id]) {
+        delete this.readDiscussions[id];
+      }
+      return false;
+    }
+
+    const localTimestamp = this.readDiscussions[id];
+    return !localTimestamp || localTimestamp !== serverTimestamp;
+  }
+
+  getDiscussionHasUnreadByDay(dayQuestions) {
+    if (!this.isLoggedOn() || !this.permissions.chat) {
+      return 0;
+    }
+
+    let result = false;
+    for (let i in dayQuestions) {
+      if (this.getDiscussionHasUnread(dayQuestions[i])) {
+        result = true;
+        break;
+      }
+    }
+
+    console.log('getDiscussionHasUnreadByDay: ' + JSON.stringify({ result }));
+    return result;
   }
 }
 
