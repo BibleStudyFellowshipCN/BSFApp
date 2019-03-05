@@ -5,7 +5,7 @@
     "slug": "CBSFApp",
     "privacy": "public",
     "sdkVersion": "32.0.0",
-    "version": "2019.1.23",
+    "version": "2019.3.4",
     "primaryColor": "#cccccc",
     "icon": "./assets/images/icon.png",
     "splash": {
@@ -16,7 +16,7 @@
     "updates": {
       "enabled": true,
       "checkAutomatically": "ON_LOAD",
-      "fallbackToCacheTimeout": 20000
+      "fallbackToCacheTimeout": 10000
     },
     "assetBundlePatterns": [
       "**/*"
@@ -35,7 +35,7 @@
       "permissions": [
         "WAKE_LOCK"
       ],
-      "versionCode": 30
+      "versionCode": 31
     }
   }
 }

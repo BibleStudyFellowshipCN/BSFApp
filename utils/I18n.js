@@ -77,6 +77,8 @@ const text = {
     "讲道录音",
     "经文释义",
     "专题讲座",
+    "评论",
+    "关于CBSF",
   ],
   cht: [
     "BSF課程",
@@ -153,6 +155,8 @@ const text = {
     "講道錄音",
     "經文釋義",
     "專題講座",
+    "評論",
+    "關於CBSF",
   ],
   eng: [
     "BSF Lessons",
@@ -229,6 +233,8 @@ const text = {
     "Sermon",
     "Notes",
     "Seminar",
+    "Review",
+    "About CBSF",
   ],
   spa: [
     "BSF Lecciones",
@@ -305,6 +311,8 @@ const text = {
     "Sermón",
     "Notas",
     "Seminario",
+    "Revisión",
+    "Acerca de CBSF",
   ]
 };
 

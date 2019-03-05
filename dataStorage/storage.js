@@ -42,12 +42,12 @@ function encode(idOrKey) {
 global_cache = [];
 
 function resetGlobalCache(name) {
-    console.log("resetGlobalCache: " + name);
+    // console.log("resetGlobalCache: " + name);
     delete global_cache[name];
 }
 
 async function reloadGlobalCache(name) {
-    console.log("reloadGlobalCache: " + name);
+    // console.log("reloadGlobalCache: " + name);
     try {
         const localUri = FileSystem.documentDirectory + name + '.json';
         var data = await FileSystem.readAsStringAsync(localUri);
@@ -58,7 +58,7 @@ async function reloadGlobalCache(name) {
 }
 
 async function getCacheData(name, key) {
-    console.log(`getCacheData(${name}, ${key})`);
+    // console.log(`getCacheData(${name}, ${key})`);
 
     if (!global_cache[name]) {
         await reloadGlobalCache(name);
@@ -277,9 +277,9 @@ async function clearStorageAsync(key) {
 }
 
 async function callWebServiceAsync(url, api, method, headersUnused, body) {
-    let responseStatus;
-    let responseHeader;
-    let responseJson;
+    let responseStatus = -1;
+    let responseHeader = {};
+    let responseJson = '';
     let serverUrl = url + api;
     const headers = getHttpHeaders();
     try {
@@ -309,7 +309,7 @@ async function callWebServiceAsync(url, api, method, headersUnused, body) {
         }
 
     } catch (err) {
-        console.log('callWebServiceAsync Error:' + JSON.stringify(err));
+        console.log('callWebServiceAsync Error:' + JSON.stringify({ url: serverUrl, method, body, err }));
     }
 
     const result = { headers: responseHeader, body: responseJson, status: responseStatus };

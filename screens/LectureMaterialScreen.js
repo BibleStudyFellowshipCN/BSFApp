@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, ActivityIndicator, Text, Dimensions, Image, TouchableOpacity } from 'react-native';
+import { View, ActivityIndicator, Text, Dimensions, Image, TouchableOpacity, ScrollView, Linking } from 'react-native';
 import { getI18nText } from '../utils/I18n';
 import { getCurrentUser } from '../utils/user';
 import { Models } from '../dataStorage/models';
@@ -7,7 +7,7 @@ import { callWebServiceAsync, showWebServiceCallErrorsAsync } from '../dataStora
 import Colors from '../constants/Colors';
 import { EventRegister } from 'react-native-event-listeners';
 import AudioPlayer from '../components/AudioPlayer';
-import { ScrollView } from 'react-native-gesture-handler';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 export default class LectureMaterialScreen extends React.Component {
   static navigationOptions = ({ navigation }) => {
@@ -76,14 +76,14 @@ export default class LectureMaterialScreen extends React.Component {
 
     const showNotes = !!(this.state.audio.notes_message && this.state.audio.notes_message.trim().length > 0);
     const showSeminar = !!(this.state.audio.seminar_message && this.state.audio.seminar_message.trim().length > 0);
-    const cellphone = getCurrentUser().getCellphone();
     return (
       <ScrollView style={{ flex: 1, backgroundColor: 'white' }}>
         <SermonAudioSection
           title={getI18nText('讲道录音')}
           message={this.state.audio.message}
           width={this.state.windowWidth}
-          audio={`http://mycbsf.org:3000/audio/${cellphone}?lesson=${this.state.audio.lesson}&play=1`} />
+          type='0'
+          lesson={this.state.audio.lesson} />
 
         {
           showNotes &&
@@ -91,7 +91,8 @@ export default class LectureMaterialScreen extends React.Component {
             title={getI18nText('经文释义')}
             message={this.state.audio.notes_message}
             width={this.state.windowWidth}
-            audio={`http://mycbsf.org:3000/audio/${cellphone}?lesson=${this.state.audio.lesson}&playNotes=1`} />
+            type='1'
+            lesson={this.state.audio.lesson} />
         }
 
         {
@@ -100,7 +101,8 @@ export default class LectureMaterialScreen extends React.Component {
             title={getI18nText('专题讲座')}
             message={this.state.audio.seminar_message}
             width={this.state.windowWidth}
-            audio={`http://mycbsf.org:3000/audio/${cellphone}?lesson=${this.state.audio.lesson}&playSeminar=1`} />
+            type='2'
+            lesson={this.state.audio.lesson} />
         }
       </ScrollView>
     );
@@ -109,9 +111,30 @@ export default class LectureMaterialScreen extends React.Component {
 
 class SermonAudioSection extends React.Component {
 
+  async download() {
+    const result = await callWebServiceAsync(`${Models.HostServer}/downloadToken/${getCurrentUser().getCellphone()}/${this.props.lesson}/${this.props.type}`, '', 'GET');
+    const succeed = await showWebServiceCallErrorsAsync(result, 200);
+    if (succeed && result.body.token) {
+      Linking.openURL(`${Models.HostServer}/download/${result.body.token}`);
+    }
+  }
+
   render() {
     const lines = this.props.message.split('\n');
     let index = 0;
+    const cellphone = getCurrentUser().getCellphone();
+    let audioUrl;
+    switch (this.props.type) {
+      case '1':
+        audioUrl = `${Models.HostServer}/audio/${cellphone}?lesson=${this.props.lesson}&playNotes=1`;
+        break;
+      case '2':
+        audioUrl = `${Models.HostServer}/audio/${cellphone}?lesson=${this.props.lesson}&playSeminar=1`;
+        break;
+      default:
+        audioUrl = `${Models.HostServer}/audio/${cellphone}?lesson=${this.props.lesson}&play=1`;
+        break;
+    }
     return (
       <View style={{
         marginTop: 10,
@@ -128,13 +151,16 @@ class SermonAudioSection extends React.Component {
         }
         <AudioPlayer
           width={this.props.width - 50}
-          uri={this.props.audio}
+          uri={audioUrl}
         />
-        {/*<View style={{ right: 0 }}>
-          <TouchableOpacity>
-            <Text>Download</Text>
+        <View style={{
+          position: 'absolute',
+          right: 0,
+        }}>
+          <TouchableOpacity onPress={() => this.download()}>
+            <MaterialCommunityIcons color={Colors.yellow} size={28} name='file-download' />
           </TouchableOpacity>
-      </View>*/}
+        </View>
       </View>
     );
   }

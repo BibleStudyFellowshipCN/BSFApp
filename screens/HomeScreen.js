@@ -17,16 +17,15 @@ import {
   Image
 } from 'react-native';
 import Accordion from 'react-native-collapsible/Accordion';
-import { requestBooks, clearBooks } from "../store/books.js";
-import { clearLesson } from '../store/lessons.js'
-import { clearPassage } from '../store/passage.js'
+import { requestBooks, clearBooks } from "../store/books";
+import { clearLesson } from '../store/lessons';
+import { clearPassage } from '../store/passage';
 import { getI18nText } from '../utils/I18n';
 import { getCurrentUser } from '../utils/user';
 import { Models } from '../dataStorage/models';
 import { resetGlobalCache } from '../dataStorage/storage';
-import Colors from '../constants/Colors.js';
+import Colors from '../constants/Colors';
 import { EventRegister } from 'react-native-event-listeners';
-import { checkAppUpdateInBackground } from '../utils/update';
 
 class HomeScreen extends React.Component {
   static navigationOptions = ({ navigation }) => {
@@ -35,7 +34,7 @@ class HomeScreen extends React.Component {
       title: getI18nText(title),
       headerRight: (
         <View style={{ marginRight: 10, flexDirection: 'row' }}>
-          <TouchableOpacity onPress={() => { checkForContentUpdate(true); }}>
+          <TouchableOpacity onPress={() => { checkForContentUpdate() }}>
             <Image
               style={{ width: 34, height: 34 }}
               source={require('../assets/images/Download.png')} />
@@ -66,11 +65,11 @@ class HomeScreen extends React.Component {
       this.setState({ windowWidth: window.width, windowHeight: window.height });
     });
 
-    checkForContentUpdate = this.checkForContentUpdate.bind(this);
+    checkForContentUpdate = () => this.checkForContentUpdate(true);
   }
 
   componentWillUnmount() {
-    EventRegister.removeEventListener(this.listener)
+    EventRegister.removeEventListener(this.listener);
   }
 
   downloadCallback(downloadProgress) {
@@ -86,6 +85,9 @@ class HomeScreen extends React.Component {
     if (this.state.downloading) {
       return;
     }
+
+    await getCurrentUser().reloadPermissionAsync();
+    this.setState({ onRefresh: !this.state.onRefresh });
 
     this.lastCheckForContentUpdateDate = (new Date()).getDate();
     try {
@@ -141,7 +143,6 @@ class HomeScreen extends React.Component {
   }
 
   goToLesson(lesson) {
-    checkAppUpdateInBackground();
     let parsed = lesson.name.split(' ');
     this.props.navigation.navigate('Lesson', { lesson, title: parsed[1] });
   }
@@ -166,9 +167,7 @@ class HomeScreen extends React.Component {
   }
 
   async onRefresh() {
-    await getCurrentUser().reloadPermissionAsync();
     await this.checkForContentUpdate(false);
-    this.setState({ onRefresh: !this.state.onRefresh });
   }
 
   render() {

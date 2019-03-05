@@ -3,7 +3,7 @@ export const CachePolicy = {
   AsyncStorage: 2,
 };
 
-const HostServer = 'http://mycbsf.org:3000';
+const HostServer = 'http://bsf.turbozv.com';
 export const Models = {
   HostServer,
   Book: {
@@ -29,11 +29,6 @@ export const Models = {
     api: "/logon",
     restUri: HostServer + "/logon",
     userKey: '@BsfApp:user'
-  },
-  Attendance: {
-    key: "Attendance",
-    api: "/attendance",
-    restUri: HostServer + "/attendanceV2"
   },
   User: {
     key: "User",

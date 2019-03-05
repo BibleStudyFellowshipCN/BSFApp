@@ -5,7 +5,10 @@ import MainTabNavigator from './MainTabNavigator';
 import LessonScreen from '../screens/LessonScreen';
 import BibleScreen from '../screens/BibleScreen';
 import SetPhoneScreen from '../screens/SetPhoneScreen';
-import AttendanceScreen from '../screens/AttendanceScreen';
+import AttendanceHomeScreen from '../screens/AttendanceHomeScreen';
+import AttendanceGroupScreen from '../screens/AttendanceGroupScreen';
+import AttendanceLessonScreen from '../screens/AttendanceLessonScreen';
+import AttendanceSelectLeaderScreen from '../screens/AttendanceSelectLeaderScreen';
 import LectureMaterialScreen from '../screens/LectureMaterialScreen';
 import GlobalChatScreen from '../screens/GlobalChatScreen';
 import HomeTrainingScreen from '../screens/HomeTrainingScreen';
@@ -14,6 +17,7 @@ import NotesScreen from '../screens/NotesScreen';
 import AnswerManageScreen from '../screens/AnswerManageScreen';
 import BibleSelectScreen from '../screens/BibleSelectScreen';
 import DiscussionScreen from '../screens/DiscussionScreen';
+import AboutScreen from '../screens/AboutScreen';
 //////////////
 // added by Frank on Dec 18, 2018
 import MyBSFScreen from '../screens/MyBSFScreen';
@@ -33,8 +37,17 @@ const RootStackNavigator = StackNavigator(
     SetPhone: {
       screen: SetPhoneScreen
     },
-    Attendance: {
-      screen: AttendanceScreen
+    AttendanceHome: {
+      screen: AttendanceHomeScreen
+    },
+    AttendanceGroup: {
+      screen: AttendanceGroupScreen
+    },
+    AttendanceLesson: {
+      screen: AttendanceLessonScreen
+    },
+    AttendanceSelectLeader: {
+      screen: AttendanceSelectLeaderScreen
     },
     LectureMaterial: {
       screen: LectureMaterialScreen
@@ -62,6 +75,9 @@ const RootStackNavigator = StackNavigator(
     },
     Discussion: {
       screen: DiscussionScreen
+    },
+    About: {
+      screen: AboutScreen
     }
   },
   {
