@@ -11,8 +11,23 @@ import { getCurrentUser } from './utils/user';
 import { Localization } from 'expo-localization';
 import Layout from './constants/Layout';
 import { EventRegister } from 'react-native-event-listeners';
+import { Constants } from 'expo';
 
 let store;
+
+const defaultErrorHandler = ErrorUtils.getGlobalHandler();
+
+const myErrorHandler = (error, isFatal) => {
+  message = JSON.stringify({ error, isFatal });
+  Alert.alert('App crashed!', `Sorry for the inconvenience.\n\nPlease DO NOT uninstall the app, for you will LOSE your answers!\n\n${message}`,
+    [
+      { text: 'Ok', onPress: () => { defaultErrorHandler(error, isFatal); } }
+    ]
+  );
+  fetch(`${Models.HostServer}/reportError/JS/${Constants['deviceId']}`);
+};
+
+ErrorUtils.setGlobalHandler(myErrorHandler);
 
 export default class App extends React.Component {
   state = {
