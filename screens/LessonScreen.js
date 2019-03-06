@@ -141,7 +141,7 @@ class LessonScreen extends React.Component {
         ref={ref => this.tabView = ref}
         {...scrollableStyleProps}
         initialPage={this.initialPage}
-        renderTabBar={() => <LessonTab dayQuestions={[
+        renderTabBar={() => <LessonTab key={dayQuestions} dayQuestions={[
           dayQuestions.one.questions,
           dayQuestions.two.questions,
           dayQuestions.three.questions,
@@ -186,6 +186,16 @@ class LessonTab extends React.Component {
           this.props.tabs.map((name, page) => {
             const hasUnread = getCurrentUser().getDiscussionHasUnreadByDay(this.props.dayQuestions[page]);
             const isTabActive = this.props.activeTab === page;
+            const redDot = hasUnread ? (<View
+              style={{
+                position: 'absolute',
+                backgroundColor: 'red',
+                height: 9,
+                width: 9,
+                borderRadius: 9,
+                right: 2,
+                top: 3
+              }} />) : null;
             return (
               <TouchableOpacity key={name} onPress={() => this.props.goToPage(page)}>
                 <View style={{
@@ -209,19 +219,7 @@ class LessonTab extends React.Component {
                     color: isTabActive ? Colors.yellow : 'whitesmoke',
                     fontWeight: '900'
                   }}>{name}</Text>
-                  {
-                    hasUnread && <View
-                      style={{
-                        position: 'absolute',
-                        backgroundColor: 'red',
-                        height: 9,
-                        width: 9,
-                        borderRadius: 9,
-                        right: 2,
-                        top: 3
-                      }}
-                    />
-                  }
+                  {redDot}
                 </View>
               </TouchableOpacity>
             );
