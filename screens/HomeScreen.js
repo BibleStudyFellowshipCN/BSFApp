@@ -1,7 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { FontAwesome } from '@expo/vector-icons';
-import { FileSystem } from 'expo';
+import { Constants, FileSystem } from 'expo';
 import {
   ScrollView,
   StyleSheet,
@@ -29,7 +29,8 @@ import { EventRegister } from 'react-native-event-listeners';
 
 class HomeScreen extends React.Component {
   static navigationOptions = ({ navigation }) => {
-    let title = navigation.state.params && navigation.state.params.title ? navigation.state.params.title : 'BSF课程';
+    const title = navigation.state.params && navigation.state.params.title ? navigation.state.params.title : 'BSF课程';
+    const testVersion = (Constants.manifest && Constants.manifest.id && Constants.manifest.id !== '@turbozv/CBSFApp');
     return {
       title: getI18nText(title),
       headerRight: (
@@ -39,6 +40,24 @@ class HomeScreen extends React.Component {
               style={{ width: 34, height: 34 }}
               source={require('../assets/images/Download.png')} />
           </TouchableOpacity>
+          {
+            testVersion &&
+            <View style={{
+              position: 'absolute',
+              right: 50,
+              top: 5,
+              backgroundColor: '#e74c3c',
+              borderRadius: 11,
+              paddingHorizontal: 5
+            }}>
+              <Text style={{
+                padding: 3,
+                color: '#ecf0f1',
+                fontWeight: 'bold',
+                fontSize: 14
+              }}>Preview</Text>
+            </View>
+          }
         </View>)
     };
   };

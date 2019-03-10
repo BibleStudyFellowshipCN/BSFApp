@@ -9,6 +9,14 @@ export default class SetPhoneScreen extends React.Component {
       title: getI18nText('设置手机号码'),
       headerLeft: (
         <View style={{ marginLeft: 10 }}>
+          <TouchableOpacity onPress={() => navigateBack()}>
+            <Image
+              style={{ width: 34, height: 34 }}
+              source={require('../assets/images/GoBack.png')} />
+          </TouchableOpacity>
+        </View>),
+      headerRight: (
+        <View style={{ marginRight: 10 }}>
           <TouchableOpacity onPress={() => onSubmit()}>
             <Image
               style={{ width: 34, height: 34 }}
@@ -24,6 +32,7 @@ export default class SetPhoneScreen extends React.Component {
   }
 
   componentWillMount() {
+    navigateBack = () => this.props.navigation.pop();
     onSubmit = () => this.onSubmit();
   }
 

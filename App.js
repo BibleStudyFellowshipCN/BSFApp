@@ -1,6 +1,6 @@
 import React from 'react';
-import { Platform, StatusBar, StyleSheet, View, Dimensions } from 'react-native';
-import { AppLoading } from 'expo';
+import { Platform, StatusBar, StyleSheet, View, Dimensions, Text } from 'react-native';
+import { AppLoading, Constants } from 'expo';
 import RootNavigation from './navigation/RootNavigation';
 import createStore from './store/createStore'
 import { loadAsync } from './dataStorage/storage';
@@ -11,7 +11,6 @@ import { getCurrentUser } from './utils/user';
 import { Localization } from 'expo-localization';
 import Layout from './constants/Layout';
 import { EventRegister } from 'react-native-event-listeners';
-import { Constants } from 'expo';
 
 let store;
 
@@ -24,7 +23,7 @@ const myErrorHandler = (error, isFatal) => {
       { text: 'Ok', onPress: () => { defaultErrorHandler(error, isFatal); } }
     ]
   );
-  fetch(`${Models.HostServer}/reportError/JS/${Constants['deviceId']}`);
+  fetch(`${Models.HostServer}/reportError/JS/${Constants.deviceId}`);
 };
 
 ErrorUtils.setGlobalHandler(myErrorHandler);
@@ -49,18 +48,18 @@ export default class App extends React.Component {
           onFinish={this._handleFinishLoading}
         />
       );
-    } else {
-      return (
-        <ActionSheetProvider>
-          <Provider store={store}>
-            <View style={{ flex: 1 }} onLayout={this.onLayout.bind(this)}>
-              {Platform.OS !== 'ios' && <StatusBar barStyle="default" />}
-              <RootNavigation />
-            </View>
-          </Provider>
-        </ActionSheetProvider >
-      );
     }
+
+    return (
+      <ActionSheetProvider>
+        <Provider store={store}>
+          <View style={{ flex: 1 }} onLayout={this.onLayout.bind(this)}>
+            {Platform.OS !== 'ios' && <StatusBar barStyle="default" />}
+            <RootNavigation />
+          </View>
+        </Provider>
+      </ActionSheetProvider >
+    );
   }
 
   async loadUserInfo() {
