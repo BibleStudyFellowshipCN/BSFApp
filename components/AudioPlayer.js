@@ -54,14 +54,14 @@ export default class AudioPlayer extends React.Component {
     }
 
     if (status.didJustFinish || status.progress == 1) {
-      console.log('didJustFinish');
+      // console.log('didJustFinish');
       if (this.props.onFinished) {
         this.props.onFinished();
       }
     }
 
     if (status.error) {
-      console.log(status.error);
+      // console.log(status.error);
       await this.resetAudio();
       await this.setState({ error: status.error });
     }
@@ -106,7 +106,7 @@ export default class AudioPlayer extends React.Component {
   }
 
   onSeekSliderValueChange(value) {
-    console.log('Seeking: ' + value);
+    // console.log('Seeking: ' + value);
     if (!this.isSeeking) {
       this.isSeeking = true;
     }

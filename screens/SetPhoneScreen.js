@@ -1,7 +1,9 @@
 import React from 'react';
-import { StyleSheet, View, Alert, TextInput, KeyboardAvoidingView, Keyboard, Image, TouchableOpacity } from 'react-native';
+import { StyleSheet, View, ActivityIndicator, TextInput, KeyboardAvoidingView, Image, TouchableOpacity } from 'react-native';
 import { getI18nText } from '../utils/I18n';
 import { getCurrentUser } from '../utils/user';
+import { Overlay } from 'react-native-elements';
+import Colors from '../constants/Colors';
 
 export default class SetPhoneScreen extends React.Component {
   static navigationOptions = ({ navigation }) => {
@@ -9,6 +11,14 @@ export default class SetPhoneScreen extends React.Component {
       title: getI18nText('设置手机号码'),
       headerLeft: (
         <View style={{ marginLeft: 10 }}>
+          <TouchableOpacity onPress={() => navigateBack()}>
+            <Image
+              style={{ width: 34, height: 34 }}
+              source={require('../assets/images/GoBack.png')} />
+          </TouchableOpacity>
+        </View>),
+      headerRight: (
+        <View style={{ marginRight: 10 }}>
           <TouchableOpacity onPress={() => onSubmit()}>
             <Image
               style={{ width: 34, height: 34 }}
@@ -24,6 +34,7 @@ export default class SetPhoneScreen extends React.Component {
   }
 
   componentWillMount() {
+    navigateBack = () => this.props.navigation.pop();
     onSubmit = () => this.onSubmit();
   }
 
@@ -59,6 +70,18 @@ export default class SetPhoneScreen extends React.Component {
             onSubmitEditing={this.onSubmit.bind(this)}
           />
         </View>
+        {
+          this.state.busy &&
+          <Overlay isVisible
+            windowBackgroundColor="rgba(255, 255, 255, .5)"
+            width="auto"
+            height="auto">
+            <ActivityIndicator
+              style={{ justifyContent: 'center', alignItems: 'center' }}
+              size='large'
+              color={Colors.yellow} />
+          </Overlay>
+        }
       </KeyboardAvoidingView>
     );
   }

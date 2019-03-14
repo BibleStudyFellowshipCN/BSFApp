@@ -5,11 +5,12 @@ import { Entypo } from '@expo/vector-icons';
 import { updateAnswer } from '../store/answers';
 import { loadAsync } from '../dataStorage/storage';
 import { getI18nText } from '../utils/I18n';
-import { Button } from 'react-native-elements';
+import { Button, ButtonGroup } from 'react-native-elements';
 import { Models } from '../dataStorage/models';
 import { getCurrentUser } from '../utils/user';
-import SegmentedControlTab from 'react-native-segmented-control-tab';
 import { EventRegister } from 'react-native-event-listeners';
+import { showMessage } from "react-native-flash-message";
+import Colors from '../constants/Colors';
 
 class AnswerManageScreen extends React.Component {
   static navigationOptions = ({ navigation }) => {
@@ -61,7 +62,7 @@ class AnswerManageScreen extends React.Component {
 
   export() {
     const shareData = { title: getI18nText('导出'), subject: getI18nText('导出'), message: this.state.answers };
-    console.log(shareData);
+    // console.log(shareData);
     Share.share(shareData);
   }
 
@@ -69,13 +70,18 @@ class AnswerManageScreen extends React.Component {
     try {
       const content = JSON.parse(this.importAnswerText);
       if (content.length == 0) {
-        Alert.alert(getI18nText('错误'), getI18nText('没有答案'));
+        showMessage({
+          message: getI18nText('错误'),
+          duration: 3000,
+          description: getI18nText('没有答案'),
+          type: "danger",
+        });
         return;
       }
 
       for (let i in content) {
         const item = content[i];
-        console.log(item.id + ':' + item.value);
+        // console.log(item.id + ':' + item.value);
       }
 
       Alert.alert(getI18nText('确认'), getI18nText('如果本机已有对应的答案，内容将会被覆盖，请确认是否导入答案？'), [
@@ -86,35 +92,43 @@ class AnswerManageScreen extends React.Component {
               this.props.updateAnswer(item.id, item.value);
             }
 
-            Alert.alert(getI18nText('导入成功'));
+            showMessage({
+              message: getI18nText('导入成功'),
+              duration: 3000,
+              type: "success"
+            });
+            this.props.navigation.pop();
           }
         },
         { text: 'Cancel', onPress: () => { } },
       ]);
 
     } catch (err) {
-      Alert.alert(getI18nText('错误'), getI18nText('答案格式不正确'), [
-        { text: 'OK', onPress: () => { } }
-      ]);
+      showMessage({
+        message: getI18nText('错误'),
+        duration: 3000,
+        description: getI18nText('答案格式不正确'),
+        type: "danger",
+      });
     }
   }
 
   render() {
     return (
       <KeyboardAvoidingView style={styles.container} behavior='padding' keyboardVerticalOffset={0}>
-        <View style={{ margin: 10 }}>
-          <SegmentedControlTab
-            values={[getI18nText('导出'), getI18nText('导入')]}
-            selectedIndex={this.state.selectedIndex}
-            onTabPress={(index) => this.setState({ selectedIndex: index })}
-          />
-        </View>
-
+      
+        <ButtonGroup
+          buttons={[getI18nText('导出'), getI18nText('导入')]}
+          selectedIndex={this.state.selectedIndex}
+          onPress={(selectedIndex) => {
+            this.setState({ selectedIndex })
+          }}
+        />
         {
           this.state.selectedIndex == 0 &&
           <View style={{ alignItems: 'center' }}>
             <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-              <Text style={{ fontSize: 15 }}>{getI18nText('请全选以下文本后复制，或者导出')} </Text>
+              <Text style={{ fontSize: 14 }}>{getI18nText('请全选以下文本后复制，或者导出')} </Text>
               <TouchableOpacity onPress={this.export.bind(this)}>
                 <Entypo
                   name='share-alternative'
@@ -149,11 +163,11 @@ class AnswerManageScreen extends React.Component {
             />
             <View style={{ alignItems: 'center' }}>
               <Button
-                backgroundColor='#397EDC'
-                borderRadius={5}
-                containerViewStyle={{ width: 130 }}
+                icon={{ name: "import-export", size: 20, color: "white" }}
                 title={getI18nText('导入')}
-                onPress={this.import.bind(this)} />
+                buttonStyle={{ backgroundColor: Colors.yellow, margin: 10, borderRadius: 30, paddingLeft: 10, paddingRight: 20, width: 150 }}
+                onPress={() => this.import()}
+              />
             </View>
           </View>
         }

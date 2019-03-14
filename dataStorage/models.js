@@ -4,8 +4,10 @@ export const CachePolicy = {
 };
 
 const HostServer = 'http://bsf.turbozv.com';
+const HostHttpsServer = 'https://mycbsf.org';
 export const Models = {
   HostServer,
+  HostHttpsServer,
   Book: {
     key: "BOOK",
     api: "/lessons",

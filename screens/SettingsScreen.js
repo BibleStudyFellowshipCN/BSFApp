@@ -3,8 +3,9 @@ import { connect } from 'react-redux'
 import { ScrollView, StyleSheet, View, Alert, Image } from 'react-native';
 import { Constants, StoreReview, FileSystem } from 'expo';
 import { Models } from '../dataStorage/models';
+import { appVersion } from '../dataStorage/storage';
 import { getCurrentUser } from '../utils/user';
-import { requestBooks, clearBooks } from "../store/books.js";
+import { requestBooks, clearBooks } from "../store/books";
 import SettingsList from 'react-native-settings-list';
 import { getI18nText } from '../utils/I18n';
 import { clearLesson } from '../store/lessons.js'
@@ -13,6 +14,7 @@ import { connectActionSheet } from '@expo/react-native-action-sheet';
 import { NavigationActions } from 'react-navigation';
 import { FontAwesome, MaterialIcons, MaterialCommunityIcons } from '@expo/vector-icons';
 import Colors from '../constants/Colors';
+import { showMessage } from "react-native-flash-message";
 
 @connectActionSheet class SettingsScreen extends React.Component {
   static navigationOptions = ({ navigation }) => {
@@ -68,7 +70,7 @@ import Colors from '../constants/Colors';
       this.setState({ language: getCurrentUser().getLanguageDisplayName() });
 
       const setParamsAction = NavigationActions.setParams({
-        params: { title: 'BSF课程' },
+        params: { title: getI18nText('BSF课程') },
         key: 'Home',
       })
       this.props.navigation.dispatch(setParamsAction);
@@ -213,9 +215,19 @@ import Colors from '../constants/Colors';
           await FileSystem.deleteAsync(fileUri, { idempotent: true });
         }
       }
-      Alert.alert('Completed', `Removed ${freeSize} bytes`);
+      showMessage({
+        message: getI18nText('Completed'),
+        description: `Removed ${freeSize} bytes`,
+        duration: 3000,
+        type: "success"
+      });
     } catch (e) {
-      Alert.alert('Error', JSON.stringify(e));
+      showMessage({
+        message: getI18nText('错误'),
+        description: JSON.stringify(e),
+        duration: 5000,
+        type: "danger"
+      });
     }
   }
 
@@ -370,7 +382,7 @@ import Colors from '../constants/Colors';
                     source={require('../assets/images/icon-android.png')} />
                 </View>
               }
-              title={getI18nText('关于CBSF')}
+              title={getI18nText('关于CBSF') + ` (${appVersion})`}
               titleStyle={{ fontSize }}
               titleInfoStyle={{ fontSize }}
               hasNavArrow={true}

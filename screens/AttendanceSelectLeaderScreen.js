@@ -1,7 +1,6 @@
 import React from 'react';
-import { ScrollView, View, Alert, Text, ActivityIndicator, Dimensions, Image, TouchableOpacity } from 'react-native';
+import { ScrollView, View, ActivityIndicator, Dimensions, Image, TouchableOpacity } from 'react-native';
 import { getI18nText } from '../utils/I18n';
-import { Card, ListItem } from 'react-native-elements';
 import { Models } from '../dataStorage/models';
 import { callWebServiceAsync, showWebServiceCallErrorsAsync } from '../dataStorage/storage';
 import { getCurrentUser } from '../utils/user';

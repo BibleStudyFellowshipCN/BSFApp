@@ -5,6 +5,7 @@ import { EventRegister } from 'react-native-event-listeners';
 import { Constants, Updates } from 'expo';
 import { Button } from 'react-native-elements';
 import Colors from '../constants/Colors';
+import { appVersion } from '../dataStorage/storage';
 
 export default class AboutScreen extends React.Component {
   static navigationOptions = ({ navigation }) => {
@@ -37,9 +38,7 @@ export default class AboutScreen extends React.Component {
   }
 
   render() {
-    const { manifest, platform } = Constants;
-    const version = manifest.publishedTime ? `${manifest.publishedTime.split('T')[0].replace(/-/g, '.')} (SDK${manifest.sdkVersion})` :
-      `${manifest.version} SDK${manifest.sdkVersion}`;
+    const version = `${appVersion} (SDK${Constants.manifest.sdkVersion})`;
     return (
       <View style={{ flex: 1, backgroundColor: 'white' }}>
         <View style={{

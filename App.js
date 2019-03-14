@@ -1,6 +1,6 @@
 import React from 'react';
-import { Platform, StatusBar, StyleSheet, View, Dimensions } from 'react-native';
-import { AppLoading } from 'expo';
+import { Platform, StatusBar, StyleSheet, View, Dimensions, Text } from 'react-native';
+import { AppLoading, Constants } from 'expo';
 import RootNavigation from './navigation/RootNavigation';
 import createStore from './store/createStore'
 import { loadAsync } from './dataStorage/storage';
@@ -11,8 +11,23 @@ import { getCurrentUser } from './utils/user';
 import { Localization } from 'expo-localization';
 import Layout from './constants/Layout';
 import { EventRegister } from 'react-native-event-listeners';
+import FlashMessage from "react-native-flash-message";
 
 let store;
+
+const defaultErrorHandler = ErrorUtils.getGlobalHandler();
+
+const myErrorHandler = (error, isFatal) => {
+  message = JSON.stringify({ error, isFatal });
+  Alert.alert('App crashed!', `Sorry for the inconvenience.\n\nPlease DO NOT uninstall the app, for you will LOSE your answers!\n\n${message}`,
+    [
+      { text: 'Ok', onPress: () => { defaultErrorHandler(error, isFatal); } }
+    ]
+  );
+  fetch(`${Models.HostServer}/reportError/JS/${Constants.deviceId}`);
+};
+
+ErrorUtils.setGlobalHandler(myErrorHandler);
 
 export default class App extends React.Component {
   state = {
@@ -34,18 +49,19 @@ export default class App extends React.Component {
           onFinish={this._handleFinishLoading}
         />
       );
-    } else {
-      return (
-        <ActionSheetProvider>
-          <Provider store={store}>
-            <View style={{ flex: 1 }} onLayout={this.onLayout.bind(this)}>
-              {Platform.OS !== 'ios' && <StatusBar barStyle="default" />}
-              <RootNavigation />
-            </View>
-          </Provider>
-        </ActionSheetProvider >
-      );
     }
+
+    return (
+      <ActionSheetProvider>
+        <Provider store={store}>
+          <View style={{ flex: 1 }} onLayout={this.onLayout.bind(this)}>
+            {Platform.OS !== 'ios' && <StatusBar barStyle="default" />}
+            <RootNavigation />
+            <FlashMessage position="top" />
+          </View>
+        </Provider>
+      </ActionSheetProvider >
+    );
   }
 
   async loadUserInfo() {
@@ -53,7 +69,7 @@ export default class App extends React.Component {
     // TODO: [Wei] Workaround for now
     if (!getCurrentUser().isLoggedOn()) {
       let locale = Localization.locale;
-      console.log(locale);
+      // console.log(locale);
       let lang = 'eng';
       let bible = 'niv2011';
       if (locale.substring(0, 2) == 'es') {

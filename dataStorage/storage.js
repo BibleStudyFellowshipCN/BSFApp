@@ -3,6 +3,10 @@ import { debounce } from 'lodash';
 import Storage from 'react-native-storage';
 import { Constants, FileSystem } from 'expo';
 import { Models, CachePolicy } from './models';
+import { showMessage } from "react-native-flash-message";
+
+export const isPreview = Constants.manifest && Constants.manifest.id && Constants.manifest.id !== '@turbozv/CBSFApp';
+export const appVersion = Constants.manifest.publishedTime ? `${Constants.manifest.publishedTime.split('T')[0].replace(/-/g, '.')}` : Constants.manifest.version;
 
 if (!global.storage) {
     global.storage = new Storage({
@@ -261,8 +265,8 @@ async function saveAsync(data, model, id) {
 async function saveToOffilneStorageAsync(payload, key, id) {
     console.log("save to storage: " + JSON.stringify({ key, id }));
     return !!id ?
-        await storage.save({ key: encode(key), id: encode(id), rawData: payload }) :
-        await storage.save({ key: encode(key), rawData: payload })
+        await storage.save({ key: encode(key), id: encode(id), data: payload }) :
+        await storage.save({ key: encode(key), data: payload })
 }
 
 function saveToCloud(data, model, id) {
@@ -282,34 +286,41 @@ async function callWebServiceAsync(url, api, method, headersUnused, body) {
     let responseJson = '';
     let serverUrl = url + api;
     const headers = getHttpHeaders();
+    let payload;
+    if (body) {
+        payload = { method, headers, body: JSON.stringify(body) };
+    } else {
+        payload = { method, headers };
+    }
+
+    let response;
     try {
-        let payload;
-        if (body) {
-            payload = { method, headers, body: JSON.stringify(body) };
-        } else {
-            payload = { method, headers };
-        }
+        response = await fetch(serverUrl, payload);
+    } catch (err) {
+        console.log('fetch error:' + JSON.stringify({ url: serverUrl, method, body, err }));
+        return { headers: responseHeader, body: {}, status: responseStatus };
+    }
 
-        const response = await fetch(serverUrl, payload);
+    responseStatus = response.status;
+    responseHeader = response.headers.map;
 
-        responseStatus = response.status;
-        responseHeader = response.headers.map;
-
-        try {
-            let responseString = await response.text();
-            responseJson = JSON.parse(responseString);
-        } catch (err) {
-            if (response._bodyText) {
+    try {
+        const responseString = await response.text();
+        console.log(responseString);
+        responseJson = JSON.parse(responseString);
+    } catch (err) {
+        if (response._bodyText) {
+            try {
                 responseJson = eval("(" + response._bodyText + ")")
+            } catch (err) {
+                console.log('Payload error:' + response._bodyText);
+                responseJson = response._bodyText;
             }
         }
+    }
 
-        if (!responseJson) {
-            responseJson = '';
-        }
-
-    } catch (err) {
-        console.log('callWebServiceAsync Error:' + JSON.stringify({ url: serverUrl, method, body, err }));
+    if (!responseJson) {
+        responseJson = '';
     }
 
     const result = { headers: responseHeader, body: responseJson, status: responseStatus };
@@ -319,31 +330,42 @@ async function callWebServiceAsync(url, api, method, headersUnused, body) {
 }
 
 async function showWebServiceCallErrorsAsync(result, acceptStatus, showUI = true) {
-    if (!result || !result.status) {
+    if (!result || !result.status || result.status === -1) {
         if (showUI) {
-            await Alert.alert('Error', 'Please check your network connection');
+            showMessage({
+                message: getI18nText('错误'),
+                duration: 10000,
+                description: getI18nText('Please check your network connection'),
+                type: "danger",
+            });
         }
     }
     else if (acceptStatus) {
         if (result.status == acceptStatus) {
             return true;
-        } else {
-            let message = 'HTTP status ' + result.status;
-            if (result.body) {
-                if (result.body.Message) {
-                    message = message + "\n\n" + result.body.Message;
-                }
-                if (result.body.ExceptionMessage) {
-                    message = message + "\n\n" + result.body.ExceptionMessage;
-                }
-                if (result.body.ExceptionType) {
-                    message = message + "\n\n" + result.body.ExceptionType;
-                }
+        }
+
+        const message = 'HTTP status ' + result.status;
+        if (result.body) {
+            if (result.body.Message) {
+                message = message + "\n\n" + result.body.Message;
             }
-            if (showUI) {
-                await Alert.alert('Error', message);
+            if (result.body.ExceptionMessage) {
+                message = message + "\n\n" + result.body.ExceptionMessage;
+            }
+            if (result.body.ExceptionType) {
+                message = message + "\n\n" + result.body.ExceptionType;
             }
         }
+        if (showUI) {
+            showMessage({
+                message: getI18nText('错误'),
+                duration: 5000,
+                description: message,
+                type: "danger",
+            });
+        }
+
         return false;
     }
 

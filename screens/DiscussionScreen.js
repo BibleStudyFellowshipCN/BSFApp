@@ -12,8 +12,7 @@ import { getI18nBibleBook, getI18nText } from '../utils/I18n';
 import { GiftedChat, Bubble } from 'react-native-gifted-chat';
 import KeyboardSpacer from 'react-native-keyboard-spacer';
 import { callWebServiceAsync, showWebServiceCallErrorsAsync } from '../dataStorage/storage';
-
-function shareAnswer() { }
+import { showMessage } from "react-native-flash-message";
 
 export default class DiscussionScreen extends React.Component {
   static navigationOptions = ({ navigation }) => {
@@ -43,7 +42,7 @@ export default class DiscussionScreen extends React.Component {
   constructor(props) {
     super(props);
 
-    shareAnswer = this.shareAnswer.bind(this);
+    shareAnswer = () => this.shareAnswer();
 
     let id = '';
     if (props.navigation.state.params) {
@@ -126,7 +125,12 @@ export default class DiscussionScreen extends React.Component {
     if (!answerContent || !answerContent.answers || !answerContent.answers[questionId] ||
       !answerContent.answers[questionId].answerText ||
       answerContent.answers[questionId].answerText.length < 1) {
-      Alert.alert(getI18nText('提示'), getI18nText('您没有答这道题目'));
+      showMessage({
+        message: getI18nText('提示'),
+        duration: 3000,
+        description: getI18nText('您没有答这道题目'),
+        type: "info",
+      });
       return;
     }
 

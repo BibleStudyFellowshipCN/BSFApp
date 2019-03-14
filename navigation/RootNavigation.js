@@ -22,6 +22,7 @@ import AboutScreen from '../screens/AboutScreen';
 // added by Frank on Dec 18, 2018
 import MyBSFScreen from '../screens/MyBSFScreen';
 //////////////
+import UserHomeScreen from '../screens/UserHomeScreen';
 
 const RootStackNavigator = StackNavigator(
   {
@@ -78,6 +79,9 @@ const RootStackNavigator = StackNavigator(
     },
     About: {
       screen: AboutScreen
+    },
+    UserProfile: {
+      screen: UserHomeScreen
     }
   },
   {

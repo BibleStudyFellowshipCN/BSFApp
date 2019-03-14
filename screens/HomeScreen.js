@@ -1,7 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { FontAwesome } from '@expo/vector-icons';
-import { FileSystem } from 'expo';
+import { FileSystem, Updates } from 'expo';
 import {
   ScrollView,
   StyleSheet,
@@ -26,20 +26,63 @@ import { Models } from '../dataStorage/models';
 import { resetGlobalCache } from '../dataStorage/storage';
 import Colors from '../constants/Colors';
 import { EventRegister } from 'react-native-event-listeners';
+import { isPreview, appVersion } from '../dataStorage/storage';
+import { showMessage } from "react-native-flash-message";
+
+async function checkForAppUpdate() {
+  const { isAvailable } = await Updates.checkForUpdateAsync();
+  if (isAvailable) {
+    Updates.reload();
+  } else {
+    showMessage({
+      message: getI18nText('没有发现更新！'),
+      duration: 3000,
+      type: "info"
+    });
+  }
+}
 
 class HomeScreen extends React.Component {
   static navigationOptions = ({ navigation }) => {
-    let title = navigation.state.params && navigation.state.params.title ? navigation.state.params.title : 'BSF课程';
     return {
-      title: getI18nText(title),
+      title: getI18nText('BSF课程'),
+      headerLeft: (
+        <View style={{ marginLeft: 10 }} >
+          <TouchableOpacity onPress={() => { userHome() }}>
+            <FontAwesome name='user-o' size={28} color='white' />
+          </TouchableOpacity>
+        </View>
+      ),
       headerRight: (
-        <View style={{ marginRight: 10, flexDirection: 'row' }}>
+        <View style={{ flexDirection: 'row' }}>
+          {
+            isPreview &&
+            <View>
+              <TouchableOpacity onPress={() => {
+                checkForAppUpdate();
+              }}>
+                <View style={{
+                  backgroundColor: '#e74c3c',
+                  borderRadius: 11,
+                  paddingHorizontal: 5
+                }}>
+                  <Text style={{
+                    padding: 3,
+                    color: '#ecf0f1',
+                    fontWeight: 'bold',
+                    fontSize: 10
+                  }}>{appVersion}</Text>
+                </View>
+              </TouchableOpacity>
+            </View>
+          }
           <TouchableOpacity onPress={() => { checkForContentUpdate() }}>
             <Image
               style={{ width: 34, height: 34 }}
               source={require('../assets/images/Download.png')} />
           </TouchableOpacity>
-        </View>)
+          <View style={{ width: 10 }} />
+        </View >)
     };
   };
 
@@ -66,6 +109,7 @@ class HomeScreen extends React.Component {
     });
 
     checkForContentUpdate = () => this.checkForContentUpdate(true);
+    userHome = () => this.props.navigation.navigate('UserProfile');
   }
 
   componentWillUnmount() {
