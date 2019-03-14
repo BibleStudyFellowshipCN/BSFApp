@@ -11,6 +11,7 @@ import { getCurrentUser } from './utils/user';
 import { Localization } from 'expo-localization';
 import Layout from './constants/Layout';
 import { EventRegister } from 'react-native-event-listeners';
+import FlashMessage from "react-native-flash-message";
 
 let store;
 
@@ -56,6 +57,7 @@ export default class App extends React.Component {
           <View style={{ flex: 1 }} onLayout={this.onLayout.bind(this)}>
             {Platform.OS !== 'ios' && <StatusBar barStyle="default" />}
             <RootNavigation />
+            <FlashMessage position="top" />
           </View>
         </Provider>
       </ActionSheetProvider >
@@ -67,7 +69,7 @@ export default class App extends React.Component {
     // TODO: [Wei] Workaround for now
     if (!getCurrentUser().isLoggedOn()) {
       let locale = Localization.locale;
-      console.log(locale);
+      // console.log(locale);
       let lang = 'eng';
       let bible = 'niv2011';
       if (locale.substring(0, 2) == 'es') {

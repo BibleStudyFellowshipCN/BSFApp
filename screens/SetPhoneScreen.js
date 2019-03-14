@@ -1,7 +1,9 @@
 import React from 'react';
-import { StyleSheet, View, Alert, TextInput, KeyboardAvoidingView, Keyboard, Image, TouchableOpacity } from 'react-native';
+import { StyleSheet, View, ActivityIndicator, TextInput, KeyboardAvoidingView, Image, TouchableOpacity } from 'react-native';
 import { getI18nText } from '../utils/I18n';
 import { getCurrentUser } from '../utils/user';
+import { Overlay } from 'react-native-elements';
+import Colors from '../constants/Colors';
 
 export default class SetPhoneScreen extends React.Component {
   static navigationOptions = ({ navigation }) => {
@@ -68,6 +70,18 @@ export default class SetPhoneScreen extends React.Component {
             onSubmitEditing={this.onSubmit.bind(this)}
           />
         </View>
+        {
+          this.state.busy &&
+          <Overlay isVisible
+            windowBackgroundColor="rgba(255, 255, 255, .5)"
+            width="auto"
+            height="auto">
+            <ActivityIndicator
+              style={{ justifyContent: 'center', alignItems: 'center' }}
+              size='large'
+              color={Colors.yellow} />
+          </Overlay>
+        }
       </KeyboardAvoidingView>
     );
   }

@@ -12,6 +12,7 @@ import { loadAsync } from '../dataStorage/storage';
 import { Models } from '../dataStorage/models';
 import { getI18nText } from '../utils/I18n';
 import Colors from '../constants/Colors';
+import { showMessage } from "react-native-flash-message";
 
 export default class ExportAnswer extends React.Component {
 
@@ -39,7 +40,7 @@ export default class ExportAnswer extends React.Component {
     console.log("Save " + this.props.lessonId);
     try {
       const answerContent = await loadAsync(Models.Answer, null, false);
-      console.log(JSON.stringify(answerContent));
+      // console.log(JSON.stringify(answerContent));
       let answers = '';
       if (answerContent && answerContent.answers) {
         answers = answerContent.answers;
@@ -47,7 +48,12 @@ export default class ExportAnswer extends React.Component {
 
       const lessonContent = await loadAsync(Models.Lesson, this.props.lessonId, false);
       if (!lessonContent) {
-        Alert.alert("Error", "Network error");
+        showMessage({
+          message: getI18nText('错误'),
+          description: getI18nText('Network error'),
+          duration: 5000,
+          type: "danger"
+        });
         return;
       }
 
@@ -60,13 +66,16 @@ export default class ExportAnswer extends React.Component {
       content += this.getContent(lessonContent.dayQuestions.six, answers);
 
       const shareData = { title: lessonContent.name, subject: lessonContent.name, message: content };
-      console.log(shareData);
+      // console.log(shareData);
 
       Share.share(shareData);
     } catch (error) {
-      console.log(error);
-      Alert.alert("Error", error);
-      return;
+      showMessage({
+        message: getI18nText('错误'),
+        description: getI18nText(JSON.stringify(error)),
+        duration: 5000,
+        type: "danger"
+      });
     }
   }
 
@@ -74,7 +83,7 @@ export default class ExportAnswer extends React.Component {
     console.log("Print " + this.props.lessonId);
     try {
       const answerContent = await loadAsync(Models.Answer, null, false);
-      console.log(JSON.stringify(answerContent));
+      // console.log(JSON.stringify(answerContent));
       let answers = '';
       if (answerContent && answerContent.answers) {
         answers = answerContent.answers;
@@ -82,7 +91,12 @@ export default class ExportAnswer extends React.Component {
 
       const lessonContent = await loadAsync(Models.Lesson, this.props.lessonId, false);
       if (!lessonContent) {
-        Alert.alert("Error", "Network error");
+        showMessage({
+          message: getI18nText('错误'),
+          description: getI18nText('Network error'),
+          duration: 5000,
+          type: "danger"
+        });
         return;
       }
 
@@ -98,7 +112,7 @@ export default class ExportAnswer extends React.Component {
       content += '</p>';
 
       const html = `<style> p { font-size: 11px; } </style> ${content}`;
-      console.log(html);
+      // console.log(html);
 
       // Android has a bug that cannot parse width/height
       if (Platform.OS === 'ios') {
@@ -112,8 +126,12 @@ export default class ExportAnswer extends React.Component {
         Print.printAsync({ html });
       }
     } catch (error) {
-      console.log(error);
-      Alert.alert("Error", error);
+      showMessage({
+        message: getI18nText('错误'),
+        description: getI18nText(JSON.stringify(error)),
+        duration: 5000,
+        type: "danger"
+      });
       return;
     }
   }
@@ -130,14 +148,14 @@ export default class ExportAnswer extends React.Component {
         <View style={{ width: 10 }} />
         <View style={{ width: 40 }}>
           <TouchableOpacity onPress={this.onPrint.bind(this)}>
-          <Image
+            <Image
               style={{ width: 34, height: 34 }}
               source={require('../assets/images/Print.png')} />
           </TouchableOpacity>
         </View>
         <View style={{ width: 40 }}>
           <TouchableOpacity onPress={() => this.onClick()}>
-          <Image
+            <Image
               style={{ width: 34, height: 34 }}
               source={require('../assets/images/Share.png')} />
           </TouchableOpacity>
