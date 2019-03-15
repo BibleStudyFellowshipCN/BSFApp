@@ -33,7 +33,7 @@ class UserHomeScreen extends React.Component {
 
     const userLoggedIn = this.getUserLoggedIn();
     this.state = {
-      mode: userLoggedIn ? 'userProfile' : 'createUser',
+      mode: userLoggedIn ? 'answerManagement' : 'createUser',
       email: getCurrentUser().getEmail(),
       cellphone: getCurrentUser().getCellphone(),
       nickname: getCurrentUser().getNickName(),
@@ -63,6 +63,8 @@ class UserHomeScreen extends React.Component {
   componentDidMount() {
     if (this.state.mode === 'userProfile') {
       this.getUserProfile();
+    } else if (this.state.mode === 'answerManagement') {
+      this.getAnswerCount();
     }
   }
 
