@@ -33,7 +33,7 @@ class UserHomeScreen extends React.Component {
 
     const userLoggedIn = this.getUserLoggedIn();
     this.state = {
-      mode: userLoggedIn ? 'userProfile' : 'userLogin',
+      mode: userLoggedIn ? 'userProfile' : 'createUser',
       email: getCurrentUser().getEmail(),
       cellphone: getCurrentUser().getCellphone(),
       nickname: getCurrentUser().getNickName(),
@@ -197,6 +197,16 @@ class UserHomeScreen extends React.Component {
           return;
         }
 
+        if (result.status === 404) {
+          showMessage({
+            message: getI18nText('错误'),
+            duration: 10000,
+            description: getI18nText('用户不存在，或者密码错误'),
+            type: "danger",
+          });
+          return;
+        }
+
         this.handleError(result);
       }
     }
@@ -238,10 +248,12 @@ class UserHomeScreen extends React.Component {
         }
 
         if (result.status === 409) {
-          Alert.alert(getI18nText('错误'), getI18nText('Email已经注册，请点击"找回密码"'), [
-            { text: getI18nText('找回密码'), onPress: () => { this.gotoPage('forgetPassword') } },
-            { text: getI18nText('取消'), onPress: () => { } }
-          ]);
+          showMessage({
+            message: getI18nText('错误'),
+            duration: 10000,
+            description: getI18nText('Email已经注册，请点击"找回密码"'),
+            type: "danger",
+          });
           return;
         }
 
@@ -884,7 +896,7 @@ class UserHomeScreen extends React.Component {
               }
 
               {
-                this.state.mode === 'userLogin' &&
+                (this.state.mode === 'userLogin' || this.state.mode === 'createUser') &&
                 <View style={{ marginLeft: 7 }}>
                   <TouchableOpacity onPress={() => { this.gotoPage('forgetPassword') }}>
                     <Text style={{ fontSize: 18, textDecorationLine: 'underline', color: '#2980b9' }}>{getI18nText('找回密码')}</Text>
