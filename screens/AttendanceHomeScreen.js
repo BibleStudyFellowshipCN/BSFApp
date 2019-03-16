@@ -6,6 +6,7 @@ import { callWebServiceAsync, showWebServiceCallErrorsAsync } from '../dataStora
 import { getCurrentUser } from '../utils/user';
 import Colors from '../constants/Colors';
 import { EventRegister } from 'react-native-event-listeners';
+import { showMessage } from "react-native-flash-message";
 
 export default class AttendanceHomeScreen extends React.Component {
   static navigationOptions = ({ navigation }) => {
@@ -54,27 +55,35 @@ export default class AttendanceHomeScreen extends React.Component {
       this.setState({ busy: true });
       const result = await callWebServiceAsync(`${Models.HostServer}/attendanceSummary/`, getCurrentUser().getCellphone(), 'GET');
       const succeed = await showWebServiceCallErrorsAsync(result, 200);
-      if (succeed) {
-        const data = result.body;
-        let lessons = [];
-        let rates = {};
-        let totalRate = 0;
-        let totalRateCount = 0;
-        for (let i = 0; i < 30; i++) {
-          const { displayName, value } = this.getRate(data.attendance, i);
-          if (value) {
-            totalRate += value;
-            totalRateCount++;
-          }
-
-          rates[i] = displayName;
-          lessons.push({ id: i, displayName: '第' + i + '课', rate: displayName });
+      if (!succeed) {
+        showMessage({
+          message: getI18nText('提示'),
+          duration: 10000,
+          description: getI18nText('没有权限'),
+          type: "info",
+        });
+        this.props.navigation.pop();
+        return;
+      }
+      const data = result.body;
+      let lessons = [];
+      let rates = {};
+      let totalRate = 0;
+      let totalRateCount = 0;
+      for (let i = 0; i < 30; i++) {
+        const { displayName, value } = this.getRate(data.attendance, i);
+        if (value) {
+          totalRate += value;
+          totalRateCount++;
         }
 
-        this.setState({ data: data, lessons: lessons, rates: rates });
-        if (totalRateCount > 0) {
-          this.props.navigation.setParams({ rate: Math.round(totalRate / totalRateCount * 100) / 100 + '%' });
-        }
+        rates[i] = displayName;
+        lessons.push({ id: i, displayName: '第' + i + '课', rate: displayName });
+      }
+
+      this.setState({ data: data, lessons: lessons, rates: rates });
+      if (totalRateCount > 0) {
+        this.props.navigation.setParams({ rate: Math.round(totalRate / totalRateCount * 100) / 100 + '%' });
       }
     }
     finally {
@@ -113,6 +122,16 @@ export default class AttendanceHomeScreen extends React.Component {
         }
       }
     }
+    if (!lastMatchingGroup) {
+      showMessage({
+        message: getI18nText('提示'),
+        duration: 10000,
+        description: getI18nText('没有权限'),
+        type: "info",
+      });
+      return;
+    }
+
     if (count > 1) {
       this.props.navigation.navigate('AttendanceGroup', { lesson: lesson.id, lessonTitle: lesson.displayName, data: this.state.data });
     } else {
