@@ -327,7 +327,7 @@ class UserHomeScreen extends React.Component {
             type: "success"
           });
           await getCurrentUser().setUserInfoAsync({ accessToken: result.body.accessToken });
-          this.setState({password:'', password2:''});
+          this.setState({ password: '', password2: '' });
           return;
         }
 
