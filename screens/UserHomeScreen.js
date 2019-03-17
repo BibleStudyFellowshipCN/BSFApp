@@ -339,6 +339,14 @@ class UserHomeScreen extends React.Component {
     this.gotoPage('userLogin');
   }
 
+  trim(str) {
+    if (str === undefined || str === null) {
+      return str;
+    }
+
+    return str.trim();
+  }
+
   async syncAnswers() {
     try {
       this.setState({ busy: true });
@@ -371,8 +379,8 @@ class UserHomeScreen extends React.Component {
       let useMerged = 0;
       let mergedAnswers = JSON.parse(JSON.stringify(localAnswers));
       for (let i in downloadAnswers) {
-        const remote = downloadAnswers[i];
-        const local = localAnswers[i];
+        const remote = this.trim(downloadAnswers[i]);
+        const local = this.trim(localAnswers[i]);
         let merged;
         if (local === undefined || local === null) {
           merged = remote;

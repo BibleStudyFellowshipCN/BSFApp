@@ -58,7 +58,7 @@ export default class AttendanceHomeScreen extends React.Component {
       if (!succeed) {
         showMessage({
           message: getI18nText('提示'),
-          duration: 10000,
+          duration: 5000,
           description: getI18nText('没有权限'),
           type: "info",
         });
