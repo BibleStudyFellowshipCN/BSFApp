@@ -38,18 +38,19 @@ export default class DiscussionScreen extends React.Component {
   contentSize = null;
   defaultUserName = 'B';
   messageId = 1;
+  roomId = '';
 
   constructor(props) {
     super(props);
 
     shareAnswer = () => this.shareAnswer();
 
-    let id = '';
+    this.roomId = '';
     if (props.navigation.state.params) {
       if (props.navigation.state.params.id) {
-        id = props.navigation.state.params.id;
+        this.roomId = props.navigation.state.params.id;
         if (props.navigation.state.params.isGroupLeader) {
-          id = 'H' + id;
+          this.roomId = 'H' + this.roomId;
         }
       }
 
@@ -64,7 +65,7 @@ export default class DiscussionScreen extends React.Component {
       }
     }
 
-    this.chatServer = new Chat(id, this.onNewMessage.bind(this), this.onDeleteMessage.bind(this), this.defaultUserName);
+    this.chatServer = new Chat(this.roomId, this.onNewMessage.bind(this), this.onDeleteMessage.bind(this), this.defaultUserName);
   }
 
   componentDidMount() {
@@ -87,10 +88,13 @@ export default class DiscussionScreen extends React.Component {
       message._id = ++this.messageId;
     }
     console.log(`onNewMessage: ${JSON.stringify(message)}`);
-    this.setState((previousState) => {
-      return {
-        messages: GiftedChat.append(previousState.messages, message),
-      };
+
+    getCurrentUser().setDiscussionReadAsync(this.roomId, message.createdAt.getTime()).then(() => {
+      this.setState((previousState) => {
+        return {
+          messages: GiftedChat.append(previousState.messages, message),
+        };
+      });
     });
   }
 

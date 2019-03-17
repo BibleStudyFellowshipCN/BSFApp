@@ -321,8 +321,13 @@ class UserHomeScreen extends React.Component {
       const succeed = await showWebServiceCallErrorsAsync(result);
       if (succeed) {
         if (result.status === 201 && result.body.accessToken) {
+          showMessage({
+            message: getI18nText('成功'),
+            duration: 3000,
+            type: "success"
+          });
           await getCurrentUser().setUserInfoAsync({ accessToken: result.body.accessToken });
-          this.gotoPage('userProfile');
+          this.setState({password:'', password2:''});
           return;
         }
 
