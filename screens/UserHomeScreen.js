@@ -7,11 +7,12 @@ import { callWebServiceAsync, showWebServiceCallErrorsAsync } from '../dataStora
 import { Models } from '../dataStorage/models';
 import { getCurrentUser } from '../utils/user';
 import { EventRegister } from 'react-native-event-listeners';
-import { Button, Input, Overlay } from 'react-native-elements';
+import { Button, CheckBox, Input, Overlay } from 'react-native-elements';
 import Colors from '../constants/Colors';
 import { loadAsync } from '../dataStorage/storage';
 import { updateAnswer, clearAnswers } from '../store/answers';
 import { showMessage } from "react-native-flash-message";
+import { syncAnswersAsync } from '../utils/answers';
 
 class UserHomeScreen extends React.Component {
   static navigationOptions = ({ navigation }) => {
@@ -233,6 +234,15 @@ class UserHomeScreen extends React.Component {
       this.password2Input.focus();
       return;
     }
+    if (!this.state.agreeEULA) {
+      showMessage({
+        message: getI18nText('提示'),
+        duration: 10000,
+        description: getI18nText('Please accept the terms'),
+        type: "info",
+      });
+      return;
+    }
 
     try {
       this.setState({ busy: true });
@@ -355,88 +365,21 @@ class UserHomeScreen extends React.Component {
   async syncAnswers() {
     try {
       this.setState({ busy: true });
-      let body = {
-        accessToken: getCurrentUser().getAccessToken()
-      };
 
-      // Download answers
-      let result = await callWebServiceAsync(`${Models.HostHttpsServer}/api.php?c=downloadAnswers`, '', 'POST', [], body);
-      let succeed = await showWebServiceCallErrorsAsync(result);
-      if (!succeed || !result.status || result.status !== 200) {
-        this.handleError(result);
-        return;
-      }
-
-      // Merge answers
-      let downloadAnswers = result.body.answer ? (result.body.answer === '[]' ? {} : JSON.parse(result.body.answer)) : {};
-
-      const answerContent = await loadAsync(Models.Answer, null, false);
-      let localAnswers = {};
-      if (answerContent && answerContent.answers) {
-        for (let i in answerContent.answers) {
-          const item = answerContent.answers[i];
-          localAnswers[item.questionId] = item.answerText;
-        }
-      }
-
-      // console.log({ localAnswers, downloadAnswers });
-      let useRemote = 0;
-      let useMerged = 0;
-      let mergedAnswers = JSON.parse(JSON.stringify(localAnswers));
-      for (let i in downloadAnswers) {
-        const remote = this.trim(downloadAnswers[i]);
-        const local = this.trim(localAnswers[i]);
-        let merged;
-        if (local === undefined || local === null) {
-          merged = remote;
-          useRemote++;
-          this.props.updateAnswer(i, merged);
-          // console.log(`${i}: ${local} | ${remote} => ${merged} - No local, use remote`);
-        } else if (local === remote) {
-          merged = local;
-          // console.log(`${i}: ${local} | ${remote} => ${merged} - Same, use local`);
-        } else if (local.indexOf(remote) !== -1) {
-          merged = local;
-          // console.log(`${i}: ${local} | ${remote} => ${merged} - local contains remote, use local`);
-        } else if (remote.indexOf(local) !== -1) {
-          merged = remote;
-          useRemote++;
-          this.props.updateAnswer(i, merged);
-          // console.log(`${i}: ${local} | ${remote} => ${merged} - remote contains local, use remote`);
-        } else {
-          merged = local + '\n---\n' + remote;
-          useMerged++;
-          this.props.updateAnswer(i, merged);
-          // console.log(`${i}: ${local} | ${remote} => ${merged} - Use both`);
-        }
-        mergedAnswers[i] = merged;
-      }
-      // console.log({ mergedAnswers });
-      const useLocal = Object.keys(mergedAnswers).length - useRemote - useMerged;
-
-      // Upload answers
-      body = {
-        accessToken: getCurrentUser().getAccessToken(),
-        answers: mergedAnswers
-      };
-      result = await callWebServiceAsync(`${Models.HostHttpsServer}/api.php?c=uploadAnswers`, '', 'POST', [], body);
-      succeed = await showWebServiceCallErrorsAsync(result);
-      if (succeed) {
-        if (result.status === 201) {
+      syncAnswersAsync(this.props.updateAnswer,
+        this.handleError,
+        this.handleError,
+        (useRemote, useLocal, useMerged) => {
           showMessage({
             message: getI18nText('合并成功'),
-            duration: 10000,
+            duration: 3000,
             description: getI18nText('使用远程答案: ') + useRemote + '\n' +
               getI18nText('使用本地答案: ') + useLocal + '\n' +
               getI18nText('使用合并答案: ') + useMerged,
             type: "success"
           });
           this.getAnswerCount();
-          return;
-        }
-
-        this.handleError(result);
-      }
+        });
     }
     finally {
       this.setState({ busy: false });
@@ -849,6 +792,12 @@ class UserHomeScreen extends React.Component {
                   errorStyle={{ color: 'red' }}
                   onChangeText={(text) => { this.setState({ password2: text }); }}
                 />
+                <CheckBox
+                  containerStyle={{ width: this.state.windowWidth - 20, backgroundColor: '#FFF2CC' }}
+                  checkedColor={Colors.yellow}
+                  title={getI18nText('I agree to send my entered data (user profile, answers) in CBSF app to CBSF server.')}
+                  checked={this.state.agreeEULA}
+                  onPress={() => this.setState({ agreeEULA: !this.state.agreeEULA })} />
                 <Button
                   containerStyle={{ width: 170 }}
                   icon={{ name: "send", size: 20, color: "white" }}

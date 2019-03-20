@@ -1,6 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux'
-import { ScrollView, StyleSheet, View, Alert, Image } from 'react-native';
+import { ScrollView, StyleSheet, View, TouchableOpacity, Image } from 'react-native';
 import { Constants, StoreReview, FileSystem } from 'expo';
 import { Models } from '../dataStorage/models';
 import { appVersion } from '../dataStorage/storage';
@@ -20,7 +20,14 @@ import { showMessage } from "react-native-flash-message";
   static navigationOptions = ({ navigation }) => {
     let title = navigation.state.params && navigation.state.params.title ? navigation.state.params.title : getI18nText('我的设置');
     return {
-      title: getI18nText(title)
+      title: getI18nText(title),
+      headerLeft: (
+        <View style={{ marginLeft: 10 }} >
+          <TouchableOpacity onPress={() => { userHome() }}>
+            <FontAwesome name='user-o' size={28} color='white' />
+          </TouchableOpacity>
+        </View>
+      ),
     };
   };
 

@@ -181,6 +181,7 @@ export default class AttendanceLessonScreen extends React.Component {
             this.state.attendance.map((user) => user.checked ? (
               <CheckBox
                 containerStyle={{ width: this.state.windowWidth - 20 }}
+                checkedColor={Colors.yellow}
                 key={keyIndex++}
                 title={this.getTitle(++index, user)}
                 checked={user.checked}
@@ -191,6 +192,7 @@ export default class AttendanceLessonScreen extends React.Component {
             this.state.attendance.map((user) => !user.checked ? (
               <CheckBox
                 containerStyle={{ width: this.state.windowWidth - 20 }}
+                checkedColor={Colors.yellow}
                 key={keyIndex++}
                 title={this.getTitle(++index, user)}
                 checked={user.checked}
