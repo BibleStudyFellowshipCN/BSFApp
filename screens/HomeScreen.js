@@ -98,6 +98,7 @@ class HomeScreen extends React.Component {
     remoteVersion: '',
     downloading: false,
     refreshing: false,
+    activeSections: [0],
     windowWidth: Dimensions.get('window').width
   };
 
@@ -278,10 +279,12 @@ class HomeScreen extends React.Component {
             {
               this.props.booklist &&
               <Accordion
-                initiallyActiveSection={0}
+                activeSections={this.state.activeSections}
+                underlayColor='white'
                 sections={this.props.booklist}
                 renderHeader={this._renderHeader.bind(this)}
-                renderContent={this._renderContent.bind(this)} />
+                renderContent={this._renderContent.bind(this)}
+                onChange={(activeSections) => this.setState({ activeSections })} />
             }
             {
               !this.props.booklist &&
