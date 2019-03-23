@@ -6,6 +6,7 @@ import { callWebServiceAsync, showWebServiceCallErrorsAsync } from '../dataStora
 import { getCurrentUser } from '../utils/user';
 import Colors from '../constants/Colors';
 import { EventRegister } from 'react-native-event-listeners';
+import { ListItem } from 'react-native-elements';
 
 export default class AttendanceSelectLeaderScreen extends React.Component {
   static navigationOptions = ({ navigation }) => {

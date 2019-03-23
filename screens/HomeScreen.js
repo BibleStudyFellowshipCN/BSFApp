@@ -28,6 +28,9 @@ import Colors from '../constants/Colors';
 import { EventRegister } from 'react-native-event-listeners';
 import { isPreview, appVersion } from '../dataStorage/storage';
 import { showMessage } from "react-native-flash-message";
+import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { syncAnswersAsync } from '../utils/answers';
+import { updateAnswer } from '../store/answers';
 
 async function checkForAppUpdate() {
   const { isAvailable } = await Updates.checkForUpdateAsync();
@@ -76,6 +79,10 @@ class HomeScreen extends React.Component {
               </TouchableOpacity>
             </View>
           }
+          <TouchableOpacity onPress={() => { syncUserData() }}>
+            <MaterialCommunityIcons name='cloud-sync' size={34} color='white' />
+          </TouchableOpacity>
+          <View style={{ width: 10 }} />
           <TouchableOpacity onPress={() => { checkForContentUpdate() }}>
             <Image
               style={{ width: 34, height: 34 }}
@@ -91,6 +98,7 @@ class HomeScreen extends React.Component {
     remoteVersion: '',
     downloading: false,
     refreshing: false,
+    activeSections: [0],
     windowWidth: Dimensions.get('window').width
   };
 
@@ -110,6 +118,7 @@ class HomeScreen extends React.Component {
 
     checkForContentUpdate = () => this.checkForContentUpdate(true);
     userHome = () => this.props.navigation.navigate('UserProfile');
+    syncUserData = () => this.syncUserData();
   }
 
   componentWillUnmount() {
@@ -123,6 +132,30 @@ class HomeScreen extends React.Component {
       progress = downloadProgress.totalBytesWritten / downloadProgress.totalBytesExpectedToWrite;
     }
     this.setState({ downloadProgress: progress });
+  }
+
+  async syncUserData() {
+    const accessToken = getCurrentUser().getAccessToken();
+    if (!accessToken || accessToken.length <= 0) {
+      showMessage({
+        message: getI18nText('Please create/login a user first in order to sync answers to cloud'),
+        duration: 10000,
+        type: "info"
+      });
+      this.props.navigation.navigate('UserProfile');
+      return;
+    }
+
+    syncAnswersAsync(this.props.updateAnswer, null, null, (useRemote, useLocal, useMerged) => {
+      showMessage({
+        message: getI18nText('合并成功'),
+        duration: 5000,
+        description: getI18nText('使用远程答案: ') + useRemote + '\n' +
+          getI18nText('使用本地答案: ') + useLocal + '\n' +
+          getI18nText('使用合并答案: ') + useMerged,
+        type: "success"
+      });
+    });
   }
 
   async checkForContentUpdate(showUI) {
@@ -246,10 +279,12 @@ class HomeScreen extends React.Component {
             {
               this.props.booklist &&
               <Accordion
-                initiallyActiveSection={0}
+                activeSections={this.state.activeSections}
+                underlayColor='white'
                 sections={this.props.booklist}
                 renderHeader={this._renderHeader.bind(this)}
-                renderContent={this._renderContent.bind(this)} />
+                renderContent={this._renderContent.bind(this)}
+                onChange={(activeSections) => this.setState({ activeSections })} />
             }
             {
               !this.props.booklist &&
@@ -360,13 +395,12 @@ const mapStateToProps = (state) => {
   }
 }
 
-const mapDispatchToProps = (dispatch, ownProps) => {
-  return {
-    requestBooks: () => dispatch(requestBooks()),
-    clearLesson: () => dispatch(clearLesson()),
-    clearPassage: () => dispatch(clearPassage()),
-    clearBooks: () => dispatch(clearBooks())
-  }
+const mapDispatchToProps = {
+  requestBooks,
+  clearLesson,
+  clearPassage,
+  clearBooks,
+  updateAnswer
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(HomeScreen)

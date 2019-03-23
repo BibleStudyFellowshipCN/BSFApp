@@ -1,4 +1,4 @@
-import { Alert, AsyncStorage, Platform } from 'react-native';
+import { AsyncStorage, Platform } from 'react-native';
 import { debounce } from 'lodash';
 import Storage from 'react-native-storage';
 import { Constants, FileSystem } from 'expo';
@@ -333,9 +333,9 @@ async function showWebServiceCallErrorsAsync(result, acceptStatus, showUI = true
     if (!result || !result.status || result.status === -1) {
         if (showUI) {
             showMessage({
-                message: getI18nText('错误'),
+                message: 'Error',
                 duration: 10000,
-                description: getI18nText('Please check your network connection'),
+                description: 'Please check your network connection',
                 type: "danger",
             });
         }
@@ -345,21 +345,13 @@ async function showWebServiceCallErrorsAsync(result, acceptStatus, showUI = true
             return true;
         }
 
-        const message = 'HTTP status ' + result.status;
+        let message = 'HTTP status ' + result.status;
         if (result.body) {
-            if (result.body.Message) {
-                message = message + "\n\n" + result.body.Message;
-            }
-            if (result.body.ExceptionMessage) {
-                message = message + "\n\n" + result.body.ExceptionMessage;
-            }
-            if (result.body.ExceptionType) {
-                message = message + "\n\n" + result.body.ExceptionType;
-            }
+            message = message + "\n\n" + JSON.stringify(result.body);
         }
         if (showUI) {
             showMessage({
-                message: getI18nText('错误'),
+                message: 'Error',
                 duration: 5000,
                 description: message,
                 type: "danger",

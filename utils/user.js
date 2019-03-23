@@ -433,6 +433,19 @@ export default class User {
     this.logUserInfo();
   }
 
+  async setDiscussionReadAsync(id, timestamp) {
+    if (!this.isLoggedOn() || !this.permissions.chat) {
+      return;
+    }
+
+    this.permissions.discussions[id] = timestamp;
+    this.readDiscussions[id] = timestamp;
+
+    EventRegister.emit('userReadDiscussionChanged');
+    await saveUserAsync(this.getUserInfo());
+    this.logUserInfo();
+  }
+
   async resetDiscussionReadAsync() {
     if (!this.isLoggedOn() || !this.permissions.chat) {
       return;
@@ -468,7 +481,7 @@ export default class User {
     }
 
     const localTimestamp = this.readDiscussions[id];
-    return !localTimestamp || localTimestamp !== serverTimestamp;
+    return !localTimestamp || localTimestamp < serverTimestamp;
   }
 
   getDiscussionHasUnreadByDay(dayQuestions) {
